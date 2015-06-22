@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.kapps.market">
+
+    <!--
+          1:1.0  -  2:1.1 -  3:1.2 -  4:1.5 -  5:1.6 -  6:1.7 
+		  10:2.0  11:2.1  12 - 2.2
+
+
+
+
+
+
+
+    -->
+    <application
+        tools:replace="android:icon"
+        android:name=".MApplication"
+        android:allowTaskReparenting="true"
+        android:alwaysRetainTaskState="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:screenOrientation="user">
+        <activity
+            android:name="MarketMainFrame"
+            android:configChanges="keyboardHidden|orientation"
+            android:icon="@drawable/a_icon"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:screenOrientation="user"
+            android:theme="@style/CustomActionBarTheme"
+            android:windowSoftInputMode="adjustPan" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.kapps.market.push.DialogActivity"
+            android:launchMode="singleInstance"
+            android:theme="@style/dialog" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".AccountFrame"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="user"
+            android:theme="@style/CustomActionBarTheme" />
+        <activity
+            android:name=".AppDetailFrame"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="user"
+            android:theme="@style/CustomActionBarTheme" >
+            <intent-filter android:label="@string/market_search_software" >
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="details"
+                    android:path=""
+                    android:scheme="mgymarket" />
+                <data
+                    android:host="mogoyun.com"
+                    android:path="/details"
+                    android:scheme="http" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ScreensFrame"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="user"
+            android:theme="@style/CustomActionBarTheme" />
+        <activity
+            android:name=".MConfigFrame"
+            android:configChanges="keyboardHidden|orientation"
+            android:theme="@style/CustomActionBarTheme" />
+        <activity
+            android:name=".MDownloadFrame"
+            android:configChanges="keyboardHidden|orientation"
+            android:theme="@style/CustomActionBarTheme" />
+        <activity
+            android:name=".MUpdateFrame"
+            android:configChanges="keyboardHidden|orientation"
+            android:theme="@style/CustomActionBarTheme" />
+        <activity
+            android:name="UpdateableFrame"
+            android:configChanges="keyboardHidden|orientation"
+            android:theme="@style/CustomActionBarTheme" />
+        <activity
+            android:name=".ui.search.AppSearchActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:theme="@style/CustomActionBarTheme" />
+        <!-- android:uiOptions="splitActionBarWhenNarrow" -->
+        <activity
+            android:name=".ui.manage.AppManageActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:theme="@style/CustomActionBarTheme" />
+        <!-- 广告弹出页面 -->
+        <activity
+            android:name=".StaticADFrame"
+            android:configChanges="keyboardHidden|orientation"
+            android:theme="@style/CustomActionBarTheme" />
+        <!-- 推送相关 -->
+        <activity
+            android:name="org.androidpn.client.NotificationDetailsActivity"
+            android:label="Notification Details" >
+        </activity>
+        <activity
+            android:name="org.androidpn.client.NotificationSettingsActivity"
+            android:label="Notification Settings" >
+        </activity>
+
+        <service
+            android:name="org.androidpn.client.NotificationService"
+            android:enabled="true"
+            android:label="NotificationService"
+            android:process=":NotificationService" >
+            <intent-filter>
+                <action android:name="org.androidpn.client.NotificationService" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".BootBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </receiver>
+        <!-- 易迅支付插件 -->
+        <activity
+            android:name="com.ehoo.paysdk.MainActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="user"
+            android:theme="@style/FloatingWindowStyle" >
+            <intent-filter>
+                <action android:name="com.ehoo.paysdk.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.ehoo.paysdk.SmsPayActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="user"
+            android:theme="@style/FloatingWindowStyle" >
+        </activity>
+        <activity
+            android:name="com.ehoo.paysdk.BankCardActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="user"
+            android:theme="@style/FloatingWindowStyle" />
+        <activity
+            android:name="com.ehoo.paysdk.PrePaidCardActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="user"
+            android:theme="@style/FloatingWindowStyle" />
+        <activity
+            android:name="com.ehoo.paysdk.GameCardActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="user"
+            android:theme="@style/FloatingWindowStyle" />
+
+        <meta-data
+            android:name="BAOPAY_MERID"
+            android:value="1782" />
+
+        <service android:name=".DownloadService" >
+            <intent-filter>
+                <action android:name="com.kapps.market.ACTION_SERVICE_DOWNLOAD_REQUEST" />
+                <action android:name="com.kapps.market.ACTION_SERVICE_DOWNLOAD_CANCEL" />
+                <action android:name="com.kapps.market.ACTION_SERVICE_DOWNLOAD_STOP" />
+                <action android:name="com.kapps.market.ACTION_SERVICE_DOWNLOAD_REVERSE" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name=".AppStateReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.kapps.market.ACTION_CHOOSE_DOWNLOAD_APP_COMPLETED" />
+                <action android:name="com.kapps.market.ACTION_CHOOSE_APP_DOWNLOAD_LIST_NOTIFY" />
+                <action android:name="com.kapps.market.ACTION_CHOOSE_SOFT_UPDATE_NOTIFY" />
+                <action android:name="com.kapps.market.ACTION_CHOOSE_MARKET_UPDATE_NOTIFY" />
+                <action android:name="com.kapps.market.ACTION_UPDATE_CHECK_NOTIFY" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="com.kapps.market.ACTION_STATIC_AD_CHECK_NOTIFY" />
+                <action android:name="com.kapps.market.ACTION_CHOOSE_STATIC_AD_NOTIFY" />
+            </intent-filter>
+        </receiver>
+        <!-- 友盟（开始） -->
+        <!-- 友盟key -->
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="4f5345c7527015693500003a" />
+
+        <!-- 友盟（反馈1） -->
+        <activity
+            android:name="com.feedback.ui.SendFeedback"
+            android:windowSoftInputMode="adjustResize" />
+        <!-- 友盟（反馈2） -->
+        <activity android:name="com.feedback.ui.FeedbackConversations" />
+        <!-- 友盟（反馈3） -->
+        <activity
+            android:name="com.feedback.ui.FeedbackConversation"
+            android:configChanges="keyboard" />
+        <!-- 友盟分发渠道分析统计 -->
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="04512ec0d184219d498935b35a10dc9e" />
+        <!-- 友盟（结束） -->
+
+    </application>
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
+
+    <!-- 要使用的权限 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ADD_SYSTEM_SERVICE" />
+    <uses-permission android:name="android.permission.GET_PACKAGE_SIZE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
+
+    <!-- 易迅支付插件 -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <!-- 收发短信 -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+    <uses-permission android:name="android.permission.WRITE_OWNER_DATA" />
+    <uses-permission android:name="android.permission.READ_OWNER_DATA" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- 获取机型 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+</manifest>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="folder_max_count_x">4</integer>
+    <integer name="folder_max_count_y">3</integer>
+    <integer name="folder_max_num_items">12</integer>
+    <integer name="cell_count_x">4</integer>
+    <integer name="cell_count_y">4</integer>
+    <integer name="hotseat_cell_count">4</integer>
+    <integer name="hotseat_all_apps_index">4</integer>
+    <integer name="apphub_max_count_x">4</integer>
+    <integer name="apphub_max_count_y">3</integer>
+    <integer name="apphub_max_num_items">12</integer>
+    <integer name="config_apphubAnimDuration">250</integer>
+    <integer name="page_conuts">6</integer>
+    <integer name="private_page_conuts">1</integer>
+    <integer name="default_page">3</integer>
+</resources>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_light"
+    android:orientation="vertical" >
+
+    <include
+        android:id="@+id/titleBar"
+        layout="@layout/paysdk_titlebar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none" >
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center" >
+
+            <RelativeLayout
+                android:id="@+id/rlnormal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:background="#ffffff" >
+
+                <TextView
+                    android:id="@+id/tv_explain"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="15dp"
+                    android:gravity="center"
+                    android:text="@string/gamecard_tip"
+                    android:textColor="#000000"
+                    android:textSize="18sp" />
+
+                <com.ehoo.paysdk.view.CustomSpinner
+                    android:id="@+id/sp_paypaidStyle"
+                    style="@style/CustomsPinnerStyle"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_below="@id/tv_explain" />
+
+                <com.ehoo.paysdk.view.CustomSpinner
+                    android:id="@+id/sp_paypaidValue"
+                    style="@style/CustomsPinnerStyle"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_below="@id/sp_paypaidStyle" />
+
+                <TextView
+                    android:id="@+id/tv_tips"
+                    style="@style/textStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/sp_paypaidValue"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:padding="0dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/gamecard_tips" />
+
+                <!-- 强制获得焦点,使edittext不会弹出软键盘 -->
+
+                <LinearLayout
+                    android:layout_width="0px"
+                    android:layout_height="0px"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true" />
+
+                <EditText
+                    android:id="@+id/et_card_num"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_tips"
+                    android:singleLine="true"
+                    android:hint="@string/gamecard_num_hint" />
+
+                <EditText
+                    android:id="@+id/et_card_psw"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/et_card_num"
+                    android:singleLine="true"
+                    android:inputType="number"
+                    android:hint="@string/gamecard_psw_hint" />
+
+                <CheckBox
+                    android:id="@+id/cb_remeber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/et_card_psw"
+                    android:checked="true"
+                    android:text="@string/remeber"
+                    android:textColor="#000000" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/rlnormal"
+                android:background="@drawable/bg_button_default"
+                android:gravity="center" >
+
+                <Button
+                    android:id="@+id/bt_confirm"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/btn_confirm_selector"
+                    android:padding="10dp"
+                    android:text="@string/confirm"
+                    android:textSize="20sp" />
+            </RelativeLayout>
+
+            <include layout="@layout/paysdk_bottombar" />
+        </RelativeLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -1,0 +1,266 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@android:color/darker_gray"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+   
+    <include android:id="@+id/titleBar" 
+        layout="@layout/paysdk_titlebar" />
+
+	<!-- 短信支付 -->
+
+	 <RelativeLayout
+	     android:id="@+id/rltlyt_main"
+	     android:layout_width="fill_parent"
+	     android:layout_height="wrap_content"	
+	     android:layout_marginTop="45dp">
+
+	    <RelativeLayout android:id="@+id/rltlyt_sms"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:background="@drawable/main_item_bg"
+	        android:clickable="true">
+	        <ImageView
+	            android:id="@+id/button1"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_centerVertical="true"
+	            android:layout_marginLeft="20dp"
+	            android:text="@string/home_sms" 
+	            android:src="@drawable/icon_sms"/>
+	        <ImageView
+		       android:id="@+id/ver_line1"
+		       android:layout_width="wrap_content"
+		       android:layout_height="wrap_content"
+		       android:clickable="false"
+		       android:focusable="false"
+	           android:layout_centerVertical="true"
+	           android:layout_marginLeft="15dp"
+		       android:layout_toRightOf="@id/button1"
+		       android:src="@drawable/line_vertical"/>
+	        <RelativeLayout 
+	            android:layout_height="wrap_content"
+	            android:layout_width="wrap_content"
+	            android:layout_centerVertical="true"
+	            android:layout_marginLeft="15dp"
+	            android:layout_toRightOf="@id/ver_line1">
+		        <TextView
+			        android:id="@+id/sms_prompt"
+			        android:layout_width="fill_parent"
+			        android:layout_height="wrap_content"
+			        android:text="@string/sms_prompt_text"
+			        android:textSize="18sp"
+			        android:textColor="@android:color/black"
+			        />
+		        <TextView
+			        android:id="@+id/sms_prompt2"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_below="@id/sms_prompt"
+			        android:text="@string/sms_prompt_text2"
+			        
+			        android:textColor="@android:color/darker_gray"/>
+	        </RelativeLayout>
+	   	</RelativeLayout>
+	   	
+		<!-- 水平分隔线 -->
+	
+		<ImageView
+		    android:id="@+id/hor_line1"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_below="@id/rltlyt_sms"
+		    android:clickable="false"
+		    android:focusable="false"
+		    android:src="@drawable/line_horizontal" />
+		
+		<!-- 银行 -->
+		<RelativeLayout android:id="@+id/rltlyt_back"
+	       android:layout_width="fill_parent"
+	       android:layout_height="wrap_content"
+	       android:layout_below="@id/hor_line1"
+	       android:background="@drawable/main_item_bg"
+	       android:clickable="true">
+	        <ImageView
+	            android:id="@+id/button2"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_centerVertical="true"
+	            android:layout_marginLeft="10dp"
+	            android:src="@drawable/icon_callbank"/>
+	        <ImageView
+		       android:id="@+id/ver_line2"
+		       android:layout_width="wrap_content"
+		       android:layout_height="wrap_content"
+		       android:clickable="false"
+		       android:focusable="false"
+		       android:layout_centerVertical="true"
+		       android:layout_marginTop="5dp"
+		       android:layout_marginBottom="5dp"
+		       android:layout_marginLeft="10dp"
+		       android:layout_toRightOf="@id/button2"
+		       android:src="@drawable/line_vertical"/>
+	        <RelativeLayout 
+	            android:layout_height="wrap_content"
+	            android:layout_width="wrap_content"
+	            android:layout_centerVertical="true"
+	            android:layout_marginLeft="15dp"
+	            android:layout_toRightOf="@id/ver_line2">
+		        <TextView
+			        android:id="@+id/bank_prompt"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			 
+			        android:text="@string/bank_prompt_text"
+			        android:textSize="18sp"
+			        android:textColor="@android:color/black"
+			        />
+		        <TextView
+			        android:id="@+id/bank_prompt2"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_centerHorizontal="true"
+			      
+			        android:layout_below="@id/bank_prompt"
+			        android:text="@string/bank_prompt_text2"
+			        android:textColor="@android:color/darker_gray"/>
+		        <ImageView
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_toRightOf="@id/bank_prompt"
+		            android:layout_alignTop="@id/bank_prompt"
+		            android:layout_marginTop="5dp"
+		            android:src="@drawable/icon_chinapay"
+		            />
+	        </RelativeLayout>
+	   </RelativeLayout>
+	   
+		<!-- 水平分隔线 -->
+		<ImageView
+	        android:id="@+id/hor_line2"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:clickable="false"
+	        android:focusable="false"
+	        android:layout_below="@id/rltlyt_back"
+	        android:src="@drawable/line_horizontal" 
+	        />
+		
+		<!-- 充值卡 -->
+		<RelativeLayout android:id="@+id/rltlyt_repaid"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/hor_line2"
+	        android:background="@drawable/main_item_bg"
+	        android:clickable="true">
+	        <ImageView
+	            android:id="@+id/button3"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_centerVertical="true"
+	            android:layout_marginLeft="10dp"
+	            android:src="@drawable/icon_callcredit"/>
+	        <ImageView
+		       android:id="@+id/ver_line3"
+		       android:layout_width="wrap_content"
+		       android:layout_height="wrap_content"
+		       android:clickable="false"
+		       android:focusable="false"
+		       android:layout_centerVertical="true"
+		       android:layout_marginLeft="4dp"
+		       android:layout_toRightOf="@id/button3"
+		       android:src="@drawable/line_vertical"/>
+	        <RelativeLayout 
+	            android:layout_height="wrap_content"
+	            android:layout_width="wrap_content"
+	            android:layout_centerVertical="true"
+	            android:layout_marginLeft="15dp"
+	            android:layout_toRightOf="@id/ver_line3">
+		        <TextView
+			        android:id="@+id/prepaid_prompt"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:text="@string/prepaid_prompt_text"
+			        android:textSize="18sp"
+			        android:textColor="@android:color/black"
+			        />
+		        <TextView
+			        android:id="@+id/prepaid_prompt2"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			  
+			        android:layout_below="@id/prepaid_prompt"
+			        android:text="@string/prepaid_prompt_text2"
+			        android:textColor="@android:color/darker_gray"/>
+	        </RelativeLayout>
+	    </RelativeLayout>
+	    <!-- 水平分隔线 -->
+		<ImageView
+	        android:id="@+id/hor_line3"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:clickable="false"
+	        android:focusable="false"
+	        android:layout_below="@id/rltlyt_repaid"
+	        android:src="@drawable/line_horizontal" 
+	        />
+	    
+	<!--  游戏点卡  -->
+		<RelativeLayout android:id="@+id/gamecard_repaid"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@id/hor_line3"
+	        android:background="@drawable/main_item_bg"
+	        android:clickable="true">
+	        <ImageView
+	            android:id="@+id/button3"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_centerVertical="true"
+	            android:layout_marginLeft="10dp"
+	            android:src="@drawable/game"/>
+	        <ImageView
+		       android:id="@+id/ver_line3"
+		       android:layout_width="wrap_content"
+		       android:layout_height="wrap_content"
+		       android:clickable="false"
+		       android:focusable="false"
+		       android:layout_centerVertical="true"
+		       android:layout_marginLeft="4dp"
+		       android:layout_toRightOf="@id/button3"
+		       android:src="@drawable/line_vertical"/>
+	        <RelativeLayout 
+	            android:layout_height="wrap_content"
+	            android:layout_width="wrap_content"
+	            android:layout_centerVertical="true"
+	            android:layout_marginLeft="15dp"
+	            android:layout_toRightOf="@id/ver_line3">
+		        <TextView
+			        android:id="@+id/prepaid_prompt"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:text="@string/gamecard_pay_text"
+			        android:textSize="18sp"
+			        android:textColor="@android:color/black"
+			        />
+		        <TextView
+			        android:id="@+id/prepaid_prompt2"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			  
+			        android:layout_below="@id/prepaid_prompt"
+			        android:text="@string/gamecard_pay_detail"
+			        android:textColor="@android:color/darker_gray"/>
+	        </RelativeLayout>
+	    </RelativeLayout>
+	</RelativeLayout>
+    
+    <ProgressBar
+        android:id="@+id/pb"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone" />
+
+</RelativeLayout>

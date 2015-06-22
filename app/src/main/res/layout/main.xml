@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:panel="http://schemas.android.com/apk/res/com.applite.android"
+    android:id="@+id/linear_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ylz"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context=".MainActivity" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/apps_customize_tab_bar_height"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/back_bg"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/app_hub_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="16.0sp" />
+
+        <!-- <Button
+            android:id="@+id/show_or_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/app_hub_game_featured_more" /> -->
+    </RelativeLayout>
+
+    <include
+        android:id="@+id/install_apps_customize_pane"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        layout="@layout/install_apps_customize_pane_content"
+        android:paddingLeft="@dimen/folder_padding_left"
+        android:paddingTop="@dimen/apps_customize_tab_bar_height"
+        android:visibility="visible" />
+
+    <FrameLayout
+        android:id="@+id/frame_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <com.android.applite.view.Panel
+            android:id="@+id/bottomPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            panel:animationDuration="1000"
+            panel:closedHandle="@drawable/app_hub_game_handle_up"
+            panel:content="@+id/panelContent"
+            panel:handle="@+id/panelHandle"
+            panel:linearFlying="true"
+            panel:openedHandle="@drawable/app_hub_game_handle_down"
+            panel:position="bottom" >
+
+            <ImageView
+                android:id="@+id/panelHandle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@+id/panelHandle" />
+
+            <RelativeLayout
+                android:id="@+id/panelContent"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/app_onlineview_size"
+                android:background="#50000000" >
+
+                <include
+                    android:id="@+id/apps_customize_pane"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="@dimen/apphub_recommend_apps_margin_top"
+                    layout="@layout/apps_customize_pane"
+                    android:visibility="visible" />
+            </RelativeLayout>
+        </com.android.applite.view.Panel>
+
+        <LinearLayout
+            android:id="@+id/linear_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <LinearLayout
+            android:id="@+id/linear_bottom"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/linear_bottom_h"
+            android:layout_gravity="bottom"
+             />
+    </FrameLayout>
+
+</LinearLayout>

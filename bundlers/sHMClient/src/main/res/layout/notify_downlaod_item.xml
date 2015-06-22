@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/app_download_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dip"
+        android:src="@drawable/download_process_icon" />
+
+    <LinearLayout android:id="@+id/centerlayout"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/app_download_icon"
+        android:layout_marginLeft="8dip"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/app_download_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dip"
+            android:layout_toRightOf="@id/app_download_icon"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:singleLine="true"
+            android:textColor="@color/download_process_notify_font_color" />
+
+        <ProgressBar
+            android:id="@+id/app_download_pross"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="15dip"
+            android:layout_marginTop="3dip"
+            android:minWidth="200dp"
+            android:max="100" />
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/app_download_text"
+        android:layout_width="20dip"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/centerlayout"
+        android:layout_toRightOf="@id/centerlayout"
+        android:layout_margin="10dip"
+        android:singleLine="true"
+        android:textColor="@color/download_process_notify_font_color" />
+
+</RelativeLayout>

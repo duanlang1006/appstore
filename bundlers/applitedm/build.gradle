@@ -1,0 +1,70 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "com.applite.dm"
+        minSdkVersion 10
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+    lintOptions {
+        abortOnError false
+    }
+    signingConfigs {
+        debug {
+            storeFile file("../../dsc.keystore")
+            storePassword "shly123456"
+            keyAlias "dbservice"
+            keyPassword "shly123456"
+        }
+
+        def config = release {
+            storeFile file("../../dsc.keystore")
+            storePassword "shly123456"
+            keyAlias "dbservice"
+            keyPassword "shly123456"
+        }
+        config
+    }
+    buildTypes {
+        release {
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+}
+
+dependencies {
+    provided files('../../app/libs/afinal_0.5.1_bin.jar')
+    provided files('../../app/reflibs/osgi2.7.0.jar')
+    provided files('../../app/reflibs/gson-2.2.4.jar')
+    provided files('../../extras/dscdownloader/dsc-downloader-v1.1.jar')
+    provided files('../../extras/impl/applite-impl-v1.1.jar')
+    provided files('../../extras/applitecommon/applite-common-v1.0.jar')
+    provided files('../../app/reflibs/android-support-v4.jar')
+    provided files('../../app/reflibs/android-support-v7-appcompat.jar')
+}
+
+task clearPlugin(type: Delete) {
+    delete '../../app/src/main/assets/applitedm.apk'
+}
+
+task makePlugin(type: Copy) {
+    from('build/outputs/apk/')
+    into('../../app/src/main/assets/')
+    include('applitedm-release.apk')
+    rename('applitedm-release.apk', "applitedm.apk")
+}
+
+makePlugin.dependsOn(clearPlugin, assembleRelease)

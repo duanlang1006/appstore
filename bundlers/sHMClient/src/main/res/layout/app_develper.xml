@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="fill_parent" android:layout_width="fill_parent"
+	android:orientation="vertical" >
+	<TextView android:id="@+id/contactLabel" android:text="@string/contact_info"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		style="@style/AppDetail.Title" />
+	<TextView android:id="@+id/devSiteLabel" android:text="@string/homepage_colon"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		style="@style/AppDetail.Content" />
+	<TextView android:id="@+id/devSiteContentLabel"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_below="@id/devSiteLabel" android:ellipsize="marquee"
+		android:marqueeRepeatLimit="marquee_forever" android:singleLine="true"
+		android:autoLink="all" style="@style/AppDetail.Content"
+		android:layout_marginBottom="2dip" />
+	<TextView android:id="@+id/emailLabel" android:text="@string/email_colon"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_marginBottom="2dip" style="@style/AppDetail.Content" />
+	<TextView android:id="@+id/emailContentLabel"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:ellipsize="marquee" android:marqueeRepeatLimit="marquee_forever"
+		android:singleLine="true" android:autoLink="all"
+		android:layout_marginBottom="2dip" style="@style/AppDetail.Content" />
+	<TextView android:text="@string/other_produce"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		style="@style/AppDetail.Title" />
+
+</LinearLayout>
+    

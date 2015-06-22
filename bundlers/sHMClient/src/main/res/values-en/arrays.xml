@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<!-- 查询配置选项 -->
+	<string-array name="search_config">
+		<item>app name</item>
+		<item>app introduced</item>
+		<item>author name</item>
+	</string-array>
+
+	<!-- 已安装软件菜单 -->
+	<string-array name="software_click">
+		<item>uninstalling app</item>
+		<item>open app</item>
+		<item>check info</item>
+		<item>app attributes</item>
+	</string-array>
+
+	<!-- 已安装软件有更新菜单 -->
+	<string-array name="software_update_click">
+		<item>uninstalling app</item>
+		<item>open app</item>
+		<item>new version info</item>
+		<item>installed info</item>
+		<item>app attributes</item>
+	</string-array>
+
+	<string-array name="apk_installed_click">
+		<item>reinstall APK</item>
+		<item>open app</item>
+		<item>delete APK</item>
+		<item>check info</item>
+	</string-array>
+
+	<!-- 更新项菜单 -->
+	<string-array name="update_item_click">
+		<item>new version info</item>
+		<item>installed info</item>
+	</string-array>
+
+	<!-- apk长按菜单 -->
+	<string-array name="apk_click">
+		<item>install APK</item>
+		<item>delete APK</item>
+		<item>check info</item>
+	</string-array>
+
+	<!-- 我的收藏 -->
+	<string-array name="app_favor_click">
+		<item>delete favor</item>
+		<item>download app</item>
+		<item>check info</item>
+	</string-array>
+
+	<string-array name="app_favor_downloaded_click">
+		<item>delete favor</item>
+		<item>install app</item>
+		<item>check info</item>
+	</string-array>
+
+	<!-- 已购买 -->
+	<string-array name="app_purchase_click">
+		<item>download app</item>
+		<item>check info</item>
+	</string-array>
+
+	<!-- 已经下载的apk -->
+	<string-array name="task_downloaded_click">
+		<item>install APK</item>
+		<item>delete APK</item>
+		<item>check info</item>
+	</string-array>
+
+	<!-- 下载处理失败的apk -->
+	<string-array name="task_downloaded_lf_click">
+		<item>delete task</item>
+		<item>repeat task</item>
+		<item>check info</item>
+	</string-array>
+
+	<!-- 下载处理中的apk -->
+	<string-array name="task_downloading_click">
+		<item>delete task</item>
+		<item>check info</item>
+	</string-array>
+
+	<!-- 可以下载的软件 -->
+	<string-array name="app_can_download_long_click">
+		<item>favor app</item>
+		<item>download app</item>
+	</string-array>
+
+
+	<string-array name="app_comment_mark">
+		<item>Useful comments</item>
+		<item>Useless comments</item>
+	</string-array>
+</resources>
+ 

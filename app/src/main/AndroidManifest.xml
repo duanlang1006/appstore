@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.applite.android"
+    android:installLocation="auto">
+
+    <uses-permission android:name="android.permission.ACCESS_ALL_DOWNLOADS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER" />
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
+    <uses-permission android:name="android.permission.SEND_DOWNLOAD_COMPLETED_INTENTS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="com.shly.launcher.permission.INSTALL_SHORTCUT" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+	<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <uses-permission android:name="com.android.dsc.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="com.android.dsc.permission.READ_SETTINGS"/>
+
+    <application
+        android:name="com.android.applite.plugin.AppLiteApplication"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name" 
+        android:hardwareAccelerated="true">
+        <!--<activity-->
+            <!--android:name="com.android.applite.plugin.AppLiteEnter"-->
+            <!--android:configChanges="keyboardHidden|orientation"-->
+            <!--android:icon="@drawable/ylzx"-->
+            <!--android:label="@string/app_name_enter"-->
+            <!--android:launchMode="singleTask"-->
+            <!--android:screenOrientation="portrait"-->
+            <!--android:theme="@style/AppTheme" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+                <!--<category android:name="android.intent.category.APP_MARKET" />-->
+                <!--<category android:name="android.intent.category.default" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+        <!--<activity-->
+            <!--android:name="com.android.applite.plugin.AppLiteHotapps"-->
+            <!--android:configChanges="keyboardHidden|orientation"-->
+            <!--android:icon="@drawable/zjbb"-->
+            <!--android:label="@string/app_name_hotapp"-->
+            <!--android:launchMode="singleTask"-->
+            <!--android:screenOrientation="portrait"-->
+            <!--android:theme="@style/AppTheme" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                 <!--<category android:name="android.intent.category.APP_MARKET" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+                <!--<category android:name="android.intent.category.default" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+        <!--<activity-->
+            <!--android:name="com.android.applite.plugin.AppLitePlugin"-->
+            <!--android:configChanges="keyboardHidden|orientation"-->
+            <!--android:label="@string/app_name"-->
+            <!--android:launchMode="singleTask"-->
+            <!--android:screenOrientation="portrait"-->
+            <!--android:theme="@style/AppTheme" >-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.default" />-->
+            <!--</intent-filter>-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.VIEW" />-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+                <!--<category android:name="android.intent.category.BROWSABLE" />-->
+                <!--<data android:scheme="market" android:host="details" android:path="" />-->
+                <!--<data android:scheme="market" android:host="search" android:path="" />-->
+                 <!--<data android:scheme="http" android:host="market.android.com" android:path="/details" />-->
+                <!--<data android:scheme="http" android:host="market.android.com" android:path="/search" />-->
+                <!--<data android:scheme="https" android:host="market.android.com" android:path="/details" />-->
+                <!--<data android:scheme="https" android:host="market.android.com" android:path="/search" />-->
+                <!--<data android:scheme="http" android:host="play.google.com" android:path="/store/apps/details" />-->
+                <!--<data android:scheme="http" android:host="play.google.com" android:path="/store/search" />-->
+                <!--<data android:scheme="https" android:host="play.google.com" android:path="/store/apps/details" />-->
+                <!--<data android:scheme="https" android:host="play.google.com" android:path="/store/search" />-->
+                <!--<data android:scheme="http" android:host="apptest.baidu.com" android:pathPrefix="/appsearch/highdownload" />-->
+                <!--<data android:scheme="http" android:host="mo.baidu.com" android:pathPrefix="/appsearch/highdownload" />-->
+                <!--<data android:scheme="https" android:host="mo.baidu.com" android:pathPrefix="/appsearch/highdownload" />-->
+                <!--<data android:scheme="appclient" android:host="apptest.baidu.com" android:pathPrefix="/appsearch/highdownload" />-->
+                <!--<data android:scheme="appclient" android:host="mo.baidu.com" android:pathPrefix="/appsearch/highdownload" />-->
+                <!--<data android:scheme="http" android:host="dbl-chunlei-rd06.vm.baidu.com" android:pathPrefix="/appsearch/highdownload" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+
+        <activity
+            android:name="com.mit.market.MitMarketActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.default" />
+            </intent-filter>
+        </activity>
+
+
+        <service
+            android:name="com.umeng.update.net.DownloadingService"
+            android:process=":DownloadingService" >
+        </service>
+
+        <activity
+            android:name="com.umeng.update.UpdateDialogActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
+
+        <receiver android:name="com.android.applite.model.AppLiteReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.DATE_CHANGED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="com.dataservice.broadcast" />
+                <action android:name="com.installer.system.install.result" />
+                <action android:name="com.installer.system.delete.result" />
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+            </intent-filter>
+            <intent-filter android:priority="1000" >
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <action android:name="android.intent.action.PACKAGE_CHANGED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
+        <provider
+            android:name="com.android.applite.model.AppLiteProvider"
+            android:authorities="com.android.applite.settings"
+            android:exported="true"
+            android:readPermission="com.android.applite.permission.READ_SETTINGS"
+            android:writePermission="com.android.applite.permission.WRITE_SETTINGS" />
+
+        <!--==================apkplug=======================================-->
+        <activity
+            android:name="org.apkplug.app.apkplugActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:theme="@style/android:Theme.Light" />
+        <!--==================apkplug=======================================-->
+
+        <meta-data android:name="MIT_APPKEY" android:value="B+JV6gaSBbNdn1evBeJTwwjbA7JSylCOUGZbOANhWGBZYQY1VGJROFY4Wjo=" />
+        <meta-data android:name="UMENG_CHANNEL" android:value="${UMENG_CHANNEL_VALUE}" />
+        <meta-data android:name="UMENG_APPKEY" android:value="53c77d9c56240b2447001087" />
+        <meta-data android:name="APPLITE_DATA" android:value="folder.data"/>
+        <meta-data  android:name="apkplug-appid" android:value="c6fb0702a4c5f81e" ></meta-data>
+        <meta-data  android:name="apkplug-theme-auth" android:value="c3c1CqGa8Akd0KXK3r7/ejczH+u+M+4RRwuf3/0RIHgZkWFIMy5svg9aWL/jzKUcdBL45p4smWCVlGWTfFgMZFDXqSr9hVo80zfuhpzQdHLq3oJvf23vfbONqz0Phib63d/Ckm9vLSDU+DV9Bop/jb03dB6dX84n4Hlg/6Pshiw=" ></meta-data>
+        <meta-data  android:name="apkplug-auth" android:value="L/AHLAOZzGcVCbEugHLsFSX5sXAJbV3K16f0bYITvHzVTezNu+xs19aP/uZhH8IV5INUl4p6fEI+rxs+asecB19gzClRj3iPmcB2F6yZgCKShXD2C/QRbt58ZhKrRZkMsa1alz8W9G85sxD3T0ignP+ijS8A1jluARxRP7ikgYM=" ></meta-data>
+    </application>
+
+</manifest>

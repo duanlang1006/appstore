@@ -1,0 +1,28 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 17
+    buildToolsVersion "19.1.0"
+
+    defaultConfig {
+        applicationId "com.kapps.market"
+        minSdkVersion 8
+        targetSdkVersion 17
+        versionCode 12
+        versionName "2.2"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile project(':extras:androidpnclient')
+    compile 'com.android.support:appcompat-v7:18.+'
+    compile files('libs/PaySDK.jar')
+    compile files('libs/AndroidAnalyticSDK3.2.1.jar')
+}

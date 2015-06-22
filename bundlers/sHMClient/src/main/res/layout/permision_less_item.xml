@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:layout_marginTop="12dip">
+	<ImageView android:id="@+id/permissionIcon"
+		android:layout_gravity="center_horizontal" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_alignParentLeft="true"
+		android:src="@drawable/common_permission" />
+	<TextView android:id="@+id/permissionTitleLabel" android:text="permission title"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_toRightOf="@id/permissionIcon"
+		android:layout_alignBaseline="@id/permissionIcon" style="@style/PermissionLess.Note" />
+	<TextView android:id="@+id/permissionDesLabel" android:text="permission des"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_below="@id/permissionTitleLabel"
+		android:layout_alignLeft="@id/permissionTitleLabel" style="@style/PermissionLess.Content" />
+</RelativeLayout>
+ 

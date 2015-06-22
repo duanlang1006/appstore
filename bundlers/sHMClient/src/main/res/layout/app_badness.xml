@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="fill_parent" android:layout_width="fill_parent"
+	android:orientation="vertical" android:background="@color/content_bg_color">
+	<ScrollView android:layout_width="fill_parent"
+		android:layout_height="0px" android:layout_weight="1"
+		android:background="@color/content_bg_color">
+		<LinearLayout android:layout_height="fill_parent"
+			android:layout_width="fill_parent" android:orientation="vertical">
+			<TextView android:id="@+id/badnessTitleLabel" android:text="@string/market_ill_text"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				style="@style/AppBadness.Note" />
+			<ImageView android:id="@+id/lineDivider"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:src="@drawable/line" android:scaleType="fitXY" />
+			<RadioGroup android:id="@+id/badnessRadioGroup"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:orientation="vertical">
+				<RadioButton android:id="@+id/eroticism" android:text="@string/eroticism_content"
+					android:textColor="@color/badness_content" />
+				<RadioButton android:id="@+id/violence" android:text="@string/violence_pic"
+					android:textColor="@color/badness_content" />
+				<RadioButton android:id="@+id/rebarbative"
+					android:text="@string/rebarbative_content_or_invasive"
+					android:textColor="@color/badness_content" />
+				<RadioButton android:id="@+id/deleterious" android:text="@string/deleterious"
+					android:textColor="@color/badness_content" />
+				<RadioButton android:id="@+id/otherReason" android:text="@string/other_oppose"
+					android:textColor="@color/badness_content" />
+			</RadioGroup>
+			<!-- TODO 其他类型时候的描述 -->
+			<EditText android:id="@+id/badnessContentField"
+				android:hint="@string/your_report" android:minLines="3"
+				android:maxLength="50" android:visibility="gone"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:layout_marginLeft="5dip" android:layout_marginRight="5dip" />
+		</LinearLayout>
+	</ScrollView>
+	<LinearLayout android:layout_height="wrap_content"
+		android:layout_width="fill_parent" android:gravity="center"
+		android:background="@drawable/fun_band">
+		<Button android:id="@+id/commitBadnessButton"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:enabled="false" style="@style/Common.Button"
+			android:layout_margin="3dip" android:text="@string/ok" />
+		<Button android:id="@+id/cancelBadnessButton"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_margin="3dip" style="@style/Common.Button"
+			android:text="@string/cancel" />
+	</LinearLayout>
+</merge>
+
+

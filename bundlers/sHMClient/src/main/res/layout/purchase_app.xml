@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	 android:paddingTop="6dip"
+	android:paddingBottom="6dip">
+	<ImageView android:id="@+id/appIconView" android:scaleType="fitCenter"
+		android:layout_marginLeft="2dip" android:layout_width="48dip"
+		android:layout_height="48dip" android:layout_alignParentLeft="true"
+		android:layout_marginRight="8dip" />
+
+	<TextView android:id="@+id/appNameLabel" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:ellipsize="marquee"
+		android:marqueeRepeatLimit="marquee_forever" android:singleLine="true"
+		android:maxWidth="180dip" android:textSize="14dip"
+		android:layout_toRightOf="@id/appIconView" style="@style/AppItem.Name" />
+
+	<TextView android:id="@+id/appVersionLabel"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:minWidth="110dip" android:maxWidth="110dip"
+		android:singleLine="true" android:layout_marginRight="5dip"
+		android:layout_below="@id/appNameLabel" android:layout_toRightOf="@id/appIconView"
+		style="@style/AppItem.Author" />
+
+	<TextView android:id="@+id/stateLabel" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:singleLine="true"
+		android:textSize="11sp" android:layout_marginRight="5dip"
+		android:layout_below="@id/appNameLabel" android:layout_toRightOf="@id/appVersionLabel"
+		android:layout_alignBottom="@id/appVersionLabel" style="@style/AppItem.Author" />
+
+	<TextView android:id="@+id/favorTimeLabel"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:singleLine="true" android:layout_marginRight="5dip"
+		android:layout_below="@id/appVersionLabel" android:layout_toRightOf="@id/appIconView"
+		style="@style/AppItem.Author" />
+
+	<Button android:id="@+id/showDetailButton" android:text="@string/watch"
+		android:focusable="false" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_marginRight="4dip"
+		android:layout_alignParentRight="true" style="@style/Common.Button" />
+
+</RelativeLayout>
+  

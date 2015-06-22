@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <group android:id="@+id/normalGrp" >
+        <item
+            android:id="@+id/marketUpdateMenuItem"
+            android:icon="@drawable/menu_marketupdate"
+            android:title="@string/marketupdate"/>
+        <item
+            android:id="@+id/softUpdateMenuItem"
+            android:icon="@drawable/menu_softupdate"
+            android:title="@string/softupdate"/>
+        <item
+            android:id="@+id/logoutMenuItem"
+            android:icon="@drawable/menu_logout"
+            android:title="@string/login_registe"/>
+        <item
+            android:id="@+id/feedbackMenuItem"
+            android:icon="@drawable/menu_feedback"
+            android:title="@string/feed_back"/>
+        <item
+            android:id="@+id/closeMenuItem"
+            android:icon="@drawable/menu_close"
+            android:title="@string/exit_market"/>
+        <item
+            android:id="@+id/configMenuItem"
+            android:icon="@drawable/menu_manage"
+            android:title="@string/setup"/>
+        <item
+            android:id="@+id/aboutMenuItem"
+            android:icon="@drawable/menu_about"
+            android:title="@string/about"/>
+    </group>
+
+</menu>

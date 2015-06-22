@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:layout_marginBottom="5dip">
+	<TextView android:id="@+id/configTitleLabel"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_marginLeft="5dip" android:layout_alignParentLeft="true"
+		style="@style/ConfigView.Item" />
+	<CheckBox android:id="@+id/configCheckBox"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_alignParentRight="true" style="@style/Common.CheckBox" />
+	<TextView android:id="@+id/configDesLabel"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_marginBottom="1dip" android:layout_below="@id/configTitleLabel"
+		android:layout_alignLeft="@id/configTitleLabel"
+		android:layout_toLeftOf="@id/configCheckBox" style="@style/ConfigView.ItemNote" />
+</RelativeLayout>
+ 

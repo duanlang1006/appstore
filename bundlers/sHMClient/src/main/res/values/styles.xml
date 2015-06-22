@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 通用型 -->
+    <style name="Choose.CheckBox" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:background">@null</item>
+        <item name="android:button">@drawable/check_choose_btn</item>
+    </style>
+
+    <style name="Common.CheckBox" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:background">@null</item>
+        <item name="android:button">@drawable/check_common_btn</item>
+    </style>
+
+    <style name="Common.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/common_btn</item>
+        <item name="android:textColor">#ffffff</item>
+    </style>
+
+    <style name="Common.Detail.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/common_btn</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:paddingLeft">15dip</item>
+        <item name="android:paddingRight">15dip</item>
+    </style>
+
+    <style name="Common.AppItem.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/common_btn</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+    
+    <style name="Common.SButton" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/common_s_btn</item>
+        <item name="android:textColor">#ffffff</item>
+    </style>
+
+    <style name="Common.More" parent="@android:style/Widget.TextView">
+        <item name="android:src">@drawable/more_normal</item>
+        <item name="android:paddingTop">8dip</item>
+        <item name="android:paddingRight">12dip</item>
+    </style>
+
+    <!-- 登录/注册 -->
+    <style name="Registe.CheckBox" parent="Choose.CheckBox">
+        <item name="android:background">@drawable/btn_check_bg</item>
+        <item name="android:button">@drawable/check_choose_btn</item>
+    </style>
+    
+    <style name="Common.EditText" parent="Choose.CheckBox">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">20dip</item>
+        <item name="android:layout_marginRight">20dip</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:padding">8dip</item>
+    	<item name="android:background">@drawable/bg_edittext</item>
+    </style>
+    
+
+    <!-- 进度条 -->
+    <style name="ProgressSmall.circle" parent="@android:style/Widget.ProgressBar.Small">
+        <item name="android:indeterminateDrawable">@drawable/progress_small_circle</item>
+    </style>
+
+    <style name="ProgressBSmall.circle" parent="@android:style/Widget.ProgressBar.Small">
+        <item name="android:indeterminateDrawable">@drawable/progress_bsmall_circle</item>
+    </style>
+
+    <style name="ProgressMedium.circle" parent="@android:style/Widget.ProgressBar">
+        <item name="android:indeterminateDrawable">@drawable/progress_medium_circle</item>
+    </style>
+
+    <style name="ProgressLarge.circle" parent="@android:style/Widget.ProgressBar.Large">
+        <item name="android:indeterminateDrawable">@drawable/progress_large_circle</item>
+    </style>
+
+    <style name="Progress.Note" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#7a7979</item>
+    </style>
+
+    <style name="ProgressBar.Download" parent="@android:style/Widget.ProgressBar.Horizontal">
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:progressDrawable">@drawable/progress_bar_download_h</item>
+        <item name="android:minHeight">10dip</item>
+        <item name="android:maxHeight">10dip</item>
+    </style>
+
+    <style name="LoadWait.Note" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">@dimen/wait_note_font_szie</item>
+        <item name="android:background">@drawable/reload_note</item>
+        <item name="android:height">@dimen/wait_band_height</item>
+        <item name="android:textColor">@color/load_note_fail</item>
+    </style>
+
+    <style name="LoadingProgress.h" parent="@android:style/Widget.ProgressBar.Small">
+        <item name="android:indeterminateDrawable">@drawable/loading_progress</item>
+        <item name="android:minHeight">10dip</item>
+        <item name="android:maxHeight">10dip</item>
+    </style>
+
+    <!-- 星级 -->
+    <style name="Comment.RatingBar" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/comment_rating_bar</item>
+        <item name="android:maxWidth">42dip</item>
+        <item name="android:maxHeight">44dip</item>
+    </style>
+
+    <!-- 软件明细 -->
+    <style name="AppDetail.Title" parent="@android:style/Widget.TextView">
+        <item name="android:background">@drawable/intro_title</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/app_info_title_text_color</item>
+        <item name="android:textSize">@dimen/app_info_title_font_size</item>
+    </style>
+
+    <style name="AppDetail.StatContent" parent="@android:style/Widget.TextView">
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:textColor">#6E5423</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="AppDetail.PermissionContent" parent="@android:style/Widget.TextView">
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:textColor">#ae5423</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="AppDetail.Content" parent="@android:style/Widget.TextView">
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:textSize">@dimen/app_info_content_font_size</item>
+    </style>
+
+    <style name="AppDetail.ContentNote" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">#4a4a4a</item>
+        <item name="android:textSize">@dimen/app_info_content_font_size</item>
+    </style>
+
+    <!-- 举报信息 -->
+    <style name="AppBadness.Note" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#c24812</item>
+        <item name="android:paddingLeft">5dip</item>
+        <item name="android:paddingTop">10dip</item>
+        <item name="android:paddingBottom">10dip</item>
+    </style>
+
+    <!-- 主页按钮 -->
+    <style name="AppPickPage.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/apppick_page_btn</item>
+        <item name="android:gravity">bottom|center_horizontal</item>
+        <item name="android:paddingBottom">1dip</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#EEF0F0</item>
+        <item name="android:focusable">false</item>
+    </style>
+
+    <style name="AppCategoryPage.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/appcategory_page_btn</item>
+        <item name="android:gravity">bottom|center_horizontal</item>
+        <item name="android:paddingBottom">1dip</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#EEF0F0</item>
+        <item name="android:focusable">false</item>
+    </style>
+
+    <style name="AppDiggPage.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/appdigg_page_btn</item>
+        <item name="android:gravity">bottom|center_horizontal</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:paddingBottom">1dip</item>
+        <item name="android:textColor">#EEF0F0</item>
+        <item name="android:focusable">false</item>
+    </style>
+
+    <style name="AppSearchPage.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/appsearch_page_btn</item>
+        <item name="android:gravity">bottom|center_horizontal</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:paddingBottom">1dip</item>
+        <item name="android:textColor">#EEF0F0</item>
+        <item name="android:focusable">false</item>
+    </style>
+
+    <style name="AppManagePage.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/appmanage_page_btn</item>
+        <item name="android:gravity">bottom|center_horizontal</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:paddingBottom">1dip</item>
+        <item name="android:textColor">#EEF0F0</item>
+        <item name="android:focusable">false</item>
+    </style>
+
+        <style name="Appfoot.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/appfoot_bar_bg</item>
+        <item name="android:gravity">bottom|center_horizontal</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:paddingBottom">1dip</item>
+        <item name="android:textColor">#EEF0F0</item>
+        <item name="android:focusable">false</item>
+    </style>
+    <!-- 不同类型应用TAB按钮 -->
+    <style name="TopTypeLeft.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@null</item>
+        <item name="android:textSize">@dimen/top_type_button_font_szie</item>
+        <item name="android:textColor">@drawable/common_btn_font_color</item>
+        <item name="android:focusable">false</item>
+    </style>
+
+    <style name="TopTypeMiddle.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@null</item>
+        <item name="android:textSize">@dimen/top_type_button_font_szie</item>
+        <item name="android:textColor">@drawable/common_btn_font_color</item>
+        <item name="android:focusable">false</item>
+    </style>
+
+    <style name="TopTypeRight.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@null</item>
+        <item name="android:textSize">@dimen/top_type_button_font_szie</item>
+        <item name="android:textColor">@drawable/common_btn_font_color</item>
+        <item name="android:focusable">false</item>
+    </style>
+
+    <!-- 应用分类 -->
+    <style name="AppCategory.NoteMain" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">#000000</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="AppCategory.NoteSub" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">#000000</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!-- 静态广告 -->
+    <style name="StaticAD.Title" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">#000000</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="StaticAD.Content" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">#000000</item>
+        <item name="android:textSize">@dimen/app_info_title_font_size</item>
+    </style>
+
+    <style name="Theme.CustomDialog" parent="android:style/Theme.Dialog">
+        <item name="android:windowBackground">@drawable/dialog_bg</item>
+    </style>
+
+    <style name="AppCategoryMain.Name" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/app_category_name</item>
+    </style>
+
+    <style name="AppCategory.Name" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/app_category_name</item>
+    </style>
+
+    <style name="AppCategory.TopApp" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">#969696</item>
+    </style>
+
+    <!-- 软件查询 -->
+    <style name="Search.Band" parent="@android:style/ButtonBar">
+        <item name="android:background">@drawable/search_band</item>
+    </style>
+
+    <style name="Search.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/search_btn</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SearchType.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/search_type_btn</item>
+    </style>
+
+    <style name="selectedTxt.Button" parent="@android:style/Widget.Button">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="selectTxt.Button" parent="@android:style/Widget.Button">
+        <item name="android:textColor">#999999</item>
+    </style>
+
+    <style name="select.Button" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/searchapp</item>
+    </style>
+    <!-- 快捷视图 -->
+    <style name="QuickView.Title" parent="@android:style/Widget.TextView">
+        <item name="android:background">@drawable/title_bg</item>
+        <item name="android:textSize">@dimen/category_title_font_size</item>
+        <item name="android:textColor">@color/category_title_font_color</item>
+    </style>
+
+    <!-- 配置视图 -->
+    <style name="ConfigView.Band" parent="@android:style/Widget.TextView">
+        <item name="android:background">@drawable/intro_title</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:paddingLeft">3dip</item>
+    </style>
+
+    <style name="ConfigView.Item" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">#4a4a4a</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="ConfigView.ItemNote" parent="@android:style/Widget.TextView">
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#888888</item>
+    </style>
+
+    <!-- 列表的应用项 -->
+    <style name="AppItem.Name" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#222222</item>
+    </style>
+
+    <style name="AppItem.Label" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#333333</item>
+    </style>
+    
+    <style name="AppItem.State" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+
+    <style name="AppItem.Author" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#838383</item>
+    </style>
+
+    <style name="AppItem.DetailAuthor" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#e8e8e8</item>
+    </style>
+
+    <style name="AppItem.Version" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">#797979</item>
+    </style>
+
+    <style name="AppItem.Pick.Des" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">@dimen/pick_item_des_font_size</item>
+        <item name="android:textColor">#0F0F0F</item>
+    </style>
+
+    <!-- 评论 -->
+    <style name="AppComment.Author" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#838383</item>
+    </style>
+
+    <style name="AppComment.Content" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">#969696</item>
+    </style>
+
+    <style name="AppComment.Time" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">#0F0F0F</item>
+    </style>
+
+    <!-- 个人信息 -->
+    <style name="Personal.Note" parent="@android:style/Widget.TextView">
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#222222</item>
+    </style>
+
+    <style name="Personal.Content" parent="@android:style/Widget.TextView">
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#7a7979</item>
+    </style>
+
+    <style name="Keyword.Content" parent="@android:style/Widget.TextView">
+        <item name="android:background">@drawable/keyword_bg</item>
+        <item name="android:textColor">#000000</item>        
+    </style>
+    <!-- 权限 -->
+    <style name="Permission.Title" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#c24812</item>
+        <item name="android:paddingLeft">5dip</item>
+        <item name="android:paddingTop">10dip</item>
+        <item name="android:paddingBottom">10dip</item>
+    </style>
+
+    <style name="Permission.HideNote" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">#ffffff</item>
+    </style>
+
+    <style name="Permission.Note" parent="@android:style/Widget.TextView">
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#d86820</item>
+    </style>
+
+    <style name="Permission.Content" parent="@android:style/Widget.TextView">
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#d78149</item>
+    </style>
+
+    <style name="PermissionLess.Note" parent="@android:style/Widget.TextView">
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#101010</item>
+    </style>
+
+    <style name="PermissionLess.Content" parent="@android:style/Widget.TextView">
+        <item name="android:paddingLeft">3dip</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#464646</item>
+    </style>
+
+    <!-- 动画 -->
+    <style name="Animation_DropDownDown">
+        <item name="android:windowEnterAnimation">@anim/grow_fade_in</item>
+        <item name="android:windowExitAnimation">@anim/shrink_fade_out</item>
+    </style>
+
+    <style name="Animation_DropDownUp">
+        <item name="android:windowEnterAnimation">@anim/grow_fade_in_from_bottom</item>
+        <item name="android:windowExitAnimation">@anim/shrink_fade_out_from_bottom</item>
+    </style>
+
+    <style name="Theme.CustomDialog_NoTitle" parent="android:style/Theme.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@drawable/dialog_bg</item>
+    </style>
+
+    <!-- 易迅支付插件 -->
+        <style name="CustomsPinnerStyle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:background">@drawable/btn_dropdown_background</item>
+    </style>
+    <style name="FloatingWindowStyle">
+        <item name="android:screenOrientation">sensor</item>
+        <item name="android:windowBackground">@drawable/bg</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+    <style name="otherPayButtonStyle">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:background">@drawable/button_style3</item>
+        <item name="android:clickable">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingTop">10dp</item>
+    </style>
+    <style name="otherPayTextStyle">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">#000000</item>
+        <item name="android:background">@drawable/bg_item_more</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingTop">10dp</item>
+    </style>
+    <style name="textStyle">
+        <item name="android:background">#ffffff</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+    <style name="buttonStyle">
+        <item name="android:background">@drawable/button_style2</item>
+        <item name="android:paddingBottom">30dp</item>
+        <item name="android:paddingTop">30dp</item>
+        <item name="android:visibility">gone</item>
+    </style>
+       <style name="dialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@drawable/dialog_bg</item>
+ 		<item name="android:windowNoTitle">false</item>
+    </style>
+
+</resources>

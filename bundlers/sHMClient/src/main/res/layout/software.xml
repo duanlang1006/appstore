@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/TOP_PAD"
+    android:paddingTop="@dimen/TOP_PAD"
+    android:background="@android:color/white">
+
+    <ImageView
+        android:id="@+id/appIconView"
+        android:layout_width="60dip"
+        android:layout_height="60dip"
+        android:layout_alignParentLeft="true"
+        android:padding="6dip"
+        android:scaleType="fitCenter" />
+
+    <TextView
+        android:id="@+id/appNameLabel"
+        style="@style/AppItem.Name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/appIconView"
+        android:layout_toRightOf="@id/appIconView"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:maxWidth="180dip"
+        android:singleLine="true"
+        android:textSize="14dip" />
+
+    <TextView
+        android:id="@+id/appVersionLabel"
+        style="@style/AppItem.Author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="5dip"
+        android:layout_toRightOf="@id/appIconView"
+        android:maxWidth="95dip"
+        android:minWidth="95dip"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/sizeLabel"
+        style="@style/AppItem.Version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/appVersionLabel" />
+
+    <TextView
+        android:id="@+id/infoLabel"
+        style="@style/AppItem.Author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/appIconView"
+        android:layout_toRightOf="@id/appIconView"
+        android:maxWidth="65dip"
+        android:minWidth="65dip"
+        android:text="@string/installed" />
+
+    <Button
+        android:id="@+id/funButton"
+        style="@style/Common.AppItem.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_height"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="4dip"
+        android:focusable="false"
+        android:text="@string/uninstall" />
+
+</RelativeLayout>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="fun_btn_font_size">21sp</dimen>
+    <dimen name="pick_item_des_font_size">15sp</dimen>
+    <dimen name="top_type_button_font_szie">18sp</dimen>
+    <dimen name="fun_type_button_font_szie">19sp</dimen>
+    <dimen name="wait_note_font_szie">18sp</dimen>
+    <dimen name="dir_note_font_size">16sp</dimen>
+    <dimen name="app_info_title_font_size">16sp</dimen>
+    <dimen name="app_info_content_font_size">18sp</dimen>
+    <dimen name="category_title_font_size">18sp</dimen>
+    <dimen name="downoad_separate_title">18sp</dimen>
+    <dimen name="screenshot_frame_height">60dip</dimen>
+    <dimen name="screenshot_frame_big_height">237dip</dimen>
+    <dimen name="screenshot_width">156dip</dimen>
+    <dimen name="screenshot_height">235dip</dimen>
+    <dimen name="screenshot_right_margin">2dip</dimen>
+    <dimen name="wait_band_height">45dip</dimen>
+    <dimen name="advertise_band_height">100dip</dimen>
+    <dimen name="advertise_icon_width">140dip</dimen>
+    <dimen name="advertise_icon_height">86dip</dimen>
+    <dimen name="advertise_top_icon_height">81dip</dimen>
+    <dimen name="ad_item_icon_height">86dip</dimen>
+    <dimen name="ad_item_icon_width">120dip</dimen>
+
+    <!-- 暂时的弹出框的 -->
+    <dimen name="popup_window_height">150dip</dimen>
+    <dimen name="local_apk_view_note_frame_left_margin">5dip</dimen>
+
+    <!-- Conver Flow -->
+    <dimen name="APP_NAME_FONT_SIZE">16.0sp</dimen>
+    <dimen name="NAME_PAD">15.0dip</dimen>
+    <dimen name="TOP_PAD">5.0dip</dimen>
+    <dimen name="M_PIECE_WIDTH">176.0dip</dimen>
+    <dimen name="M_PIECE_HEIGHT">115.0dip</dimen>
+    <dimen name="M_BG_WIDTH">180.0dip</dimen>
+    <dimen name="M_BG_HEIGHT">119.0dip</dimen>
+    <dimen name="BG_PAD_LEFT">2.0dip</dimen>
+    <dimen name="BG_PAD_TOP">2.0dip</dimen>
+    <dimen name="SEP_WIDTH">60.0dip</dimen>
+    <dimen name="CONVER_FLOW_HEIGHT">130.0dip</dimen>
+
+    <!-- sz -->
+    <dimen name="common_textsize">28sp</dimen>
+    <dimen name="button_height">50dip</dimen>
+</resources>

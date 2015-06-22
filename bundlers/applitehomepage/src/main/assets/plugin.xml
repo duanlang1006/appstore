@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin-features
+	Bundle-Name="applite_homepage"
+	Bundle-SymbolicName="applite.plugin.homepage"
+	Bundle-Version="1.0"
+	date="2015.5.26"
+	provider-name=""
+	provider-url="" 
+	Bundle-Activator="com.mit.homepage.SimpleBundle"
+	Bundle-Activity="com.mit.homepage.GuideActivity">
+    Bundle-Service=""
+    Bundle-Receiver=""
+</plugin-features>

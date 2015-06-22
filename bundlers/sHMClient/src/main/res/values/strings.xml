@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="app_name">KAPPS</string>
+    <string name="exit_confirm">Confirma sair</string>
+    <string name="share_confirm">Compartilhar confirm</string>
+    <string name="exit_market_confirm">Deseja sair do Kapps central de software?</string>
+    <string name="click_exit">Clique para sair do Kapps central de software</string>
+    <string name="press_back_again_to_quit">Pressione novamente para lançar o programa</string>
+    <string name="share_market_confirm">Compartilhe?</string>
+    <string name="ok">Sim</string>
+    <string name="quit">cair fora</string>
+    <string name="cancel">Cancela</string>
+    <string name="note">Aviso</string>
+    <string name="note_colon">Note:</string>
+    <string name="watch">Localizar</string>
+    <string name="choose_all">Selecione todos</string>
+    <string name="ignore_this_update">Não lembrar</string>
+    <string name="update">Atualizar</string>
+    <string name="back">Volta</string>
+    <string name="unknow">Desconhecido</string>
+    <string name="none_user">Anômio</string>
+    <string name="open">Abrir</string>
+    <string name="show_all">Mostra todos</string>
+    <string name="retry">Repita</string>
+    <string name="favoliten">Adcione favorito</string>
+    <string name="share">Apresentar</string>
+    <string name="category">Classificar</string>
+    <string name="digg">Arranjar</string>
+    <string name="boot_error">Falha de ativar mercado</string>
+    <string name="empty_task_item">Não existe missão de download</string>
+    <string name="more_func">Mais funções</string>
+
+    <!-- 主页初始化 -->
+    <string name="market_in_none_network">O Kapps central de software está trabalhando offline</string>
+    <string name="use_personal_center_must_login">Você tem que fazer login</string>
+    <string name="market_init_config">Está iniciando configuração de mercado</string>
+    <string name="load_config_fail_cant_boot_market">Falha de obter dados de iniciacao de mercado, o Kapps central de software não consegue ativar.</string>
+    <string name="check_network">Verificar rede</string>
+    <string name="network_abnormal">A rede está anormal</string>
+
+    <!-- 本机相关 -->
+    <string name="insert_sdcard_first">Insere cartão SD primeiro</string>
+    <string name="sdcard_using_close_first">O cartão SD está funcionando, por favor, desligue o equipamento USB</string>
+    <string name="sdcard_state_unusual">O cartão SD está anormal</string>
+
+    <!-- 关于 -->
+    <string name="market_version_colon">Versão de Kapps central de software:</string>
+    <string name="about_title">Sobre Kapps central software</string>
+    <string name="about_content">		Caso o senhor achou qualquer erro ou tiver melhor suguestões sobre nosso software, por favo, levante! O seu retorno é nossa força de avançar!</string>
+
+    <!-- 登录注册 -->
+    <string name="valid_email_format">Formato do e-mail valido</string>
+    <string name="register_account">Ainda não tem conta? \ cria uma conta agora! É fácil.</string>
+    <string name="login_market">Já possui conta? \ use o "Kapps central de software" que você deseja conecta com este celular para fazer login. Usuario de fórum pode login diretamente com conta de fórum, nem precisa catastrar novamente.</string>
+    <string name="account">Conta</string>
+    <string name="register">Catastrar</string>
+    <string name="login">Login</string>
+    <string name="next">Proximo</string>
+    <string name="pwd_note_colon">Senha:</string>
+    <string name="user_registe_name_note_colon">Usuario: (entre 2-16 dígitos)</string>
+    <string name="affirm_pwd_note_colon">Confirmar senha:</string>
+    <string name="wait_for_progress">Está tratando pedido, por favor, aguarde...</string>
+    <string name="login_userid_cant_none">O ID de usuário não pode ser vazio</string>
+    <string name="password_not_confirm">As senhas digitadas de duaz vezes são diferentes</string>
+    <string name="email_must_satisfactory">Formato do e-mail valido, entre 3-25 digitos.</string>
+    <string name="pw_must_satisfactory">A senha entre 7-12 digitos</string>
+    <string name="login_unusual">Falha de login</string>
+    <string name="registe_unusual">Falha de catastrar</string>
+    <string name="progress_in_registe">Está tratando pedido de catastrar</string>
+    <string name="progress_in_login">Está tratando pedido de login</string>
+    <string name="login_success_entry_home">Login com sucesso, está entrando pagna principal</string>
+    <string name="registe_success_then_login">Catastre com sucesso, está fazendo login</string>
+    <string name="login_request">Está pedindo login</string>
+    <string name="cant_auto_login">Não pode login automaticamente</string>
+    <string name="login_success">Login com sucesso</string>
+    <string name="login_fail">Falha de login</string>
+    <string name="weloome_login_market">Bem vindo para Kapps central de software</string>
+    <string name="password_colon">Senha:</string>
+    <string name="accept_declare_note">Concordo os provisões</string>
+    <string name="user_registe">Registração de novo usuario</string>
+    <string name="pwd_registe_note_colon">Senha: (7-12 digitos)</string>
+    <string name="user_name">Nome de usuario</string>
+    <string name="app_share">Software públicos</string>
+    <string name="app_other_ver">Outras versões</string>
+    <string name="user_center">OS usuários do Centro</string>
+
+    <!-- 应用分类 -->
+    <string name="day_hotp">Melhores do dia</string>
+    <string name="day_hot">Os necessários</string>
+    <string name="week_hot">Hot da semana</string>
+    <string name="month_day">Hot do mês</string>
+    <string name="year_day">Hot do ano</string>
+    <string name="user_rating">Nivel dado do usuario</string>
+    <string name="free_hot">Hot gratuito</string>
+    <string name="pay_hot">Hot pagado</string>
+    <string name="newest_upload">Novidades</string>
+    <string name="pick_app">Aplicativo recomentado</string>
+    <string name="download_task">Nissão baixado</string>
+    <string name="installed_software">Software instalado</string>
+    <string name="local_apk">APK do local</string>
+    <string name="my_favoliten">Meu favorito</string>
+    <string name="my_purchase">Minha compra</string>
+    <string name="personal_info">Perfil</string>
+    <string name="software_instroduce">Detalhas</string>
+    <string name="watch_comment">Comentario</string>
+    <string name="other_comment">Outros comentarios</string>
+    <string name="about_author">Autor</string>
+    <string name="home">Pagina principal</string>
+    <string name="categroy">Tipo</string>
+    <string name="manage">Administração</string>
+    <string name="personal_center">Central pessoal</string>
+    <string name="cat_application">APPS</string>
+    <string name="cat_game">JOGOS</string>
+    <string name="cat_pick">Ofereciso</string>
+
+    <!-- 作者信息 -->
+    <string name="contact_info">Contato</string>
+    <string name="homepage_colon">Pagina principal:</string>
+    <string name="email_colon">E-mail:</string>
+    <string name="other_produce">Outras obras</string>
+    <string name="load_other_produce">Clique, procure outras obras do autor</string>
+
+    <!-- 软件操作 -->
+    <string name="hi_market_app_install">Instalação de software de central de software Kapps</string>
+    <string name="install_success">Instalação com sucesso</string>
+    <string name="install_failure">Instalação falhou</string>
+    <string name="uninstall_success">Remoção com sucesso</string>
+    <string name="uninstall_failure">Remoção falhou</string>
+    <string name="cant_find_app_detail">Não consegue informação detalhada</string>
+    <string name="free">Baixar Grátis</string>
+    <string name="price_colon">Baixado:</string>
+    <string name="downloaded">Baixado</string>
+    <string name="downloading">Está baixando</string>
+    <string name="installing">Está instalando</string>
+    <string name="updatable">A atualizar</string>
+    <string name="installed">Instalado</string>
+    <string name="purchased">Comptrado</string>
+    <string name="uninstall">Desinstalar</string>
+    <string name="install">Instalar</string>
+    <string name="download">Baixar</string>
+    <string name="stop">Parar</string>
+    <string name="not_installed">Não instalado</string>
+    <string name="software_error_cant_boot">Existe um erro no software, não consegue ativar esse software</string>
+    <string name="please_fill_objection">Por favor, preencha a causa de opor</string>
+    <string name="submit_same_report">O seu mesmo aviso já tinha passado uma vez</string>
+    <string name="your_report">Seu mensagem</string>
+    <string name="wait_for_reporting">A denúncia está enviando, por favor, aguarde</string>
+    <string name="wait_for_commenting">Comentário está enviando, por favor, aguarde</string>
+    <string name="commit_comment_success">O comentário foi enviado com sucesso</string>
+    <string name="commit_comment_fail">O comentário não foi enviado</string>
+    <string name="commit_badness_success">O aviso foi enviado com sucesso</string>
+    <string name="commit_badness_fail">O aviso não foi enviado</string>
+    <string name="my_comment">Meu comentário</string>
+    <string name="need_score_software">é necessário tirar uma nota para software</string>
+    <string name="none_other_app">Não existe obra relarionada</string>
+    <string name="none_other_version_app">Não existe outra versão relacionada</string>
+    <string name="load_other_version_app_fail">Recarrega outra versão relacionada falhou, por favor, tente novamente</string>
+    <string name="download_count_colon">Vez baixada:</string>
+    <string name="comment_count_colon">Vez comentada:</string>
+    <string name="wait_for_installing">Está instalando, por favor, aguarde...</string>
+    <string name="new_apk_file">Novo documento de APK</string>
+    <string name="choose_apk_first">Escolha o APK que vai instalar</string>
+    <string name="manual_load_screenshot_note">Esse software possui uma imagem, clica para carregar</string>
+    <string name="none_screenshot_note">Este software não  possui imagem</string>
+    <string name="install_success_click_open">Instalação com sucesso, clica para abrir</string>
+
+    <!-- 软件权限 -->
+    <string name="software_need_permission_tip">Esse aplicativo precisa autolização seguinte:</string>
+    <string name="load_permission_fail">Carrega autolização falhou</string>
+    <string name="show_hided_permission">Mostra lista de compentência oculta</string>
+
+    <!-- 软件信息 -->
+    <string name="my_comment_title">Meus comentários</string>
+    <string name="comment_colon">Comentarios:</string>
+    <string name="score_colon">Nota:</string>
+    <string name="size_colon">Tamanho:</string>
+    <string name="version_colon">Versão:</string>
+    <string name="state_colon">Status:</string>
+    <string name="app_auth_time">Tempo de upload</string>
+    <string name="char_introduce_title">Explicação textual</string>
+    <string name="screenshot_title">Imagem de software</string>
+    <string name="other_version_note">Clica para ver outras versões</string>
+    <string name="badness_title">Publica o problema</string>
+    <string name="badness_note">Se você achou o software ou tela possui alguns conteudos escandalosos, por favor, avise o Kapps central de software </string>
+    <string name="app_permission_title">Permissão de software</string>
+    <string name="app_permission_note">Clica para ver a permissão de software</string>
+    <string name="software_category">Tipo de software</string>
+    <string name="wait_for_load_app_category">Esta carregando lista de tipo, por favor, aguarde</string>
+    <string name="load_category_fail_retry">Carrega o tipo falhou, clica para tentar novamente</string>
+    <string name="wait_for_commit_comment_mark">Está publicando marca de comentario, por favor, aguarde</string>
+    <string name="commit_comment_mark_success">Publica a marca de comentario com sucesso</string>
+    <string name="commit_comment_mark_fail">Publica a marca de comentario falhou</string>
+    <string name="cant_not_commit_same_cmark">não permite marca de comentario repitido</string>
+
+    <!-- 收藏软件 -->
+    <string name="favoliten_need_login">quando adiciona favorito, você tem de está no login</string>
+    <string name="favoliten_exist"> já existe</string>
+    <string name="favoliten_added">já foi favorito </string>
+    <string name="favoliten_add_fail">adiciona favorito falhou</string>
+    <string name="favoliten_del_fail">remove favorito falhou</string>
+    <string name="favoliten_choose_need">por favor, escolhe item de favorito</string>
+
+    <!-- 处理提示 -->
+    <string name="load_software_more_info">está carregando informação detalhada de software</string>
+    <string name="load_apk_more_info">está carregando informação detalhada de pacote de instalação</string>
+    <string name="load_error_retry">falha de carregar, clica aqui para tentar novamente</string>
+    <string name="load_wait">atualizar</string>
+    <string name="load">carregar</string>
+    <string name="loading">esta carregando</string>
+
+    <!-- 软件下载 -->
+    <string name="app_download_table">lista de missão de download</string>
+    <string name="market_download_task_quit">o Kapps central de software foi parado forçadamente</string>
+    <string name="download_task_rest_colon"> uma missão de download está andando</string>
+    <string name="download_task_finish">a missão de download já finalizou</string>
+    <string name="add_to_download_list">já foi adicionado automaticamente para lista de download</string>
+    <string name="market_download_task">missão baixado de Kapps central de software</string>
+    <string name="add_download_task_suffix"> uma missão de download já foi adicionada</string>
+    <string name="apk_file_exit_check_tasklist">já existe esse APK, por favor, verifique lista de missão</string>
+    <string name="download_task_exist_check_tasklist">a missão de download está andando, por favor, verifique lista de missão</string>
+    <string name="apk_file_exist_check_localapklist">já existe esse APK, por favor, verifique a lista de missão local</string>
+    <string name="download_task_complete"> finalizou o download</string>
+    <string name="download_task_fail"> falhou o download</string>
+    <string name="download_task_stop"> parou o download</string>
+    <string name="download_task_added"> já foi adicionado o download</string>
+    <string name="download_task_begin">começa baixar</string>
+    <string name="download_list_complete">finalizou o download</string>
+    <string name="download_list_downloading">está baixando</string>
+    <string name="download_list_download_fail">falhou o download</string>
+    <string name="download_choosed_software">baixa software escolhado</string>
+    <string name="choose_need_download_software_first">por favor, escolhe o software preferido</string>
+    <string name="no_need_download_apk_check_local">não existe APK para baixar, por favor, veirifique lista de download ou lista de APK local</string>
+    <string name="click_to_install">clica para instalar</string>
+
+    <!-- 下载管理 -->
+    <string name="download_manage">controle de download</string>
+    
+    <!-- 软件搜索 -->
+    <string name="search">pesquisa</string>
+    <string name="search_btn" tools:ignore="MissingTranslation">GO</string>
+    <string name="search_software">pesquisa de software</string>
+    <string name="market_search_software">pesquisa de Kapps central de software</string>
+    <string name="search_result">resultado de pesquisa</string>
+    <string name="search_by_software_name">nome de software</string>
+    <string name="search_by_software_introduce">procura segundo apresentação de software</string>
+    <string name="search_by_software_author">nome de autor</string>
+    <string name="search_by_software_package">procura segundo nome de pacote de software</string>
+    <string name="search_for_key_word_colon">procura palavra chave:</string>
+    <string name="search_result_total">achou () softwares conformados"</string>
+    <string name="searching_key_word_fail">"palavra chave () falhou"</string>
+    <string name="inpust_key_word">digite palavra chave</string>
+    <string name="choose_search_range">escolha area de pesquisa</string>
+
+    <!-- 更新相关 -->
+    <string name="software_update_title">atualização de software</string>
+    <string name="software_update_note">tem uma versão mais nova do software </string>
+    <string name="market_update_title">informação de atualização do Kapps central de software</string>
+    <string name="add_update_task_suffix"> já adicionou a missão nova</string>
+    <string name="upateable_software_list">lista de software de versão nova</string>
+    <string name="update_all">atualiza tudo</string>
+    <string name="none_software_need_update">não existe software para atualizar</string>
+    <string name="wait_for_server_feedback">está aguardando retono de servidor, só um minuto</string>
+    <string name="request_market_update">a verificação de atualização do Kapps central de software já foi punlicado</string>
+    <string name="request_software_update">solicitação de atualização de software foi oferecido</string>
+    <string name="local_version_note">versão local</string>
+    <string name="find_version_note">versão encontrada</string>
+    <string name="market_newest">o Kapps central de software está com versão mais nova</string>
+    <string name="softwoft_newest">o software local está com versão mais nova</string>
+    <string name="software_can_update">() software possui atualizar, clica para ver</string>
+    <string name="install_update_software">começa instalar software atualizado</string>
+
+    <!-- 配置相关 -->
+    <string name="config_market">configuração de mercado</string>
+    <string name="config_ref_image">carrega imagem de software</string>
+    <string name="whether_load_icon">carrega icone de software</string>
+    <string name="whether_load_icon_note">Irá reduzir trafego na rede caso não carregue screenshots</string>
+    <string name="whether_auto_load_screenshot">carrega imagem de software automaticamente</string>
+    <string name="whether_auto_load_screenshot_note">Não colocar screenshots irá reduzir o tráfego da rede, mas você ainda pode carregar as imagens clicando na barra de screenshot.</string>
+    <string name="whether_back_more_fun">usa atalho o função voltar</string>
+    <string name="whether_back_more_fun_note">Com esse recurso ativado, a tecla Voltar terá uma função específica em diferentes telas. Para sair clique na tecla Home</string>
+    <string name="config_ref_other">outras configuracoes</string>
+    <string name="local_apk_dir">diretorio de localização de APK local</string>
+    <string name="local_apk_dir_shortcut">diretorio </string>
+    <string name="whether_check_software_update">será verificar a atualização de software automaticamente</string>
+    <string name="whether_check_software_update_note">se verificar a atualização de software automaticamente, vai receber software de versao mais avançada oportunamente</string>
+
+    <!-- 举报 -->
+    <string name="market_ill_text">o motivo de você acha que o conteudo ou aplicativo não se serve é:</string>
+    <string name="eroticism_content">conteudo sexual</string>
+    <string name="violence_pic">imagem violencia</string>
+    <string name="rebarbative_content_or_invasive">conteudo chato ou ofentivo</string>
+    <string name="deleterious">ruim para celular ou para dados</string>
+    <string name="other_oppose">outros motivos</string>
+
+    <!-- 个人中 -->
+    <string name="login_user_colon">usuario atual:</string>
+    <string name="share_info_tof">compartilhar para amigos</string>
+    <string name="can_not_share">desculpa, não existe aplicativo no seu sistema para ativar essa operação de compartilhar</string>
+    <string name="share_app">compartilha:[ %1$s\n ]
+		http://mogoyun.com/details?id=%2$s&amp;vcode=%3$s</string>
+
+    <!-- 市场声明 -->
+    <string name="terms">concordo provisão de serviço de "Kapps central de software"</string>
+    <string name="terms_title">Termo de uso</string>
+    <string name="terms_content">Termo de</string>
+
+    <!-- 静态广告 -->
+    <string name="static_ad_title">informação de promoção</string>
+
+    <!-- 额外信息 -->
+    <string name="top_download_app">Download top</string>
+
+    <!-- 菜单 -->
+    <string name="marketupdate">atualizacao de mercado</string>
+    <string name="softupdate">atualizacao de software</string>
+    <string name="login_registe">logoff</string>
+    <string name="feed_back">retorno</string>
+    <string name="exit_market">sair do sistema</string>
+    <string name="setup">configuração</string>
+    <string name="about">sobre</string>
+    <!-- 易迅支付插件 -->
+    <string name="hello">Hello World, MainActivity!</string>
+    <string name="pay_app_name">PaySDK</string>
+    <string name="pay_back">返回</string>
+    <string name="home_sms">短信-发短信即可支付</string>
+    <string name="home_paycard">话费充值卡支付-移动 联通一卡充</string>
+    <string name="home_bank">银行卡支付-无需开通网上银行</string>
+    <string name="paidcard_tips">请确认所选面额与充值卡面额一致,否则会造成支付失败或话费充值卡作废,卡内剩余金额还可以再次使用.(有效期1个月)</string>
+    <string name="gamecard_tips">请确认所选面额与游戏点卡面额一致,否则会造成支付失败或游戏点卡作废,卡内剩余金额还可以再次使用.(有效期1个月)</string>
+    <string name="bankcard_tips">所填信息将提交给中国银联进行验证；通过验证后，将接收到来自中国银联的语音回拨电话（020-96585），请您放心使用。</string>
+    <string name="bankpaying1">中国银联将对您提交的身份及银行信息进行核实,核实通过后银联将通过电话:(020-96585)呼叫手机号:</string>
+    <string name="bankpaying2">,请按语音提示完成支付.</string>
+    <string name="prepaidpaying">正在为您支付...\n可能由于网络原因导致支付时间较长,请耐心等待.</string>
+    <string name="paidcard_tip">使用话费充值卡支付</string>
+    <string name="gamecard_tip">使用游戏点卡支付</string>
+    <string name="bankcard_tip">使用银行卡语音支付</string>
+    <string name="yuan">元</string>
+    <string name="bank_cardid">银行卡卡号</string>
+    <string name="bank_peopleid">持卡人身份证号</string>
+    <string name="bank_countname">银行卡开户姓名</string>
+    <string name="bank_phonenum">被呼叫的手机号</string>
+    <string name="remeber">记住填写的信息</string>
+    <string name="confirm">确定</string>
+    <string name="pay_cancel">取消</string>
+    <string name="otherpaytips">您还可以使用其他支付方式</string>
+    <string name="card_num_hint">输入充值卡序列号</string>
+    <string name="gamecard_num_hint">输入游戏点卡序列号</string>
+    <string name="card_psw_hint">输入充值卡密码</string>
+    <string name="gamecard_psw_hint">输入游戏点卡密码</string>
+    <string name="bankprovince">开户银行所在省</string>
+    <string name="bankcity">开户银行所在市</string>
+    <string name="cardisbank">银行卡所属银行</string>
+    <string name="prepaidstyle">话费充值卡类型</string>
+    <string name="gamecardstyle">游戏点卡类型</string>
+    <string name="prepaidvalue">话费充值卡面额</string>
+    <string name="gamecardvalue">游戏点卡面额</string>
+    <string name="selectpay">选择支付方式</string>
+    <string name="ppcsNoempt">请选择话费充值卡类型</string>
+    <string name="ppcvNoempt">请选择话费充值卡面额</string>
+    <string name="ppcIDNoempt">请输入充值卡序列号</string>
+    <string name="ppcIDNolegal">充值卡号不正确</string>
+    <string name="ppcPswNoempt">请输入充值卡密码</string>
+    <string name="ppcPswNolegal">充值卡密码不正确</string>
+    <string name="gcsNoempt">请选择游戏点卡类型</string>
+    <string name="gcvNoempt">请选择游戏点卡面额</string>
+    <string name="gcIDNoempt">请输入游戏点卡序列号</string>
+    <string name="gcIDNolegal">游戏点卡号不正确</string>
+    <string name="gcPswNoempt">请输入游戏点卡密码</string>
+    <string name="gcPswNolegal">游戏点卡密码不正确</string>
+    <string name="bcNameNoempt">请选择银行卡所属银行</string>
+    <string name="bcpNoempt">请选择开户银行所在省</string>
+    <string name="bccNoempt">请选择开户银行所在市</string>
+    <string name="bcIDNolegal">银行卡号不正确</string>
+    <string name="bcIDNoempt">请输入银行卡卡号</string>
+    <string name="bcICNolegal">身份证号不正确</string>
+    <string name="bcICNoempt">请输入持卡人身份证号</string>
+    <string name="bcCNNoempt">请输入银行卡开户姓名</string>
+    <string name="bcphoneNoempt">请输入被呼叫的手机号</string>
+    <string name="bcphoneNolegal">手机号码不正确</string>
+    <string name="warning">提示</string>
+    <string name="appCheckfail">程序验证失败</string>
+    <string name="networkyichang">网络连接异常</string>
+    <string name="networkzhongduan">网络异常中断</string>
+    <string name="paysuccess_colon">支付成功,订单号: </string>
+    <string name="payfail">支付不成功!</string>
+    <string name="pleaseCheckNetwork">请检查网络是否可用</string>
+    <string name="unicomNOSupport">(联通卡不支持)</string>
+    <string name="mustSelectStyle">请先选择充值卡类型</string>
+    <string name="mustSelectGameStyle">请先选择游戏点卡类型</string>
+    <string name="mustSelectProvince">请先选择省会</string>
+    <string name="payNotSuccessNow">支付尚未成功</string>
+    <string name="CSPN">客服电话:400-8181-328</string>
+    <string name="sichuan">四川省</string>
+    <string name="guizhousheng">贵州省</string>
+    <string name="yunnansheng">云南省</string>
+    <string name="xizang">西藏</string>
+    <string name="tianjin">天津市</string>
+    <string name="shanghai">上海市</string>
+    <string name="beijing">北京市</string>
+    <string name="guangdong">广东省</string>
+    <string name="shanxi">陕西省</string>
+    <string name="gansu">甘肃省</string>
+    <string name="qinghai">青海省</string>
+    <string name="ningxia">宁夏</string>
+    <string name="xinjiang">新疆</string>
+    <string name="hebeisheng">河北省</string>
+    <string name="shanxisheng">山西省</string>
+    <string name="neimenggu">内蒙古</string>
+    <string name="liaoningsheng">辽宁省</string>
+    <string name="jilinsheng">吉林省</string>
+    <string name="heilongjiangsheng">黑龙江省</string>
+    <string name="jiangsusheng">江苏省</string>
+    <string name="zhejiangsheng">浙江省</string>
+    <string name="anhuisheng">安徽省</string>
+    <string name="fujiansheng">福建省</string>
+    <string name="jiangxisheng">江西省</string>
+    <string name="shandongsheng">山东省</string>
+    <string name="henansheng">河南省</string>
+    <string name="hubeisheng">湖北省</string>
+    <string name="hunansheng">湖南省</string>
+    <string name="guangxi">广西省</string>
+    <string name="hainansheng">海南省</string>
+    <string name="chongqingshi">重庆市</string>
+    <string name="network_instability">当前网络不稳定。</string>
+    <string name="normal_updata">软件更新</string>
+    <string name="pay_downloading">正在下载</string>
+    <string name="please_wait">请稍后…</string>
+    <string name="rate_prompt">资费提示</string>
+    <string name="total_rate_prompt">费用S元，需要发送N条短信付费，点击确定继续。</string>
+    <string name="prompt">提示</string>
+    <string name="money_to_much">大于10元的金额暂时无法使用短信支付。</string>
+    <string name="not_support">暂时不支持该网络用户，请选择其它支付方式。</string>
+    <string name="sms_pay_tip">使用短信支付S元。</string>
+    <string name="sms_imsi_type">请选择所属运行商</string>
+    <string name="no_strategy">该金额暂时无法使用短信支付</string>
+    <string name="no_strategy_re">该金额</string>
+    <string name="yidong">移动用户</string>
+    <string name="liantong">联通用户</string>
+    <string name="dianxin">电信用户</string>
+    <string name="loading_please_wait">正在通讯，请稍等...</string>
+    <string name="ch_unicom">[中国联通]</string>
+    <string name="ch_telecom">[中国电信]</string>
+    <string name="ch_cmcc">[中国移动]</string>
+    <string name="no_network">没有有效的网络连接。</string>
+    <string name="sms_prompt_text">短信支付(推荐)</string>
+    <string name="sms_prompt_text2">发条短信即可快速支付</string>
+    <string name="bank_prompt_text">银行卡语音支付</string>
+    <string name="bank_prompt_text2">无需开通网银 支持多种银行卡</string>
+    <string name="prepaid_prompt_text">话费充值卡支付</string>
+    <string name="prepaid_prompt_text2">支持移动 联通话费充值卡</string>
+    <string name="pay_sms_success">支付短信发送成功</string>
+    <string name="pay_sms_faild">支付短信发送失败</string>
+    <string name="can_not_pay_by_sms">暂时无法使用短信支付</string>
+    <string name="confirm_timeout">等待确认信息超时</string>
+    <string name="network_error">无法连接到网络，请稍候重试</string>
+    <string name="confirm_temp_key1">您</string>
+    <string name="confirm_temp_key2">回复</string>
+    <string name="confirm_temp_key3">密码</string>
+
+    <!-- 游戏点卡String -->
+    <string name="gamecard_pay_text">游戏点卡支付</string>
+    <string name="gamecard_pay_detail">支持骏网 盛大 网易等点卡</string>
+    <!-- for push -->
+        <string name="notification_finish">finalizou o download, clica para instalar</string>
+    <string name="start_download">começa baixar</string>
+    <string name="push_come">informação sistematica</string>
+    <string name="download_finish">finalizou o download </string>
+    <string name="download_fail">falou o download</string>
+    <string name="download_timeout">passou o tempo, por favor, tente novamente</string>
+    <string name="download_reload">baixa novamente</string>
+    <string name="topic">tópico</string>
+
+</resources>

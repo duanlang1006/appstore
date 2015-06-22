@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:paddingTop="6dip" android:paddingBottom="6dip">
+	<TextView android:id="@+id/authorLabel" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:ellipsize="end"
+		android:singleLine="true" style="@style/AppComment.Author"
+		android:layout_marginLeft="3dip" android:minWidth="150dip"
+		android:maxWidth="150dip" android:layout_alignParentLeft="true" />
+
+	<TextView android:id="@+id/dateLabel" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:ellipsize="end"
+		android:singleLine="true" style="@style/AppComment.Time"
+		android:layout_alignParentRight="true" android:layout_marginLeft="3dip"
+		android:layout_marginRight="5dip" />
+
+	<TextView android:id="@+id/contentLabel" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:maxWidth="235dip"
+		android:ellipsize="marquee" android:marqueeRepeatLimit="marquee_forever"
+		android:singleLine="true" style="@style/AppComment.Content"
+		android:layout_alignParentLeft="true" android:layout_below="@id/authorLabel"
+		android:layout_marginLeft="3dip" />
+
+	<com.kapps.market.ui.RatingView android:id="@+id/commentRatingBar"
+		android:layout_height="wrap_content" android:layout_width="wrap_content"
+		android:layout_marginTop="2dip" android:layout_marginRight="5dip"
+		android:layout_alignParentRight="true" android:layout_alignBottom="@id/contentLabel" />
+
+</RelativeLayout>
+  

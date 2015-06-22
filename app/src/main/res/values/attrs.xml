@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/* Copyright 2008, The Android Open Source Project
+**
+** Licensed under the Apache License, Version 2.0 (the "License");
+** you may not use this file except in compliance with the License.
+** You may obtain a copy of the License at
+**
+**     http://www.apache.org/licenses/LICENSE-2.0
+**
+** Unless required by applicable law or agreed to in writing, software
+** distributed under the License is distributed on an "AS IS" BASIS,
+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+** See the License for the specific language governing permissions and
+** limitations under the License.
+*/
+-->
+
+<resources>
+    <!-- Orientation of a widget. -->
+    <attr name="direction">
+        <!-- Vertical widget. -->
+        <enum name="vertical" value="0" />
+        <!-- Horizontal widget. -->
+        <enum name="horizontal" value="1" />
+    </attr>
+
+    <skip />
+
+    <!-- Cling specific attributes. These attributes are used to customize
+         the cling in XML files. -->
+
+    <!-- Workspace specific attributes. These attributes are used to customize
+         the workspace in XML files. -->
+    
+    <!-- Hotseat specific attributes. These attributes are used to customize
+         the hotseat in XML files. -->
+
+    <!-- CellLayout specific attributes. These attributes are used to customize
+         a CellLayout view in XML files. -->
+
+    <!-- StrokedTextView specific attributes. -->
+
+    <!-- HolographicLinearLayout specific attributes. -->
+
+    <!-- PagedViewIcon specific attributes. These attributes are used to customize
+         a PagedViewIcon view in XML files. -->
+    <declare-styleable name="PagedViewIcon">
+        <!-- The blur color of the holographic outline -->
+        <attr name="blurColor" format="color" />
+        <!-- The outline color of the holographic outline -->
+        <attr name="outlineColor" format="color" />
+    </declare-styleable>
+
+    <!-- PagedViewWidget specific attributes. These attributes are used to
+         customize a PagedViewWidget view in XML files. -->
+
+    <!-- PagedView specific attributes. These attributes are used to customize
+         a PagedView view in XML files. -->
+    <declare-styleable name="PagedView">
+        <!-- A spacing override for the icons within a page -->
+        <attr name="pageLayoutWidthGap" format="dimension" />
+        <attr name="pageLayoutHeightGap" format="dimension" />
+        <!-- The padding of the pages that are dynamically created per page -->
+        <attr name="pageLayoutPaddingTop" format="dimension" />
+        <attr name="pageLayoutPaddingBottom" format="dimension" />
+        <attr name="pageLayoutPaddingLeft" format="dimension" />
+        <attr name="pageLayoutPaddingRight" format="dimension" />
+        <!-- The space between adjacent pages of the PagedView. -->
+        <attr name="pageSpacing" format="dimension" />
+        <!-- The padding for the scroll indicator area -->
+        <attr name="scrollIndicatorPaddingLeft" format="dimension" />
+        <attr name="scrollIndicatorPaddingRight" format="dimension" />
+    </declare-styleable>
+
+    <!-- AppsCustomizePagedView specific attributes.  These attributes are used to
+         customize an AppsCustomizePagedView in xml files. -->
+    <declare-styleable name="AppsCustomizePagedView">
+        <!-- Max number of cells of applications horizontally -->
+        <attr name="maxAppCellCountX" format="integer" />
+        <!-- Max number of cells of applications vertically -->
+        <attr name="maxAppCellCountY" format="integer" />
+        <!-- Horizontal spacing between widgets and wallpapers -->
+        <attr name="widgetCellWidthGap" format="dimension" />
+        <!-- Vertical spacing between widgets -->
+        <attr name="widgetCellHeightGap" format="dimension" />
+        <!-- Number of widgets horizontally -->
+        <attr name="widgetCountX" format="integer" />
+        <!-- Number of widgets vertically -->
+        <attr name="widgetCountY" format="integer" />
+        <!-- The x index of the item to be focused in the cling -->
+        <attr name="clingFocusedX" format="integer" />
+        <!-- The y index of the item to be focused in the cling -->
+        <attr name="clingFocusedY" format="integer" />
+        <attr name="isInstall" format="boolean" />
+    </declare-styleable>
+
+    <!-- HandleView specific attributes. These attributes are used to customize
+         a HandleView view in XML files. -->
+
+    <!-- XML attributes used by default_workspace.xml -->
+    <declare-styleable name="Panel">
+       <!-- Defines panel animation duration in ms. -->
+        <attr name="animationDuration" format="integer" />
+        <!-- Defines panel position on the screen. -->
+        <attr name="position">
+        	<!-- Panel placed at top of the screen. -->
+            <enum name="top" value="0" />
+            <!-- Panel placed at bottom of the screen. -->
+            <enum name="bottom" value="1" />
+            <!-- Panel placed at left of the screen. -->
+            <enum name="left" value="2" />
+            <!-- Panel placed at right of the screen. -->
+            <enum name="right" value="3" />
+        </attr>
+        <!-- Identifier for the child that represents the panel's handle. -->
+        <attr name="handle" format="reference" />
+        <!-- Identifier for the child that represents the panel's content. -->
+        <attr name="content" format="reference" />
+        <!-- Defines if flying gesture forces linear interpolator in animation. -->
+        <attr name="linearFlying" format="boolean" />
+        <!-- Defines size relative to parent (must be in form: nn%p). -->
+        <attr name="weight" format="fraction" />
+        <!-- Defines opened handle (drawable/color). -->
+        <attr name="openedHandle" format="reference|color" />
+        <!-- Defines closed handle (drawable/color). -->
+        <attr name="closedHandle" format="reference|color" />
+  </declare-styleable>
+</resources>

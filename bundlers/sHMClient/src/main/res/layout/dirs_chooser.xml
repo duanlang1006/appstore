@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:orientation="vertical" android:minWidth="300dip"
+	android:minHeight="470dip">
+
+	<TextView android:id="@+id/dirLabel" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:textSize="@dimen/dir_note_font_size" />
+
+	<TextView android:id="@+id/tryButton" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:text="@string/retry"
+		android:visibility="gone" android:gravity="center" style="@style/LoadWait.Note" />
+
+	<!--主内容frame -->
+	<ListView android:id="@+id/dirsList" android:layout_width="fill_parent"
+		android:layout_height="0px" android:layout_weight="1" android:divider="@drawable/line" />
+	<LinearLayout android:layout_height="wrap_content"
+		android:layout_width="fill_parent" android:gravity="center"
+		android:layout_gravity="bottom|center_horizontal">
+		<Button android:id="@+id/okButton" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" style="@style/Common.Button"
+			android:text="@string/ok" />
+		<Button android:id="@+id/cancelButton" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" style="@style/Common.Button"
+			android:text="@string/cancel" />
+	</LinearLayout>
+</LinearLayout>
+ 

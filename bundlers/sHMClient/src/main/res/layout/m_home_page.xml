@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <com.kapps.market.ui.ConverFlowFull
+        android:id="@+id/coverFlow"
+        android:layout_width="fill_parent"
+        android:layout_height="150dip">
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <LinearLayout
+            android:id="@+id/viewGroupDots"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="#33000000"
+            android:gravity="center"
+            android:orientation="horizontal" />
+    </com.kapps.market.ui.ConverFlowFull>
+
+    <LinearLayout
+        android:id="@+id/funcList"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/tab_bg"
+        android:gravity="center" >
+
+        <Button
+            android:id="@+id/tab1Button"
+            style="@style/TopTypeLeft.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/pick_app" />
+
+        <Button
+            android:id="@+id/tab2Button"
+            style="@style/TopTypeMiddle.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/day_hot" />
+
+        <Button
+            android:id="@+id/tab3Button"
+            style="@style/TopTypeRight.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/newest_upload" />
+    </LinearLayout>
+
+    <!-- 主内容frame -->
+
+    <FrameLayout
+        android:id="@+id/contentFrame"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" >
+
+       </FrameLayout> 
+
+</LinearLayout>

@@ -1,0 +1,53 @@
+package com.mit.applite.search.bean;
+
+/**
+ * Created by LSY on 15-5-27.
+ */
+public class HotWordBean {
+    private int _id;
+    private String mName;
+    private String mImgUrl;
+    private String mType;
+
+    @Override
+    public String toString() {
+        return "HotWordBean{" +
+                "_id=" + _id +
+                ", mName='" + mName + '\'' +
+                ", mImgUrl='" + mImgUrl + '\'' +
+                ", mType='" + mType + '\'' +
+                '}';
+    }
+
+    public int get_id() {
+        return _id;
+    }
+
+    public void set_id(int _id) {
+        this._id = _id;
+    }
+
+    public String getmName() {
+        return mName;
+    }
+
+    public void setmName(String mName) {
+        this.mName = mName;
+    }
+
+    public String getmImgUrl() {
+        return mImgUrl;
+    }
+
+    public void setmImgUrl(String mImgUrl) {
+        this.mImgUrl = mImgUrl;
+    }
+
+    public String getmType() {
+        return mType;
+    }
+
+    public void setmType(String mType) {
+        this.mType = mType;
+    }
+}

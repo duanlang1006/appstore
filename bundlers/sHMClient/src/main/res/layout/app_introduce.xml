@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fadingEdge="none" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+
+        <!-- 软件截图+ 基本信息 screenshot and basic info. -->
+        <!--TextView
+            style="@style/AppDetail.Title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/screenshot_title" /-->
+
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scrollbars="none" >
+
+            <com.kapps.market.ui.detail.ScreenshotBand
+                android:id="@+id/screenshotFrame"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/screenshot_frame_height"
+                android:paddingBottom="2dip"
+                android:paddingLeft="2dip"
+                android:paddingTop="2dip" />
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/statLabel"
+            style="@style/AppDetail.StatContent"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+        
+        <!-- description -->
+        
+        <TextView
+            style="@style/AppDetail.Title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/char_introduce_title" />
+        
+        <TextView
+            android:id="@+id/introduceLabel"
+            style="@style/AppDetail.Content"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dip"
+            android:layout_marginTop="5dip" />
+        
+        <!-- more -->
+        <TextView
+            style="@style/AppDetail.Title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/more_func"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="1dip"
+            android:layout_marginTop="2dip"
+            android:gravity="center" 
+            android:visibility="gone" >
+
+            <Button
+                android:id="@+id/permssionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dip"
+                android:background="@drawable/app_per_btn"
+                android:gravity="bottom|center_horizontal"
+                android:padding="2dip"
+                android:text="@string/app_permission_title"
+                android:textColor="@color/band_title_text_color"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/reportButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dip"
+                android:background="@drawable/report_issue_btn"
+                android:gravity="bottom|center_horizontal"
+                android:padding="2dip"
+                android:text="@string/badness_title"
+                android:textColor="@color/band_title_text_color"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/shareAppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/share_app_btn"
+                android:gravity="bottom|center_horizontal"
+                android:padding="2dip"
+                android:text="@string/app_share"
+                android:textColor="@color/band_title_text_color"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/otherVerAppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/other_version_btn"
+                android:gravity="bottom|center_horizontal"
+                android:padding="2dip"
+                android:text="@string/app_other_ver"
+                android:textColor="@color/band_title_text_color"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

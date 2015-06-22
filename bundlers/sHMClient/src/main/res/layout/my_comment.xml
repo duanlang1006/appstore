@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/myCommentView" android:layout_width="fill_parent"
+	android:layout_height="wrap_content" android:layout_marginBottom="10dip">
+	<!-- 我的评论, 只有有它的评论的时候才显示	-->
+	<TextView android:id="@+id/titleBnad" title="@string/my_comment_title"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:background="@drawable/intro_title" android:paddingLeft="3dip"
+		android:layout_alignParentLeft="true" />
+	<TextView android:id="@+id/commentScoreLabel" android:text="@string/score_colon"
+		style="@style/AppDetail.ContentNote" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_alignParentLeft="true"
+		android:layout_below="@id/titleBnad" />
+	<com.kapps.market.ui.RatingView android:id="@+id/commentRatingView"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_marginTop="2dip" android:layout_marginRight="5dip"
+		android:layout_toRightOf="@id/commentScoreLabel"
+		android:layout_alignBottom="@id/commentScoreLabel" />
+	<TextView android:id="@+id/commentLabel" android:text="@string/comment_colon"
+		style="@style/AppDetail.ContentNote" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_alignParentLeft="true"
+		android:layout_below="@id/commentScoreLabel" />
+	<TextView android:id="@+id/commentContentField"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true" android:layout_below="@id/commentLabel"
+		android:layout_marginLeft="5dip" style="@style/AppComment.Content" />
+
+	<com.kapps.market.ui.ViewProgressNote
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:background="@drawable/intro_title" android:paddingLeft="3dip"
+		android:layout_alignParentLeft="true" title="@string/other_comment"
+		android:layout_below="@id/commentContentField" />
+
+</RelativeLayout>
+ 

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:orientation="vertical">
+	<LinearLayout android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:gravity="center"
+		android:background="@android:color/white">
+		<!--介绍包含 描述，截图，权限 -->
+		<Button android:id="@+id/introduceButton" style="@style/TopTypeLeft.Button"
+			android:layout_width="0px" android:layout_weight="1"
+			android:layout_height="wrap_content" android:text="@string/software_instroduce" />
+		<Button android:id="@+id/commentButton" style="@style/TopTypeMiddle.Button"
+			android:layout_width="0px" android:layout_weight="1"
+			android:layout_height="wrap_content" android:text="@string/watch_comment" />
+		<Button android:id="@+id/develperButton" style="@style/TopTypeRight.Button"
+			android:layout_width="0px" android:layout_weight="1"
+			android:layout_height="wrap_content" android:text="@string/about_author" />
+	</LinearLayout>
+
+	<ImageView
+	    android:id="@+id/animation_pic"
+	    android:layout_width="wrap_content"
+	    android:layout_height="5dp"
+	    android:background="@drawable/main_bg_green"/>
+    
+	<!--主内容frame -->
+	<FrameLayout android:id="@+id/contentFrame"
+		android:layout_width="fill_parent" android:layout_height="0px"
+		android:layout_weight="1" android:background="@color/content_bg_color" />
+
+	<!--操作 -->
+	<LinearLayout android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:gravity="center"
+		android:background="@drawable/fun_band"
+		>
+		<Button android:id="@+id/favorFunButton" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" style="@style/Common.Detail.Button"
+			android:layout_margin="3dip" android:text="@string/favoliten"
+			android:layout_weight="1" />
+		<Button android:id="@+id/openFunButton" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:visibility="gone"
+			android:layout_margin="3dip" style="@style/Common.Detail.Button"
+			android:text="@string/open"
+			android:layout_weight="1" />
+		<!-- 标签内容有应用的状态决定 -->
+		<Button android:id="@+id/merFunButton" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" style="@style/Common.Detail.Button"
+			android:layout_margin="3dip" android:text="@string/unknow"
+			android:layout_weight="1" />
+	</LinearLayout>
+</merge>
+ 

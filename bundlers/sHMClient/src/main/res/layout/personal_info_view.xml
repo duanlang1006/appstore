@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="fill_parent" android:layout_width="fill_parent"
+	android:orientation="vertical" >
+	<TextView android:id="@+id/userNameNoteLabel"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true" android:text="@string/login_user_colon"
+		style="@style/Personal.Note" />
+	<TextView android:id="@+id/userNameLabel"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_toRightOf="@id/userNameNoteLabel" style="@style/Personal.Content" />
+</RelativeLayout>
+
+

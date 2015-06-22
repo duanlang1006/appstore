@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:background="@color/load_note_common">
+	<ProgressBar android:id="@+id/progressBar"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_centerInParent="true" style="@style/ProgressMedium.circle" />
+
+	<TextView android:id="@+id/progressLabel" android:text="@string/wait_for_load_app_category"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_marginTop="5dip" android:layout_marginLeft="5dip"
+		android:layout_centerHorizontal="true" android:layout_below="@id/progressBar"
+		style="@style/Progress.Note" />
+
+	<TextView android:id="@+id/loadButton" android:layout_width="fill_parent"
+		android:layout_height="45dip" android:text="@string/load_category_fail_retry"
+		android:gravity="center" android:visibility="invisible"
+		android:background="@drawable/reload_note" android:textColor="@color/load_note_fail"
+		android:textSize="18sp" android:focusable="false"
+		android:layout_alignParentBottom="true" />
+</RelativeLayout>
+  

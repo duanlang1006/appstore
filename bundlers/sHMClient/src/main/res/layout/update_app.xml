@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="3dip"
+    android:paddingTop="3dip" >
+
+    <ImageView
+        android:id="@+id/appIconView"
+        android:layout_width="48dip"
+        android:layout_height="48dip"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="2dip"
+        android:layout_marginRight="8dip"
+        android:scaleType="fitCenter" />
+
+    <TextView
+        android:id="@+id/appNameLabel"
+        style="@style/AppItem.Name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_toRightOf="@id/appIconView"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:maxWidth="180dip"
+        android:singleLine="true"
+        android:textSize="14dip" />
+
+    <TextView
+        android:id="@+id/appVersionLabel"
+        style="@style/AppItem.Author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/appNameLabel"
+        android:layout_marginRight="5dip"
+        android:layout_toRightOf="@id/appIconView"
+        android:maxWidth="110dip"
+        android:minWidth="110dip"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/appSizeLabel"
+        style="@style/AppItem.Author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/appNameLabel"
+        android:layout_marginRight="5dip"
+        android:layout_toRightOf="@id/appVersionLabel"
+        android:singleLine="true"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/infoLabel"
+        style="@style/AppItem.Author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/appVersionLabel"
+        android:layout_toRightOf="@id/appIconView"
+        android:singleLine="true" />
+
+    <Button
+        android:id="@+id/funView"
+        style="@style/Common.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="3dip"
+        android:focusable="false"
+        android:text="@string/update"
+        android:textColor="@color/app_updatable_highlight" />
+
+</RelativeLayout>

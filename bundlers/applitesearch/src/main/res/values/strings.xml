@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">AppliteSearch</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_detail">DetailActivity</string>
+
+    <string name="version"> Version: </string>
+    <string name="download_number"> download </string>
+    <string name="wan"> Wan </string>
+    <string name="download"> Download </string>
+    <string name="install">Install</string>
+    <string name="pause"> Pause </string>
+    <string name="open">Open</string>
+    <string name="update">Update</string>
+    <string name="keep_on">Keep on</string>
+    <string name="srarch_content_no_null"> search can not be empty! </string>
+
+</resources>

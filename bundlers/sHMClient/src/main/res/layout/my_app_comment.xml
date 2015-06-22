@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/myAppCommentView" android:layout_width="fill_parent"
+	android:layout_height="wrap_content" android:orientation="vertical">
+	<TextView android:id="@+id/commentScoreLabel" android:text="@string/score_colon"
+        android:textSize="22sp"
+		android:layout_width="wrap_content" android:layout_height="wrap_content" />
+	<RatingBar android:id="@+id/commentRatingBar" android:layout_marginTop="10dp"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		style="@style/Comment.RatingBar" android:numStars="5"
+        android:layout_gravity="center_vertical"
+        android:minHeight="30dp" android:layout_marginBottom="10dp"
+		android:layout_marginLeft="10dip" />
+	<TextView android:id="@+id/commentLabel" android:text="@string/comment_colon"
+        android:textSize="22sp"
+		android:layout_width="wrap_content" android:layout_height="wrap_content" />
+	<EditText android:id="@+id/commentContentField"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_marginLeft="10dip" android:layout_marginRight="10dip"
+		android:maxLength="70" />
+	<TextView android:id="@+id/errorLabel" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:layout_marginLeft="10dip"
+		android:layout_marginRight="10dip" />
+
+	<LinearLayout android:layout_height="wrap_content"
+		android:layout_width="fill_parent" android:gravity="center"
+		android:layout_gravity="bottom|center_horizontal">
+		<Button android:id="@+id/commitCommentButton"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_margin="5dip" style="@style/Common.Button"
+			android:text="@string/ok" />
+		<Button android:id="@+id/cancelCommentButton"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_margin="5dip" style="@style/Common.Button"
+			android:text="@string/cancel" />
+	</LinearLayout>
+</LinearLayout>

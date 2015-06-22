@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="app_name">KAPPS</string>
+    <string name="exit_confirm">Exit confirm</string>
+    <string name="share_confirm">Share confirmation</string>
+    <string name="share_success">Thank you for your sharing</string>
+    <string name="quit">Continue to exit</string>
+    <string name="share_app_link">"This application is very good, the download link is:%1$s"</string>
+    <string name="exit_market_confirm">Do you want to quit Kapps app market?</string>
+    <string name="share_market_confirm">Share it？</string>
+    <string name="click_exit">Click to exit</string>
+    <string name="press_back_again_to_quit">Press back again to quit</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="note">Note</string>
+    <string name="note_colon">Note：</string>
+    <string name="watch">Watch</string>
+    <string name="choose_all">Choose all</string>
+    <string name="ignore_this_update">Ignore this update</string>
+    <string name="update">Update</string>
+    <string name="back">Back</string>
+    <string name="unknow">Unknow</string>
+    <string name="none_user">No user</string>
+    <string name="open">Open</string>
+    <string name="show_all">Show all</string>
+    <string name="retry">Retry</string>
+    <string name="favoliten">Favoliten</string>
+    <string name="share">Share</string>
+    <string name="category">Category</string>
+    <string name="digg">Hot</string>
+    <string name="boot_error">Market failed to start</string>
+    <string name="empty_task_item">No related download a task</string>
+    <string name="more_func">More functions</string>
+
+    <!-- 主页初始化 -->
+    <string name="market_in_none_network">Market in off-line mode</string>
+    <string name="use_personal_center_must_login">You must login first.</string>
+    <string name="market_init_config">Initial market config.</string>
+    <string name="load_config_fail_cant_boot_market">Market initialized data errors,market unable to start.</string>
+    <string name="check_network">Check network</string>
+    <string name="network_abnormal">Network anomalies</string>
+
+    <!-- 本机相关 -->
+    <string name="insert_sdcard_first">Please to insert SDCard.</string>
+    <string name="sdcard_using_close_first">SDCard is in use, please turn off the USB devices.</string>
+    <string name="sdcard_state_unusual">SDCard not normal state.</string>
+
+    <!-- 关于 -->
+    <string name="market_version_colon">Kapps App market version:</string>
+    <string name="about_title">About Kapps App Market</string>
+    <string name="about_content">		If you find this software any problems or Suggestions, please put forward! Your feedback is always our motivation!</string>
+
+    <!-- 登录注册 -->
+    <string name="valid_email_format">Effective mailbox format.</string>
+    <string name="register_account">Still no account? \n immediately create a! Very simple.</string>
+    <string name="login_market">Already have account?\nUse your cell phone to link so far of "Kapps App Market" account login. BBS user login account directly with BBS, do not need to register!</string>
+    <string name="account">Account</string>
+    <string name="register">Register</string>
+    <string name="login">Login</string>
+    <string name="next">Next</string>
+    <string name="pwd_note_colon">Password:</string>
+    <string name="user_registe_name_note_colon">Name: (between 2 to 16 characters )</string>
+    <string name="affirm_pwd_note_colon">Confirm Password：</string>
+    <string name="wait_for_progress">Is in processing the request please later。。。</string>
+    <string name="login_userid_cant_none">Login user ID can\'t for empty</string>
+    <string name="password_not_confirm">Two password input is not the same</string>
+    <string name="email_must_satisfactory">Effective mailbox format, length is in 3 to 25 between characters</string>
+    <string name="pw_must_satisfactory">Password length in 7 to 12 characters between</string>
+    <string name="login_unusual">Login handling abnormal。。。</string>
+    <string name="registe_unusual">Registered exception handling。。。</string>
+    <string name="progress_in_registe">Registration is requested。。。</string>
+    <string name="progress_in_login">Ongoing login request。。。</string>
+    <string name="login_success_entry_home">Login success, into the home page。。。</string>
+    <string name="registe_success_then_login">Registered success,loining。。。</string>
+    <string name="login_request">Login request</string>
+    <string name="cant_auto_login">Cannot automatically logged on</string>
+    <string name="login_success">Login success</string>
+    <string name="login_fail">Login failed</string>
+    <string name="weloome_login_market">Log in Kapps App Market of welcome</string>
+    <string name="password_colon">password:</string>
+    <string name="accept_declare_note">I agree to the terms of use</string>
+    <string name="user_registe">New user registration</string>
+    <string name="pwd_registe_note_colon">Password: (7 to 12 characters)</string>
+    <string name="user_name">Username</string>
+    <string name="app_share">Share App</string>
+    <string name="app_other_ver">History</string>
+    <string name="user_center">UserCenter</string>
+
+    <!-- 应用分类 -->
+
+    <string name="day_hotp">Day hot</string>
+    <string name="day_hot">Machine required</string>
+    <string name="week_hot">Week hot</string>
+    <string name="month_day">Month hot</string>
+    <string name="year_day">Year hot</string>
+    <string name="user_rating">User rating</string>
+    <string name="free_hot">Free hot</string>
+    <string name="pay_hot">Fee hot</string>
+    <string name="newest_upload">News</string>
+    <string name="pick_app">Pick</string>
+    <string name="download_task">Download task</string>
+    <string name="installed_software">Installed app</string>
+    <string name="local_apk">Local apk</string>
+    <string name="my_favoliten">Favoliten</string>
+    <string name="my_purchase">Purchase</string>
+    <string name="personal_info">Personal</string>
+    <string name="software_instroduce">Instroduce</string>
+    <string name="watch_comment">Comments</string>
+    <string name="other_comment">Others</string>
+    <string name="about_author">Author</string>
+    <string name="home">Home</string>
+    <string name="hot">Hot</string>
+    <string name="categroy">Categroy</string>
+    <string name="manage">Manage</string>
+    <string name="personal_center">Personal</string>
+    <string name="cat_application">Fine game</string>
+    <string name="cat_game">Game</string>
+    <string name="cat_pick">Pick</string>
+
+    <!-- 作者信息 -->
+    <string name="contact_info">Contact</string>
+    <string name="homepage_colon">Homepage:</string>
+    <string name="email_colon">Email:</string>
+    <string name="other_produce">Other app</string>
+    <string name="load_other_produce">Click, check the author\'s others</string>
+
+    <!-- 软件操作 -->
+    <string name="hi_market_app_install">Kapps App Market install</string>
+    <string name="install_success">Installed success</string>
+    <string name="install_failure">Installed failure</string>
+    <string name="uninstall_success">Uninstall success</string>
+    <string name="uninstall_failure">Uninstall failure</string>
+    <string name="cant_find_app_detail">Can\'t get the app detail.</string>
+    <string name="free">free</string>
+    <string name="price_colon">Price:</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="downloading">Downloading</string>
+    <string name="installing">Installing</string>
+    <string name="updatable">Updatable</string>
+    <string name="installed">Installed</string>
+    <string name="purchased">Purchased</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="install">Install</string>
+    <string name="download">Download</string>
+    <string name="stop">Stop</string>
+    <string name="not_installed">Not installed</string>
+    <string name="software_error_cant_boot">Software error, and cannot start the software.</string>
+    <string name="please_fill_objection">Please fill out the reason for the opposition.</string>
+    <string name="submit_same_report">You have just filed a notice of the same article.</string>
+    <string name="your_report">Report</string>
+    <string name="wait_for_reporting">The report submitted, please wait a moment.</string>
+    <string name="wait_for_commenting">Submit comments, please wait a moment.</string>
+    <string name="commit_comment_success">Comments submitted to success.</string>
+    <string name="commit_comment_fail">Comments submitted to failure.</string>
+    <string name="commit_badness_success">Notice to submit success.</string>
+    <string name="commit_badness_fail">Notice to submit failure</string>
+    <string name="my_comment">My comment</string>
+    <string name="need_score_software">You need to test software.</string>
+    <string name="none_other_app">None other app</string>
+    <string name="none_other_version_app">None other version app</string>
+    <string name="load_other_version_app_fail">Load other version app failed.</string>
+    <string name="download_count_colon">Download count:</string>
+    <string name="comment_count_colon">Comment count:</string>
+    <string name="wait_for_installing">Wait for installing</string>
+    <string name="new_apk_file">New apk file</string>
+    <string name="choose_apk_first">Choose apk first</string>
+    <string name="manual_load_screenshot_note">This software has %1$s screenshot, click on the loading.</string>
+    <string name="none_screenshot_note">This app is not screenshot.</string>
+    <string name="install_success_click_open">Install success,click open</string>
+
+    <!-- 软件权限 -->
+    <string name="software_need_permission_tip">This app needs some permissions:</string>
+    <string name="load_permission_fail">Permissions fail to load</string>
+    <string name="show_hided_permission">Show hidden permissions list</string>
+
+    <!-- 软件信息 -->
+    <string name="my_comment_title">My comment</string>
+    <string name="comment_colon">Comment：</string>
+    <string name="score_colon">Score：</string>
+    <string name="size_colon">Size：</string>
+    <string name="version_colon">Version：</string>
+    <string name="state_colon">State：</string>
+    <string name="app_auth_time">Auth time</string>
+    <string name="char_introduce_title">Introduce</string>
+    <string name="screenshot_title">Screenshot</string>
+    <string name="other_version_note">Click,other version</string>
+    <string name="badness_title">Badness</string>
+    <string name="badness_note">If you find this application or screen objectionable content there, please tell us.</string>
+    <string name="app_permission_title">Permission</string>
+    <string name="app_permission_note">Click,permission list</string>
+    <string name="software_category">App category</string>
+    <string name="wait_for_load_app_category">Category list,loading。。。</string>
+    <string name="load_category_fail_retry">Load category fail,retry</string>
+    <string name="wait_for_commit_comment_mark">Comments submiting。。。</string>
+    <string name="commit_comment_mark_success">Comment success</string>
+    <string name="commit_comment_mark_fail">Comment fail</string>
+    <string name="cant_not_commit_same_cmark">Can\'t commit same mark</string>
+
+    <!-- 收藏软件 -->
+    <string name="favoliten_need_login">Add collection, you must be in a login state.</string>
+    <string name="favoliten_exist">Already exists</string>
+    <string name="favoliten_added">Favoliten added </string>
+    <string name="favoliten_add_fail">Add collection failure</string>
+    <string name="favoliten_del_fail">Delete collection failure</string>
+    <string name="favoliten_choose_need">Choose need favoliten</string>
+
+    <!-- 处理提示 -->
+    <string name="load_software_more_info">Loading app more info</string>
+    <string name="load_apk_more_info">Loading apk more info</string>
+    <string name="load_error_retry">Load error,retry</string>
+    <string name="load_wait">Refresh</string>
+    <string name="load">Load</string>
+    <string name="loading">Loading。。。</string>
+
+    <!-- 软件下载 -->
+    <string name="app_download_table">Download list</string>
+    <string name="market_download_task_quit">Market download stop</string>
+    <string name="download_task_rest_colon"> Download task</string>
+    <string name="download_task_finish">Download finish</string>
+    <string name="add_to_download_list">Add to download list</string>
+    <string name="market_download_task">Market download task</string>
+    <string name="add_download_task_suffix"> Add download task</string>
+    <string name="apk_file_exit_check_tasklist">Apk exist check tasklist</string>
+    <string name="download_task_exist_check_tasklist">Download task exist,check tasklist</string>
+    <string name="apk_file_exist_check_localapklist">Apk exist,check local apklist</string>
+    <string name="download_task_complete">Download complete</string>
+    <string name="download_task_fail">Downloadb fail</string>
+    <string name="download_task_stop">Download stop</string>
+    <string name="download_task_added">Download added</string>
+    <string name="download_task_begin">Task begin %1$s(%2$s)</string>
+    <string name="download_list_complete">Download complete</string>
+    <string name="download_list_downloading">Downloading</string>
+    <string name="download_list_download_fail">Download fail</string>
+    <string name="download_choosed_software">Choosed software</string>
+    <string name="choose_need_download_software_first">Choose app first</string>
+    <string name="no_need_download_apk_check_local">No need download apk check local</string>
+    <string name="click_to_install">Click to install</string>
+
+    <string name="download_manage">Download Manager</string>
+    <!-- 软件搜索 -->
+    <string name="search">Search</string>
+    <string name="search_btn">GO</string>
+    <string name="search_software">App search</string>
+    <string name="market_search_software">Market search app</string>
+    <string name="search_result">Search result</string>
+    <string name="search_by_software_name">Softwore name</string>
+    <string name="search_by_software_introduce">Search by introduce</string>
+    <string name="search_by_software_author">Softwore author</string>
+    <string name="search_by_software_package">Search by package</string>
+    <string name="search_for_key_word_colon">Search key word:</string>
+    <string name="search_result_total">Search %1$ sresult"</string>
+    <string name="searching_key_word_fail">"Key word[ %1$s ]fail"</string>
+    <string name="inpust_key_word">Inpust key word</string>
+    <string name="choose_search_range">Choose search range</string>
+
+    <!-- 更新相关 -->
+    <string name="software_update_title">App update</string>
+    <string name="software_update_note">New version</string>
+    <string name="market_update_title">Market update</string>
+    <string name="add_update_task_suffix"> Add update task</string>
+    <string name="upateable_software_list">Upateable app list</string>
+    <string name="update_all">Update all</string>
+    <string name="none_software_need_update">None app need update</string>
+    <string name="wait_for_server_feedback">Wait for server feedback</string>
+    <string name="request_market_update">Request market update</string>
+    <string name="request_software_update">Request app update</string>
+    <string name="local_version_note">Local version:</string>
+    <string name="find_version_note">New version:</string>
+    <string name="market_newest">Market is newest</string>
+    <string name="softwoft_newest">Apps is newest</string>
+    <string name="software_can_update">%1$s app can update</string>
+    <string name="install_update_software">Install update app</string>
+
+    <!-- 配置相关 -->
+    <string name="config_market">Market config</string>
+    <string name="config_ref_image">App image config</string>
+    <string name="whether_load_icon">Whether load icon</string>
+    <string name="whether_load_icon_note">Not loading ICONS will reduce the network traffic</string>
+    <string name="whether_auto_load_screenshot">Whether auto load screenshot</string>
+    <string name="whether_auto_load_screenshot_note">Not loading screenshots will reduce network traffic, but can you still can be clicked column screenshots loading software screenshots.</string>
+    <string name="whether_back_more_fun">Whether back more fun</string>
+    <string name="whether_back_more_fun_note">Enable this function, back key in different views will have a specific function, but you need to use a menu item to exit the market exit.</string>
+    <string name="config_ref_other">Other config</string>
+    <string name="local_apk_dir">Local apk dir</string>
+    <string name="local_apk_dir_shortcut">Dir</string>
+    <string name="whether_check_software_update">Whether the automatic detection software upgrade</string>
+    <string name="whether_check_software_update_note">Detection software upgrade will have timely access to the latest software</string>
+
+    <!-- 举报 -->
+    <string name="market_ill_text">You think the content or applications not appropriate reasons:</string>
+    <string name="eroticism_content">Eroticism</string>
+    <string name="violence_pic">Violence</string>
+    <string name="rebarbative_content_or_invasive">Rebarbative or invasive</string>
+    <string name="deleterious">Deleterious</string>
+    <string name="other_oppose">Other oppose</string>
+
+    <!-- 个人中 -->
+    <string name="login_user_colon">Login user</string>
+    <string name="share_info_tof">Share info</string>
+    <string name="can_not_share">I\'m sorry! Your system without application can perform this share operation.</string>
+    <string name="share_app">Share:[ %1$s ] \n
+		http://mogoyun.com/details?id=%2$s&amp;vcode=%3$s</string>
+
+    <!-- 市场声明 -->
+    <string name="terms">Agree wiKappsoyun App Market" terms of service</string>
+    <string name="terms_title">"Kapps App Market"service</string>
+    <string name="terms_content"> "Kapps App Market"service content</string>
+    <!-- 静态广告 -->
+    <string name="static_ad_title">Favourable activity</string>
+
+    <!-- 额外信息 -->
+    <string name="top_download_app">Download ranking</string>
+
+    <!-- 菜单 -->
+    <string name="marketupdate">Market upgrade</string>
+    <string name="softupdate">Software upgrade</string>
+    <string name="login_registe">Log out</string>
+    <string name="feed_back">Feedback</string>
+    <string name="exit_market">Exit</string>
+    <string name="setup">Set up</string>
+    <string name="about">About</string>
+   
+    <!-- for push -->
+    <string name="topic">topic</string>
+    <string name="notification_finish">download compeleted,click to install</string>
+    <string name="start_download">start download</string>
+    <string name="push_come">system message</string>
+    <string name="download_finish">download finish</string>
+    <string name="download_fail">download fail</string>
+    <string name="download_timeout">timeout,please try again</string>
+    <string name="download_reload">reload</string>
+
+</resources>

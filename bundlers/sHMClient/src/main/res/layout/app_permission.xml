@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="fill_parent" android:layout_width="fill_parent"
+	android:orientation="vertical" android:background="@color/content_bg_color">
+	<!--主内容frame -->
+	<TextView android:text="@string/software_need_permission_tip"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		style="@style/Permission.Title" />
+	<ImageView android:id="@+id/lineDivider"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:src="@drawable/line" android:scaleType="fitXY" />
+	<ScrollView android:layout_width="fill_parent"
+		android:layout_height="0px" android:layout_weight="1">
+		<LinearLayout android:layout_width="fill_parent"
+			android:layout_height="fill_parent" android:orientation="vertical"
+			android:paddingLeft="15dip" android:paddingBottom="10dip">
+			<LinearLayout android:id="@+id/showPermissionList"
+				android:layout_width="fill_parent" android:layout_height="fill_parent"
+				android:orientation="vertical" />
+			<RelativeLayout android:id="@+id/showHidePermissionView"
+				android:layout_width="fill_parent" android:gravity="center_vertical"
+				style="@android:style/Widget.ListView" android:layout_height="48dip">
+				<ImageView android:id="@+id/expendableImageView"
+					android:src="@drawable/expend_s_1" android:layout_gravity="center_horizontal"
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:layout_alignParentLeft="true" />
+				<TextView android:id="@+id/permissionTitleLabel"
+					android:text="@string/show_hided_permission" android:layout_width="fill_parent"
+					android:layout_height="wrap_content" android:layout_toRightOf="@id/expendableImageView"
+					android:layout_alignBottom="@id/expendableImageView" style="@style/PermissionLess.Note" />
+			</RelativeLayout>
+			<LinearLayout android:id="@+id/hidePermissionList"
+				android:layout_width="fill_parent" android:layout_height="fill_parent"
+				android:visibility="gone" android:orientation="vertical" />
+		</LinearLayout>
+	</ScrollView>
+</merge>

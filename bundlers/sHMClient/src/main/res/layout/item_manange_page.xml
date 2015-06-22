@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:orientation="vertical">
+	<!--管理选择 -->
+	<LinearLayout android:id="@+id/funcList"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:background="@drawable/tab_bg" android:gravity="center">
+		<Button android:id="@+id/softwareManageButton" style="@style/TopTypeLeft.Button"
+			android:layout_width="0px" android:layout_height="wrap_content"
+			android:layout_weight="1" android:text="@string/installed_software" />
+		<Button android:id="@+id/taskListButton" android:layout_width="0px"
+			style="@style/TopTypeMiddle.Button" android:layout_weight="1"
+			android:layout_height="wrap_content" android:text="@string/download_task" />
+		<Button android:id="@+id/favorAppButton" android:layout_width="0px"
+			style="@style/TopTypeRight.Button" android:layout_weight="1"
+			android:layout_height="wrap_content" android:text="@string/my_favoliten" />
+	</LinearLayout>
+
+	<!--主内容frame -->
+	<FrameLayout android:id="@+id/contentFrame"
+		android:layout_width="fill_parent" android:layout_height="0px"
+		android:layout_weight="1" />
+</LinearLayout>

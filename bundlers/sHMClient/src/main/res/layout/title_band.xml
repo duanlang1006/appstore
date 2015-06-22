@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:paddingLeft="10dip" android:paddingRight="5dip"
+	android:paddingTop="1dip" android:paddingBottom="1dip"
+	android:background="@drawable/intro_title">
+
+	<ImageButton android:id="@+id/iconLabel"
+		android:layout_gravity="left|center_vertical" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+	<Button android:id="@+id/titleFunButton" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_gravity="center_horizontal|center_vertical"
+		android:paddingLeft="10dip" android:paddingRight="10dip"
+		style="@style/Common.Button" />
+
+	<CheckBox android:id="@+id/chooseBox" android:layout_width="wrap_content"
+		style="@style/Common.CheckBox" android:layout_height="wrap_content"
+		android:layout_gravity="right|center_vertical" />
+
+</FrameLayout>

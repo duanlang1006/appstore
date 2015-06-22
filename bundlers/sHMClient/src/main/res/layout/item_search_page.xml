@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <!-- 搜索栏 -->
+    <!-- 主内容frame -->
+
+    <TextView
+        android:id="@+id/resultStateLabel"
+        style="@style/AppDetail.Title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:text="@string/search_result" />
+
+    <FrameLayout
+        android:id="@+id/contentFrame"
+        android:layout_width="fill_parent"
+        android:layout_height="0px"
+        android:layout_weight="1" />
+
+    <!--  
+	<include layout="@layout/animationview"/>-->
+   
+
+</LinearLayout>

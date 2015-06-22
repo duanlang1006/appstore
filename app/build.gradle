@@ -1,0 +1,100 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "com.applite.android"
+        minSdkVersion 10
+        targetSdkVersion 21
+        versionCode 18
+        versionName "2.0.018"
+        multiDexEnabled true
+        manifestPlaceholders = [UMENG_CHANNEL_VALUE: "leadexceed_buildin"]
+    }
+
+    // 移除lint检查的error
+    lintOptions {
+        abortOnError false
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("../dsc.keystore")
+            storePassword "shly123456"
+            keyAlias "dbservice"
+            keyPassword "shly123456"
+        }
+
+        def config = release {
+            storeFile file(System.getenv("ANDROID_HOME")+"/security/SC8825/platform.keystore")
+            storePassword "android"
+            keyAlias "androidsystemkey"
+            keyPassword "android"
+        }
+        config
+    }
+
+    buildTypes {
+        debug {
+            // 显示Log
+            buildConfigField "boolean", "LOG_DEBUG", "true"
+
+            versionNameSuffix "-debug"
+            minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.debug
+        }
+        release {
+            // 不显示Log
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+
+            minifyEnabled false
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        // 输出apk名称为applite_v1.0_wandoujia.apk
+                        def fileName = "applite_v${defaultConfig.versionName}_${variant.productFlavors[0].name}_${variant.buildType.name}.apk"
+                        output.outputFile = new File(outputFile.parent, fileName)
+                    }
+                }
+            }
+        }
+    }
+
+    productFlavors {
+        leadexceed_buildin {}
+    }
+
+    productFlavors.all { flavor ->
+        flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+    }
+
+    task apkZip(type: Zip) {
+        classifier = 'build'
+        from projectDir
+        include 'build/outputs/apk/applite_*.apk'
+        destinationDir file('.')
+        archiveName "applite_v${defaultConfig.versionName}.zip"
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile project(':extras:mitUpdateSDK')
+    compile project(':extras:impl')
+    compile project(':extras:applitecommon')
+    compile project(':extras:dscdownloader')
+}

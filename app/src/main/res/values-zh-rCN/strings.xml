@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">应用商城</string>
+    <string name="app_name_hotapp">工 具</string>
+    <string name="app_name_enter">i 娱乐</string>
+    <string name="notification_paused_by_user">"下载已暂停"</string>
+    <string name="notification_paused_extras">"<xliff:g id="NUMBER">%d</xliff:g>项已暂停,<xliff:g id="NUMBER">%d</xliff:g>项正在下载"</string>
+	<string name="recommend">热点推荐</string>
+    <string name="download_TF_msg">请插入TF卡</string>
+    <string name="no_internet_connection">无网络连接 ！</string>
+    <string name="download_waiting">正在为您下载，请稍候</string>
+    <string name="download_none_msg">此应用需要下载，您当前没有网络，建议您选择排队下载或者连接Wi-Fi网络下载</string>
+    <string name="download_start">安装</string>
+    <string name="download_pending">等待下载</string>
+    <string name="download_running">正在下载</string>
+    <string name="download_paused">暂停</string>
+    <string name="download_failed">下载失败</string>
+    <string name="download_success">下载完成</string>
+    <string name="package_invalid">包名不合法</string>
+    <string name="install_failed">安装失败</string>
+    <string name="installing">正在安装</string>
+    <string name="installed">安装成功，点此启动</string>
+    <string name="connection">连接..</string>
+    <string name="start_up">"启动"</string>
+    <string name="more">精品应用</string>
+    <string name="getdata">"正在获取数据"</string>
+	<string name="hasdownload">"已在下载"</string>    
+	<string name="whithoutdata">"服务器端没有找到这条数据"</string>    
+    <!-- <string name="refresh_pull">拉动刷新</string> -->
+    <!-- <string name="refresh_pull_over">松开刷新</string> -->
+  <!--   <string name="refreshing">正在加载</string> -->
+    <string name="action_settings">设置</string>
+    <string name="action_search">搜索</string>
+</resources>

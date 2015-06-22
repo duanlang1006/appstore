@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:gravity="center_vertical|center_horizontal"
+	android:orientation="vertical" android:background="@color/load_note_common">
+	<ProgressBar android:id="@+id/progressBar"
+		style="?android:attr/progressBarStyleHorizontal" android:layout_width="250dip"
+		android:layout_height="wrap_content" android:max="100"
+		android:progress="0" android:secondaryProgress="100"
+		android:paddingBottom="5px" />
+	<TextView android:id="@+id/progressLabel" android:text="@string/loading"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		style="@style/Progress.Note" />
+</LinearLayout>

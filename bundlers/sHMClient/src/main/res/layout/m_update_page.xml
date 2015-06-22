@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:minWidth="250dip" android:minHeight="300dip"
+	android:orientation="vertical">
+	<TextView android:id="@+id/versionLabel" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" />
+	<TextView android:id="@+id/sizeLabel" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" />
+	<ImageView android:id="@+id/lineDivider"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:src="@drawable/line" android:scaleType="fitXY"
+		android:layout_marginTop="2dip" />
+	<ScrollView android:layout_width="fill_parent"
+		android:layout_height="0px" android:layout_weight="1">
+		<TextView android:id="@+id/describeLabel"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:padding="5dip" />
+	</ScrollView>
+
+    <CheckBox android:text="@string/ignore_this_update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:id="@+id/dontnotifyme"/>
+
+	<LinearLayout android:layout_height="wrap_content"
+		android:layout_width="fill_parent" android:gravity="center">
+		<Button android:id="@+id/acceptButton" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" style="@style/Common.Button"
+			android:layout_margin="5dip" android:text="@string/update" />
+		<Button android:id="@+id/cancelButton" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" style="@style/Common.Button"
+			android:layout_margin="5dip" android:text="@string/cancel" />
+	</LinearLayout>
+</LinearLayout>

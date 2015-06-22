@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/appBrowseView" android:layout_width="fill_parent"
+	android:layout_height="fill_parent" android:orientation="vertical">
+	<!--应用类型选择 -->
+	<LinearLayout android:id="@+id/funcList"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:background="@drawable/tab_bg" android:gravity="center">
+		<Button android:id="@+id/tab1Button" style="@style/TopTypeLeft.Button"
+			android:layout_width="0px" android:layout_weight="1"
+			android:layout_height="wrap_content" android:text="@string/cat_application" />
+		<Button android:id="@+id/tab2Button" style="@style/TopTypeMiddle.Button"
+			android:layout_width="0px" android:layout_weight="1"
+			android:layout_height="wrap_content" android:text="@string/cat_game" />
+		<Button android:id="@+id/tab3Button" style="@style/TopTypeRight.Button"
+			android:layout_width="0px" android:layout_weight="1"
+			android:layout_height="wrap_content" android:text="@string/topic" />
+	</LinearLayout>
+
+	<!--主内容frame -->
+	<FrameLayout android:id="@+id/contentFrame"
+		android:layout_width="fill_parent" android:layout_height="0px"
+		android:layout_weight="1" />
+</merge>

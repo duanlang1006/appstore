@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="PaySDK">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/bundlers/sHMClient/libs/PaySDK.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
