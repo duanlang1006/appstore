@@ -44,6 +44,8 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
     private PullDownView pullDownView; //PullDown
     private ScrollOverListView listView;
 
+
+
     public ListArrayAdapter(Context context, int resource) {
         super(context, resource);
     }
@@ -173,12 +175,16 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
                             }
                             final ViewHolder finalViewholder = holderGoods;
                             final HomePageBean finalItem = item;
+                            String mPackageName = finalItem.getPackagename();
                             holderGoods.mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
                                 @Override
                                 public void onClickListener() {
                                     if (mApkType == Utils.INSTALLED) {
                                         Utils.startApp(context, finalItem.getPackagename());
                                     } else {
+                                        HomePageUtils.i(TAG, "setOnProgressButtonClickListener yuzm Packagenam :" +
+                                                finalItem.getPackagename() + "; getUrl : " +finalItem.getUrl()
+                                        +" ; Name : "+ finalItem.getName() + " ; Packagename : " + finalItem.getPackagename());
                                         Utils.setDownloadViewText(context, finalViewholder.mProgressButton);
                                         ImplAgent.downloadPackage(context,
                                                 finalItem.getPackagename(),

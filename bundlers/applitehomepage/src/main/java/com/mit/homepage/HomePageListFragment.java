@@ -26,10 +26,14 @@ import android.widget.AbsListView.OnScrollListener;
 import com.mit.bean.HomePageBean;
 import com.mit.bean.HomePageTypeBean;
 import com.mit.data.ListArrayAdapter;
+import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplListener;
 import com.mit.utils.HomePageUtils;
+import com.mit.utils.LogUtils;
 
 import net.tsz.afinal.FinalBitmap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,6 +56,63 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     private PullDownView pullDownView; //PullDown
     private ScrollOverListView listView;
     int mCurCheckPosition = 0;
+    private List<HomePageBean> mHomePageApkContents = new ArrayList<HomePageBean>();
+    private ListArrayAdapter mAdapter;
+
+    private ImplListener mImplListener = new ImplListener() {
+        @Override
+        public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
+            HomePageUtils.i(TAG, "onDownloadComplete yuzm");
+        }
+
+        @Override
+        public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
+            for (int i = 0; i < mHomePageApkContents.size(); i++) {
+                if (downloadUpdateRsp.key.equals(mHomePageApkContents.get(i).getPackagename())) {
+                    int OriginalStatus = mHomePageApkContents.get(i).getStatus();
+                    mHomePageApkContents.get(i).setStatus(downloadUpdateRsp.status);
+                    int CurrentStatus = mHomePageApkContents.get(i).getStatus();
+                    HomePageUtils.i(TAG, mHomePageApkContents.get(i).getName() + "-----" + mHomePageApkContents.get(i).getStatus());
+                    if (OriginalStatus != CurrentStatus)
+                        mAdapter.notifyDataSetChanged();
+                    //mAdapter.setList(mSearchApkContents);
+                    HomePageUtils.i(TAG, OriginalStatus + "-------" + CurrentStatus);
+                }
+            }
+//            mAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
+            HomePageUtils.i(TAG,  "onPackageAdded yuzm");
+
+        }
+
+        @Override
+        public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
+            HomePageUtils.i(TAG,  "onPackageRemoved yuzm");
+        }
+
+        @Override
+        public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
+            HomePageUtils.i(TAG,  "onPackageChanged yuzm");
+        }
+
+        @Override
+        public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
+            HomePageUtils.i(TAG,  "onSystemInstallResult yuzm");
+        }
+
+        @Override
+        public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
+            HomePageUtils.i(TAG,  "onSystemDeleteResult yuzm");
+        }
+
+        @Override
+        public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
+            HomePageUtils.i(TAG,  "onFinish yuzm");
+        }
+    };
     public HomePageListFragment(List<HomePageBean> data, List<HomePageTypeBean> mDataType, int mTable, Activity activity) {
         this.mData = data;
         this.mTable = mTable;
@@ -62,6 +123,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ImplAgent.registerImplListener(mImplListener);
         HomePageUtils.i(TAG, "ListFragment.onCreate() yuzm");
     }
 
@@ -82,10 +144,16 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
         super.onStop();
         HomePageUtils.i(TAG, "onStop");
     }
-
+    @Override
+    public void onDetach(){
+        super.onDetach();
+        HomePageUtils.i(TAG, "onDetach yuzm");
+        ImplAgent.unregisterImplListener(mImplListener);
+    }
     @Override
     public void onDestroy() {
         super.onDestroy();
+        //ImplAgent.unregisterImplListener(mImplListener);
         HomePageUtils.i(TAG, "onDestroy");
     }
 
