@@ -6,8 +6,10 @@
     android:layout_height="fill_parent">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/buffer"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:id="@+id/imageViewName"
         android:visibility="visible"
         android:layout_alignParentTop="true"

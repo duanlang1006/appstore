@@ -22,6 +22,8 @@ public class HomePageBean {
     private String mM_IconUrl;
     private String mM_Name;
     private int mVersionCode;
+    private int status;
+    private String mDownloadNumber;
     @Override
     public String toString() {
         return "HomePageBean{" +
@@ -39,11 +41,19 @@ public class HomePageBean {
                 ", mVersionCode='" + mVersionCode + '\'' +
                 ", boxLabel='" + mBoxLabel + '\'' +
                 ", downloadTimes='" + mDownloadTimes + '\'' +
+                ", mDownloadNumber='" + mDownloadNumber + '\'' +
                 ", m_iconurl='" + mM_IconUrl + '\'' +
                 ", m_name='" + mM_Name + '\'' +
                 '}';
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
     public int getId() {
         return id;
     }
@@ -151,21 +161,11 @@ public class HomePageBean {
         this.mDownloadTimes = downloadTimes;
     }
 
-    public String getM_IconUrl() {
-        return mM_IconUrl;
+    public String getDownloadNumber() {
+        return mDownloadNumber;
     }
 
-    public void setM_IconUrl(String mIconUrl) {
-        this.mM_IconUrl = mIconUrl;
+    public void setDownloadNumber(String mDownloadNumber) {
+        this.mDownloadNumber = mDownloadNumber;
     }
-
-    public String getM_Name() {
-        return mM_Name;
-    }
-
-    public void setM_Name(String mName) {
-        this.mM_Name = mName;
-    }
-
-
 }
