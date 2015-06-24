@@ -1,4 +1,4 @@
-package com.mit.utils;
+package com.applite.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

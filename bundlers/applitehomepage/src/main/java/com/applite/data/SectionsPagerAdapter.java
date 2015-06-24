@@ -1,4 +1,4 @@
-package com.mit.data;
+package com.applite.data;
 
 import android.app.Activity;
 import android.content.res.Resources;
@@ -7,12 +7,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
 
-import com.mit.bean.HomePageBean;
-import com.mit.bean.HomePageTab;
-import com.mit.bean.HomePageTypeBean;
-import com.mit.homepage.BundleContextFactory;
-import com.mit.homepage.HomePageListFragment;
-import com.mit.utils.HomePageUtils;
+import com.applite.homepage.HomePageListFragment;
+import com.applite.bean.HomePageBean;
+import com.applite.bean.HomePageTab;
+import com.applite.bean.HomePageTypeBean;
+import com.applite.homepage.BundleContextFactory;
+import com.applite.utils.HomePageUtils;
 
 import java.util.ArrayList;
 import java.util.List;

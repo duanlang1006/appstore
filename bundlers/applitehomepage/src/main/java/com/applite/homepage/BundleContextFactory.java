@@ -1,4 +1,4 @@
-package com.mit.homepage;
+package com.applite.homepage;
 import org.apkplug.Bundle.BundleInstance;
 import org.osgi.framework.BundleContext;
 

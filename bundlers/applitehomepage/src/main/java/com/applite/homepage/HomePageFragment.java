@@ -1,14 +1,11 @@
-package com.mit.homepage;
+package com.applite.homepage;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -17,15 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.applite.bean.HomePageTypeBean;
 import com.applite.common.Constant;
-import com.mit.bean.HomePageBean;
-import com.mit.bean.HomePageTab;
-import com.mit.bean.HomePageTypeBean;
-import com.mit.data.ListArrayAdapter;
-import com.mit.data.SectionsPagerAdapter;
-import com.mit.utils.HomePageUtils;
-import com.mit.utils.SPUtils;
-import com.mit.utils.Utils;
+import com.applite.data.SectionsPagerAdapter;
+import com.applite.utils.SPUtils;
+import com.applite.bean.HomePageBean;
+import com.applite.bean.HomePageTab;
+import com.applite.utils.HomePageUtils;
+import com.applite.utils.Utils;
 
 import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
@@ -41,7 +37,6 @@ import org.osgi.framework.BundleContext;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by yuzhimin on 6/17/15.
@@ -464,6 +459,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                 hpBeanGoods.setDownloadTimes(object.getString("downloadTimes"));
                 hpBeanGoods.setVersionName(object.getString("versionName"));
                 hpBeanGoods.setmVersionCode(object.getInt("versionCode"));
+                hpBeanGoods.setStatus(Utils.isAppInstalled(mActivity, hpBeanGoods.getPackagename(), hpBeanGoods.getmVersionCode()));
                 mHomePageGoods.add(hpBeanGoods);
                 SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
                         (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);
@@ -492,6 +488,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                 hpBeanOrders.setDownloadTimes(object.getString("downloadTimes"));
                 hpBeanOrders.setVersionName(object.getString("versionName"));
                 hpBeanOrders.setmVersionCode(object.getInt("versionCode"));
+                hpBeanOrders.setStatus(Utils.isAppInstalled(mActivity, hpBeanOrders.getPackagename(), hpBeanOrders.getmVersionCode()));
                 mHomePageOrder.add(hpBeanOrders);
                 SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
                         (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);

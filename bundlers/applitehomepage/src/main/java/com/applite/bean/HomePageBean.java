@@ -1,4 +1,6 @@
-package com.mit.bean;
+package com.applite.bean;
+
+import com.applite.utils.Utils;
 
 import java.util.List;
 

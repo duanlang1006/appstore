@@ -1,4 +1,4 @@
-package com.mit.homepage;
+package com.applite.homepage;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -7,7 +7,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
 
-import com.mit.utils.HomePageUtils;
+import com.applite.utils.HomePageUtils;
 
 
 /**

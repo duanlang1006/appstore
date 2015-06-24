@@ -11,12 +11,12 @@ import com.android.dsc.downloads.DownloadManager;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class ImplDownload extends AbstractImpl{
+    private static final String TAG = "impl_download";
     private SparseArray<Method> mCmdList = new SparseArray<Method>();
     private RealRunnable mDlRunnable;
     private DownloadManager dm;
@@ -164,6 +164,7 @@ public class ImplDownload extends AbstractImpl{
 
     private boolean handleQueryReq(ImplAgent.ImplRequest cmd){
         ImplAgent.DownloadUpdateReq implCmd = (ImplAgent.DownloadUpdateReq)cmd;
+        ImplLog.d(TAG,"handleQueryReq,"+implCmd.keys);
         List<ImplInfo> infoList = ImplConfig.findInfoByKeyBatch(databaseHelper,implCmd.keys);
         for (ImplInfo info:infoList){
             mDlRunnable.add(cmd.context, info);
@@ -178,9 +179,11 @@ public class ImplDownload extends AbstractImpl{
         long id = 0;
         ImplInfo info = ImplConfig.findInfoByKey(databaseHelper,implCmd.key);
         if (null != info){
+            ImplLog.d(TAG,"handleDownloadReq,"+info.getDownloadId()+","+info.getKey()+","+info.getTitle());
             id = info.getDownloadId();
+        }else {
+            ImplLog.d(TAG, "handleDownloadReq," + id);
         }
-
         if (existInDownloadDb(id)){
             mDlRunnable.add(cmd.context,info);
             toggleDownload(cmd.context, info);
@@ -230,6 +233,7 @@ public class ImplDownload extends AbstractImpl{
             return false;
         }
 
+        ImplLog.d(TAG,"handleDownloadComplete,"+info.getDownloadId()+","+info.getKey());
         DownloadManager.Query query = new DownloadManager.Query();
         query.setFilterById(id);
         Cursor c = dm.query(query);
@@ -270,6 +274,7 @@ public class ImplDownload extends AbstractImpl{
         if (id == 0){
             return false;
         }
+        ImplLog.d(TAG,"handleDownloadDelete,"+id+","+info.getKey()+","+info.getTitle());
         try{
             dm.remove(id);
         }catch(Exception e){}
@@ -283,6 +288,7 @@ public class ImplDownload extends AbstractImpl{
         long id = 0;
         ImplInfo info = ImplConfig.findInfoByKey(databaseHelper,implCmd.key);
         if (null != info){
+            ImplLog.d(TAG,"handleDownloadToggle,"+info.getKey()+","+info.getTitle());
             id = info.getDownloadId();
             if (existInDownloadDb(id)){
                 mDlRunnable.add(cmd.context,info);

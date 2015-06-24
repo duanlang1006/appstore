@@ -1,37 +1,28 @@
-package com.mit.homepage;
+package com.applite.homepage;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RatingBar;
-import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
-import com.mit.bean.HomePageBean;
-import com.mit.bean.HomePageTypeBean;
-import com.mit.data.ListArrayAdapter;
+import com.applite.bean.HomePageBean;
+import com.applite.bean.HomePageTypeBean;
+import com.applite.common.Constant;
+import com.applite.data.ListArrayAdapter;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
-import com.mit.utils.HomePageUtils;
-import com.mit.utils.LogUtils;
-
-import net.tsz.afinal.FinalBitmap;
+import com.applite.utils.HomePageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +31,7 @@ import java.util.List;
 * Created by hxd on 15-6-9.
 */
 public class HomePageListFragment extends ListFragment implements OnTouchListener,OnScrollListener {
-    private final String TAG = "HomePageListFragment";
+    private final String TAG = "homepage_ListFragment";
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -56,74 +47,16 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     private PullDownView pullDownView; //PullDown
     private ScrollOverListView listView;
     int mCurCheckPosition = 0;
-    private List<HomePageBean> mHomePageApkContents = new ArrayList<HomePageBean>();
-    private ListArrayAdapter mAdapter;
-
-    private ImplListener mImplListener = new ImplListener() {
-        @Override
-        public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
-            HomePageUtils.i(TAG, "onDownloadComplete yuzm");
-        }
-
-        @Override
-        public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
-            for (int i = 0; i < mHomePageApkContents.size(); i++) {
-                if (downloadUpdateRsp.key.equals(mHomePageApkContents.get(i).getPackagename())) {
-                    int OriginalStatus = mHomePageApkContents.get(i).getStatus();
-                    mHomePageApkContents.get(i).setStatus(downloadUpdateRsp.status);
-                    int CurrentStatus = mHomePageApkContents.get(i).getStatus();
-                    HomePageUtils.i(TAG, mHomePageApkContents.get(i).getName() + "-----" + mHomePageApkContents.get(i).getStatus());
-                    if (OriginalStatus != CurrentStatus)
-                        mAdapter.notifyDataSetChanged();
-                    //mAdapter.setList(mSearchApkContents);
-                    HomePageUtils.i(TAG, OriginalStatus + "-------" + CurrentStatus);
-                }
-            }
-//            mAdapter.notifyDataSetChanged();
-        }
-
-        @Override
-        public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
-            HomePageUtils.i(TAG,  "onPackageAdded yuzm");
-
-        }
-
-        @Override
-        public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
-            HomePageUtils.i(TAG,  "onPackageRemoved yuzm");
-        }
-
-        @Override
-        public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
-            HomePageUtils.i(TAG,  "onPackageChanged yuzm");
-        }
-
-        @Override
-        public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
-            HomePageUtils.i(TAG,  "onSystemInstallResult yuzm");
-        }
-
-        @Override
-        public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
-            HomePageUtils.i(TAG,  "onSystemDeleteResult yuzm");
-        }
-
-        @Override
-        public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
-            HomePageUtils.i(TAG,  "onFinish yuzm");
-        }
-    };
+    private ImplListener mImplListener = new HomePageImplListener();
     public HomePageListFragment(List<HomePageBean> data, List<HomePageTypeBean> mDataType, int mTable, Activity activity) {
         this.mData = data;
         this.mTable = mTable;
         this.mDataType = mDataType;
-
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ImplAgent.registerImplListener(mImplListener);
         HomePageUtils.i(TAG, "ListFragment.onCreate() yuzm");
     }
 
@@ -202,6 +135,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
         HomePageUtils.i(TAG, "onAttach yuzm");
         mListAdapter = new ListArrayAdapter(mActivity, R.layout.fragment_list, mData, mDataType, mTable);
         setListAdapter(mListAdapter);
+        ImplAgent.registerImplListener(mImplListener);
     }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -334,6 +268,119 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         HomePageUtils.v(TAG, "onScrollStateChanged yuzm view = " + view + " ,totalItemCount = " + totalItemCount);
+    }
+
+    class HomePageImplListener implements ImplListener{
+        private final String TAG = "impl_homepage";
+        private Runnable mRefreshListRunnable = new Runnable(){
+            @Override
+            public void run() {
+                mListAdapter.notifyDataSetInvalidated();
+            }
+        };
+        private HomePageBean findBeanByKey(String key){
+            HomePageBean bean = null;
+            for (int i = 0;i<mData.size();i++){
+                if (key.equals(mData.get(i).getPackagename())){
+                    bean = mData.get(i);
+                    break;
+                }
+            }
+            return bean;
+        }
+
+        @Override
+        public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
+            HomePageUtils.i(TAG,  "onDownloadComplete key="+downloadCompleteRsp.key);
+            HomePageBean bean = findBeanByKey(downloadCompleteRsp.key);
+            if (null != bean){
+                HomePageUtils.i(TAG,  "onDownloadComplete name="+bean.getName()+",status="+bean.getStatus());
+                if (bean.getStatus() <= Constant.STATUS_FAILED) {
+                    bean.setStatus(downloadCompleteRsp.status);
+                    mActivity.runOnUiThread(mRefreshListRunnable);
+                }
+            }
+            HomePageUtils.i(TAG,  "onDownloadComplete end");
+        }
+
+        @Override
+        public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
+            HomePageUtils.i(TAG,  "onDownloadUpdate  key="+downloadUpdateRsp.key);
+            HomePageBean bean = findBeanByKey(downloadUpdateRsp.key);
+            if (null != bean){
+                HomePageUtils.i(TAG,  "onDownloadUpdate name="+bean.getName()+",status="+bean.getStatus());
+                if (bean.getStatus() <= Constant.STATUS_FAILED) {
+                    int OriginalStatus = bean.getStatus();
+                    bean.setStatus(downloadUpdateRsp.status);
+                    if (OriginalStatus != bean.getStatus()) {
+                        mActivity.runOnUiThread(mRefreshListRunnable);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
+            HomePageUtils.i(TAG,  "onPackageAdded key="+packageAddedRsp.key);
+            HomePageBean bean = findBeanByKey(packageAddedRsp.key);
+            if (null != bean){
+                bean.setStatus(Constant.STATUS_INSTALLED);
+                HomePageUtils.i(TAG,  "onPackageAdded name="+bean.getName()+",status="+bean.getStatus());
+                mActivity.runOnUiThread(mRefreshListRunnable);
+            }
+        }
+
+        @Override
+        public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
+            HomePageBean bean = findBeanByKey(packageRemovedRsp.key);
+            if (null != bean){
+                bean.setStatus(Constant.STATUS_INIT);
+                HomePageUtils.i(TAG,  "onPackageRemoved key="+packageRemovedRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
+                mActivity.runOnUiThread(mRefreshListRunnable);
+            }
+        }
+
+        @Override
+        public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
+            HomePageBean bean = findBeanByKey(packageChangedRsp.key);
+            if (null != bean){
+                bean.setStatus(Constant.STATUS_INSTALLED);
+                HomePageUtils.i(TAG,  "onPackageChanged key="+packageChangedRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
+                mActivity.runOnUiThread(mRefreshListRunnable);
+            }
+        }
+
+        @Override
+        public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
+            HomePageUtils.i(TAG,  "onSystemInstallResult key="+systemInstallResultRsp.key);
+            HomePageBean bean = findBeanByKey(systemInstallResultRsp.key);
+            if (null != bean){
+                if (systemInstallResultRsp.result == Constant.INSTALL_SUCCEEDED) {
+                    bean.setStatus(Constant.STATUS_INSTALLED);
+                }else{
+                    bean.setStatus(Constant.STATUS_INSTALL_FAILED);
+                }
+                HomePageUtils.i(TAG,  "onSystemInstallResult name="+bean.getName()+",status="+bean.getStatus());
+                mActivity.runOnUiThread(mRefreshListRunnable);
+            }
+        }
+
+        @Override
+        public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
+            HomePageBean bean = findBeanByKey(systemDeleteResultRsp.key);
+            if (null != bean){
+                if (systemDeleteResultRsp.result == Constant.DELETE_SUCCEEDED) {
+                    bean.setStatus(Constant.STATUS_INIT);
+                }
+                HomePageUtils.i(TAG,  "onSystemDeleteResult key="+systemDeleteResultRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
+                mActivity.runOnUiThread(mRefreshListRunnable);
+            }
+        }
+
+        @Override
+        public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
+            HomePageUtils.i(TAG,  "onFinish implResponse.action="+implResponse.action);
+        }
     }
 
 }

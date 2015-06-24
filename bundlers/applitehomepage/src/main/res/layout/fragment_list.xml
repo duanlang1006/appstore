@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.mit.homepage.PullDownView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.applite.homepage.PullDownView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/pullDownView"
     android:layout_width="fill_parent"
@@ -63,7 +63,7 @@
             android:focusableInTouchMode="false"/>
 
     </LinearLayout>
-    <com.mit.view.ProgressButton
+    <com.applite.view.ProgressButton
         android:id="@+id/list_item_progress_button"
         android:layout_marginTop="10dp"
         android:layout_marginRight="20dp"
@@ -90,4 +90,4 @@
         android:visibility="invisible"
         android:focusable="false"/>
 
-</com.mit.homepage.PullDownView>
+</com.applite.homepage.PullDownView>

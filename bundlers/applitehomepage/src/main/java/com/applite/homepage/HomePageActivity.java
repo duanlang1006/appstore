@@ -1,4 +1,4 @@
-package com.mit.homepage;
+package com.applite.homepage;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,13 +6,10 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.mit.data.ListArrayAdapter;
-import com.mit.utils.HomePageUtils;
+import com.applite.utils.HomePageUtils;
 
 public class HomePageActivity extends FragmentActivity {
     private FragmentManager fm;

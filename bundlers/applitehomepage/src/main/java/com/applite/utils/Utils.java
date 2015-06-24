@@ -1,4 +1,4 @@
-package com.mit.utils;
+package com.applite.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,8 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import com.mit.homepage.R;
-import com.mit.view.ProgressButton;
+import com.applite.common.Constant;
+import com.applite.view.ProgressButton;
+import com.applite.homepage.R;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -141,21 +142,19 @@ public class Utils {
      * @param versionCode 要判断应用的版本名称
      */
     public static int isAppInstalled(Context context, String packageName, int versionCode) {
+        int status = Constant.STATUS_INIT;
         PackageManager pm = context.getPackageManager();
         try {
             PackageInfo pakageinfo = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
-            if (versionCode == pakageinfo.versionCode) {
-                LogUtils.i(TAG, "已经安装，不用更新，可以卸载该应用");
-                return INSTALLED;
-            } else if (versionCode > pakageinfo.versionCode) {
+            status = Constant.STATUS_INSTALLED;
+            if (versionCode > pakageinfo.versionCode) {
                 LogUtils.i(TAG, "已经安装，有更新");
-                return INSTALLED_UPDATE;
+                status = Constant.STATUS_UPGRADE;
             }
         } catch (PackageManager.NameNotFoundException e) {
             LogUtils.i(TAG, "未安装该应用，可以安装");
-            return UNINSTALLED;
         }
-        return UNINSTALLED;
+        return status;
     }
 
     /**

@@ -50,8 +50,11 @@ public class ImplConfig implements BaseColumns{
     public static ImplInfo findInfoByDownloadId(ImplDatabaseHelper dbHelper,long id){
         ImplInfo info = null;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String sql = "select * from "+ImplConfig.TABLE_IMPL+" where "+ImplConfig.COLUMN_DOWNLOADID + " = " + id;
-        Cursor c = db.rawQuery(sql,null);
+        Cursor c = db.query(TABLE_IMPL,
+                null,
+                COLUMN_DOWNLOADID + " = ?",
+                new String[]{String.valueOf(id)},
+                null,null,null);
         try{
             c.moveToFirst();
             info = ImplInfo.from(c);
@@ -68,8 +71,11 @@ public class ImplConfig implements BaseColumns{
     public static ImplInfo findInfoByPackageName(ImplDatabaseHelper dbHelper,String pkgName){
         ImplInfo info = null;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String sql = "select * from "+ImplConfig.TABLE_IMPL+" where "+ImplConfig.COLUMN_PACKAGENAME + " = " + pkgName;
-        Cursor c = db.rawQuery(sql,null);
+        Cursor c = db.query(TABLE_IMPL,
+                null,
+                COLUMN_PACKAGENAME + " = ?",
+                new String[]{pkgName},
+                null,null,null);
         try{
             c.moveToFirst();
             info = ImplInfo.from(c);
@@ -86,11 +92,15 @@ public class ImplConfig implements BaseColumns{
     public static ImplInfo findInfoByKey(ImplDatabaseHelper dbHelper,String key){
         ImplInfo info = null;
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        String sql = "select * from "+ImplConfig.TABLE_IMPL+" where "+ImplConfig.COLUMN_KEY + " = " + key;
-        Cursor c = db.rawQuery(sql,null);
+        Cursor c = db.query(TABLE_IMPL,
+                null,
+                COLUMN_KEY + " = ?",
+                new String[]{key},
+                null, null, null);
         try{
-            c.moveToFirst();
-            info = ImplInfo.from(c);
+            if (null != c && c.moveToFirst()) {
+                info = ImplInfo.from(c);
+            }
         }catch(Exception e){
             e.printStackTrace();
         }finally {
@@ -104,7 +114,7 @@ public class ImplConfig implements BaseColumns{
     public static List<ImplInfo> findInfoByKeyBatch(ImplDatabaseHelper dbHelper,String[] keys){
         List<ImplInfo> infoList = new ArrayList<ImplInfo>();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor c = db.query(ImplConfig.TABLE_IMPL, null, getWhereClauseForKeys(keys), getWhereArgsForKeys(keys), null, null, null);
+        Cursor c = db.query(TABLE_IMPL, null, getWhereClauseForKeys(keys), getWhereArgsForKeys(keys), null, null, null);
         try{
             c.moveToFirst();
             do {
@@ -130,7 +140,7 @@ public class ImplConfig implements BaseColumns{
             if (i > 0) {
                 whereClause.append("OR ");
             }
-            whereClause.append(ImplConfig.COLUMN_KEY);
+            whereClause.append(COLUMN_KEY);
             whereClause.append(" = '?' ");
         }
         whereClause.append(")");

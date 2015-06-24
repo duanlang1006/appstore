@@ -1,4 +1,4 @@
-package com.mit.bean;
+package com.applite.bean;
 
 /**
  * Created by android217 on 6/18/15.

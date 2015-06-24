@@ -1,13 +1,13 @@
-package com.mit.utils;
+package com.applite.utils;
 
 import android.util.Log;
 
 /**
- * Add by zhimin.yu for applitehomepage
+ * Created by yuzhimin on 6/19/15.
  */
-public class HomePageUtils {
+public class LogUtils {
 
-    private HomePageUtils() {
+    private LogUtils() {
         /* cannot be instantiated */
         throw new UnsupportedOperationException("cannot be instantiated");
     }

@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.applite.common.Constant;
+import com.applite.common.PagerSlidingTabStrip;
 
 
 public class DownloadPagerFragment extends android.support.v4.app.Fragment {
@@ -48,7 +49,8 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
         View rootView = mInflater.inflate(R.layout.fragment_download_pager, container, false);
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
         mViewPager.setAdapter(new SectionsPagerAdapter(this.getFragmentManager()));
-        mPagerSlidingTabStrip = (PagerSlidingTabStrip)mInflater.inflate(R.layout.pager_sliding_tab,container,false);
+//        mPagerSlidingTabStrip = (PagerSlidingTabStrip)inflater.inflate(R.layout.pager_sliding_tab,container,false);
+        mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,container,false);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
 //        mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         initActionBar(mPagerSlidingTabStrip);

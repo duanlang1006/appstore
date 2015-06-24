@@ -12,7 +12,7 @@
         android:visibility="gone"
         android:id="@+id/test_load" />
 
-    <com.mit.homepage.PagerSlidingTabStrip
+    <com.applite.homepage.PagerSlidingTabStrip
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="48dip" />
