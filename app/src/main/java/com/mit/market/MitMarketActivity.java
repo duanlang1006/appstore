@@ -51,7 +51,7 @@ public class MitMarketActivity extends ApkPluginActivity {
 
         MitUpdateAgent.update(this);
         if (savedInstanceState == null) {
-            launchFragment(R.id.container,Constant.OSGI_SERVICE_MAIN_FRAGMENT);
+            launchFragment(R.id.container,Constant.OSGI_SERVICE_LOGO_FRAGMENT);
         }
     }
 

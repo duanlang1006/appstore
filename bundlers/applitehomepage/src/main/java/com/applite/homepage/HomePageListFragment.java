@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -17,23 +16,12 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.AbsListView.OnScrollListener;
-
-import com.applite.utils.SPUtils;
-import com.applite.utils.Utils;
-import com.mit.impl.ImplAgent;
-import com.mit.impl.ImplListener;
-
-import net.tsz.afinal.FinalHttp;
-import net.tsz.afinal.http.AjaxCallBack;
-import net.tsz.afinal.http.AjaxParams;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import com.applite.bean.HomePageBean;
 import com.applite.bean.HomePageTypeBean;
 import com.applite.common.Constant;
 import com.applite.data.ListArrayAdapter;
+import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplListener;
 import com.applite.utils.HomePageUtils;
 
 import java.util.ArrayList;
@@ -58,15 +46,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     boolean mDualPane;
     private PullDownView pullDownView; //PullDown
     private ScrollOverListView listView;
-    private FinalHttp mFinalHttp;
     int mCurCheckPosition = 0;
-    private List<HomePageBean> mHomePageApkContents = new ArrayList<HomePageBean>();
-    private List<HomePageBean> mHomePageData = new ArrayList<HomePageBean>();
-    private List<HomePageBean> mHomePageOrder = new ArrayList<HomePageBean>();
-    private List<HomePageTypeBean> mHomePageMainType = new ArrayList<HomePageTypeBean>();
-    private int mPageDood = 0;
-    private int mPageOder = 0;
-    private int mPageMainType = 0;
     private ImplListener mImplListener = new HomePageImplListener();
     public HomePageListFragment(List<HomePageBean> data, List<HomePageTypeBean> mDataType, int mTable, Activity activity) {
         this.mData = data;
@@ -153,7 +133,6 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
         super.onAttach(activity);
         mActivity = activity;
         HomePageUtils.i(TAG, "onAttach yuzm");
-
         mListAdapter = new ListArrayAdapter(mActivity, R.layout.fragment_list, mData, mDataType, mTable);
         setListAdapter(mListAdapter);
         ImplAgent.registerImplListener(mImplListener);
@@ -198,11 +177,9 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
         }
         HomePageUtils.i(TAG, "ListFragment.onCreateView() yuzm");
         View rootView = mInflater.inflate(R.layout.fragment_tabl, container, false);
-        //
-        pullDownView = (PullDownView)rootView.findViewById(R.id.pullDownView);
+        /*View mView = mInflater.inflate(R.layout.fragment_list, container, false);
+        pullDownView = (PullDownView)mView.findViewById(R.id.pullDownView);
         HomePageUtils.i(TAG, "ListFragment.onCreateView() yuzm pullDownView : " + pullDownView);
-        HomePageUtils.i(TAG, "ListFragment.onCreateView() yuzm Thread.currentThread().getId() : " +
-                Thread.currentThread().getId());
         if(null != pullDownView) {
             pullDownView.enableAutoFetchMore(true, 0);
             listView = pullDownView.getListView();
@@ -211,7 +188,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
 
                 @Override
                 public void onRefresh() {//刷新
-                    getNewData(new Handler() {
+                    getNewString(new Handler() {
                         @Override
                         public void handleMessage(Message msg) {
                             //arrays.add(0, (String) msg.obj);
@@ -224,53 +201,35 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
 
                 @Override
                 public void onLoadMore() {//加载更多
-                    getNewData(new Handler() {
+                    getNewString(new Handler() {
                         @Override
                         public void handleMessage(Message msg) {
-                            HomePageUtils.i(TAG, "ListFragment.onLoadMore() yuzm Thread.currentThread().getId() : " +
-                                    Thread.currentThread().getId() + " ; mHomePageData : " + mHomePageData);
-                            if(null != mHomePageData) {
-                                mListAdapter.setData(mHomePageData, mHomePageMainType, mTable);
-                            }
-                            mListAdapter.notifyDataSetChanged();
-                            pullDownView.notifyDidLoadMore((mHomePageData.size() != 0) ? false : true);
+                            //arrays.add((String) msg.obj);
+                            //adapter.notifyDataSetChanged();
+                            pullDownView.notifyDidLoadMore(true);
                             System.out.println("加载更多");
                         }
                     });
                 }
             });
-            pullDownView.notifyDidDataLoad(false);
-        }
-        mFinalHttp = new FinalHttp();
+        }*/
         //TextView tv = (TextView)rootView.findViewById(R.id.section_label);
         //String text = "" + tv.getText()+getArguments().getInt(ARG_SECTION_NUMBER);
         //tv.setText(text);
 
         return rootView;
     }
-    private void getNewData(final Handler mHandler) {
+    private void getNewString(final Handler handler) {
         new Thread(new Runnable() {//刷新
             @Override
             public void run() {
                 try {
-                    switch (mTable) {
-                        case 0 : listPost("goods", ++mPageDood);
-                                 break;
-                        case 1 : listPost("order", ++mPageOder);
-                                 break;
-                        case 2 : listPost("maintype", ++mPageMainType);
-                                 break;
-                    }
-                    //listPost("order",1,mHandler);
-                    Thread.sleep(3000);
+                    Thread.sleep(2000);
                 } catch (Exception e) {
                     Thread.interrupted();
                     e.printStackTrace();
                 }
-
-                HomePageUtils.i(TAG, "ListFragment.getNewString() yuzm Thread.currentThread().getId() : " +
-                        Thread.currentThread().getId());
-                mHandler.obtainMessage().sendToTarget();
+                handler.obtainMessage(0, "New Text " + System.currentTimeMillis()).sendToTarget();
             }
         }).start();
     }
@@ -300,120 +259,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
 
         return false;
     }
-    /**
-     * 上拉加载网络请求
-     */
-    public void listPost(final String mTabType ,final int mPage) {
-        //Message msg = new Message();
-        if(null == mFinalHttp) {
-            mFinalHttp = new FinalHttp();
-        }
-        AjaxParams params = new AjaxParams();
-        params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
-        params.put("packagename", "com.android.applite1.0");
-        //params.put("packagename",Utils.getPackgeName(this));
-        params.put("app", "applite");
-        params.put("type", "hptab");
-        params.put("page", String.valueOf(mPage));
-        params.put("tabtype", mTabType);
-        params.put("pullonloading", "pullonloading");
-        mFinalHttp.post(Utils.URL, params, new AjaxCallBack<Object>() {
-            @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
-                Message msg = new Message();
-                String reuslt = (String) o;
-                HomePageUtils.i(TAG, "HomePage网络请求成功，yuzm reuslt:" + reuslt);
-                setData(reuslt, mActivity, mTabType);
 
-            }
-
-            @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
-                HomePageUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
-            }
-        });
-    }
-    /**
-     * 设置数据
-     *
-     * @param data
-     */
-    public void setData(final String data, final Activity mActivity, final String mType) {
-        HomePageBean hpBeanData = null;
-        try {
-            JSONObject obj = new JSONObject(data);
-            HomePageUtils.i(TAG, "setData JSONObject data，yuzm obj : " + obj);
-            int app_key = obj.getInt("app_key");
-            //goods_data
-            String mData =null;
-            switch (mType){
-                case "goods" : mData = obj.getString("goods_data");
-                    break;
-                case "order" : mData = obj.getString("order_data");
-                    break;
-                case "maintype" : mData =obj.getString("maintype_data");
-                      setDateMainType(obj);
-            }
-
-            JSONArray mJson = new JSONArray(mData);
-            //HomePageUtils.i(TAG, "setData JSONObject data，json : " + json);
-            HomePageUtils.i( TAG,"yuzm mJson.length() : " + mJson.length());
-            HomePageUtils.i( TAG,"yuzm mJson : " + mJson);
-            for (int i = 0; i < mJson.length(); i++) {
-                JSONObject object = new JSONObject(mJson.get(i).toString());
-                hpBeanData = new HomePageBean();
-                hpBeanData.setId(1 + (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0));
-                hpBeanData.setPackagename(object.getString("packageName"));
-                hpBeanData.setName(object.getString("name"));
-                hpBeanData.setImgurl(object.getString("iconUrl"));
-                hpBeanData.setUrl(object.getString("rDownloadUrl"));
-                hpBeanData.setApkSize(object.getString("apkSize"));
-                hpBeanData.setRating(object.getString("rating"));
-                hpBeanData.setBrief(object.getString("brief"));
-                hpBeanData.setBoxLabel(object.getString("boxLabel"));
-                hpBeanData.setCategoryMain(object.getString("categorymain"));
-                hpBeanData.setCategorySub(object.getString("categorysub"));
-                hpBeanData.setDownloadTimes(object.getString("downloadTimes"));
-                hpBeanData.setVersionName(object.getString("versionName"));
-                try {
-                    hpBeanData.setmVersionCode(object.getInt("versionCode"));
-                }catch (Exception e){
-                    hpBeanData.setmVersionCode(0);
-                    e.printStackTrace();
-                }
-                mHomePageData.add(hpBeanData);
-                SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
-                        (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);
-            }
-            HomePageUtils.i( TAG,"yuzm mJson : " + mJson);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            HomePageUtils.e(TAG, "yuzm HomePageJSON解析异常");
-        }
-    }
-
-    public void setDateMainType(JSONObject mObj) throws JSONException {
-
-        HomePageTypeBean hpBeanMainType = null;
-        //MainType_data
-
-        String mMainType_data = mObj.getString("maintype_data");
-        JSONArray mMainType_json = new JSONArray(mMainType_data);
-        HomePageUtils.i(TAG, "yuzm mMainType_json.length() : " + mMainType_json.length());
-        HomePageUtils.i(TAG, "yuzm mMainType_json : " + mMainType_json);
-        for (int i = 0; i < mMainType_json.length(); i++) {
-            JSONObject object = new JSONObject(mMainType_json.get(i).toString());
-            hpBeanMainType = new HomePageTypeBean();
-            hpBeanMainType.setId(1 + (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0));
-            hpBeanMainType.setM_Name(object.getString("m_name"));
-            hpBeanMainType.setM_IconUrl(object.getString("m_iconurl"));
-            mHomePageMainType.add(hpBeanMainType);
-            SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
-                    (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);
-        }
-    }
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         HomePageUtils.v(TAG, "onScrollStateChanged yuzm view = " + view + " ,scrollState = " + scrollState);
