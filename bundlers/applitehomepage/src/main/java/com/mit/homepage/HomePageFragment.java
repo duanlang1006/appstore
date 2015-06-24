@@ -336,7 +336,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                     OSGIServiceAgent.real_time);   //每次都重新查询
             agent.getService().ApkplugOSGIService(bundleContext,
                     Constant.OSGI_SERVICE_MAIN_FRAGMENT,
-                    0, Constant.OSGI_SERVICE_UPGRADE_FRAGMENT);
+                    0, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
         } catch (Exception e) {
             // TODO 自动生成的 catch 块
             e.printStackTrace();

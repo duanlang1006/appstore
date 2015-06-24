@@ -6,4 +6,5 @@
     <color name="transparent">#00000000</color>
     <color name="dividing_line">#a0a0a0</color>
     <color name="progress_foreground">#00CC00</color>
+    <color name="qingse">#00ced1</color>
 </resources>

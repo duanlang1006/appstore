@@ -1,4 +1,4 @@
-package com.mit.appliteupdate;
+package com.mit.appliteupdate.main;
 import org.apkplug.Bundle.BundleInstance;
 import org.osgi.framework.BundleContext;
 

@@ -1,9 +1,11 @@
-package com.mit.appliteupdate;
+package com.mit.appliteupdate.main;
 
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+
+import com.mit.appliteupdate.R;
 
 
 public class MainActivity extends FragmentActivity {

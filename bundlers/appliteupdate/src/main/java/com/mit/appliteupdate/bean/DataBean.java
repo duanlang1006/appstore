@@ -11,6 +11,7 @@ public class DataBean {
     private long mSize;
     private int mVersionCode;
     private String mVersionName;
+    private String mShowText;
 
     @Override
     public String toString() {
@@ -23,6 +24,14 @@ public class DataBean {
                 ", mVersionCode=" + mVersionCode +
                 ", mVersionName='" + mVersionName + '\'' +
                 '}';
+    }
+
+    public String getmShowText() {
+        return mShowText;
+    }
+
+    public void setmShowText(String mShowText) {
+        this.mShowText = mShowText;
     }
 
     public String getmVersionName() {

@@ -55,15 +55,15 @@ public class MitApkplugCloudAgent {
     }
 
     public static void download(Context context, ApkplugQueryModel<ApkplugModel> apkplugModel, ApkplugDownloadCallback callback) {
-//        List<ApkplugModel> data = apkplugModel.getData();
-//        for (int i = 0;i < data.size(); i++){
-//            ApkplugModel model = data.get(i);
-        new FinalHttp().download(
-                "http://192.168.1.157/applitehomepage.apk",
-                "/sdcard/.android/applitehomepage.apk",
-                false,
-                new MyAjaxCallBack<File>(callback).progress(true, 1000));
-//        }
+        List<ApkplugModel> data = apkplugModel.getData();
+        for (int i = 0; i < data.size(); i++) {
+            ApkplugModel model = data.get(i);
+            new FinalHttp().download(
+                    model.getPlugurl(),
+                    Utils.getAppDir(model.getAppname() + ".apk"),
+                    false,
+                    new MyAjaxCallBack<File>(callback).progress(true, 1000));
+        }
     }
 
     /**

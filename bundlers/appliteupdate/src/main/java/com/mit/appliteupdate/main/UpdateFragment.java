@@ -1,4 +1,4 @@
-package com.mit.appliteupdate;
+package com.mit.appliteupdate.main;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,16 +12,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
+import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.adapter.UpdateAdapter;
 import com.mit.appliteupdate.bean.DataBean;
-import com.mit.appliteupdate.utils.LogUtils;
-import com.mit.appliteupdate.utils.Utils;
+import com.mit.appliteupdate.utils.UpdateUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
 
-import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
@@ -47,12 +49,47 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     private ImplListener mImplListener = new ImplListener() {
         @Override
         public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
-
+            for (int i = 0; i < mDataContents.size(); i++) {
+                if (downloadCompleteRsp.key.equals(mDataContents.get(i).getmPackageName())) {
+                    switch (downloadCompleteRsp.status) {
+                        case Constant.STATUS_SUCCESSFUL:
+                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.download_success));
+                            mAdapter.notifyDataSetChanged();
+                            break;
+                    }
+                }
+            }
         }
 
         @Override
         public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
+            for (int i = 0; i < mDataContents.size(); i++) {
+                if (downloadUpdateRsp.key.equals(mDataContents.get(i).getmPackageName())) {
+                    String OriginalShowText = mDataContents.get(i).getmShowText();
 
+                    switch (downloadUpdateRsp.status) {
+                        case Constant.STATUS_PENDING:
+                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.download_pending));
+                            break;
+                        case Constant.STATUS_RUNNING:
+                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.download_running));
+                            break;
+                        case Constant.STATUS_PAUSED:
+                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.download_paused));
+                            break;
+                        case Constant.STATUS_FAILED:
+                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.download_failed));
+                            break;
+                        case Constant.STATUS_NORMAL_INSTALLING:
+                            break;
+                    }
+
+                    String CurrentShowText = mDataContents.get(i).getmShowText();
+                    if (!OriginalShowText.equals(CurrentShowText))
+                        mAdapter.notifyDataSetChanged();
+                    LogUtils.i(TAG, OriginalShowText + "-------" + CurrentShowText);
+                }
+            }
         }
 
         @Override
@@ -72,7 +109,24 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
-
+            for (int i = 0; i < mDataContents.size(); i++) {
+                if (systemInstallResultRsp.key.equals(mDataContents.get(i).getmPackageName())) {
+                    switch (systemInstallResultRsp.result) {
+                        case Constant.STATUS_PACKAGE_INVALID:
+                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.package_invalid));
+                            Toast.makeText(mActivity, AppliteUtils.getString(mContext, R.string.package_invalid),
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case Constant.STATUS_INSTALL_FAILED:
+                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.install_failed));
+                            break;
+                        case Constant.STATUS_INSTALLED:
+                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.start_up));
+                            break;
+                    }
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
         }
 
         @Override
@@ -82,9 +136,17 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
-
+            if (implResponse instanceof ImplAgent.InstallPackageRsp) {
+                for (int i = 0; i < mDataContents.size(); i++) {
+                    if (((ImplAgent.InstallPackageRsp) implResponse).key.equals(mDataContents.get(i).getmPackageName())) {
+                        mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.installing));
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
         }
     };
+    private Context mContext;
 
     public UpdateFragment() {
     }
@@ -112,10 +174,10 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
             mInflater = mInflater.cloneInContext(context);
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.hide();
-//            mContext = context;
+            mContext = context;
         } catch (Exception e) {
             e.printStackTrace();
-//            mContext = mActivity;
+            mContext = mActivity;
         }
         if (null == mInflater) {
             mInflater = inflater;
@@ -145,7 +207,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                         ImplAgent.downloadPackage(mActivity,
                                 data.getmPackageName(),
                                 data.getmUrl(),
-                                Utils.extenStorageDirPath,
+                                Constant.extenStorageDirPath,
                                 data.getmName() + ".apk",
                                 3,
                                 false,
@@ -156,6 +218,8 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                                 "",
                                 data.getmPackageName());
                     }
+                } else {
+                    Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.no_update), Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -170,12 +234,12 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
 
     private void post() {
         AjaxParams params = new AjaxParams();
-        params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
         params.put("type", "update_management");
-        params.put("update_info", Utils.getAllApkData(mActivity));
-        mFinalHttp.post(Utils.URL, params, new AjaxCallBack<Object>() {
+        params.put("update_info", UpdateUtils.getAllApkData(mActivity));
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
@@ -216,6 +280,9 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                     bean.setmPackageName(obj.getString("packageName"));
                     bean.setmUrl(obj.getString("rDownloadUrl"));
                     bean.setmSize(obj.getLong("apkSize"));
+
+                    bean.setmShowText(AppliteUtils.getString(mContext, R.string.install));
+
                     mDataContents.add(bean);
                 }
             }

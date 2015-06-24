@@ -7,13 +7,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.mit.appliteupdate.BundleContextFactory;
+import com.applite.common.AppliteUtils;
+import com.applite.common.Constant;
+import com.mit.appliteupdate.main.BundleContextFactory;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.bean.DataBean;
-import com.mit.appliteupdate.utils.Utils;
 import com.mit.impl.ImplAgent;
 
 import net.tsz.afinal.FinalBitmap;
@@ -77,14 +77,15 @@ public class UpdateAdapter extends BaseAdapter {
         viewholder.mName.setText(data.getmName());
         mFinalBitmap.display(viewholder.mImg, data.getmImgUrl());
         viewholder.mVersionName.setText(data.getmVersionName());
-        viewholder.mApkSize.setText(Utils.bytes2kb(data.getmSize()));
+        viewholder.mApkSize.setText(AppliteUtils.bytes2kb(data.getmSize()));
+        viewholder.mBt.setText(data.getmShowText());
         viewholder.mBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ImplAgent.downloadPackage(mContext,
                         data.getmPackageName(),
                         data.getmUrl(),
-                        Utils.extenStorageDirPath,
+                        Constant.extenStorageDirPath,
                         data.getmName() + ".apk",
                         3,
                         false,

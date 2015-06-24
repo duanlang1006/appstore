@@ -6,9 +6,11 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.PointF;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,12 +31,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.mit.bean.GuideBean;
 import com.mit.impl.ImplAgent;
-import com.mit.utils.LogUtils;
-import com.mit.utils.SPUtils;
-import com.mit.utils.Utils;
+import com.mit.utils.GuideUtils;
+import com.mit.utils.GuideSPUtils;
 
 import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
@@ -79,7 +82,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                         public void run() {
                             toHome();
                         }
-                    }, (long) SPUtils.get(mActivity, SPUtils.LOGO_SHOW_TIME, 3000L));
+                    }, (long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_SHOW_TIME, 3000L));
                     break;
             }
         }
@@ -131,18 +134,18 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
 
         mFinalBitmap = FinalBitmap.create(mActivity);
         mFinalHttp = new FinalHttp();
-        if ((Boolean) SPUtils.get(mActivity, SPUtils.ISGUIDE, true)) {
+        if ((Boolean) GuideSPUtils.get(mActivity, GuideSPUtils.ISGUIDE, true)) {
             rootView = mInflater.inflate(R.layout.fragment_guide, container, false);
             initView();
             getResolution();
             post(1, 10, POST_ALL_APK);
-            SPUtils.put(mActivity, SPUtils.ISGUIDE, false);
+            GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
         } else {
             rootView = mInflater.inflate(R.layout.fragment_logo, container, false);
             logoInitView();
             mHandler.sendEmptyMessageDelayed(FINSH_LOGO, 1000);
             if (System.currentTimeMillis() / 1000 >
-                    (Long) SPUtils.get(mActivity, SPUtils.LOGO_NEXT_TIME, 0L)) {
+                    (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_NEXT_TIME, 0L)) {
                 logoPost();
             }
         }
@@ -161,8 +164,8 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void initView() {
         mFLayout = (FrameLayout) rootView.findViewById(R.id.guide_fl);
-        mFLayoutWidth = Utils.px2dip(mActivity, Utils.getWidth(mFLayout));
-        mFLayoutHeight = Utils.px2dip(mActivity, Utils.getHeight(mFLayout));
+        mFLayoutWidth = AppliteUtils.px2dip(mActivity, AppliteUtils.getWidth(mFLayout));
+        mFLayoutHeight = AppliteUtils.px2dip(mActivity, AppliteUtils.getHeight(mFLayout));
         LogUtils.i(TAG, "mFLayoutWidth:" + mFLayoutWidth
                 + "--------------mFLayoutHeight:" + mFLayoutHeight);
         mRLayout = (RelativeLayout) rootView.findViewById(R.id.guide_rl);
@@ -224,14 +227,14 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         annalPostApkNumber(apkPsition);
 
         AjaxParams params = new AjaxParams();
-        params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
         params.put("type", "guide");
         params.put("sort", "gift");
         params.put("position", position + "");
         params.put("number", number + "");
-        mFinalHttp.post(Utils.URL, params, new AjaxCallBack<Object>() {
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
@@ -300,11 +303,11 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void annalPostApkNumber(int apkPsition) {
         if (apkPsition == POST_ALL_APK) {
-            SPUtils.put(mActivity, SPUtils.GUIDE_POSITION,
-                    (Integer) SPUtils.get(mActivity, SPUtils.GUIDE_POSITION, 0) + 10);
+            GuideSPUtils.put(mActivity, GuideSPUtils.GUIDE_POSITION,
+                    (Integer) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 10);
         } else {
-            SPUtils.put(mActivity, SPUtils.GUIDE_POSITION,
-                    (Integer) SPUtils.get(mActivity, SPUtils.GUIDE_POSITION, 0) + 1);
+            GuideSPUtils.put(mActivity, GuideSPUtils.GUIDE_POSITION,
+                    (Integer) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 1);
         }
     }
 
@@ -316,12 +319,12 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void deleteNoReturn(int apkPsition, int number) {
         if (number < 10 && apkPsition == POST_ALL_APK) {//请求10个，但是返回数据小于10
-            SPUtils.put(mActivity, SPUtils.GUIDE_POSITION,
-                    (Integer) SPUtils.get(mActivity, SPUtils.GUIDE_POSITION, 0)
+            GuideSPUtils.put(mActivity, GuideSPUtils.GUIDE_POSITION,
+                    (Integer) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0)
                             - (10 - number));
         } else if (number == 0 && apkPsition != POST_ALL_APK) {//请求1个，但是返回数据等于零
-            SPUtils.put(mActivity, SPUtils.GUIDE_POSITION,
-                    (Integer) SPUtils.get(mActivity, SPUtils.GUIDE_POSITION, 0) - 1);
+            GuideSPUtils.put(mActivity, GuideSPUtils.GUIDE_POSITION,
+                    (Integer) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) - 1);
         }
     }
 
@@ -358,18 +361,18 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                 mApkList.remove(child);
                 paowuxianAnimator(child, mApkMovePath[apkPsition]);
 
-                post((int) SPUtils.get(mActivity, SPUtils.GUIDE_POSITION, 0) + 1, 1, apkPsition);
+                post((int) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 1, 1, apkPsition);
 
-                int mApkType = Utils.isAppInstalled(mActivity, bean.getPackagename(), bean.getmVersionCode());
+                int mApkType = AppliteUtils.isAppInstalled(mActivity, bean.getPackagename(), bean.getmVersionCode());
                 LogUtils.i(TAG, "mApkType:" + mApkType);
                 switch (mApkType) {
-                    case Utils.UNINSTALLED:
+                    case Constant.UNINSTALLED:
                         requestDownload(bean);
                         break;
-                    case Utils.INSTALLED:
+                    case Constant.INSTALLED:
                         Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
                         break;
-                    case Utils.INSTALLED_UPDATE:
+                    case Constant.INSTALLED_UPDATE:
                         Toast.makeText(mActivity, "版本更新", Toast.LENGTH_SHORT).show();
                         requestDownload(bean);
                         break;
@@ -378,7 +381,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         });
 
         mRLayout.addView(child);
-        Utils.setLayout(child, mX[apkPsition], mY[apkPsition]);
+        AppliteUtils.setLayout(child, mX[apkPsition], mY[apkPsition]);
         appearAnimator(child);
 
         int i = (child.getRight() - child.getLeft()) / 2;
@@ -398,7 +401,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         ImplAgent.downloadPackage(mActivity,
                 bean.getPackagename(),
                 bean.getUrl(),
-                Utils.extenStorageDirPath,
+                Constant.extenStorageDirPath,
                 bean.getName() + ".apk",
                 3,
                 false,
@@ -435,7 +438,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.guide_install:
                 installAllApp();
-                post((int) SPUtils.get(mActivity, SPUtils.GUIDE_POSITION, 0) + 1, 10, POST_ALL_APK);
+                post((int) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 1, 10, POST_ALL_APK);
                 break;
             default:
                 break;
@@ -464,6 +467,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      *
      * @param view
      */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void appearAnimator(final View view) {
         ObjectAnimator anim1 = ObjectAnimator.ofFloat(view, "scaleX", 0.2f, 1f);
         ObjectAnimator anim2 = ObjectAnimator.ofFloat(view, "scaleY", 0.2f, 1f);
@@ -547,7 +551,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void download(final String name, String url) {
         HttpHandler mHttpHandler = mFinalHttp.download(url, //这里是下载的路径
-                Utils.getAppDir(name), //这是保存到本地的路径
+                AppliteUtils.getAppDir(name), //这是保存到本地的路径
                 true,//true:断点续传 false:不断点续传（全新下载）
                 new AjaxCallBack<File>() {
 
@@ -559,8 +563,8 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void onSuccess(File t) {
                         LogUtils.i(TAG, name + "下载成功");
-                        LogUtils.i(TAG, "Utils.getAppDir(name):" + Utils.getAppDir(name));
-                        SPUtils.put(mActivity, SPUtils.LOGO_IMG_URL, Utils.getAppDir(name));
+                        LogUtils.i(TAG, "Utils.getAppDir(name):" + AppliteUtils.getAppDir(name));
+                        GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_IMG_URL, AppliteUtils.getAppDir(name));
                     }
 
                     @Override
@@ -576,11 +580,11 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void logoInitView() {
         mLogoIV = (ImageView) rootView.findViewById(R.id.logo_iv);
-        if (System.currentTimeMillis() / 1000 >= (Long) SPUtils.get(mActivity, SPUtils.LOGO_START_SHOW_TIME, 0L) &&
-                System.currentTimeMillis() / 1000 <= (Long) SPUtils.get(mActivity, SPUtils.LOGO_END_SHOW_TIME, 0L)) {
-            if (!TextUtils.isEmpty((String) SPUtils.get(mActivity, SPUtils.LOGO_IMG_URL, ""))) {
-                mLogoIV.setImageBitmap(Utils.getLoacalBitmap(
-                        (String) SPUtils.get(mActivity, SPUtils.LOGO_IMG_URL, "")));
+        if (System.currentTimeMillis() / 1000 >= (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_START_SHOW_TIME, 0L) &&
+                System.currentTimeMillis() / 1000 <= (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_END_SHOW_TIME, 0L)) {
+            if (!TextUtils.isEmpty((String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, ""))) {
+                mLogoIV.setImageBitmap(GuideUtils.getLoacalBitmap(
+                        (String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, "")));
             }
         }
     }
@@ -590,11 +594,11 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void logoPost() {
         AjaxParams params = new AjaxParams();
-        params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
-        params.put("packagename", Utils.getPackgeName(mActivity));
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
         params.put("type", "logo");
-        mFinalHttp.post(Utils.URL, params, new AjaxCallBack<Object>() {
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
@@ -612,10 +616,10 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                     String SmallImgUrl = obj.getString("i_smalllogourl");
                     long StartTime = obj.getLong("limit_starttime");
                     long EndTime = obj.getLong("limit_endtime");
-                    SPUtils.put(mActivity, SPUtils.LOGO_NEXT_TIME, NextTime);
-                    SPUtils.put(mActivity, SPUtils.LOGO_SHOW_TIME, ShowTime);
-                    SPUtils.put(mActivity, SPUtils.LOGO_START_SHOW_TIME, StartTime);
-                    SPUtils.put(mActivity, SPUtils.LOGO_END_SHOW_TIME, EndTime);
+                    GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_NEXT_TIME, NextTime);
+                    GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_SHOW_TIME, ShowTime);
+                    GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_START_SHOW_TIME, StartTime);
+                    GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_END_SHOW_TIME, EndTime);
                     if (!TextUtils.isEmpty(BigImgUrl)) {
                         download("logo.jpg", BigImgUrl);
                     }

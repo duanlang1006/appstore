@@ -11,15 +11,57 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    lintOptions {
+        abortOnError false
+    }
+    signingConfigs {
+        debug {
+            storeFile file("../../dsc.keystore")
+            storePassword "shly123456"
+            keyAlias "dbservice"
+            keyPassword "shly123456"
+        }
+
+        def config = release {
+            storeFile file(System.getenv("ANDROID_HOME")+"/security/SC8825/platform.keystore")
+            storePassword "android"
+            keyAlias "androidsystemkey"
+            keyPassword "android"
+        }
+        config
+    }
     buildTypes {
         release {
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.3'
+    provided files('../../app/libs/afinal_0.5.1_bin.jar')
+    provided files('../../app/reflibs/osgi2.7.0.jar')
+    provided files('../../app/reflibs/android-support-v4.jar')
+    provided files('../../app/reflibs/android-support-v7-appcompat.jar')
+    provided files('../../extras/impl/applite-impl-v1.1.jar')
+    provided files('../../extras/applitecommon/applite-common-v1.0.jar')
 }
+
+task clearPlugin(type: Delete) {
+    delete '../../app/src/main/assets/appliteupdate.apk'
+}
+
+task makePlugin(type: Copy) {
+    from('build/outputs/apk/')
+    into('../../app/src/main/assets/')
+    include('appliteupdate-release.apk')
+    rename ('appliteupdate-release.apk', "appliteupdate.apk")
+}
+
+makePlugin.dependsOn(clearPlugin, assembleRelease)

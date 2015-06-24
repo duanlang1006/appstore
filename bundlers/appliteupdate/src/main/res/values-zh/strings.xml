@@ -33,4 +33,6 @@
     <string name="installed">安装成功，点此启动</string>
     <string name="start_up">"启动"</string>
 
+    <string name="no_update">没有可更新应用！</string>
+
 </resources>

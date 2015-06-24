@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.mit.appliteupdate.UpdateFragment">
+    tools:context="com.mit.appliteupdate.main.UpdateFragment">
 
     <TextView
         android:padding="5dp"
@@ -30,6 +30,7 @@
         <TextView
             android:id="@+id/update_all_update"
             android:text="全部更新"
+            android:textColor="@color/qingse"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

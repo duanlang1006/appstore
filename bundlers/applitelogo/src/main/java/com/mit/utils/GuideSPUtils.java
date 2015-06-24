@@ -10,9 +10,9 @@ import java.util.Map;
 /**
  * Created by LSY on 15-5-22.
  */
-public class SPUtils {
+public class GuideSPUtils {
 
-    public SPUtils() {
+    public GuideSPUtils() {
         /* cannot be instantiated */
         throw new UnsupportedOperationException("cannot be instantiated");
     }
