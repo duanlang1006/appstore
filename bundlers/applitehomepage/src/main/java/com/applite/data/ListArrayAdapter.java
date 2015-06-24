@@ -42,16 +42,11 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
     private FinalBitmap mFinalBitmap;
     private int mTable = 0;
     private List<HomePageTypeBean> mDataType = null;
-    private PullDownView pullDownView; //PullDown
-    private ScrollOverListView listView;
 
 
 
     public ListArrayAdapter(Context context, int resource) {
         super(context, resource);
-    }
-    public interface ApkItemClickListener {
-        void onToOtherFragment();
     }
     public ListArrayAdapter(Context context, int resource, List<HomePageBean> data, List<HomePageTypeBean> dataType, int mTab) {
 
@@ -62,7 +57,6 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
         this.mTable = mTab;
         this.mDataType = dataType;
         mFinalBitmap = FinalBitmap.create(context);
-        //mData.getClass();
         HomePageUtils.i(TAG, "yuzm-----------------");
         if(null != mData) {
             for (int i = 0; i < mData.size(); i++) {
@@ -292,9 +286,25 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
         return convertView;
     }
 
-    public void setData(List<HomePageBean> data) {
-        this.mData = data;
-        this.notifyDataSetChanged();
+    public void setData(List<HomePageBean> data,List<HomePageTypeBean> dataType, int mType) {
+        HomePageUtils.i(TAG, "ListAdapter.setData yuzm before data : " + data +
+                "data.size() : " + data.size());
+        //HomePageUtils.i(TAG, "ListAdapter.setData yuzm before mData.size() : " + mData.size());
+        HomePageUtils.i(TAG, "getView() yuzm Thread.currentThread().getId() : " +
+                Thread.currentThread().getId());
+        switch (mType) {
+            case 0 :
+            case 1 : for (int i = 0; null != data && i < data.size(); i++) {
+                        this.mData.add(data.get(i));
+                    }
+                break;
+            case 2 :  for (int i = 0; null != data && i < data.size(); i++) {
+                        this.mDataType.add(dataType.get(i));
+                }
+                break;
+        }
+
+        //HomePageUtils.i(TAG, "ListAdapter.setData yuzm after mData.size() : " + mData.size());
     }
 
     class ViewHolder {

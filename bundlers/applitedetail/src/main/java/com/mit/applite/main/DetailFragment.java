@@ -19,9 +19,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
-import com.mit.applite.utils.LogUtils;
-import com.mit.applite.utils.Utils;
+import com.applite.common.LogUtils;
 import com.mit.applite.view.ProgressButton;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
@@ -68,41 +68,29 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private ImplListener mImplListener = new ImplListener() {
         @Override
         public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
+            switch (downloadCompleteRsp.status) {
+                case Constant.STATUS_SUCCESSFUL:
+                    mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_success));
+                    break;
+            }
         }
 
         @Override
         public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
             switch (downloadUpdateRsp.status) {
                 case Constant.STATUS_PENDING:
-                    mProgressButton.setText(Utils.getString(mContext, R.string.download_pending));
+                    mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_pending));
                     break;
                 case Constant.STATUS_RUNNING:
-                    mProgressButton.setText(Utils.getString(mContext, R.string.download_running));
+                    mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_running));
                     break;
                 case Constant.STATUS_PAUSED:
-                    mProgressButton.setText(Utils.getString(mContext, R.string.download_paused));
+                    mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_paused));
                     break;
                 case Constant.STATUS_FAILED:
-                    mProgressButton.setText(Utils.getString(mContext, R.string.download_failed));
-                    break;
-                case Constant.STATUS_SUCCESSFUL:
-                    mProgressButton.setText(Utils.getString(mContext, R.string.download_success));
-                    break;
-                case Constant.STATUS_PACKAGE_INVALID:
-//                    mProgressButton.setText(Utils.getString(mContext, R.string.package_invalid));
-                    Toast.makeText(mContext, Utils.getString(mContext, R.string.package_invalid),
-                            Toast.LENGTH_SHORT).show();
-                    break;
-                case Constant.STATUS_PRIVATE_INSTALLING:
-                    mProgressButton.setText(Utils.getString(mContext, R.string.installing));
+                    mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_failed));
                     break;
                 case Constant.STATUS_NORMAL_INSTALLING:
-                    break;
-                case Constant.STATUS_INSTALLED:
-                    mProgressButton.setText(Utils.getString(mContext, R.string.start_up));
-                    break;
-                case Constant.STATUS_INSTALL_FAILED:
-                    mProgressButton.setText(Utils.getString(mContext, R.string.install_failed));
                     break;
             }
             if (downloadUpdateRsp.key.equals(mPackageName)) {
@@ -130,6 +118,21 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
+            if (systemInstallResultRsp.key.equals(mPackageName)) {
+                switch (systemInstallResultRsp.result) {
+                    case Constant.STATUS_PACKAGE_INVALID:
+                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.package_invalid));
+                        Toast.makeText(mActivity, AppliteUtils.getString(mContext, R.string.package_invalid),
+                                Toast.LENGTH_SHORT).show();
+                        break;
+                    case Constant.STATUS_INSTALL_FAILED:
+                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.install_failed));
+                        break;
+                    case Constant.STATUS_INSTALLED:
+                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.start_up));
+                        break;
+                }
+            }
         }
 
         @Override
@@ -138,6 +141,11 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
+            if (implResponse instanceof ImplAgent.InstallPackageRsp) {
+                if (((ImplAgent.InstallPackageRsp) implResponse).key.equals(mPackageName)) {
+                    mProgressButton.setText(AppliteUtils.getString(mContext, R.string.installing));
+                }
+            }
         }
     };
 
@@ -217,8 +225,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onClickListener() {
                 if (!TextUtils.isEmpty(mPackageName)) {
-                    if (mApkType == Utils.INSTALLED) {
-                        Utils.startApp(mActivity, mPackageName);
+                    if (mApkType == Constant.INSTALLED) {
+                        AppliteUtils.startApp(mActivity, mPackageName);
                     } else {
 //                        mProgressBar.setVisibility(View.VISIBLE);
 //                        Utils.setDownloadViewText(mContext, mProgressButton);
@@ -258,12 +266,12 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private void post(String name) {
         FinalHttp mFinalHttp = new FinalHttp();
         AjaxParams params = new AjaxParams();
-        params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
         params.put("type", "detail");
         params.put("name", name);
-        mFinalHttp.post(Utils.URL, params, new AjaxCallBack<Object>() {
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
@@ -312,7 +320,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     mName1View.setText(mName);
                     mXingView.setRating(Float.parseFloat(xing) / 2.0f);
                     mFinalBitmap.display(mApkImgView, mImgUrl);
-                    mApkSizeAndCompanyView.setText(Utils.bytes2kb(size));
+                    mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size));
                     mApkContentView.setText(content);
                 }
                 mViewPagerUrlList = mViewPagerUrl.split(",");
@@ -323,12 +331,12 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             ImplAgent.queryDownload(mActivity, mPackageName);
 
             //判断应用是否安装
-            mApkType = Utils.isAppInstalled(mActivity, mPackageName, mVersionCode);
-            if (mApkType == Utils.INSTALLED) {
+            mApkType = AppliteUtils.isAppInstalled(mActivity, mPackageName, mVersionCode);
+            if (mApkType == Constant.INSTALLED) {
                 mProgressButton.setText(mContext.getResources().getString(R.string.open));
-            } else if (mApkType == Utils.INSTALLED_UPDATE) {
+            } else if (mApkType == Constant.INSTALLED_UPDATE) {
                 mProgressButton.setText(mContext.getResources().getString(R.string.update));
-            } else if (mApkType == Utils.UNINSTALLED) {
+            } else if (mApkType == Constant.UNINSTALLED) {
                 mProgressButton.setText(mContext.getResources().getString(R.string.install));
             }
         } catch (JSONException e) {
@@ -360,7 +368,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         ImplAgent.downloadPackage(mActivity,
                 mPackageName,
                 mDownloadUrl,
-                Utils.extenStorageDirPath,
+                Constant.extenStorageDirPath,
                 mName + ".apk",
                 3,
                 false,

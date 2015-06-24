@@ -10,14 +10,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.main.BundleContextFactory;
-import com.mit.applite.search.utils.LogUtils;
-import com.mit.applite.search.utils.Utils;
+import com.mit.applite.search.utils.SearchUtils;
 import com.mit.applite.search.view.ProgressButton;
 import com.mit.impl.ImplAgent;
 
@@ -95,9 +94,9 @@ public class SearchApkAdapter extends BaseAdapter {
         final SearchBean data = mSearchBeans.get(position);
         mFinalBitmap.display(viewholder.mImg, data.getmImgUrl());
         viewholder.mName.setText(data.getmName());
-        viewholder.mApkSize.setText(Utils.bytes2kb(Long.parseLong(data.getmApkSize())));
+        viewholder.mApkSize.setText(AppliteUtils.bytes2kb(Long.parseLong(data.getmApkSize())));
         viewholder.mDownloadNumber.setText(
-                Utils.getDownloadNumber(context, Integer.parseInt(data.getmDownloadNumber())) +
+                SearchUtils.getDownloadNumber(context, Integer.parseInt(data.getmDownloadNumber())) +
                         context.getResources().getString(R.string.download_number));
         viewholder.mVersionName.setText(context.getResources().getString(R.string.version) +
                 data.getmVersionName());
@@ -108,7 +107,7 @@ public class SearchApkAdapter extends BaseAdapter {
             }
         });
 
-        final int mApkType = Utils.isAppInstalled(context, data.getmPackageName(), data.getmVersionCode());
+        final int mApkType = AppliteUtils.isAppInstalled(context, data.getmPackageName(), data.getmVersionCode());
 //        if (mApkType == Utils.INSTALLED) {
 //            viewholder.mBt.setText(context.getResources().getString(R.string.open));
 //        } else if (mApkType == Utils.INSTALLED_UPDATE) {
@@ -140,26 +139,25 @@ public class SearchApkAdapter extends BaseAdapter {
 //                }
 //            }
 //        });
-        if (mApkType == Utils.INSTALLED) {
+        if (mApkType == Constant.INSTALLED) {
             viewholder.mProgressButton.setText(context.getResources().getString(R.string.open));
-        } else if (mApkType == Utils.INSTALLED_UPDATE) {
+        } else if (mApkType == Constant.INSTALLED_UPDATE) {
             viewholder.mProgressButton.setText(context.getResources().getString(R.string.update));
-        } else if (mApkType == Utils.UNINSTALLED) {
+        } else if (mApkType == Constant.UNINSTALLED) {
             viewholder.mProgressButton.setText(context.getResources().getString(R.string.install));
         }
-        final ViewHolder finalViewholder = viewholder;
-        setmProgressButtonText(data, finalViewholder);
+        viewholder.mProgressButton.setText(data.getmShowButtonText());
         viewholder.mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
             public void onClickListener() {
-                if (mApkType == Utils.INSTALLED) {
-                    Utils.startApp(context, data.getmPackageName());
+                if (mApkType == Constant.INSTALLED) {
+                    AppliteUtils.startApp(context, data.getmPackageName());
                 } else {
 //                    Utils.setDownloadViewText(context, finalViewholder.mProgressButton);
                     ImplAgent.downloadPackage(context,
                             data.getmPackageName(),
                             data.getmDownloadUrl(),
-                            Utils.extenStorageDirPath,
+                            Constant.extenStorageDirPath,
                             data.getmName() + ".apk",
                             3,
                             false,
@@ -174,43 +172,6 @@ public class SearchApkAdapter extends BaseAdapter {
         });
         viewholder.mXing.setRating(Float.parseFloat(data.getmXing()) / 2.0f);
         return convertView;
-    }
-
-    private void setmProgressButtonText(SearchBean data, ViewHolder viewholder) {
-        int status = data.getStatus();
-        switch (status) {
-            case Constant.STATUS_PENDING:
-                viewholder.mProgressButton.setText(Utils.getString(context, R.string.download_pending));
-                break;
-            case Constant.STATUS_RUNNING:
-                viewholder.mProgressButton.setText(Utils.getString(context, R.string.download_running));
-                break;
-            case Constant.STATUS_PAUSED:
-                viewholder.mProgressButton.setText(Utils.getString(context, R.string.download_paused));
-                break;
-            case Constant.STATUS_FAILED:
-                viewholder.mProgressButton.setText(Utils.getString(context, R.string.download_failed));
-                break;
-            case Constant.STATUS_SUCCESSFUL:
-                viewholder.mProgressButton.setText(Utils.getString(context, R.string.download_success));
-                break;
-            case Constant.STATUS_PACKAGE_INVALID:
-//                    mProgressButton.setText(Utils.getString(mContext, R.string.package_invalid));
-                Toast.makeText(context, Utils.getString(context, R.string.package_invalid),
-                        Toast.LENGTH_SHORT).show();
-                break;
-            case Constant.STATUS_PRIVATE_INSTALLING:
-                viewholder.mProgressButton.setText(Utils.getString(context, R.string.installing));
-                break;
-            case Constant.STATUS_NORMAL_INSTALLING:
-                break;
-            case Constant.STATUS_INSTALLED:
-                viewholder.mProgressButton.setText(Utils.getString(context, R.string.start_up));
-                break;
-            case Constant.STATUS_INSTALL_FAILED:
-                viewholder.mProgressButton.setText(Utils.getString(context, R.string.install_failed));
-                break;
-        }
     }
 
     /**

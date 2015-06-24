@@ -13,6 +13,7 @@ public class Constant {
     public static final String OSGI_SERVICE_UPGRADE_FRAGMENT = "osgi.service.upgrade.fragment";
     public static final String OSGI_SERVICE_HOST_OPT = "osgi.service.host.opt";
     public static final String OSGI_SERVICE_DETAIL_FRAGMENT = "osgi.service.detail.fragment";
+    public static final String OSGI_SERVICE_UPDATE_FRAGMENT = "osgi.service.update.fragment";
 
     public static final String OSGI_SERVICE_IMPL_LISTENER = "osgi.service.impl.listener";
 
@@ -36,4 +37,12 @@ public class Constant {
 
     public final static int INSTALL_SUCCEEDED = 1;//ApplicationManager
     public final static int DELETE_SUCCEEDED = 1; //ApplicationManager
+
+    public static final String META_DATA_MIT = "MIT_APPKEY";
+    public static final String extenStorageDirPath = ".android/";//下载的APK保存文件夹
+    public static final String PATH = "applite/";//下载的LOGO图片和插件保存的文件夹
+
+    public static final int INSTALLED = 0; // 表示已经安装，且跟现在这个apk文件是一个版本
+    public static final int UNINSTALLED = 1; // 表示未安装
+    public static final int INSTALLED_UPDATE = 2; // 表示已经安装，版本比现在这个版本要低，可以点击按钮更新
 }

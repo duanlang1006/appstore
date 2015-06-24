@@ -5,7 +5,7 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "com.mit.homepage"
+        applicationId "com.applite.homepage"
         minSdkVersion 8
         targetSdkVersion 21
         versionCode 1

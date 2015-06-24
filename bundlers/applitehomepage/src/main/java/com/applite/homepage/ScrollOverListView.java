@@ -27,19 +27,19 @@ public class ScrollOverListView extends ListView {
 	public ScrollOverListView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
-        HomePageUtils.d(TAG, "ScrollOverListView yuzm 3");
+        HomePageUtils.d(TAG, "ScrollOverListView 3");
 	}
 
 	public ScrollOverListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
-        HomePageUtils.d(TAG, "ScrollOverListView yuzm 2");
+        HomePageUtils.d(TAG, "ScrollOverListView 2");
 	}
 
 	public ScrollOverListView(Context context) {
 		super(context);
 		init();
-        HomePageUtils.d(TAG, "ScrollOverListView yuzm 1");
+        HomePageUtils.d(TAG, "ScrollOverListView 1");
 	}
 
 	private void init(){
@@ -49,7 +49,7 @@ public class ScrollOverListView extends ListView {
 	
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
-        HomePageUtils.d(TAG, "onInterceptTouchEvent yuzm ");
+        HomePageUtils.d(TAG, "onInterceptTouchEvent");
 		if (ev.getAction() == MotionEvent.ACTION_DOWN) {
 			if (DEBUG) HomePageUtils.d(TAG, "onInterceptTouchEvent Action down");
 			mLastY = (int) ev.getRawY();
@@ -62,11 +62,11 @@ public class ScrollOverListView extends ListView {
 	public boolean onTouchEvent(MotionEvent ev) {
 		final int action = ev.getAction();
 		final int y = (int) ev.getRawY();
-        HomePageUtils.d(TAG, "onTouchEvent yuzm ");
+        HomePageUtils.d(TAG, "onTouchEvent");
 		boolean isHandled = false;
 		switch(action){
 			case MotionEvent.ACTION_DOWN:{
-				if (DEBUG) HomePageUtils.d(TAG, "onTouchEvent action down yuzm");
+				if (DEBUG) HomePageUtils.d(TAG, "onTouchEvent action down");
 				mLastY = y;
 				isHandled = mOnScrollOverListener.onMotionDown(ev);
 				if (isHandled) {
@@ -76,7 +76,7 @@ public class ScrollOverListView extends ListView {
 			}
 			
 			case MotionEvent.ACTION_MOVE:{
-				if (DEBUG) HomePageUtils.d(TAG, "onTouchEvent action move yuzm");
+				if (DEBUG) HomePageUtils.d(TAG, "onTouchEvent action move");
 				final int childCount = getChildCount();
 				if(childCount == 0) {
 					break;
@@ -114,6 +114,7 @@ public class ScrollOverListView extends ListView {
 		        if (firstVisiblePosition + childCount >= itemCount && lastBottom <= end && deltaY < 0) {
 		        	if (DEBUG) Log.d(TAG, "action move pull up");
 		        	isHandled = mOnScrollOverListener.onListViewBottomAndPullUp(ev, deltaY);
+                    HomePageUtils.d(TAG, "onTouchEvent action move pull up yuzm isHandled : " + isHandled);
 		        	if(isHandled){
 		        		break;
 		        	}
@@ -123,7 +124,7 @@ public class ScrollOverListView extends ListView {
 			
 			case MotionEvent.ACTION_CANCEL:
 			case MotionEvent.ACTION_UP:{
-				if (DEBUG) HomePageUtils.d(TAG, "onTouchEvent action move pull up yuzm");
+				if (DEBUG) HomePageUtils.d(TAG, "onTouchEvent action move pull up");
 				isHandled = mOnScrollOverListener.onMotionUp(ev);
 				if (isHandled) {
 					break;

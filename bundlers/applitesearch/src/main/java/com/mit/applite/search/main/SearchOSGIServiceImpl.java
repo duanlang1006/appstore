@@ -2,6 +2,7 @@ package com.mit.applite.search.main;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 import com.applite.common.Constant;
@@ -19,7 +20,11 @@ public class SearchOSGIServiceImpl implements ApkplugOSGIService {
         if (Constant.OSGI_SERVICE_SEARCH_FRAGMENT.equals(servicename)) {
             Fragment fg = new SearchFragment();
             FragmentManager fgm = (FragmentManager) objs[0];
-            fgm.beginTransaction().add(node, fg,Constant.OSGI_SERVICE_SEARCH_FRAGMENT).commit();
+            FragmentTransaction ft = fgm.beginTransaction();
+            ft.hide(fgm.findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT));//得到首页Fragment，然后隐藏
+            ft.add(node, fg, Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
+            ft.addToBackStack(null);
+            ft.commit();
         }
         return null;
     }

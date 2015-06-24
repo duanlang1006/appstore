@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -23,7 +22,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.mit.applite.search.adapter.HotWordAdapter;
 import com.mit.applite.search.R;
 import com.mit.applite.search.adapter.PreloadAdapter;
@@ -31,8 +32,6 @@ import com.mit.applite.search.adapter.SearchApkAdapter;
 import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.KeyBoardUtils;
-import com.mit.applite.search.utils.LogUtils;
-import com.mit.applite.search.utils.Utils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
 
@@ -41,12 +40,9 @@ import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
 
-import org.apkplug.Bundle.ApkplugOSGIService;
-import org.apkplug.Bundle.OSGIServiceAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osgi.framework.BundleContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,24 +82,47 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
     private ImplListener mImplListener = new ImplListener() {
         @Override
         public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
-
+            for (int i = 0; i < mSearchApkContents.size(); i++) {
+                if (downloadCompleteRsp.key.equals(mSearchApkContents.get(i).getmPackageName())) {
+                    switch (downloadCompleteRsp.status) {
+                        case Constant.STATUS_SUCCESSFUL:
+                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.download_success));
+                            mAdapter.notifyDataSetChanged();
+                            break;
+                    }
+                }
+            }
         }
 
         @Override
         public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
             for (int i = 0; i < mSearchApkContents.size(); i++) {
                 if (downloadUpdateRsp.key.equals(mSearchApkContents.get(i).getmPackageName())) {
-                    int OriginalStatus = mSearchApkContents.get(i).getStatus();
-                    mSearchApkContents.get(i).setStatus(downloadUpdateRsp.status);
-                    int CurrentStatus = mSearchApkContents.get(i).getStatus();
-                    LogUtils.i(TAG, mSearchApkContents.get(i).getmName() + "-----" + mSearchApkContents.get(i).getStatus());
-                    if (OriginalStatus != CurrentStatus)
+                    String OriginalShowText = mSearchApkContents.get(i).getmShowButtonText();
+
+                    switch (downloadUpdateRsp.status) {
+                        case Constant.STATUS_PENDING:
+                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.download_pending));
+                            break;
+                        case Constant.STATUS_RUNNING:
+                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.download_running));
+                            break;
+                        case Constant.STATUS_PAUSED:
+                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.download_paused));
+                            break;
+                        case Constant.STATUS_FAILED:
+                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.download_failed));
+                            break;
+                        case Constant.STATUS_NORMAL_INSTALLING:
+                            break;
+                    }
+
+                    String CurrentShowText = mSearchApkContents.get(i).getmShowButtonText();
+                    if (!OriginalShowText.equals(CurrentShowText))
                         mAdapter.notifyDataSetChanged();
-//                    mAdapter.setList(mSearchApkContents);
-                    LogUtils.i(TAG, OriginalStatus + "-------" + CurrentStatus);
+                    LogUtils.i(TAG, OriginalShowText + "-------" + CurrentShowText);
                 }
             }
-//            mAdapter.notifyDataSetChanged();
         }
 
         @Override
@@ -123,7 +142,24 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
-
+            for (int i = 0; i < mSearchApkContents.size(); i++) {
+                if (systemInstallResultRsp.key.equals(mSearchApkContents.get(i).getmPackageName())) {
+                    switch (systemInstallResultRsp.result) {
+                        case Constant.STATUS_PACKAGE_INVALID:
+                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.package_invalid));
+                            Toast.makeText(mActivity, AppliteUtils.getString(mContext, R.string.package_invalid),
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case Constant.STATUS_INSTALL_FAILED:
+                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.install_failed));
+                            break;
+                        case Constant.STATUS_INSTALLED:
+                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.start_up));
+                            break;
+                    }
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
         }
 
         @Override
@@ -133,9 +169,17 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
-
+            if (implResponse instanceof ImplAgent.InstallPackageRsp) {
+                for (int i = 0; i < mSearchApkContents.size(); i++) {
+                    if (((ImplAgent.InstallPackageRsp) implResponse).key.equals(mSearchApkContents.get(i).getmPackageName())) {
+                        mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.installing));
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
         }
     };
+    private Context mContext;
 
     public SearchFragment() {
     }
@@ -170,8 +214,10 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
             mInflater = mInflater.cloneInContext(context);
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.hide();
+            mContext = context;
         } catch (Exception e) {
             e.printStackTrace();
+            mContext = mActivity;
         }
         if (null == mInflater) {
             mInflater = inflater;
@@ -326,13 +372,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
      */
     public void postSearch(String name, final int type, final int number) {
         AjaxParams params = new AjaxParams();
-        params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
         params.put("type", "search");
         params.put("key", name);
 //        params.put("position", position + "");
-        mFinalHttp.post(Utils.URL, params, new AjaxCallBack<Object>() {
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
@@ -421,6 +467,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                     bean.setmVersionName(obj.getString("versionName"));
                     bean.setmVersionCode(obj.getInt("versionCode"));
                     bean.setmDownloadUrl(obj.getString("rDownloadUrl"));
+
+                    bean.setmShowButtonText(AppliteUtils.getString(mContext, R.string.install));
                     mSearchApkContents.add(bean);
                     ImplAgent.queryDownload(mActivity, bean.getmPackageName());
                 }
@@ -443,11 +491,11 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
      */
     private void postHotWord() {
         AjaxParams params = new AjaxParams();
-        params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
         params.put("type", "hot_word");
-        mFinalHttp.post(Utils.URL, params, new AjaxCallBack<Object>() {
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
@@ -486,7 +534,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                 bean.setmType(1 + "");
                 mHotWordBeans.add(bean);
             }
-            setHotWordShowData(0);
+            if (mHotWordBeans.size() >= 9)
+                setHotWordShowData(0);
+            LogUtils.i(TAG, "在线热词返回数量不足9个！ size=" + mHotWordBeans.size());
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.e(TAG, "在线热词JSON解析失败");
