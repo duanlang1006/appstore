@@ -1,4 +1,4 @@
-package com.mit.applite.search.utils;
+package com.applite.common;
 
 import android.util.Log;
 

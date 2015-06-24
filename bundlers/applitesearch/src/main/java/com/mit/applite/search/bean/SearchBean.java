@@ -15,14 +15,14 @@ public class SearchBean {
     private String mApkSize;
     private String mXing;
 
-    private int status;
+    private String mShowButtonText;
 
-    public int getStatus() {
-        return status;
+    public String getmShowButtonText() {
+        return mShowButtonText;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setmShowButtonText(String mShowButtonText) {
+        this.mShowButtonText = mShowButtonText;
     }
 
     @Override

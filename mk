@@ -22,5 +22,8 @@ cd ../applitedm
 cd ../applitedetail
 ../../gradlew clean makePlugin
 
+cd ../appliteupdate
+../../gradlew clean makePlugin
+
 cd ../../app
 ../gradlew clean assembleRelease installLeadexceed_buildinRelease

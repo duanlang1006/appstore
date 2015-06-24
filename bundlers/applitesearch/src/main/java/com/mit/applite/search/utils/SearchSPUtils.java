@@ -10,9 +10,9 @@ import java.util.Map;
 /**
  * Created by LSY on 15-5-22.
  */
-public class SPUtils {
+public class SearchSPUtils {
 
-    public SPUtils() {
+    public SearchSPUtils() {
         /* cannot be instantiated */
         throw new UnsupportedOperationException("cannot be instantiated");
     }

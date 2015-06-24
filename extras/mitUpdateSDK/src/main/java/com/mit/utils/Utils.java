@@ -1,5 +1,6 @@
 package com.mit.utils;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import android.text.TextUtils;
 public class Utils {
 
     private static final String TAG = "Utils";
+    private static final String PATH = "applite/";
 
     /**
      * 设备信息
@@ -230,6 +232,34 @@ public class Utils {
             e.printStackTrace();
         }
         return "";
+    }
+
+    /**
+     * 下载保存路径
+     *
+     * @param filename
+     * @return
+     */
+    public static String getAppDir(String filename) {
+        String path = "";
+        String state = android.os.Environment.getExternalStorageState();
+        if (android.os.Environment.MEDIA_MOUNTED.equals(state)
+                && android.os.Environment.getExternalStorageDirectory().canWrite()) {
+            path = android.os.Environment.getExternalStorageDirectory().getPath();
+            if (!path.endsWith("/")) {
+                path += "/";
+            }
+            path += PATH;
+            if (!path.endsWith("/")) {
+                path += "/";
+            }
+            File file = new File(path);
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+        }
+        path += filename;
+        return path;
     }
 
 }
