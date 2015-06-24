@@ -62,7 +62,7 @@
             android:focusableInTouchMode="false"/>
 
     </LinearLayout>
-    <com.mit.view.ProgressButton
+    <com.applite.view.ProgressButton
         android:id="@+id/list_item_progress_button"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
@@ -88,5 +88,4 @@
         android:layout_alignParentEnd="true"
         android:visibility="invisible"
         android:focusable="false"/>
-
 </RelativeLayout>

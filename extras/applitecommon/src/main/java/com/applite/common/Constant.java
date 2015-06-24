@@ -15,21 +15,25 @@ public class Constant {
     public static final String OSGI_SERVICE_DETAIL_FRAGMENT = "osgi.service.detail.fragment";
     public static final String OSGI_SERVICE_UPDATE_FRAGMENT = "osgi.service.update.fragment";
 
+    public static final String OSGI_SERVICE_IMPL_LISTENER = "osgi.service.impl.listener";
+
 
     public static final String CONFIG_BUNDLES_INFO = "bundles_info";
     public static final String KEY_BUNDLES = "bundles";
 
 
-    public final static int STATUS_PENDING = DownloadManager.STATUS_PENDING;
-    public final static int STATUS_RUNNING = DownloadManager.STATUS_RUNNING;
-    public final static int STATUS_PAUSED = DownloadManager.STATUS_PAUSED;
-    public final static int STATUS_SUCCESSFUL = DownloadManager.STATUS_SUCCESSFUL;
-    public final static int STATUS_FAILED = DownloadManager.STATUS_FAILED;
-    public final static int STATUS_PACKAGE_INVALID = 1 << 8;
-    public final static int STATUS_PRIVATE_INSTALLING = 1 << 9;
-    public final static int STATUS_NORMAL_INSTALLING = 1 << 10;
-    public final static int STATUS_INSTALLED = 1 << 11;
-    public final static int STATUS_INSTALL_FAILED = 1 << 12;
+    public final static int STATUS_INIT = 0;                                    //初始状态，未安装
+    public final static int STATUS_PENDING = DownloadManager.STATUS_PENDING;        //下载等待中
+    public final static int STATUS_RUNNING = DownloadManager.STATUS_RUNNING;        //下载进行中
+    public final static int STATUS_PAUSED = DownloadManager.STATUS_PAUSED;          //下载暂停
+    public final static int STATUS_SUCCESSFUL = DownloadManager.STATUS_SUCCESSFUL;  //下载成功
+    public final static int STATUS_FAILED = DownloadManager.STATUS_FAILED;      //下载失败
+    public final static int STATUS_PACKAGE_INVALID = 1<<8;      //包不合法
+    public final static int STATUS_PRIVATE_INSTALLING = 1<<9;   //静默安装
+    public final static int STATUS_NORMAL_INSTALLING=1<<10;     //普通安装
+    public final static int STATUS_INSTALLED = 1<<11;           //已安装
+    public final static int STATUS_INSTALL_FAILED = 1<<12;      //安装失败
+    public final static int STATUS_UPGRADE = 1<<13;             //有更新
 
     public final static int INSTALL_SUCCEEDED = 1;//ApplicationManager
     public final static int DELETE_SUCCEEDED = 1; //ApplicationManager

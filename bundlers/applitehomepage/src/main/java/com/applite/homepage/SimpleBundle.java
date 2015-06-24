@@ -1,4 +1,4 @@
-package com.mit.homepage;
+package com.applite.homepage;
 
 import android.util.Log;
 

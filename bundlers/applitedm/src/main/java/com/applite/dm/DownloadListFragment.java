@@ -18,6 +18,7 @@ import com.mit.impl.ImplConfig;
 import com.mit.impl.ImplDatabaseHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
+import com.mit.impl.ImplLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,63 +30,7 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
     private Integer mStatusFlags = null;
     private DownloadItemListener mDownloadSelectListener = new DownloadItemListener();
     private ImplDatabaseHelper databaseHelper;
-    private ImplListener mImplListener = new ImplListener() {
-        @Override
-        public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
-            if (null != mAdapter){
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public void onDownloadUpdate(boolean success, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
-            if (null != mAdapter){
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
-            if (null != mAdapter){
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
-            if (null != mAdapter){
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
-            if (null != mAdapter){
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
-            if (null != mAdapter){
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
-            if (null != mAdapter){
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
-            if (null != mAdapter){
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-    };
+    private ImplListener mImplListener = new DownloadImplListener();
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -263,6 +208,57 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
         @Override
         public void onDetailButtonClicked(DownloadItem.DownloadItemTag tag) {
 
+        }
+    }
+
+    private class DownloadImplListener implements ImplListener{
+        private static final String TAG = "impl_dm";
+        private Runnable mNotifyRunnable = new Runnable() {
+            @Override
+            public void run() {
+                setAdapter();
+            }
+        };
+        @Override
+        public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
+            ImplLog.d(TAG,  "onDownloadComplete key="+downloadCompleteRsp.key);
+            mActivity.runOnUiThread(mNotifyRunnable);
+        }
+
+        @Override
+        public void onDownloadUpdate(boolean success, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
+            ImplLog.d(TAG,  "onDownloadUpdate key="+downloadUpdateRsp.key);
+            mActivity.runOnUiThread(mNotifyRunnable);
+        }
+
+        @Override
+        public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
+            mActivity.runOnUiThread(mNotifyRunnable);
+        }
+
+        @Override
+        public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
+            mActivity.runOnUiThread(mNotifyRunnable);
+        }
+
+        @Override
+        public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
+            mActivity.runOnUiThread(mNotifyRunnable);
+        }
+
+        @Override
+        public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
+            mActivity.runOnUiThread(mNotifyRunnable);
+        }
+
+        @Override
+        public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
+            mActivity.runOnUiThread(mNotifyRunnable);
+        }
+
+        @Override
+        public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
+            mActivity.runOnUiThread(mNotifyRunnable);
         }
     }
 }

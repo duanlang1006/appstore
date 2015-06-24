@@ -1,4 +1,4 @@
-package com.mit.data;
+package com.applite.data;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,16 +11,17 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.mit.bean.HomePageBean;
-import com.mit.bean.HomePageTypeBean;
-import com.mit.homepage.BundleContextFactory;
-import com.mit.homepage.PullDownView;
-import com.mit.homepage.R;
-import com.mit.homepage.ScrollOverListView;
+import com.applite.bean.HomePageTypeBean;
+import com.applite.common.Constant;
+import com.applite.homepage.PullDownView;
+import com.applite.bean.HomePageBean;
+import com.applite.homepage.BundleContextFactory;
+import com.applite.homepage.R;
+import com.applite.homepage.ScrollOverListView;
 import com.mit.impl.ImplAgent;
-import com.mit.utils.HomePageUtils;
-import com.mit.utils.Utils;
-import com.mit.view.ProgressButton;
+import com.applite.utils.HomePageUtils;
+import com.applite.utils.Utils;
+import com.applite.view.ProgressButton;
 
 import net.tsz.afinal.FinalBitmap;
 
@@ -32,7 +33,7 @@ import java.util.List;
 public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
     private LayoutInflater mInflater = null;
 //        ViewHolder holderOrders = new ViewHolder();
-    private static final String TAG = "ListArrayAdapter";
+    private static final String TAG = "homepage_ListArrayAdapter";
     //        ViewHolder holderMainTypes = new ViewHolder();
     private Context context;
     private int layoutResourceId;
@@ -78,14 +79,14 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
 
         //pullDownView = (PullDownView)mInflater.findViewById(R.id.pullDownView);
         //pullDownView.enableAutoFetchMore(true, 0);
-        HomePageUtils.i(TAG,"ListAdapter.ListAdapter()");
+//        HomePageUtils.i(TAG,"ListAdapter.ListAdapter()");
 
     }
 
     @Override
     public int getCount() {
         if(null != mData) {
-            HomePageUtils.i(TAG, "ListAdapter.ListAdapter() yuzm this.data.size() : " + this.mData.size());
+//            HomePageUtils.i(TAG, "ListAdapter.ListAdapter() this.data.size() : " + this.mData.size());
             return this.mData.size();
         }else if (null != mDataType){
             return this.mDataType.size();
@@ -95,13 +96,13 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
 
     @Override
     public HomePageBean getItem(int position) {
-        HomePageUtils.i(TAG,"ListAdapter.getItem() yuzm position : " + position);
+//        HomePageUtils.i(TAG,"ListAdapter.getItem() position : " + position);
         return null;
     }
 
     @Override
     public long getItemId(int position) {
-        HomePageUtils.i(TAG,"ListAdapter.getItemId() yuzm position : " + position);
+//        HomePageUtils.i(TAG,"ListAdapter.getItemId() yuzm position : " + position);
         return position;
     }
 
@@ -109,9 +110,6 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
     public View getView(int position, View convertView, ViewGroup parent) {
         float mStaring = 0.0f;
         ViewHolder holderGoods = null;
-        HomePageUtils.i(TAG, "getView() yuzm Thread.currentThread().getId() : " +
-                Thread.currentThread().getId());
-        HomePageUtils.i(TAG, "ListAdapter.getView convertView : " + convertView);
         //Log.i(TAG, "ListAdapter.getView yuzm convertView : " + convertView, new Throwable());
         if (convertView == null) {
             //HomePageUtils.i(TAG, "ListAdapter.getView container : " + convertView);
@@ -141,9 +139,9 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
         HomePageTypeBean itemType =null;
         try {
             if (null != mData) {
-                HomePageUtils.i(TAG, "ListAdapter.getView position : " + position);
+//                HomePageUtils.i(TAG, "ListAdapter.getView position : " + position);
                 item = mData.get(position);
-                HomePageUtils.i(TAG, "ListAdapter.getView item : " + item);
+//                HomePageUtils.i(TAG, "ListAdapter.getView item : " + item);
             }else if(null != mDataType){
                 itemType = mDataType.get(position);
             }
@@ -161,13 +159,40 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
                     case 0 :
                     case 1 :
                         try {
-                            final int mApkType = Utils.isAppInstalled(context, item.getPackagename(), item.getmVersionCode());
-                            if (mApkType == Utils.INSTALLED) {
-                                holderGoods.mProgressButton.setText("open");
-                            } else if (mApkType == Utils.INSTALLED_UPDATE) {
-                                holderGoods.mProgressButton.setText("update");
-                            } else if (mApkType == Utils.UNINSTALLED) {
-                                holderGoods.mProgressButton.setText("install");
+//                            HomePageUtils.i(TAG, "ListAdapter.getView item:" + item.getName()+","+item.getStatus());
+//                            final int mApkType = Utils.isAppInstalled(context, item.getPackagename(), item.getmVersionCode());
+                            switch(item.getStatus()){
+                                case Constant.STATUS_INIT:
+                                    holderGoods.mProgressButton.setText("install");
+                                    break;
+                                case Constant.STATUS_PENDING:
+                                case Constant.STATUS_RUNNING:
+                                    holderGoods.mProgressButton.setText("pause");
+                                    break;
+                                case Constant.STATUS_PAUSED:
+                                    holderGoods.mProgressButton.setText("continue");
+                                    break;
+                                case Constant.STATUS_SUCCESSFUL:
+                                    holderGoods.mProgressButton.setText("open");
+                                    break;
+                                case Constant.STATUS_FAILED:
+                                    holderGoods.mProgressButton.setText("retry");
+                                    break;
+                                case Constant.STATUS_PACKAGE_INVALID:
+                                    holderGoods.mProgressButton.setText("retry");
+                                    break;
+                                case Constant.STATUS_PRIVATE_INSTALLING:
+                                    holderGoods.mProgressButton.setText("installing");
+                                    break;
+                                case Constant.STATUS_NORMAL_INSTALLING:
+                                    holderGoods.mProgressButton.setText("installing");
+                                    break;
+                                case Constant.STATUS_INSTALLED:
+                                    holderGoods.mProgressButton.setText("run");
+                                    break;
+                                case Constant.STATUS_INSTALL_FAILED:
+                                    holderGoods.mProgressButton.setText("retry");
+                                    break;
                             }
                             final ViewHolder finalViewholder = holderGoods;
                             final HomePageBean finalItem = item;
@@ -175,26 +200,42 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
                             holderGoods.mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
                                 @Override
                                 public void onClickListener() {
-                                    if (mApkType == Utils.INSTALLED) {
-                                        Utils.startApp(context, finalItem.getPackagename());
-                                    } else {
-                                        HomePageUtils.i(TAG, "setOnProgressButtonClickListener yuzm Packagenam :" +
-                                                finalItem.getPackagename() + "; getUrl : " +finalItem.getUrl()
-                                        +" ; Name : "+ finalItem.getName() + " ; Packagename : " + finalItem.getPackagename());
-                                        Utils.setDownloadViewText(context, finalViewholder.mProgressButton);
-                                        ImplAgent.downloadPackage(context,
-                                                finalItem.getPackagename(),
-                                                finalItem.getUrl(),
-                                                Utils.extenStorageDirPath,
-                                                finalItem.getName() + ".apk",
-                                                3,
-                                                false,
-                                                finalItem.getName(),
-                                                "",
-                                                true,
-                                                finalItem.getImgurl(),
-                                                "",
-                                                finalItem.getPackagename());
+                                    switch(finalItem.getStatus()){
+                                        case Constant.STATUS_INIT:
+                                        case Constant.STATUS_PENDING:
+                                        case Constant.STATUS_RUNNING:
+                                        case Constant.STATUS_PAUSED:
+                                        case Constant.STATUS_FAILED:
+                                            HomePageUtils.i(TAG, "setOnProgressButtonClickListener yuzm :" + finalItem);
+//                                            Utils.setDownloadViewText(context, finalViewholder.mProgressButton);
+                                            ImplAgent.downloadPackage(context,
+                                                    finalItem.getPackagename(),
+                                                    finalItem.getUrl(),
+                                                    Utils.extenStorageDirPath,
+                                                    finalItem.getName() + ".apk",
+                                                    3,
+                                                    false,
+                                                    finalItem.getName(),
+                                                    "",
+                                                    true,
+                                                    finalItem.getImgurl(),
+                                                    "",
+                                                    finalItem.getPackagename());
+
+                                            break;
+                                        case Constant.STATUS_SUCCESSFUL:
+                                            break;
+                                        case Constant.STATUS_PACKAGE_INVALID:
+                                            break;
+                                        case Constant.STATUS_PRIVATE_INSTALLING:
+                                            break;
+                                        case Constant.STATUS_NORMAL_INSTALLING:
+                                            break;
+                                        case Constant.STATUS_INSTALLED:
+                                            Utils.startApp(context, finalItem.getPackagename());
+                                            break;
+                                        case Constant.STATUS_INSTALL_FAILED:
+                                            break;
                                     }
                                 }
                             });
@@ -236,11 +277,11 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
                 }
 
             }catch (Exception e) {
-                HomePageUtils.i(TAG, "ListAdapter.getView Exception holderGoods : " + holderGoods);
+//                HomePageUtils.i(TAG, "ListAdapter.getView Exception holderGoods : " + holderGoods);
                 e.printStackTrace();
             }
         }else {
-            HomePageUtils.i(TAG, "ListAdapter.getView yuzm item : " + item);
+//            HomePageUtils.i(TAG, "ListAdapter.getView yuzm item : " + item);
         }
         return convertView;
     }

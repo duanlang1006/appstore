@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.applite.dm;
+package com.applite.homepage;
+
+import java.util.Locale;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -38,7 +40,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.Locale;
+import com.applite.utils.HomePageUtils;
 
 public class PagerSlidingTabStrip extends HorizontalScrollView {
 
@@ -175,6 +177,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 
 	public void setViewPager(ViewPager pager) {
 		this.pager = pager;
+        HomePageUtils.d(TAG, "setViewPager pager : " + pager);
 		if (pager.getAdapter() == null) {
 			throw new IllegalStateException("ViewPager does not have adapter instance.");
 		}
@@ -193,6 +196,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 		tabsContainer.removeAllViews();
 
 		tabCount = pager.getAdapter().getCount();
+        HomePageUtils.d(TAG, "notifyDataSetChanged yuzm tabCount : " + tabCount);
 		for (int i = 0; i < tabCount; i++) {
 
 			if (pager.getAdapter() instanceof IconTabProvider) {
@@ -352,6 +356,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 		public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 			currentPosition = position;
 			currentPositionOffset = positionOffset;
+            HomePageUtils.d(TAG, "PageListener.onPageScrolled yuzm position : " + position);
             if (null !=tabsContainer) {
                 try {
                     scrollToChild(position, (int) (positionOffset * tabsContainer.getChildAt(position).getWidth()));
@@ -368,6 +373,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 
 		@Override
 		public void onPageScrollStateChanged(int state) {
+            HomePageUtils.d(TAG, "PageListener.onPageScrollStateChanged yuzm state : " + state);
 			if (state == ViewPager.SCROLL_STATE_IDLE) {
 				scrollToChild(pager.getCurrentItem(), 0);
 			}
@@ -380,6 +386,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 		@Override
 		public void onPageSelected(int position) {
 			selectedPosition = position;
+            HomePageUtils.d(TAG, "PageListener.onPageSelected yuzm position : " + position);
 			updateTabStyles();
 			if (delegatePageListener != null) {
 				delegatePageListener.onPageSelected(position);

@@ -1,4 +1,4 @@
-package com.mit.view;
+package com.applite.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,7 +10,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.mit.homepage.R;
+import com.applite.homepage.R;
 
 /**
  * Created by yuzhinin on 6/19/15.

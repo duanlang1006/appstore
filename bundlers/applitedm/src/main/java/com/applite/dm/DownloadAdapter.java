@@ -39,6 +39,8 @@ import com.android.dsc.downloads.DownloadManager;
 import com.applite.common.Constant;
 import com.applite.dm.DownloadItem.DownloadSelectListener;
 import com.mit.impl.ImplConfig;
+import com.mit.impl.ImplLog;
+
 import net.tsz.afinal.FinalBitmap;
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -154,6 +156,7 @@ public class DownloadAdapter extends CursorAdapter {
         itemTag.key = c.getString(mKeyColumnId);
         int reason = c.getInt(mReasonColumnId);
         int status = c.getInt(mStatusColumnId);
+        ImplLog.d("impl_dm","bindView,["+itemTag.key+","+status+","+c.getInt(mCurrentBytesColumnId)+"/"+c.getInt(mTotalBytesColumnId)+"]");
         switch (status) {
             case Constant.STATUS_FAILED:
                 itemTag.operate = DownloadItem.DownloadItemTag.OP_DOWNLOAD;
@@ -344,7 +347,6 @@ public class DownloadAdapter extends CursorAdapter {
         if (null == p){
             return;
         }
-
         if (totalBytes > 0) {
             final int percent = (int) ((currentBytes * 100) / totalBytes);
             p.setIndeterminate(false);

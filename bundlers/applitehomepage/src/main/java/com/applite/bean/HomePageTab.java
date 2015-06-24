@@ -1,4 +1,4 @@
-package com.mit.bean;
+package com.applite.bean;
 
 /**
  * Created by zhimin.yu on 6/3/15.

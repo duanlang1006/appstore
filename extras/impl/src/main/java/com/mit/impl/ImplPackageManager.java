@@ -97,6 +97,7 @@ public class ImplPackageManager extends AbstractImpl {
             save(implInfo);
         }
 
+        ImplLog.d(TAG,"handlePackageInstallReq,"+implInfo.getKey()+","+implInfo.getTitle());
         boolean silent = implCmd.silent;
         try{
             PackageInfo info = pm.getPackageArchiveInfo(implCmd.localPath, PackageManager.GET_ACTIVITIES);
@@ -160,7 +161,7 @@ public class ImplPackageManager extends AbstractImpl {
         if (null == implInfo){
             implInfo = new ImplInfo(implCmd.key,"",0,implCmd.packageName,"","","","");
         }
-
+        ImplLog.d(TAG,"handlePackageDeleteReq,"+implInfo.getKey()+","+implInfo.getTitle());
         if (implCmd.silent){
             Intent intent = new Intent("com.installer.action.delete");
             intent.putExtra("name", implCmd.packageName);

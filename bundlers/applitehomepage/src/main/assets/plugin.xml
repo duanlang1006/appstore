@@ -7,8 +7,8 @@
 	date="2015.5.26"
 	provider-name=""
 	provider-url="" 
-	Bundle-Activator="com.mit.homepage.SimpleBundle"
-	Bundle-Activity="com.mit.homepage.GuideActivity">
+	Bundle-Activator="com.applite.homepage.SimpleBundle"
+	Bundle-Activity="com.applite.homepage.GuideActivity">
     Bundle-Service=""
     Bundle-Receiver=""
 </plugin-features>

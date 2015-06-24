@@ -15,12 +15,13 @@ import java.util.Set;
  * Created by hxd on 15-6-10.
  */
 public class ImplAgent {
-    private static String TAG = "ImplAgent";
+    private static String TAG = "impl_agent";
     private static final HandlerThread sWorkerThread = new HandlerThread("impl-worker");
     static {
         sWorkerThread.start();
     }
     static final Handler mWorkHandler = new Handler(sWorkerThread.getLooper());
+//    static ImplDatabaseHelper databaseHelper;
     private static Set<ImplListener> mListenerSet = new HashSet<ImplListener>();
     private static List<ImplInterface> sImplList = new ArrayList<ImplInterface>();
     private static ImplListener mDefaultListener= new ImplListener() {
@@ -29,47 +30,47 @@ public class ImplAgent {
             switch(rsp.status){
                 case DownloadManager.STATUS_SUCCESSFUL:
                     ImplAgent.requestPackageInstall(rsp.context, rsp.key, rsp.localPath, rsp.packageName, true);
-                    Log.d(TAG,"onDownloadComplete,STATUS_SUCCESSFUL");
+                    ImplLog.d(TAG,"onDownloadComplete,STATUS_SUCCESSFUL,"+rsp.key+","+rsp.localPath);
                     break;
                 case DownloadManager.STATUS_FAILED:
-                    Log.d(TAG,"onDownloadComplete,STATUS_FAILED");
+                    ImplLog.d(TAG,"onDownloadComplete,STATUS_FAILED,"+rsp.key+","+rsp.localPath);
                     break;
             }
         }
 
         @Override
         public void onDownloadUpdate(boolean success, DownloadUpdateRsp rsp) {
-            Log.d(TAG,"onDownloadUpdate,"+rsp.key+","+rsp.status+","+rsp.progress);
+            ImplLog.d(TAG,"onDownloadUpdate,"+rsp.key+","+rsp.status+","+rsp.progress);
         }
 
         @Override
         public void onPackageAdded(boolean success, PackageAddedRsp rsp) {
-            Log.d(TAG,"onPackageAdded,"+rsp.key);
+            ImplLog.d(TAG,"onPackageAdded,"+rsp.key);
         }
 
         @Override
         public void onPackageRemoved(boolean success, PackageRemovedRsp rsp) {
-            Log.d(TAG,"onPackageRemoved,"+rsp.key);
+            ImplLog.d(TAG,"onPackageRemoved,"+rsp.key);
         }
 
         @Override
         public void onPackageChanged(boolean success, PackageChangedRsp rsp) {
-            Log.d(TAG,"onPackageChanged,"+rsp.key);
+            ImplLog.d(TAG,"onPackageChanged,"+rsp.key);
         }
 
         @Override
         public void onSystemInstallResult(boolean success, SystemInstallResultRsp rsp) {
-            Log.d(TAG,"onSystemInstallResult,"+rsp.key+","+rsp.result);
+            ImplLog.d(TAG,"onSystemInstallResult,"+rsp.key+","+rsp.result);
         }
 
         @Override
         public void onSystemDeleteResult(boolean success, SystemDeleteResultRsp rsp) {
-            Log.d(TAG,"onSystemDeleteResult,"+rsp.key+","+rsp.result);
+            ImplLog.d(TAG,"onSystemDeleteResult,"+rsp.key+","+rsp.result);
         }
 
         @Override
         public void onFinish(boolean success, ImplResponse rsp) {
-            Log.d(TAG,"onFinish,"+rsp.action);
+            ImplLog.d(TAG,"onFinish,"+rsp.action);
         }
     };
 
@@ -207,6 +208,13 @@ public class ImplAgent {
         }
     }
 
+//    static ImplDatabaseHelper getDatabaseHelper(Context context){
+//        if (null == databaseHelper){
+//            databaseHelper = new ImplDatabaseHelper(context);
+//        }
+//        return databaseHelper;
+//    }
+
     ///===================================================================
     public static abstract class ImplRequest{
         Context context;
@@ -285,6 +293,7 @@ public class ImplAgent {
         public int status;
         DownloadCompleteRsp(Context context,String key,int status,String localPath,String packageName) {
             super(context,ImplInterface.IMPL_ACTION_DOWNLOAD_COMPLETE);
+            this.key = key;
             this.localPath = localPath;
             this.status = status;
             this.packageName = packageName;
