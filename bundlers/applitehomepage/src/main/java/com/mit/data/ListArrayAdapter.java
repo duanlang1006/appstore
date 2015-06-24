@@ -41,16 +41,11 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
     private FinalBitmap mFinalBitmap;
     private int mTable = 0;
     private List<HomePageTypeBean> mDataType = null;
-    private PullDownView pullDownView; //PullDown
-    private ScrollOverListView listView;
 
 
 
     public ListArrayAdapter(Context context, int resource) {
         super(context, resource);
-    }
-    public interface ApkItemClickListener {
-        void onToOtherFragment();
     }
     public ListArrayAdapter(Context context, int resource, List<HomePageBean> data, List<HomePageTypeBean> dataType, int mTab) {
 
@@ -61,7 +56,6 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
         this.mTable = mTab;
         this.mDataType = dataType;
         mFinalBitmap = FinalBitmap.create(context);
-        //mData.getClass();
         HomePageUtils.i(TAG, "yuzm-----------------");
         if(null != mData) {
             for (int i = 0; i < mData.size(); i++) {
@@ -91,7 +85,7 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
     @Override
     public int getCount() {
         if(null != mData) {
-            HomePageUtils.i(TAG, "ListAdapter.ListAdapter() this.data.size() : " + this.mData.size());
+            HomePageUtils.i(TAG, "ListAdapter.ListAdapter() yuzm this.data.size() : " + this.mData.size());
             return this.mData.size();
         }else if (null != mDataType){
             return this.mDataType.size();
@@ -101,7 +95,7 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
 
     @Override
     public HomePageBean getItem(int position) {
-        HomePageUtils.i(TAG,"ListAdapter.getItem() position : " + position);
+        HomePageUtils.i(TAG,"ListAdapter.getItem() yuzm position : " + position);
         return null;
     }
 
@@ -115,6 +109,8 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
     public View getView(int position, View convertView, ViewGroup parent) {
         float mStaring = 0.0f;
         ViewHolder holderGoods = null;
+        HomePageUtils.i(TAG, "getView() yuzm Thread.currentThread().getId() : " +
+                Thread.currentThread().getId());
         HomePageUtils.i(TAG, "ListAdapter.getView convertView : " + convertView);
         //Log.i(TAG, "ListAdapter.getView yuzm convertView : " + convertView, new Throwable());
         if (convertView == null) {
@@ -249,9 +245,25 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
         return convertView;
     }
 
-    public void setData(List<HomePageBean> data) {
-        this.mData = data;
-        this.notifyDataSetChanged();
+    public void setData(List<HomePageBean> data,List<HomePageTypeBean> dataType, int mType) {
+        HomePageUtils.i(TAG, "ListAdapter.setData yuzm before data : " + data +
+                "data.size() : " + data.size());
+        //HomePageUtils.i(TAG, "ListAdapter.setData yuzm before mData.size() : " + mData.size());
+        HomePageUtils.i(TAG, "getView() yuzm Thread.currentThread().getId() : " +
+                Thread.currentThread().getId());
+        switch (mType) {
+            case 0 :
+            case 1 : for (int i = 0; null != data && i < data.size(); i++) {
+                        this.mData.add(data.get(i));
+                    }
+                break;
+            case 2 :  for (int i = 0; null != data && i < data.size(); i++) {
+                        this.mDataType.add(dataType.get(i));
+                }
+                break;
+        }
+
+        //HomePageUtils.i(TAG, "ListAdapter.setData yuzm after mData.size() : " + mData.size());
     }
 
     class ViewHolder {

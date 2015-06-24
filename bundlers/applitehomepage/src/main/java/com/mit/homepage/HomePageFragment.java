@@ -53,7 +53,6 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 
     private final String TAG = "HomePageFragment";
     private Activity mActivity;
-    private FinalBitmap mFinalBitmap;
     private FinalHttp mFinalHttp;
     private List<HomePageBean> mHomePageGoods = new ArrayList<HomePageBean>();
     private List<HomePageBean> mHomePageOrder = new ArrayList<HomePageBean>();
@@ -187,7 +186,6 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
             e.printStackTrace();
         }
         HomePageUtils.d(TAG, "onCreateView yuzm  mInflater : " + mInflater);
-        mFinalBitmap = FinalBitmap.create(mActivity);
         mFinalHttp = new FinalHttp();
         if(!getMainType()) {
             post();
@@ -350,8 +348,6 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 
         params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
         params.put("packagename", "com.android.applite1.0");
-        //params.put("packagename",Utils.getPackgeName(this));
-        //params.put("app", "applite");
         params.put("type", "hpmaintype");
         params.put("categorytype", "m_game");
         mMainFinalHttp.post(Utils.URL, params, new AjaxCallBack<Object>() {
@@ -436,6 +432,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                 hpTab = new HomePageTab();
                 hpTab.setId(1 + (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0));
                 hpTab.setName(object.getString("s_name"));
+                hpTab.setKey(object.getString("s_key"));
                 //HomePageUtils.i(TAG, "setData JSONObject data，hpTab.getName() : " + hpTab.getName());
                 mHPTabContents.add(hpTab);
                 SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
