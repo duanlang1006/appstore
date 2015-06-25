@@ -79,14 +79,14 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
 
         //pullDownView = (PullDownView)mInflater.findViewById(R.id.pullDownView);
         //pullDownView.enableAutoFetchMore(true, 0);
-//        HomePageUtils.i(TAG,"ListAdapter.ListAdapter()");
+        HomePageUtils.i(TAG,"ListAdapter.ListAdapter()");
 
     }
 
     @Override
     public int getCount() {
         if(null != mData) {
-//            HomePageUtils.i(TAG, "ListAdapter.ListAdapter() this.data.size() : " + this.mData.size());
+            HomePageUtils.i(TAG, "ListAdapter.ListAdapter() yuzm this.data.size() : " + this.mData.size());
             return this.mData.size();
         }else if (null != mDataType){
             return this.mDataType.size();
@@ -96,13 +96,13 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
 
     @Override
     public HomePageBean getItem(int position) {
-//        HomePageUtils.i(TAG,"ListAdapter.getItem() position : " + position);
+        HomePageUtils.i(TAG,"ListAdapter.getItem() yuzm position : " + position);
         return null;
     }
 
     @Override
     public long getItemId(int position) {
-//        HomePageUtils.i(TAG,"ListAdapter.getItemId() yuzm position : " + position);
+        HomePageUtils.i(TAG,"ListAdapter.getItemId() yuzm position : " + position);
         return position;
     }
 
@@ -110,6 +110,9 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
     public View getView(int position, View convertView, ViewGroup parent) {
         float mStaring = 0.0f;
         ViewHolder holderGoods = null;
+        HomePageUtils.i(TAG, "getView() yuzm Thread.currentThread().getId() : " +
+                Thread.currentThread().getId());
+        HomePageUtils.i(TAG, "ListAdapter.getView convertView : " + convertView);
         //Log.i(TAG, "ListAdapter.getView yuzm convertView : " + convertView, new Throwable());
         if (convertView == null) {
             //HomePageUtils.i(TAG, "ListAdapter.getView container : " + convertView);
@@ -139,9 +142,9 @@ public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
         HomePageTypeBean itemType =null;
         try {
             if (null != mData) {
-//                HomePageUtils.i(TAG, "ListAdapter.getView position : " + position);
+                HomePageUtils.i(TAG, "ListAdapter.getView position : " + position);
                 item = mData.get(position);
-//                HomePageUtils.i(TAG, "ListAdapter.getView item : " + item);
+                HomePageUtils.i(TAG, "ListAdapter.getView item : " + item);
             }else if(null != mDataType){
                 itemType = mDataType.get(position);
             }

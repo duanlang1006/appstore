@@ -7,12 +7,14 @@ public class HomePageTypeBean {
     private int id;
     private String mM_IconUrl;
     private String mM_Name;
+    private String mM_key;
     @Override
     public String toString() {
         return "HomePageBean{" +
                 "id=" + id +
                 ", m_iconurl='" + mM_IconUrl + '\'' +
                 ", m_name='" + mM_Name + '\'' +
+                ", mM_key='" + mM_key + '\'' +
                 '}';
     }
 
@@ -38,6 +40,14 @@ public class HomePageTypeBean {
 
     public void setM_Name(String mName) {
         this.mM_Name = mName;
+    }
+
+    public String getM_key() {
+        return mM_key;
+    }
+
+    public void setM_key(String mKey) {
+        this.mM_key = mKey;
     }
 
 }
