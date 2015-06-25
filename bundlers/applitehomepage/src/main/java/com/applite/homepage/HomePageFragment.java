@@ -501,6 +501,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                 hpBeanMainType.setId(1 + (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0));
                 hpBeanMainType.setM_Name(object.getString("m_name"));
                 hpBeanMainType.setM_IconUrl(object.getString("m_iconurl"));
+                hpBeanMainType.setM_key("m_key");
                 mHomePageMainType.add(hpBeanMainType);
                 SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
                         (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);
