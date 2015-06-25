@@ -24,8 +24,8 @@ public class DetailOSGIServiceImpl implements ApkplugOSGIService {
             Bundle bundle = new Bundle();
             bundle.putString("name", (String) objs[1]);
             fg.setArguments(bundle);
-            ft.hide(fgm.findFragmentByTag(Constant.OSGI_SERVICE_SEARCH_FRAGMENT));//得到搜索Fragment，然后隐藏
-            ft.add(node, fg, Constant.OSGI_SERVICE_DETAIL_FRAGMENT);
+//            ft.hide(fgm.findFragmentByTag(Constant.OSGI_SERVICE_SEARCH_FRAGMENT));//得到搜索Fragment，然后隐藏
+            ft.replace(node, fg, Constant.OSGI_SERVICE_DETAIL_FRAGMENT);
             ft.addToBackStack(null);
             ft.commit();
         }

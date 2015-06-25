@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.applite.bean.HomePageTypeBean;
 import com.applite.common.Constant;
+import com.applite.common.PagerSlidingTabStrip;
 import com.applite.data.SectionsPagerAdapter;
 import com.applite.utils.SPUtils;
 import com.applite.bean.HomePageBean;
@@ -34,7 +35,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -173,9 +173,11 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         LayoutInflater mInflater = inflater;
         try {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
+            HomePageUtils.d(TAG, "bundle context=" + context);
             if (null != context) {
                 mInflater = LayoutInflater.from(context);
                 mInflater = mInflater.cloneInContext(context);
+                HomePageUtils.d(TAG,"bundle mInflater="+mInflater);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -187,7 +189,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }else {
             postMainType();
         }
-        View rootView = mInflater.inflate(R.layout.activity_test, container, false);
+        ViewGroup rootView = (ViewGroup)mInflater.inflate(R.layout.activity_test, container, false);
         mSectionsPagerAdapter = new SectionsPagerAdapter(this.getFragmentManager(),mActivity);
         // Set up the ViewPager with the sections adapter.
         mSectionsPagerAdapter.setHomePageTab(mHPTabContents);
@@ -195,48 +197,28 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         mSectionsPagerAdapter.setHomePageOrders(mHomePageOrder);
         mSectionsPagerAdapter.setHomePageMainType(mHomePageMainType);
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
-
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        HomePageUtils.i(TAG,"onCreateView mViewPager : ");
-//            mViewPager.setOnPageChangeListener(mPageChangeListener);
-        mPagerSlidingTabStrip = (PagerSlidingTabStrip)rootView.findViewById(R.id.tabs);
+
+        //加入滑动tab管理viewPager
+        mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,container,false);
+//        HomePageUtils.d(TAG,rootView.findViewById(R.id.tabs).toString());
+//        mPagerSlidingTabStrip = (com.applite.homepage.PagerSlidingTabStrip)rootView.findViewById(R.id.tabs);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
         mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
-//            rootView.findViewById(R.id.skip).setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    try {
-//                        BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-//                        OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-//                                bundleContext, ApkplugOSGIService.class,
-//                                "(serviceName=osgi.service.host.opt)", //服务查询条件
-//                                OSGIServiceAgent.real_time);   //每次都重新查询
-//                        agent.getService().ApkplugOSGIService(bundleContext, SimpleBundle.OSGI_SERVICE_LOGO_FRAGMENT, 0, "");
-//                    } catch (Exception e) {
-//                        // TODO 自动生成的 catch 块
-//                        e.printStackTrace();
-//                    }
-//                }
-//            });
+        rootView.addView(mPagerSlidingTabStrip,0);
+
+        //actionbar custom view
         View customView = mInflater.inflate(R.layout.custom_actionbar_main,container,false);
         customView.findViewById(R.id.action_dm).setOnClickListener(this);
         customView.findViewById(R.id.action_search).setOnClickListener(this);
         customView.findViewById(R.id.action_upgrade).setOnClickListener(this);
-        HomePageUtils.i(TAG, "onCreateView yuzm");
         initActionBar(customView);
+
         if (mHPTabContents.size() == 0){
             mViewPager.setVisibility(View.GONE);
         }else{
             mViewPager.setVisibility(View.VISIBLE);
         }
-
-            /*rootView.findViewById(R.id.test_load).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    post();
-                }
-            });*/
-
         return rootView;
     }
 
