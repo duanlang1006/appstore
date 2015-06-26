@@ -3,6 +3,7 @@ package com.mit.applite.search.main;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -12,6 +13,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -180,6 +182,54 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
         }
     };
     private Context mContext;
+    private int mSearchPostPage = 0;
+    private boolean isLastRow = false;
+    private AbsListView.OnScrollListener mOnScrollListener = new AbsListView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
+                LogUtils.i(TAG, "拉到最底部");
+                moreView.setVisibility(view.VISIBLE);
+                mSearchPostPage = mSearchPostPage + 1;
+                mHandler.sendEmptyMessage(0);
+                isLastRow = false;
+            }
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                             int totalItemCount) {
+//            lastItem = firstVisibleItem + visibleItemCount - 1;
+            //判断是否滚到最后一行
+            if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount > 0) {
+                LogUtils.i(TAG, "滚到最后一行");
+                isLastRow = true;
+            }
+        }
+    };
+    private View moreView;
+
+    private boolean isToEnd = false;
+    private Handler mHandler = new Handler() {
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what) {
+                case 0:
+                    if (isToEnd) {
+                        Toast.makeText(mActivity, "木有更多数据！", Toast.LENGTH_SHORT).show();
+                        mListView.removeFooterView(moreView); //移除底部视图
+                    } else {
+                        //加载更多数据，这里可以使用异步加载
+                        postSearch(mEtView.getText().toString(), POST_CLICK_SEARCH, 0);
+                    }
+                    LogUtils.i(TAG, "加载更多数据");
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        ;
+    };
 
     public SearchFragment() {
     }
@@ -224,6 +274,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
         }
 
         rootView = mInflater.inflate(R.layout.fragment_search, container, false);
+        moreView = mInflater.inflate(R.layout.load, null);
         initView();
         if (mHotWordBeans.size() == 0)
             postHotWord();
@@ -266,6 +317,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+        mListView.addFooterView(moreView);
+        mListView.setOnScrollListener(mOnScrollListener);
+
         mEtView.addTextChangedListener(mTextWatcher);
         mEtView.setFocusable(true);
         mEtView.setFocusableInTouchMode(true);
@@ -293,6 +347,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
         @Override
         public void afterTextChanged(Editable s) {
             LogUtils.i(TAG, "输入文字后的状态");
+            mSearchPostPage = 0;
             if (TextUtils.isEmpty(mEtView.getText().toString())) {//空则显示在线热词
                 mListView.setVisibility(View.GONE);
                 isHotWordLayoutVisibility(View.VISIBLE);
@@ -340,10 +395,11 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                 mEtView.setText(null);
                 break;
             case R.id.search_search:
+                isToEnd = false;
                 mPreloadListView.setVisibility(View.GONE);
                 if (TextUtils.isEmpty(mEtView.getText().toString())) {
-                    Toast.makeText(mActivity, getResources().getString(
-                            R.string.srarch_content_no_null), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, AppliteUtils.getString(mContext, R.string.srarch_content_no_null),
+                            Toast.LENGTH_SHORT).show();
                 } else {
                     KeyBoardUtils.closeKeybord(mEtView, mActivity);
                     if (null != mSearchApkContents) {
@@ -356,7 +412,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
             case R.id.hot_word_change:
                 mChangeNumbew = mChangeNumbew + 1;
                 mShowHotData.clear();
-                if (mHotWordBeans.size() / 9 <= mChangeNumbew)
+                if (mHotWordBeans.size() / 8 <= mChangeNumbew)
                     mChangeNumbew = 0;
                 setHotWordShowData(mChangeNumbew);
                 break;
@@ -377,13 +433,16 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
         params.put("app", "applite");
         params.put("type", "search");
         params.put("key", name);
+        if (type == POST_CLICK_SEARCH) {
+            params.put("page", mSearchPostPage + "");
+        }
 //        params.put("position", position + "");
         mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
                 String result = (String) o;
-                LogUtils.i(TAG, "搜索网络请求成功，resulit:" + result);
+                LogUtils.i(TAG, "搜索网络请求成功，result:" + result);
                 if (type == POST_CLICK_SEARCH) {
                     setSearchData(result);
                 } else if (type == POST_PRELOAD_SEARCH) {
@@ -406,7 +465,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
      * @param result
      */
     private void setPreloadData(String result) {
-        if (null != mPreloadData)
+        if (!mPreloadData.isEmpty())
             mPreloadData.clear();
         try {
             JSONObject object = new JSONObject(result);
@@ -443,13 +502,14 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
      * @param data
      */
     private void setSearchData(String data) {
-        if (null != mSearchApkContents)
+        if (!mSearchApkContents.isEmpty() && mSearchPostPage == 0)
             mSearchApkContents.clear();
         SearchBean bean = null;
         try {
             JSONObject object = new JSONObject(data);
             int app_key = object.getInt("app_key");
             String json = object.getString("search_info");
+            isToEnd = object.getBoolean("istoend");
             if (TextUtils.isEmpty(json)) {
 
             } else {
@@ -472,7 +532,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                     mSearchApkContents.add(bean);
                     ImplAgent.queryDownload(mActivity, bean.getmPackageName());
                 }
+                mPreloadListView.setVisibility(View.GONE);
                 mListView.setVisibility(View.VISIBLE);
+                moreView.setVisibility(View.GONE);
                 if (null == mAdapter) {
                     mAdapter = new SearchApkAdapter(mActivity, mSearchApkContents);
                     mListView.setAdapter(mAdapter);
@@ -518,6 +580,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
      * @param data
      */
     private void resolve(String data) {
+        if (!mHotWordBeans.isEmpty())
+            mHotWordBeans.clear();
         HotWordBean bean = null;
         try {
             JSONObject obj = new JSONObject(data);
@@ -529,14 +593,14 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                 bean = new HotWordBean();
                 bean.set_id(i);
                 bean.setmName(object.getString("name"));
+                bean.setmPackageName(object.getString("packageName"));
                 bean.setmImgUrl(object.getString("iconUrl"));
 //                bean.setmType(object.getString(""));
                 bean.setmType(1 + "");
                 mHotWordBeans.add(bean);
             }
-            if (mHotWordBeans.size() >= 9)
-                setHotWordShowData(0);
-            LogUtils.i(TAG, "在线热词返回数量不足9个！ size=" + mHotWordBeans.size());
+            setHotWordShowData(0);
+            LogUtils.i(TAG, "在线热词返回的数量=" + mHotWordBeans.size());
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.e(TAG, "在线热词JSON解析失败");
@@ -547,8 +611,14 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
      * 设置在线热词显示的数据
      */
     private void setHotWordShowData(int position) {
-        for (int i = 0 + 9 * position; i < 9 + 9 * position; i++) {
-            mShowHotData.add(mHotWordBeans.get(i));
+        if (mHotWordBeans.size() > 8) {
+            for (int i = 0 + 8 * position; i < 8 + 8 * position; i++) {
+                mShowHotData.add(mHotWordBeans.get(i));
+            }
+        } else {
+            for (int i = 0; i < mHotWordBeans.size(); i++) {
+                mShowHotData.add(mHotWordBeans.get(i));
+            }
         }
         mGvAdapter = new HotWordAdapter(mActivity, mShowHotData);
         mGridView.setAdapter(mGvAdapter);

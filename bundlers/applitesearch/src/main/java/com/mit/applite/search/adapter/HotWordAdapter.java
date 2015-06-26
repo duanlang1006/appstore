@@ -13,6 +13,7 @@ import com.applite.common.Constant;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.main.BundleContextFactory;
+import com.mit.applite.search.utils.SearchUtils;
 
 import net.tsz.afinal.FinalBitmap;
 
@@ -84,29 +85,10 @@ public class HotWordAdapter extends BaseAdapter {
         viewholder.mLl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toDetailFragment(data.getmName());
+                SearchUtils.toDetailFragment(data.getmPackageName(), data.getmName(), data.getmImgUrl());
             }
         });
         return convertView;
-    }
-
-    /**
-     * 去详情页面
-     */
-    public void toDetailFragment(String name) {
-        try {
-            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName=" + Constant.OSGI_SERVICE_HOST_OPT + ")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            agent.getService().ApkplugOSGIService(bundleContext,
-                    Constant.OSGI_SERVICE_SEARCH_FRAGMENT,
-                    0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT, name);
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
     }
 
     class ViewHolder {

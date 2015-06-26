@@ -4,6 +4,8 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:layout_margin="2dp"
+        android:background="@drawable/hotword_box"
         android:gravity="center_vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

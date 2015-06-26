@@ -76,7 +76,7 @@ public class UpdateAdapter extends BaseAdapter {
         final DataBean data = mDatas.get(position);
         viewholder.mName.setText(data.getmName());
         mFinalBitmap.display(viewholder.mImg, data.getmImgUrl());
-        viewholder.mVersionName.setText(data.getmVersionName());
+        viewholder.mVersionName.setText("V "+data.getmVersionName());
         viewholder.mApkSize.setText(AppliteUtils.bytes2kb(data.getmSize()));
         viewholder.mBt.setText(data.getmShowText());
         viewholder.mBt.setOnClickListener(new View.OnClickListener() {

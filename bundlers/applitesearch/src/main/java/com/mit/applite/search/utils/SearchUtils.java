@@ -2,7 +2,13 @@ package com.mit.applite.search.utils;
 
 import android.content.Context;
 
+import com.applite.common.Constant;
 import com.mit.applite.search.R;
+import com.mit.applite.search.main.BundleContextFactory;
+
+import org.apkplug.Bundle.ApkplugOSGIService;
+import org.apkplug.Bundle.OSGIServiceAgent;
+import org.osgi.framework.BundleContext;
 
 /**
  * Created by LSY on 15-5-22.
@@ -27,6 +33,25 @@ public class SearchUtils {
             s = number + "";
         }
         return s;
+    }
+
+    /**
+     * 去详情页面
+     */
+    public static void toDetailFragment(String packageName, String name, String imgUrl) {
+        try {
+            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+                    bundleContext, ApkplugOSGIService.class,
+                    "(serviceName=" + Constant.OSGI_SERVICE_HOST_OPT + ")", //服务查询条件
+                    OSGIServiceAgent.real_time);   //每次都重新查询
+            agent.getService().ApkplugOSGIService(bundleContext,
+                    Constant.OSGI_SERVICE_SEARCH_FRAGMENT,
+                    0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT, packageName, name, imgUrl);
+        } catch (Exception e) {
+            // TODO 自动生成的 catch 块
+            e.printStackTrace();
+        }
     }
 
 }
