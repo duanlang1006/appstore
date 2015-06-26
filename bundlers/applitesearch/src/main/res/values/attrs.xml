@@ -9,4 +9,5 @@
         <attr name="textSize" format="dimension"/>
         <attr name="text" format="string" />
     </declare-styleable>
+
 </resources>
