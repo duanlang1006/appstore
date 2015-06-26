@@ -8,8 +8,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,11 +20,13 @@ import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.applite.data.TopicPagerAdapter;
 import com.applite.homepage.ScrollOverListView.OnScrollOverListener;
 import com.applite.utils.HomePageUtils;
 
@@ -53,6 +58,9 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	private TextView mHeaderTextView;
 	private ImageView mHeaderArrowView;
 	private View mHeaderLoadingView;
+    private View mTopicHeaderView;
+    TopicPagerAdapter mPageAdaper;
+    private ViewPager mNewsViewPager;
 	private View mFooterView;
 	private TextView mFooterTextView;
 	private View mFooterLoadingView;
@@ -96,11 +104,15 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 
 	public PullDownView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+        mPageAdaper = new TopicPagerAdapter(context);
+        HomePageUtils.i(TAG, "PullDownView() yuzm mPageAdaper : " + mPageAdaper);
 		initHeaderViewAndFooterViewAndListView(context);
 	}
 
 	public PullDownView(Context context) {
 		super(context);
+        mPageAdaper = new TopicPagerAdapter(context);
+        HomePageUtils.i(TAG, "PullDownView() yuzm mPageAdaper : " + mPageAdaper);
 		initHeaderViewAndFooterViewAndListView(context);
 	}
 	
@@ -135,7 +147,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 		
 		mHeaderViewParams.height = 0;
 		mHeaderView.setLayoutParams(mHeaderViewParams);
-		updateHeader();
+		//updateHeader();
 		
 		doListViewIdleActionOnDataDidLoad();
 	}
@@ -152,7 +164,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 		state &= ~STATE_REFRESHING;
 		mHeaderViewState = HEADER_VIEW_STATE_IDLE;
 		setHeaderHeight(0);
-		updateHeader();
+		//updateHeader();
 		
 		doListViewIdleActionOnDataDidLoad();
 	}
@@ -293,8 +305,45 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 				Animation.RELATIVE_TO_SELF, 0.5f);
 		mRotate180To0Animation.setDuration(250);
 		mRotate180To0Animation.setFillAfter(true);
-		
-		
+
+        mListView = new ScrollOverListView(context);
+		/*
+		 * 专题头部定义
+		 */
+        mTopicHeaderView = inflater.inflate(R.layout.index_photos, null);
+
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, 300);
+        lp.gravity = Gravity.TOP;
+
+        // 页码指示点
+        // 图片切换控件
+        mNewsViewPager = (ViewPager) mTopicHeaderView.findViewById(R.id.adViewPager);
+        mNewsViewPager.setLayoutParams(lp);
+        mNewsViewPager.setAdapter(mPageAdaper);
+        mNewsViewPager.setCurrentItem(0);
+        HomePageUtils.i(TAG,"ListAdapter.getItemViewType() yuzm mNewsViewPager : " + mNewsViewPager);
+        OnPageChangeListener pageChangeListener =new OnPageChangeListener() {
+            // 页面选择
+            @Override
+            public void onPageSelected(int position) {
+                //draw_Point(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+
+            @Override
+            public void onPageScrolled(int position,float positionOffset, int positionOffsetPixels) {
+
+            }
+
+        };
+        HomePageUtils.i(TAG,"ListAdapter.getItemViewType() yuzm mTopView : " + mTopicHeaderView);
+        mNewsViewPager.setOnPageChangeListener(pageChangeListener);
+        HomePageUtils.i(TAG,"ListAdapter.getItemViewType() yuzm mTopView : " + mTopicHeaderView);
+
 		/*
 		 * 自定义脚部文件
 		 */
@@ -316,13 +365,13 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 				}
 			}
 		});
-		
-		
+        mListView.addHeaderView(mTopicHeaderView);
+
 		/*
 		 * ScrollOverListView 同样是考虑到基本都要使用，所以放在这里
 		 * 同时因为，需要它的监听事件
 		 */
-		mListView = new ScrollOverListView(context);
+
 		mListView.setFooterDividersEnabled(false);
 		mListView.setId(android.R.id.list);
 		mListView.addFooterView(mFooterView);
@@ -414,7 +463,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 				mHeaderArrowView.startAnimation(mRotate180To0Animation);
 			}
 		} else {
-			//mHeaderLoadingView.setVisibility(View.GONE);
+			mHeaderLoadingView.setVisibility(View.GONE);
 			mHeaderViewDateView.setVisibility(View.VISIBLE);
 			mHeaderArrowView.setVisibility(View.VISIBLE);
 			mHeaderTextView.setText("下拉可以刷新");
@@ -495,7 +544,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 						@Override
 						public void run() {
 							// 要清除掉动画，否则无法隐藏
-							updateHeader();
+							//updateHeader();
 							mHeaderArrowView.clearAnimation();
 							mHeaderArrowView.setVisibility(View.INVISIBLE);
 							//mHeaderLoadingView.setVisibility(View.VISIBLE);
@@ -601,7 +650,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 		mHeaderIncremental += i;
 		if(mHeaderIncremental >= 0){ // && mIncremental <= mMaxHeight
 			setHeaderHeight(mHeaderIncremental);
-			updateHeader();
+			//updateHeader();
 		}
 		return true;
 	}
@@ -645,7 +694,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 			mHeaderIncremental -= i;
 			if(mHeaderIncremental > 0){
 				setHeaderHeight(mHeaderIncremental);
-				updateHeader();
+				//updateHeader();
 			}else{
 				mHeaderViewState = HEADER_VIEW_STATE_IDLE;
 				mHeaderIncremental = 0;

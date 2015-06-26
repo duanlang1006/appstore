@@ -67,7 +67,6 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     private ScrollOverListView listView;
     private FinalHttp mFinalHttp;
     int mCurCheckPosition = 0;
-    private List<HomePageBean> mHomePageApkContents = new ArrayList<HomePageBean>();
     private List<HomePageBean> mHomePageData = new ArrayList<HomePageBean>();
     private List<HomePageBean> mHomePageOrder = new ArrayList<HomePageBean>();
     private List<HomePageTypeBean> mHomePageMainType = new ArrayList<HomePageTypeBean>();
@@ -236,11 +235,13 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
                             HomePageUtils.i(TAG, "ListFragment.onLoadMore() yuzm Thread.currentThread().getId() : " +
                                     Thread.currentThread().getId() + " ; mHomePageData : " + mHomePageData);
                             if(null != mHomePageData) {
-                                mListAdapter.setData(mHomePageData, mHomePageMainType, mTable);
+                                mPageDood = mListAdapter.setData(mHomePageData, mHomePageMainType, mTable);
                             }
                             mListAdapter.notifyDataSetChanged();
-                            pullDownView.notifyDidLoadMore((mHomePageData.size() != 0) ? false : true);
-                            System.out.println("加载更多");
+                            pullDownView.notifyDidLoadMore(((mHomePageData.size()) != 0 && (mHomePageData.size()==10)) ? false : true);
+                            mHomePageData.clear();
+                            mHomePageMainType.clear();
+                            //System.out.println("加载更多");
                         }
                     });
                 }
@@ -260,11 +261,11 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
             public void run() {
                 try {
                     switch (mTable) {
-                        case 0 : listPost("goods", ++mPageDood);
+                        case 0 : listPost("goods", mListAdapter.getCount()/10);
                                  break;
-                        case 1 : listPost("order", ++mPageOder);
+                        case 1 : listPost("order", mListAdapter.getCount()/10);
                                  break;
-                        case 2 : listPost("maintype", ++mPageMainType);
+                        case 2 : listPost("maintype", mListAdapter.getCount()/10);
                                  break;
                     }
                     //listPost("order",1,mHandler);
@@ -314,6 +315,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
         if(null == mFinalHttp) {
             mFinalHttp = new FinalHttp();
         }
+        HomePageUtils.e(TAG, "listPost yuzm mPage : " + mPage);
         AjaxParams params = new AjaxParams();
         params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
         params.put("packagename", "com.android.applite1.0");

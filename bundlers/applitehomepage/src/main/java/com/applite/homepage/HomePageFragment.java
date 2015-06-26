@@ -23,7 +23,6 @@ import com.applite.bean.HomePageTab;
 import com.applite.utils.HomePageUtils;
 import com.applite.utils.Utils;
 
-import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
@@ -55,7 +54,6 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 
     private List<HomePageTab> mHPTabContents = new ArrayList<HomePageTab>();
     private int mTableType = 0;
-    private int mTableTypeBackup = 0;
     private boolean isMainType = false;
     private static int mNode;
     public HomePageFragment(Context activity) {
@@ -95,14 +93,12 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     private final ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int i, float v, int i2) {
-            mTableTypeBackup = mTableType;
             mTableType = i;
             HomePageUtils.d(TAG, "onPageScrolled mTableType : " + mTableType);
         }
 
         @Override
         public void onPageSelected(int i) {
-            mTableTypeBackup = mTableType;
             mTableType = i;
             HomePageUtils.d(TAG,"onPageSelected  yuzm mTableType : "+mTableType);
         }
@@ -187,7 +183,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }else {
             postMainType();
         }
-        View rootView = mInflater.inflate(R.layout.activity_test, container, false);
+        View rootView = mInflater.inflate(R.layout.fragment_activity_page, container, false);
         mSectionsPagerAdapter = new SectionsPagerAdapter(this.getFragmentManager(),mActivity);
         // Set up the ViewPager with the sections adapter.
         mSectionsPagerAdapter.setHomePageTab(mHPTabContents);
@@ -230,12 +226,12 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
             mViewPager.setVisibility(View.VISIBLE);
         }
 
-            /*rootView.findViewById(R.id.test_load).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    post();
-                }
-            });*/
+        /*rootView.findViewById(R.id.topic).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                post();
+            }
+         });*/
 
         return rootView;
     }

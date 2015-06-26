@@ -10,7 +10,7 @@ public class HomePageTypeBean {
     private String mM_key;
     @Override
     public String toString() {
-        return "HomePageBean{" +
+        return "HomePageTypeBean{" +
                 "id=" + id +
                 ", m_iconurl='" + mM_IconUrl + '\'' +
                 ", m_name='" + mM_Name + '\'' +
