@@ -279,6 +279,8 @@ public class ImplDownload extends AbstractImpl{
         }catch(Exception e){}
         mDlRunnable.remove(implCmd.key.hashCode());
         remove(implCmd.key);
+        ImplAgent.notify(true,
+                new ImplAgent.DeleteDownloadRsp(cmd.context,info.getKey(),true));
         return true;
     }
 

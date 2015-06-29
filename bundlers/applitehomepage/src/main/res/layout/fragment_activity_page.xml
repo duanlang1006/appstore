@@ -6,10 +6,10 @@
     tools:context="com.mit.homepage.TestActivity"
     android:weightSum="1">
 
-    <com.applite.homepage.PagerSlidingTabStrip
-        android:id="@+id/tabs"
-        android:layout_width="match_parent"
-        android:layout_height="48dip" />
+    <!--<com.applite.common.PagerSlidingTabStrip-->
+        <!--android:id="@+id/tabs"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="48dip" />-->
 
     <android.support.v4.view.ViewPager
         android:layout_width="match_parent"

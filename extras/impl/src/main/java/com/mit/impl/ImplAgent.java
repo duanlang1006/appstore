@@ -330,10 +330,21 @@ public class ImplAgent {
     public static class DeleteDownloadReq extends ImplRequest{
         String key;
         DeleteDownloadReq(Context context,String key) {
-            super(context,ImplInterface.IMPL_ACTION_DOWNLOAD);
+            super(context,ImplInterface.IMPL_ACTION_DOWNLOAD_DELETE);
             this.key = key;
         }
     }
+
+    public static class DeleteDownloadRsp extends ImplResponse{
+        String key;
+        boolean result;
+        DeleteDownloadRsp(Context context,String key,boolean result) {
+            super(context,ImplInterface.IMPL_ACTION_DOWNLOAD_DELETE);
+            this.key = key;
+            this.result = result;
+        }
+    }
+
     ///===================================================================
     public static class ToggleDownloadReq extends ImplRequest{
         String key;
