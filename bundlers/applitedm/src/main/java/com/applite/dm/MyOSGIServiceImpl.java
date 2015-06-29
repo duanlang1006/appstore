@@ -10,13 +10,16 @@ import org.apkplug.Bundle.ApkplugOSGIService;
 import org.osgi.framework.BundleContext;
 
 public class MyOSGIServiceImpl implements ApkplugOSGIService {
+    private Fragment downloadPagerFragement;
 	@Override
 	public Object ApkplugOSGIService(BundleContext arg0, String servicename, int node,Object... objs) {
         if (Constant.OSGI_SERVICE_DM_FRAGMENT.equals(servicename)){
-            Fragment fg = new DownloadPagerFragment();
+//            if (null == downloadPagerFragement) {
+                downloadPagerFragement = new DownloadPagerFragment();
+//            }
             FragmentManager fgm = (FragmentManager)objs[0];
             FragmentTransaction ft = fgm.beginTransaction();
-            ft.replace(node, fg, Constant.OSGI_SERVICE_DM_FRAGMENT);
+            ft.replace(node, downloadPagerFragement, Constant.OSGI_SERVICE_DM_FRAGMENT);
             ft.addToBackStack(null);
             ft.commit();
         }

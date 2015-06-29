@@ -57,4 +57,5 @@
     <string name="download_error_invalid_package" >APK解析错误</string>
     <string name="download_waiting_for_network" >等待网络</string>
     <string name="download_running_percent">正在下载：<xliff:g id="NUMBER">%d</xliff:g><xliff:g id="PERCENT">%%</xliff:g></string>
+    <string name="apk_version">版本号:%1$s</string>
 </resources>

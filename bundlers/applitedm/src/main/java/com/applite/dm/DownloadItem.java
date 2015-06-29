@@ -17,13 +17,12 @@
 package com.applite.dm;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
+
+import com.mit.impl.ImplStatusTag;
 
 
 /**
@@ -39,38 +38,9 @@ public class DownloadItem extends LinearLayout implements View.OnClickListener{
     private DownloadSelectListener mListener;
 
     static interface DownloadSelectListener {
-        public void onDownloadButtonClicked(DownloadItemTag tag);
-        public void onDeleteButtonClicked(DownloadItemTag tag);
-        public void onDetailButtonClicked(DownloadItemTag tag);
-    }
-
-    static class DownloadItemTag{
-        final static int OP_OPEN = 0;       //打开下载文件
-        final static int OP_DOWNLOAD = 1;   //下载
-        final static int OP_LAUNCH = 2;     //运行
-        final static int OP_INSTALLING = 3;     //安装中
-
-        String key;
-        int operate;
-        int btnRes;
-        int statusRes;
-        Uri localUri;
-        String mediaType;
-        String versionName;
-        String packageName;
-        Intent intent;
-
-        DownloadItemTag() {
-            key = null;
-            operate = -1;
-            btnRes = 0;
-            statusRes = 0;
-            versionName = null;
-            packageName = null;
-            intent = null;
-            mediaType = null;
-            localUri = null;
-        }
+        public void onDownloadButtonClicked(ImplStatusTag tag);
+        public void onDeleteButtonClicked(ImplStatusTag tag);
+        public void onDetailButtonClicked(ImplStatusTag tag);
     }
 
     public DownloadItem(Context context, AttributeSet attrs) {
@@ -106,15 +76,16 @@ public class DownloadItem extends LinearLayout implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
+        DownloadAdapter.DownloadItemViewHolder viewHoler = (DownloadAdapter.DownloadItemViewHolder)getTag();
         switch(v.getId()){
             case R.id.button_delete:
-                mListener.onDeleteButtonClicked((DownloadItemTag)getTag());
+                mListener.onDeleteButtonClicked(viewHoler.statusTag);
                 break;
             case R.id.button_detail:
-                mListener.onDetailButtonClicked((DownloadItemTag)getTag());
+                mListener.onDetailButtonClicked(viewHoler.statusTag);
                 break;
             case R.id.button_op:
-                mListener.onDownloadButtonClicked((DownloadItemTag)getTag());
+                mListener.onDownloadButtonClicked(viewHoler.statusTag);
                 break;
         }
     }

@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.applite.bean.HomePageTypeBean;
 import com.applite.common.Constant;
 import com.applite.common.PagerSlidingTabStrip;
@@ -23,12 +22,9 @@ import com.applite.bean.HomePageBean;
 import com.applite.bean.HomePageTab;
 import com.applite.utils.HomePageUtils;
 import com.applite.utils.Utils;
-
-import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
-
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
 import org.json.JSONArray;

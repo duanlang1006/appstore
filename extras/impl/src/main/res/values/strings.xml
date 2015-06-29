@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Impl</string>
+
+    <string name="download_status_error">Unsuccessful</string>
+    <string name="download_status_insufficient_space" >Space not enough</string>
+    <string name="download_status_invalid_package" >Invalid package</string>
+    <string name="download_status_waiting_for_network" >Waiting for network</string>
+    <string name="download_status_success">Download complete</string>
+    <string name="download_status_running">In progress</string>
+    <string name="download_status_queued">Queued</string>
+    <string name="download_status_paused">Paused</string>
+
+    <string name="apk_version">version:%1$s</string>
+
+    <string name="action_retry">Retry</string>
+    <string name="action_open">Open</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_install" >Install</string>
+    <string name="action_run" >Run</string>
+    <string name="action_resume" >Resume</string>
+
+    <string name="install_status_success" >Installed</string>
+    <string name="install_status_failed" >Install failed</string>
+    <string name="install_status_installing" >Installing</string>
 </resources>
