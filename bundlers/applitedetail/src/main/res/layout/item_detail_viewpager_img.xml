@@ -5,6 +5,7 @@
     android:background="@color/white">
 
     <ImageView
+        android:background="@color/transparent"
         android:id="@+id/item_viewpager_img"
         android:layout_margin="5dp"
         android:layout_width="wrap_content"

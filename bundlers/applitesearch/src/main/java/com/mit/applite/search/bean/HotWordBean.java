@@ -8,6 +8,7 @@ public class HotWordBean {
     private String mName;
     private String mImgUrl;
     private String mType;
+    private String mPackageName;
 
     @Override
     public String toString() {
@@ -16,7 +17,16 @@ public class HotWordBean {
                 ", mName='" + mName + '\'' +
                 ", mImgUrl='" + mImgUrl + '\'' +
                 ", mType='" + mType + '\'' +
+                ", mPackageName='" + mPackageName + '\'' +
                 '}';
+    }
+
+    public String getmPackageName() {
+        return mPackageName;
+    }
+
+    public void setmPackageName(String mPackageName) {
+        this.mPackageName = mPackageName;
     }
 
     public int get_id() {

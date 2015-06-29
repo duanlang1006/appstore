@@ -65,7 +65,7 @@
 
         <GridView
             android:id="@+id/search_gv"
-            android:numColumns="3"
+            android:numColumns="2"
             android:verticalSpacing="10dp"
             android:horizontalSpacing="10dp"
             android:layout_width="fill_parent"

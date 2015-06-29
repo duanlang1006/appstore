@@ -118,7 +118,7 @@
                         android:layout_height="wrap_content">
 
                         <ImageView
-                            android:visibility="invisible"
+                            android:visibility="gone"
                             android:id="@+id/detail_preview_img1"
                             android:layout_marginTop="5dp"
                             android:layout_marginBottom="5dp"
@@ -139,7 +139,7 @@
                         android:layout_marginBottom="10dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="功能介绍" />
+                        android:text="@string/app_detail" />
 
                     <TextView
                         android:layout_marginRight="10dp"
@@ -187,7 +187,7 @@
                 app:max="100"
                 app:background="@color/dividing_line"
                 app:foreground="@color/progress_foreground"
-                app:text="下载"
+                app:text="@string/install"
                 app:textcolor="@color/black"
                 app:progress="0" />
         </LinearLayout>

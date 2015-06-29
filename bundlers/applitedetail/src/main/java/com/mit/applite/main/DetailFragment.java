@@ -157,8 +157,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         super.onAttach(activity);
         mActivity = activity;
         Bundle bundle = this.getArguments();
+        mPackageName = bundle.getString("packageName");
         mApkName = bundle.getString("name");
-        LogUtils.i(TAG, "mApkName:" + mApkName);
+        mImgUrl = bundle.getString("imgUrl");
+        LogUtils.i(TAG, "mApkName:" + mApkName + "------mPackageName:" + mPackageName + "------mImgUrl:" + mImgUrl);
     }
 
     @Override
@@ -190,8 +192,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         rootView = mInflater.inflate(R.layout.fragment_detail, container, false);
         mFinalBitmap = FinalBitmap.create(mActivity);
         initView();
-        if (!TextUtils.isEmpty(mApkName))
-            post(mApkName);
+        if (!TextUtils.isEmpty(mPackageName))
+            post(mPackageName);
         return rootView;
     }
 
@@ -220,6 +222,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
         mNameView.setText(mApkName);
         mName1View.setText(mApkName);
+        mFinalBitmap.display(mApkImgView, mImgUrl);
 
         mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
@@ -261,16 +264,16 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     /**
      * 应用详情网络请求
      *
-     * @param name
+     * @param mPackageName
      */
-    private void post(String name) {
+    private void post(String mPackageName) {
         FinalHttp mFinalHttp = new FinalHttp();
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
         params.put("type", "detail");
-        params.put("name", name);
+        params.put("name", mPackageName);
         mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
@@ -313,7 +316,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     mDownloadUrl = obj.getString("rDownloadUrl");
                     long size = obj.getLong("apkSize");
                     String mDownloadNumber = obj.getString("downloadTimes");
-                    String content = obj.getString("brief");
+                    String content = obj.getString("description");
                     mViewPagerUrl = obj.getString("screenshotsUrl");
 
                     mNameView.setText(mName);
