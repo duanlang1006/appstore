@@ -5,21 +5,15 @@
     android:orientation="vertical"
     tools:context="com.mit.homepage.TestActivity">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Load"
-        android:visibility="gone"
-        android:id="@+id/test_load" />
-
-    <com.applite.homepage.PagerSlidingTabStrip
-        android:id="@+id/tabs"
-        android:layout_width="match_parent"
-        android:layout_height="48dip" />
+    <!--<com.applite.homepage.PagerSlidingTabStrip-->
+        <!--android:id="@+id/tabs"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="48dip" />-->
 
     <android.support.v4.view.ViewPager
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/pager"
-        tools:context="com.mit.homepage.TestActivity"/>
+        tools:context="com.mit.homepage.TestActivity">
+    </android.support.v4.view.ViewPager>
 </LinearLayout>

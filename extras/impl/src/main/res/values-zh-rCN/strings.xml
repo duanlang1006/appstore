@@ -1,0 +1,23 @@
+<resources>
+    <string name="download_status_error">失败</string>
+    <string name="download_status_insufficient_space" >空间不足</string>
+    <string name="download_status_invalid_package" >APK解析错误</string>
+    <string name="download_status_waiting_for_network" >等待网络</string>
+    <string name="download_status_success">下载完成</string>
+    <string name="download_status_running">正在下载</string>
+    <string name="download_status_queued">已加入队列</string>
+    <string name="download_status_paused">已暂停</string>
+
+    <string name="apk_version">版本:%1$s</string>
+
+    <string name="action_retry">重试</string>
+    <string name="action_open">打开</string>
+    <string name="action_pause">暂停</string>
+    <string name="action_install" >安装</string>
+    <string name="action_run" >运行</string>
+    <string name="action_resume" >继续</string>
+
+    <string name="install_status_success" >已安装</string>
+    <string name="install_status_failed" >安装失败</string>
+    <string name="install_status_installing" >正在安装</string>
+</resources>
