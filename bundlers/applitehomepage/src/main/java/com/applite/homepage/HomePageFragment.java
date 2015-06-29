@@ -194,11 +194,9 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 
         //加入滑动tab管理viewPager
         mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,container,false);
-//        HomePageUtils.d(TAG,rootView.findViewById(R.id.tabs).toString());
-//        mPagerSlidingTabStrip = (com.applite.homepage.PagerSlidingTabStrip)rootView.findViewById(R.id.tabs);
+        rootView.addView(mPagerSlidingTabStrip,0);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
         mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
-        rootView.addView(mPagerSlidingTabStrip,0);
 
         //actionbar custom view
         View customView = mInflater.inflate(R.layout.custom_actionbar_main,container,false);

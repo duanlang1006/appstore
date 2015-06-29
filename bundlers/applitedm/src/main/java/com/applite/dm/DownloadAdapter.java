@@ -60,6 +60,7 @@ public class DownloadAdapter extends CursorAdapter {
     private int mLocalUriColumnId;
     private int mDateColumnId;
     private int mPackageColumnId;
+    private int mIconUrlColumnId;
 
     private FinalBitmap mFinalBitmap;
     private PackageManager mPackageManager;
@@ -97,6 +98,7 @@ public class DownloadAdapter extends CursorAdapter {
         mDateColumnId =
                 cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_LAST_MODIFIED_TIMESTAMP);
         mPackageColumnId = cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_PACKAGENAME);
+        mIconUrlColumnId = cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_ICON_URL);
     }
 
     @Override
@@ -127,6 +129,8 @@ public class DownloadAdapter extends CursorAdapter {
         viewHolder.statusTag = ImplStatusTag.generateTag(mContext,
                 c.getString(mKeyColumnId),
                 c.getString(mPackageColumnId),
+                c.getString(mTitleColumnId),
+                c.getString(mIconUrlColumnId),
                 c.getInt(mStatusColumnId),
                 c.getInt(mReasonColumnId),
                 c.getLong(mCurrentBytesColumnId),

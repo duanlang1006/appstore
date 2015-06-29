@@ -23,7 +23,9 @@ public class ImplStatusTag {
     private String actionText;    //动作
     private String statusText;    //状态
     private String descText;      //详情
-    private String packageName;
+    private String packageName;   //包名
+    private String title;         //应用名
+    private String iconUrl;       //图标地址
     private int percent;
     private Intent intent;
 
@@ -89,9 +91,27 @@ public class ImplStatusTag {
         this.percent = percent;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
+    }
+
     public static ImplStatusTag generateTag(Context context ,
                        String key,
                        String packageName,
+                       String title,
+                       String iconUrl,
                        int status,
                        int reason,
                        long currentBytes,
@@ -103,6 +123,8 @@ public class ImplStatusTag {
         int percent = getProgress(currentBytes,totalBytes);
         ImplStatusTag tag = new ImplStatusTag(key,packageName);
         tag.setPercent(percent);
+        tag.setTitle(title);
+        tag.setIconUrl(iconUrl);
         ImplLog.d("impl_status","status="+status);
         switch (status) {
             case Constant.STATUS_FAILED:

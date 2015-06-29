@@ -21,6 +21,10 @@ import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
 import com.mit.impl.ImplLog;
 
+import org.apkplug.Bundle.ApkplugOSGIService;
+import org.apkplug.Bundle.OSGIServiceAgent;
+import org.osgi.framework.BundleContext;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -205,7 +209,19 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
 
         @Override
         public void onDetailButtonClicked(ImplStatusTag tag) {
-
+            try {
+                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+                        bundleContext, ApkplugOSGIService.class,
+                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
+                        OSGIServiceAgent.real_time);   //每次都重新查询
+                agent.getService().ApkplugOSGIService(bundleContext,
+                        Constant.OSGI_SERVICE_DM_FRAGMENT,
+                        0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,tag.getPackageName(),tag.getTitle(),tag.getIconUrl());
+            } catch (Exception e) {
+                // TODO 自动生成的 catch 块
+                e.printStackTrace();
+            }
         }
     }
 
