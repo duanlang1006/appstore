@@ -46,6 +46,12 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     private ListView mListView;
     private List<DataBean> mDataContents = new ArrayList<DataBean>();
     private UpdateAdapter mAdapter;
+    private Runnable mNotifyRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mAdapter.notifyDataSetChanged();
+        }
+    };
     private ImplListener mImplListener = new ImplListener() {
         @Override
         public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
@@ -54,7 +60,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                     switch (downloadCompleteRsp.status) {
                         case Constant.STATUS_SUCCESSFUL:
                             mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.download_success));
-                            mAdapter.notifyDataSetChanged();
+                            mActivity.runOnUiThread(mNotifyRunnable);
                             break;
                     }
                 }
@@ -86,7 +92,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
 
                     String CurrentShowText = mDataContents.get(i).getmShowText();
                     if (!OriginalShowText.equals(CurrentShowText))
-                        mAdapter.notifyDataSetChanged();
+                        mActivity.runOnUiThread(mNotifyRunnable);
                     LogUtils.i(TAG, OriginalShowText + "-------" + CurrentShowText);
                 }
             }
@@ -124,7 +130,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                             mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.start_up));
                             break;
                     }
-                    mAdapter.notifyDataSetChanged();
+                    mActivity.runOnUiThread(mNotifyRunnable);
                 }
             }
         }
@@ -140,7 +146,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                 for (int i = 0; i < mDataContents.size(); i++) {
                     if (((ImplAgent.InstallPackageRsp) implResponse).key.equals(mDataContents.get(i).getmPackageName())) {
                         mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.installing));
-                        mAdapter.notifyDataSetChanged();
+                        mActivity.runOnUiThread(mNotifyRunnable);
                     }
                 }
             }

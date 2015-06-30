@@ -68,32 +68,35 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private ImplListener mImplListener = new ImplListener() {
         @Override
         public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
-            switch (downloadCompleteRsp.status) {
-                case Constant.STATUS_SUCCESSFUL:
-                    mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_success));
-                    break;
+            if (downloadCompleteRsp.key.equals(mPackageName)) {
+                switch (downloadCompleteRsp.status) {
+                    case Constant.STATUS_SUCCESSFUL:
+                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_success));
+                        break;
+                }
             }
         }
 
         @Override
         public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
-            switch (downloadUpdateRsp.status) {
-                case Constant.STATUS_PENDING:
-                    mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_pending));
-                    break;
-                case Constant.STATUS_RUNNING:
-                    mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_running));
-                    break;
-                case Constant.STATUS_PAUSED:
-                    mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_paused));
-                    break;
-                case Constant.STATUS_FAILED:
-                    mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_failed));
-                    break;
-                case Constant.STATUS_NORMAL_INSTALLING:
-                    break;
-            }
             if (downloadUpdateRsp.key.equals(mPackageName)) {
+                switch (downloadUpdateRsp.status) {
+                    case Constant.STATUS_PENDING:
+                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_pending));
+                        break;
+                    case Constant.STATUS_RUNNING:
+                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_running));
+                        break;
+                    case Constant.STATUS_PAUSED:
+                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_paused));
+                        break;
+                    case Constant.STATUS_FAILED:
+                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_failed));
+                        break;
+                    case Constant.STATUS_NORMAL_INSTALLING:
+                        break;
+                }
+
 //              mProgressBar.setProgress(downloadUpdateRsp.progress);
                 mProgressButton.setProgress(downloadUpdateRsp.progress);
                 if (downloadUpdateRsp.progress >= 100) {
@@ -247,6 +250,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.detail_back:
+                getFragmentManager().popBackStack();
+                break;
             case R.id.detail_download:
 //                if (!TextUtils.isEmpty(mPackageName)) {
 //                    if (mApkType == Utils.INSTALLED) {
@@ -354,14 +360,14 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
      */
     private void setPreViewImg() {
         FinalBitmap fb = FinalBitmap.create(mActivity);
-        fb.configLoadingImage(R.drawable.detail_default_img);
+//        fb.configLoadingImage(R.drawable.detail_default_img);
         for (int i = 0; i < mViewPagerUrlList.length; i++) {
             final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
             final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
             mImgLl.addView(child);
             fb.display(img, mViewPagerUrlList[i]);
         }
-        fb.configLoadingImage(null);
+//        fb.configLoadingImage(null);
     }
 
     /**

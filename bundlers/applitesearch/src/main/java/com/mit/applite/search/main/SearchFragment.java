@@ -49,7 +49,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchFragment extends Fragment implements View.OnClickListener {
+public class SearchFragment extends Fragment implements View.OnClickListener, HotWordAdapter.closeKeybordListener {
 
     private static final String TAG = "SearchFragment";
     private ImageButton mBackView;
@@ -63,7 +63,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
     private SearchApkAdapter mAdapter;
     private Activity mActivity;
     private View rootView;
-    //    private SearchFragmentClickListener mListener;
     private List<HotWordBean> mHotWordBeans = new ArrayList<HotWordBean>();
     private FinalBitmap mFinalBitmap;
     private int mChangeNumbew = 0;//在线热词换一换点击的次数
@@ -80,6 +79,12 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
     private boolean isClickPreloadItem = false;
     private int mPostPreloadNumber = 0;
     private PreloadAdapter mPreloadAdapter;
+    private Runnable mNotifyRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mAdapter.notifyDataSetChanged();
+        }
+    };
 
     private ImplListener mImplListener = new ImplListener() {
         @Override
@@ -89,7 +94,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                     switch (downloadCompleteRsp.status) {
                         case Constant.STATUS_SUCCESSFUL:
                             mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.download_success));
-                            mAdapter.notifyDataSetChanged();
+                            mActivity.runOnUiThread(mNotifyRunnable);
                             break;
                     }
                 }
@@ -121,7 +126,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
 
                     String CurrentShowText = mSearchApkContents.get(i).getmShowButtonText();
                     if (!OriginalShowText.equals(CurrentShowText))
-                        mAdapter.notifyDataSetChanged();
+                        mActivity.runOnUiThread(mNotifyRunnable);
                     LogUtils.i(TAG, OriginalShowText + "-------" + CurrentShowText);
                 }
             }
@@ -159,7 +164,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                             mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.start_up));
                             break;
                     }
-                    mAdapter.notifyDataSetChanged();
+                    mActivity.runOnUiThread(mNotifyRunnable);
                 }
             }
         }
@@ -175,7 +180,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                 for (int i = 0; i < mSearchApkContents.size(); i++) {
                     if (((ImplAgent.InstallPackageRsp) implResponse).key.equals(mSearchApkContents.get(i).getmPackageName())) {
                         mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.installing));
-                        mAdapter.notifyDataSetChanged();
+                        mActivity.runOnUiThread(mNotifyRunnable);
                     }
                 }
             }
@@ -240,12 +245,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
         mActivity = activity;
         mFinalHttp = new FinalHttp();
         mFinalBitmap = FinalBitmap.create(activity);
-//        try {
-//            mListener = (SearchFragmentClickListener) activity;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString() +
-//                    " must implement SearchFragmentClickListener");
-//        }
     }
 
     @Override
@@ -282,9 +281,18 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        KeyBoardUtils.closeKeybord(mEtView, mActivity);
+    public void onResume() {
+        super.onResume();
+        mEtView.setFocusable(true);
+        mEtView.setFocusableInTouchMode(true);
+        mEtView.requestFocus();
+        KeyBoardUtils.openKeybord(mEtView, mActivity);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        closeKeybord();
     }
 
     @Override
@@ -321,11 +329,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
         mListView.setOnScrollListener(mOnScrollListener);
 
         mEtView.addTextChangedListener(mTextWatcher);
-        mEtView.setFocusable(true);
-        mEtView.setFocusableInTouchMode(true);
-        mEtView.requestFocus();
-        mEtView.requestFocusFromTouch();
-        KeyBoardUtils.openKeybord(mEtView, mActivity);
 
         mHotChangeView.setOnClickListener(this);
         mDeleteView.setOnClickListener(this);
@@ -387,7 +390,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.search_back:
-//                mListener.onBack();
+                getFragmentManager().popBackStack();
                 break;
             case R.id.search_delete:
                 mPreloadListView.setVisibility(View.GONE);
@@ -401,7 +404,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(mActivity, AppliteUtils.getString(mContext, R.string.srarch_content_no_null),
                             Toast.LENGTH_SHORT).show();
                 } else {
-                    KeyBoardUtils.closeKeybord(mEtView, mActivity);
+                    closeKeybord();
                     if (null != mSearchApkContents) {
                         mSearchApkContents.clear();
                     }
@@ -417,6 +420,11 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                 setHotWordShowData(mChangeNumbew);
                 break;
         }
+    }
+
+    @Override
+    public void closeKeybord() {
+        KeyBoardUtils.closeKeybord(mEtView, mContext);
     }
 
     /**
