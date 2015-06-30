@@ -237,16 +237,15 @@ public class ImplDownload extends AbstractImpl{
         DownloadManager.Query query = new DownloadManager.Query();
         query.setFilterById(id);
         Cursor c = dm.query(query);
-        String localPath = null;
+        String localUri = null;
         int status = DownloadManager.STATUS_FAILED;;
         try{
             if(null != c && c.moveToFirst()) {
                 status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
                 if (status == DownloadManager.STATUS_SUCCESSFUL){
-                    String localUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-                    localPath = Uri.parse(localUri).getPath();
+                    localUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
                 }
-                info.setLocalPath(localPath);
+                info.setLocalPath(localUri);
                 info.setStatus(status);
                 info.setCurrentBytes(c.getLong(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)));
                 info.setTotalBytes(c.getLong(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)));
@@ -260,7 +259,7 @@ public class ImplDownload extends AbstractImpl{
             }
         }
         ImplAgent.notify(true,
-                new ImplAgent.DownloadCompleteRsp(cmd.context,info.getKey(),status,localPath,info.getPackageName()));
+                new ImplAgent.DownloadCompleteRsp(cmd.context,info.getKey(),status,localUri,info.getPackageName()));
         return true;
     }
     
@@ -280,6 +279,8 @@ public class ImplDownload extends AbstractImpl{
         }catch(Exception e){}
         mDlRunnable.remove(implCmd.key.hashCode());
         remove(implCmd.key);
+        ImplAgent.notify(true,
+                new ImplAgent.DeleteDownloadRsp(cmd.context,info.getKey(),true));
         return true;
     }
 
@@ -438,10 +439,13 @@ public class ImplDownload extends AbstractImpl{
                                 }
                                 ImplAgent.notify(true,
                                         new ImplAgent.DownloadUpdateRsp(pair.first,pair.second.getKey(),status,progress));
+                                pair.second.setReason(reason);
                                 break;
                             case DownloadManager.STATUS_SUCCESSFUL:
                                 String localUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-                                pair.second.setLocalPath(Uri.parse(localUri).getPath());
+                                String mediaType = c.getString(c.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE));
+                                pair.second.setLocalPath(localUri);
+                                pair.second.setMimeType(mediaType);
 //                                if (new File(localPath).exists()){
                                 ImplAgent.notify(true,
                                         new ImplAgent.DownloadUpdateRsp(pair.first,pair.second.getKey(),status,progress));
@@ -449,9 +453,11 @@ public class ImplDownload extends AbstractImpl{
                                 mDownloadList.remove(pair.second.getKey().hashCode());
                                 break;
                             case DownloadManager.STATUS_FAILED:
+                                reason = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON));
                                 ImplAgent.notify(true,
                                         new ImplAgent.DownloadUpdateRsp(pair.first,pair.second.getKey(),status,progress));
                                 mDownloadList.remove(pair.second.getKey().hashCode());
+                                pair.second.setReason(reason);
                                 break;
                         }
                         if (pair.second.getStatus()<=DownloadManager.STATUS_FAILED) {
@@ -487,7 +493,7 @@ public class ImplDownload extends AbstractImpl{
                 }
             }
             if (mDownloadList.size()>0){
-                ImplAgent.mWorkHandler.postDelayed(this, 3000);
+                ImplAgent.mWorkHandler.postDelayed(this, 500);
             }
         }
 

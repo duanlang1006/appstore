@@ -135,25 +135,25 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 
 		// get custom attrs
 
-		a = context.obtainStyledAttributes(attrs, R.styleable.PagerSlidingTabStrip);
+		a = context.obtainStyledAttributes(attrs, R.styleable.PagerSlidingTab);
 
-		indicatorColor = a.getColor(R.styleable.PagerSlidingTabStrip_pstsIndicatorColor, indicatorColor);
-		underlineColor = a.getColor(R.styleable.PagerSlidingTabStrip_pstsUnderlineColor, underlineColor);
-		dividerColor = a.getColor(R.styleable.PagerSlidingTabStrip_pstsDividerColor, dividerColor);
-		indicatorHeight = a.getDimensionPixelSize(R.styleable.PagerSlidingTabStrip_pstsIndicatorHeight,
+		indicatorColor = a.getColor(R.styleable.PagerSlidingTab_pstsIndicatorColor, indicatorColor);
+		underlineColor = a.getColor(R.styleable.PagerSlidingTab_pstsUnderlineColor, underlineColor);
+		dividerColor = a.getColor(R.styleable.PagerSlidingTab_pstsDividerColor, dividerColor);
+		indicatorHeight = a.getDimensionPixelSize(R.styleable.PagerSlidingTab_pstsIndicatorHeight,
 				indicatorHeight);
-		underlineHeight = a.getDimensionPixelSize(R.styleable.PagerSlidingTabStrip_pstsUnderlineHeight,
+		underlineHeight = a.getDimensionPixelSize(R.styleable.PagerSlidingTab_pstsUnderlineHeight,
 				underlineHeight);
-		dividerPadding = a.getDimensionPixelSize(R.styleable.PagerSlidingTabStrip_pstsDividerPadding,
+		dividerPadding = a.getDimensionPixelSize(R.styleable.PagerSlidingTab_pstsDividerPadding,
 				dividerPadding);
-		tabPadding = a.getDimensionPixelSize(R.styleable.PagerSlidingTabStrip_pstsTabPaddingLeftRight,
+		tabPadding = a.getDimensionPixelSize(R.styleable.PagerSlidingTab_pstsTabPaddingLeftRight,
 				tabPadding);
-		tabBackgroundResId = a.getResourceId(R.styleable.PagerSlidingTabStrip_pstsTabBackground,
+		tabBackgroundResId = a.getResourceId(R.styleable.PagerSlidingTab_pstsTabBackground,
 				tabBackgroundResId);
-		shouldExpand = a.getBoolean(R.styleable.PagerSlidingTabStrip_pstsShouldExpand, shouldExpand);
-		scrollOffset = a.getDimensionPixelSize(R.styleable.PagerSlidingTabStrip_pstsScrollOffset,
+		shouldExpand = a.getBoolean(R.styleable.PagerSlidingTab_pstsShouldExpand, shouldExpand);
+		scrollOffset = a.getDimensionPixelSize(R.styleable.PagerSlidingTab_pstsScrollOffset,
 				scrollOffset);
-		textAllCaps = a.getBoolean(R.styleable.PagerSlidingTabStrip_pstsTextAllCaps, textAllCaps);
+		textAllCaps = a.getBoolean(R.styleable.PagerSlidingTab_pstsTextAllCaps, textAllCaps);
 
 		a.recycle();
 

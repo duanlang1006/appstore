@@ -93,6 +93,7 @@
     <orderEntry type="library" exported="" name="applite-common-v1.0" level="project" />
     <orderEntry type="library" exported="" name="android-support-v7-appcompat" level="project" />
     <orderEntry type="library" exported="" name="afinal_0.5.1_bin" level="project" />
+    <orderEntry type="library" name="Bundle2.8.1.02-Dev" level="project" />
   </component>
 </module>
 

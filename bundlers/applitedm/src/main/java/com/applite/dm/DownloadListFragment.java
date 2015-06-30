@@ -13,12 +13,17 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.applite.common.Constant;
+import com.mit.impl.ImplStatusTag;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplConfig;
 import com.mit.impl.ImplDatabaseHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
 import com.mit.impl.ImplLog;
+
+import org.apkplug.Bundle.ApkplugOSGIService;
+import org.apkplug.Bundle.OSGIServiceAgent;
+import org.osgi.framework.BundleContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +46,7 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        ImplLog.d(DownloadPagerFragment.TAG,"onCreate,"+this);
         super.onCreate(savedInstanceState);
         Bundle b = getArguments();
         mStatusFlags = b.getInt("statusFilter");
@@ -49,6 +55,7 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        ImplLog.d(DownloadPagerFragment.TAG,"onCreateView,"+this);
         LayoutInflater mInflater = inflater;
         try {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
@@ -73,14 +80,21 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
         mActivity = activity;
         ImplAgent.registerImplListener(mImplListener);
         databaseHelper = new ImplDatabaseHelper(mActivity);
+        ImplLog.d(DownloadPagerFragment.TAG,"onAttach,"+this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         ImplAgent.unregisterImplListener(mImplListener);
+        ImplLog.d(DownloadPagerFragment.TAG,"onDetach,"+this);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ImplLog.d(DownloadPagerFragment.TAG,"onDestroyView,"+this);
+    }
 
     /**
      * The default content for this Fragment has a TextView that is shown when
@@ -163,51 +177,51 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
 
     private class DownloadItemListener implements DownloadItem.DownloadSelectListener{
         @Override
-        public void onDownloadButtonClicked(DownloadItem.DownloadItemTag tag) {
-            ImplInfo info = ImplConfig.findInfoByKey(databaseHelper,tag.key);
+        public void onDownloadButtonClicked(ImplStatusTag tag) {
+            ImplInfo info = ImplConfig.findInfoByKey(databaseHelper,tag.getKey());
             if (null == info){
                 return;
             }
-            switch(tag.operate){
-                case DownloadItem.DownloadItemTag.OP_DOWNLOAD:
+            switch(tag.getAction()){
+                case ImplStatusTag.ACTION_DOWNLOAD:
                     if (null != info){
                         ImplAgent.downloadToggle(mActivity,info.getKey());
                     }
                     break;
-                case DownloadItem.DownloadItemTag.OP_LAUNCH:
-                case DownloadItem.DownloadItemTag.OP_OPEN:
-                    if (tag.operate == DownloadItem.DownloadItemTag.OP_OPEN
-                            && "application/vnd.android.package-archive".equals(tag.mediaType)){
-                        if (null != info) {
-                            ImplAgent.requestPackageInstall(mActivity, info.getKey(),tag.localUri.getPath(),tag.packageName,true);
-                        }
-                    }else {
-                        if (null != tag.intent) {
-                            try {
-                                mActivity.startActivity(tag.intent);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
+                case ImplStatusTag.ACTION_OPEN:
+                    try {
+                        mActivity.startActivity(tag.getIntent());
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                     break;
             }
         }
 
         @Override
-        public void onDeleteButtonClicked(DownloadItem.DownloadItemTag tag) {
-            ImplInfo info = ImplConfig.findInfoByKey(databaseHelper,tag.key);
+        public void onDeleteButtonClicked(ImplStatusTag tag) {
+            ImplInfo info = ImplConfig.findInfoByKey(databaseHelper,tag.getKey());
             if (null == info){
                 return;
             }
-            if (null != info){
-                ImplAgent.requestDownloadDelete(mActivity,info.getKey());
-            }
+            ImplAgent.requestDownloadDelete(mActivity,info.getKey());
         }
 
         @Override
-        public void onDetailButtonClicked(DownloadItem.DownloadItemTag tag) {
-
+        public void onDetailButtonClicked(ImplStatusTag tag) {
+            try {
+                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+                        bundleContext, ApkplugOSGIService.class,
+                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
+                        OSGIServiceAgent.real_time);   //每次都重新查询
+                agent.getService().ApkplugOSGIService(bundleContext,
+                        Constant.OSGI_SERVICE_DM_FRAGMENT,
+                        0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,tag.getPackageName(),tag.getTitle(),tag.getIconUrl());
+            } catch (Exception e) {
+                // TODO 自动生成的 catch 块
+                e.printStackTrace();
+            }
         }
     }
 
@@ -216,18 +230,25 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
         private Runnable mNotifyRunnable = new Runnable() {
             @Override
             public void run() {
-                setAdapter();
+                if (null != mAdapter){
+                    Cursor c = mAdapter.getCursor();
+                    if (null != c && ! c.isClosed()){
+                        c.requery();
+                    }
+                }else {
+                    setAdapter();
+                }
             }
         };
         @Override
         public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
-            ImplLog.d(TAG,  "onDownloadComplete key="+downloadCompleteRsp.key);
+            ImplLog.d(TAG,  "onDownloadComplete key="+downloadCompleteRsp.key+","+downloadCompleteRsp.localPath);
             mActivity.runOnUiThread(mNotifyRunnable);
         }
 
         @Override
         public void onDownloadUpdate(boolean success, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
-            ImplLog.d(TAG,  "onDownloadUpdate key="+downloadUpdateRsp.key);
+            ImplLog.d(TAG,  "onDownloadUpdate key="+downloadUpdateRsp.key+","+downloadUpdateRsp.status);
             mActivity.runOnUiThread(mNotifyRunnable);
         }
 

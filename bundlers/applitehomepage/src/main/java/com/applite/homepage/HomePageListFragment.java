@@ -9,20 +9,32 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
-
+import com.applite.bean.HomePageBean;
+import com.applite.bean.HomePageTypeBean;
+import com.applite.common.Constant;
+import com.applite.data.ListArrayAdapter;
 import com.applite.utils.SPUtils;
-import com.applite.utils.Utils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
+import com.applite.utils.HomePageUtils;
+import com.applite.utils.LogUtils;
+import com.applite.utils.Utils;
 
+import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
@@ -30,11 +42,6 @@ import net.tsz.afinal.http.AjaxParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.applite.bean.HomePageBean;
-import com.applite.bean.HomePageTypeBean;
-import com.applite.common.Constant;
-import com.applite.data.ListArrayAdapter;
-import com.applite.utils.HomePageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +50,7 @@ import java.util.List;
 * Created by hxd on 15-6-9.
 */
 public class HomePageListFragment extends ListFragment implements OnTouchListener,OnScrollListener {
-    private final String TAG = "homepage_ListFragment";
+    private final String TAG = "HomePageListFragment";
     /**
      * The fragment argument representing the section number for this
      * fragment.
@@ -60,7 +67,6 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     private ScrollOverListView listView;
     private FinalHttp mFinalHttp;
     int mCurCheckPosition = 0;
-    private List<HomePageBean> mHomePageApkContents = new ArrayList<HomePageBean>();
     private List<HomePageBean> mHomePageData = new ArrayList<HomePageBean>();
     private List<HomePageBean> mHomePageOrder = new ArrayList<HomePageBean>();
     private List<HomePageTypeBean> mHomePageMainType = new ArrayList<HomePageTypeBean>();
@@ -153,7 +159,6 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
         super.onAttach(activity);
         mActivity = activity;
         HomePageUtils.i(TAG, "onAttach yuzm");
-
         mListAdapter = new ListArrayAdapter(mActivity, R.layout.fragment_list, mData, mDataType, mTable);
         setListAdapter(mListAdapter);
         ImplAgent.registerImplListener(mImplListener);
@@ -230,11 +235,13 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
                             HomePageUtils.i(TAG, "ListFragment.onLoadMore() yuzm Thread.currentThread().getId() : " +
                                     Thread.currentThread().getId() + " ; mHomePageData : " + mHomePageData);
                             if(null != mHomePageData) {
-                                mListAdapter.setData(mHomePageData, mHomePageMainType, mTable);
+                                mPageDood = mListAdapter.setData(mHomePageData, mHomePageMainType, mTable);
                             }
                             mListAdapter.notifyDataSetChanged();
-                            pullDownView.notifyDidLoadMore((mHomePageData.size() != 0) ? false : true);
-                            System.out.println("加载更多");
+                            pullDownView.notifyDidLoadMore(((mHomePageData.size()) != 0 && (mHomePageData.size()==10)) ? false : true);
+                            mHomePageData.clear();
+                            mHomePageMainType.clear();
+                            //System.out.println("加载更多");
                         }
                     });
                 }
@@ -254,11 +261,11 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
             public void run() {
                 try {
                     switch (mTable) {
-                        case 0 : listPost("goods", ++mPageDood);
+                        case 0 : listPost("goods", mListAdapter.getCount()/10);
                                  break;
-                        case 1 : listPost("order", ++mPageOder);
+                        case 1 : listPost("order", mListAdapter.getCount()/10);
                                  break;
-                        case 2 : listPost("maintype", ++mPageMainType);
+                        case 2 : listPost("maintype", mListAdapter.getCount()/10);
                                  break;
                     }
                     //listPost("order",1,mHandler);
@@ -308,6 +315,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
         if(null == mFinalHttp) {
             mFinalHttp = new FinalHttp();
         }
+        HomePageUtils.e(TAG, "listPost yuzm mPage : " + mPage);
         AjaxParams params = new AjaxParams();
         params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
         params.put("packagename", "com.android.applite1.0");
@@ -409,6 +417,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
             hpBeanMainType.setId(1 + (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0));
             hpBeanMainType.setM_Name(object.getString("m_name"));
             hpBeanMainType.setM_IconUrl(object.getString("m_iconurl"));
+            hpBeanMainType.setM_key("m_key");
             mHomePageMainType.add(hpBeanMainType);
             SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
                     (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);

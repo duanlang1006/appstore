@@ -217,7 +217,7 @@ public class ImplPackageManager extends AbstractImpl {
         if (null == implInfo){
             return false;
         }
-        remove(implInfo.getKey());
+//        remove(implInfo.getKey());
         ImplAgent.notify(true,new ImplAgent.PackageRemovedRsp(cmd.context,implInfo.getKey()));
         return true;
     }
@@ -237,6 +237,7 @@ public class ImplPackageManager extends AbstractImpl {
             implInfo.setStatus(Constant.STATUS_INSTALL_FAILED);
             implInfo.setReason(result);
         }
+        save(implInfo);
         ImplAgent.notify(true,new ImplAgent.SystemInstallResultRsp(cmd.context,implInfo.getKey(),result));
         return true;
     }

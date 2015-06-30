@@ -3,6 +3,7 @@ package com.mit.impl;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -29,7 +30,14 @@ public class ImplAgent {
         public void onDownloadComplete(boolean success, DownloadCompleteRsp rsp) {
             switch(rsp.status){
                 case DownloadManager.STATUS_SUCCESSFUL:
-                    ImplAgent.requestPackageInstall(rsp.context, rsp.key, rsp.localPath, rsp.packageName, true);
+                    String localPath = null;
+                    try {
+                        localPath = Uri.parse(rsp.localPath).getPath();
+                    }catch(Exception e){
+                    }
+                    if (null != localPath) {
+                        ImplAgent.requestPackageInstall(rsp.context, rsp.key, localPath, rsp.packageName, true);
+                    }
                     ImplLog.d(TAG,"onDownloadComplete,STATUS_SUCCESSFUL,"+rsp.key+","+rsp.localPath);
                     break;
                 case DownloadManager.STATUS_FAILED:
@@ -288,7 +296,7 @@ public class ImplAgent {
 
     public static class DownloadCompleteRsp extends ImplResponse{
         public String key;
-        public String localPath;
+        public String localPath;  //uri
         public String packageName;
         public int status;
         DownloadCompleteRsp(Context context,String key,int status,String localPath,String packageName) {
@@ -322,10 +330,21 @@ public class ImplAgent {
     public static class DeleteDownloadReq extends ImplRequest{
         String key;
         DeleteDownloadReq(Context context,String key) {
-            super(context,ImplInterface.IMPL_ACTION_DOWNLOAD);
+            super(context,ImplInterface.IMPL_ACTION_DOWNLOAD_DELETE);
             this.key = key;
         }
     }
+
+    public static class DeleteDownloadRsp extends ImplResponse{
+        String key;
+        boolean result;
+        DeleteDownloadRsp(Context context,String key,boolean result) {
+            super(context,ImplInterface.IMPL_ACTION_DOWNLOAD_DELETE);
+            this.key = key;
+            this.result = result;
+        }
+    }
+
     ///===================================================================
     public static class ToggleDownloadReq extends ImplRequest{
         String key;

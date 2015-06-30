@@ -61,4 +61,5 @@
     <string name="download_error_invalid_package" >Invalid package</string>
     <string name="download_waiting_for_network" >Waiting for network</string>
     <string name="download_running_percent">In progress, <xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g></string>
+    <string name="apk_version">version:%1$s</string>
 </resources>
