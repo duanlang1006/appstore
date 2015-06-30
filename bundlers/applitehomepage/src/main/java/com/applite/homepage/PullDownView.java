@@ -11,7 +11,6 @@ import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -22,13 +21,12 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.applite.common.LogUtils;
 import com.applite.data.TopicPagerAdapter;
 import com.applite.homepage.ScrollOverListView.OnScrollOverListener;
-import com.applite.utils.HomePageUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -105,14 +103,14 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	public PullDownView(Context context, AttributeSet attrs) {
 		super(context, attrs);
         mPageAdaper = new TopicPagerAdapter(context);
-        HomePageUtils.i(TAG, "PullDownView() yuzm mPageAdaper : " + mPageAdaper);
+        LogUtils.i(TAG, "PullDownView() yuzm mPageAdaper : " + mPageAdaper);
 		initHeaderViewAndFooterViewAndListView(context);
 	}
 
 	public PullDownView(Context context) {
 		super(context);
         mPageAdaper = new TopicPagerAdapter(context);
-        HomePageUtils.i(TAG, "PullDownView() yuzm mPageAdaper : " + mPageAdaper);
+        LogUtils.i(TAG, "PullDownView() yuzm mPageAdaper : " + mPageAdaper);
 		initHeaderViewAndFooterViewAndListView(context);
 	}
 	
@@ -140,7 +138,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	public void notifyDidDataLoad(boolean isNoMoreData) {
 		mIsDidLoad = true;
 		mIsNoMoreData = isNoMoreData;
-        HomePageUtils.i(TAG, "notifyDidDataLoad() yuzm : mIsNoMoreData" + mIsNoMoreData);
+        LogUtils.i(TAG, "notifyDidDataLoad() yuzm : mIsNoMoreData" + mIsNoMoreData);
 		mFooterView.setVisibility(View.VISIBLE);
 		updateFooter();
 		mListView.setFooterDividersEnabled(true);
@@ -160,7 +158,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	public void notifyDidRefresh(boolean isNoMoreData) {
 		mIsNoMoreData = isNoMoreData;
 		updateFooter();
-        HomePageUtils.i(TAG, "notifyDidRefresh() yuzm : mIsNoMoreData" + mIsNoMoreData);
+        LogUtils.i(TAG, "notifyDidRefresh() yuzm : mIsNoMoreData" + mIsNoMoreData);
 		state &= ~STATE_REFRESHING;
 		mHeaderViewState = HEADER_VIEW_STATE_IDLE;
 		setHeaderHeight(0);
@@ -176,7 +174,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	 */
 	public void notifyDidLoadMore(boolean isNoMoreData) {
 		mIsNoMoreData = isNoMoreData;
-        HomePageUtils.i(TAG, "notifyDidLoadMore() yuzm : mIsNoMoreData" + mIsNoMoreData);
+        LogUtils.i(TAG, "notifyDidLoadMore() yuzm : mIsNoMoreData" + mIsNoMoreData);
 		state &= ~STATE_LOADING_MORE;
 		updateFooter();
 		System.out.println("隐藏底部");
@@ -205,7 +203,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	 * @param index 倒数第几个触发
 	 */
 	public void enableAutoFetchMore(boolean enable, int index){
-        HomePageUtils.i(TAG, "enableAutoFetchMore() yuzm");
+        LogUtils.i(TAG, "enableAutoFetchMore() yuzm");
 		if(!mEnableLoadMore) return;
 		mEnableAutoFetchMore = enable;
 		if(enable){
@@ -221,7 +219,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	 */
 	public void enableLoadMore(boolean enable) {
 		mEnableLoadMore = enable;
-        HomePageUtils.i(TAG, "enableLoadMore() yuzm");
+        LogUtils.i(TAG, "enableLoadMore() yuzm");
 		if (!enable) {
 			// TODO 暂时使用这种错开的方法
 			// 更好的办法是写到属性里面
@@ -239,7 +237,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	 * 是否启用下拉刷新
 	 */
 	public void enablePullDown(boolean enable) {
-        HomePageUtils.i(TAG, "enablePullDown() yuzm");
+        LogUtils.i(TAG, "enablePullDown() yuzm");
 		mEnablePullDown = enable;
 	}
 	
@@ -257,7 +255,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private void initHeaderViewAndFooterViewAndListView(Context context){
 		//setOrientation(RelativeLayout.VERTICAL);
-        HomePageUtils.i(TAG, "initHeaderViewAndFooterViewAndListView() yuzm");
+        LogUtils.i(TAG, "initHeaderViewAndFooterViewAndListView() yuzm");
 		mContext = context;
 		
 		/*
@@ -321,7 +319,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
         mNewsViewPager.setLayoutParams(lp);
         mNewsViewPager.setAdapter(mPageAdaper);
         mNewsViewPager.setCurrentItem(0);
-        HomePageUtils.i(TAG,"ListAdapter.getItemViewType() yuzm mNewsViewPager : " + mNewsViewPager);
+        LogUtils.i(TAG,"ListAdapter.getItemViewType() yuzm mNewsViewPager : " + mNewsViewPager);
         OnPageChangeListener pageChangeListener =new OnPageChangeListener() {
             // 页面选择
             @Override
@@ -340,9 +338,9 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
             }
 
         };
-        HomePageUtils.i(TAG,"ListAdapter.getItemViewType() yuzm mTopView : " + mTopicHeaderView);
+        LogUtils.i(TAG,"ListAdapter.getItemViewType() yuzm mTopView : " + mTopicHeaderView);
         mNewsViewPager.setOnPageChangeListener(pageChangeListener);
-        HomePageUtils.i(TAG,"ListAdapter.getItemViewType() yuzm mTopView : " + mTopicHeaderView);
+        LogUtils.i(TAG,"ListAdapter.getItemViewType() yuzm mTopView : " + mTopicHeaderView);
 
 		/*
 		 * 自定义脚部文件
@@ -359,7 +357,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 				ScrollOverListView listView = mListView;
 				if (listView.getCount() - listView.getHeaderViewsCount() - listView.getFooterViewsCount() > 0) {
 					state |= STATE_LOADING_MORE;
-                    HomePageUtils.i(TAG, "setOnClickListener() yuzm");
+                    LogUtils.i(TAG, "setOnClickListener() yuzm");
 					updateFooter();
 					mOnPullDownListener.onLoadMore();
 				}
@@ -437,7 +435,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	 * 否则显示更新时间。
 	 */
 	private void updateHeader() {
-        HomePageUtils.i(TAG, "updateHeader() yuzm");
+        LogUtils.i(TAG, "updateHeader() yuzm");
 		if ((state & STATE_REFRESHING) == STATE_REFRESHING) {
 			mHeaderArrowView.clearAnimation();
 			mHeaderArrowView.setVisibility(View.GONE);
@@ -478,7 +476,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	 * 如果加载中就显示"加载中..."。
 	 */
 	private void updateFooter() {
-        HomePageUtils.i(TAG, "updateFooter() yuzm");
+        LogUtils.i(TAG, "updateFooter() yuzm");
 		if (!mEnableLoadMore) return;
 		
 		if (mIsNoMoreData) {
@@ -582,10 +580,10 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 			public void run() {
 				if(mOnListViewIdleListener != null){
 					// 不需要考虑FooterView
-                    HomePageUtils.i(TAG, "doListViewIdleActionOnDataDidLoad() yuzm");
+                    LogUtils.i(TAG, "doListViewIdleActionOnDataDidLoad() yuzm");
 					final int firstVisiblePosition = mListView.getFirstVisiblePosition();
 					final int childCount = mListView.getChildCount(); 
-					//HomePageUtils.d(TAG, "[doListViewIdleActionOnDataDidLoad] firstVisiblePosition:" + firstVisiblePosition + " childCount:" + childCount);
+					//LogUtils.d(TAG, "[doListViewIdleActionOnDataDidLoad] firstVisiblePosition:" + firstVisiblePosition + " childCount:" + childCount);
 					mOnListViewIdleListener.onIdle(firstVisiblePosition, childCount);
 				}
 			}
@@ -611,7 +609,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 			state |= STATE_MOTION_DOWN;
 			mIsPullUpDone = false;
 			mMotionDownLastY = ev.getRawY();
-			HomePageUtils.d(TAG, "pulldownview.onIntercept:" + mMotionDownLastY);
+			LogUtils.d(TAG, "pulldownview.onIntercept:" + mMotionDownLastY);
 		}
 		return super.onInterceptTouchEvent(ev);
 	}
@@ -628,7 +626,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	public boolean onListViewTopAndPullDown(MotionEvent event, int delta) {
 		// 因为某些ListView控件自己已经添加了下拉效果
 		// 所以我们必须返回true，控制ListView不会滚动，达到屏蔽的效果
-        HomePageUtils.d(TAG, "onListViewTopAndPullDown : yuzm");
+        LogUtils.d(TAG, "onListViewTopAndPullDown : yuzm");
 		if ((state & STATE_REFRESHING) == STATE_REFRESHING || !mEnablePullDown || !mIsDidLoad) {
 			return true;
 		}
@@ -657,13 +655,13 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 
 	@Override
 	public boolean onListViewBottomAndPullUp(MotionEvent event, int delta) {
-        HomePageUtils.i(TAG, "onListViewBottomAndPullUp() yuzm state : " + ((state & STATE_LOADING_MORE) == STATE_LOADING_MORE)
+        LogUtils.i(TAG, "onListViewBottomAndPullUp() yuzm state : " + ((state & STATE_LOADING_MORE) == STATE_LOADING_MORE)
         + "; !mIsDidLoad : " + !mIsDidLoad + " ; !mEnableAutoFetchMore : " + !mEnableAutoFetchMore
                 + "; mIsNoMoreData : " + mIsNoMoreData);
 		if((state & STATE_LOADING_MORE) == STATE_LOADING_MORE
 				|| !mIsDidLoad || !mEnableAutoFetchMore || mIsNoMoreData) return false;
 		ScrollOverListView listView = mListView;
-        HomePageUtils.i(TAG, "onListViewBottomAndPullUp() yuzm listView.getCount() : " + listView.getCount()
+        LogUtils.i(TAG, "onListViewBottomAndPullUp() yuzm listView.getCount() : " + listView.getCount()
                  + " ; listView.getHeaderViewsCount() : " + listView.getHeaderViewsCount() + " ; listView.getFooterViewsCount() : "
                  + listView.getFooterViewsCount());
 		if (listView.getCount() - listView.getHeaderViewsCount() - listView.getFooterViewsCount() > 0) {
@@ -682,7 +680,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	@Override
 	public boolean onMotionMove(MotionEvent ev, int delta) {
 		state |= STATE_DRAGING;
-        HomePageUtils.i(TAG, "onMotionMove()");
+        LogUtils.i(TAG, "onMotionMove()");
 		//当头部文件回推消失的时候，不允许滚动
 		if(mIsPullUpDone) return true;
 		
@@ -708,7 +706,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 
 	@Override
 	public boolean onMotionUp(MotionEvent ev) {
-        HomePageUtils.i(TAG, "onMotionUp() yuzm");
+        LogUtils.i(TAG, "onMotionUp() yuzm");
 		state &= ~STATE_DRAGING;
 		state &= ~STATE_MOTION_DOWN;
 		// 避免和点击事件冲突
@@ -748,7 +746,7 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		if(scrollState == SCROLL_STATE_IDLE){
-			if (DEBUG) HomePageUtils.d(TAG, "IDLE");
+			if (DEBUG) LogUtils.d(TAG, "IDLE");
 			if(mOnListViewIdleListener != null){
 				int count = mListView.getChildCount();
 				final int childEndIndex = mStartIndex + mListView.getChildCount() -1;
@@ -761,10 +759,10 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 		}
 		switch (scrollState) {
 		case SCROLL_STATE_FLING:
-			if (DEBUG) HomePageUtils.d(TAG, "FLING");
+			if (DEBUG) LogUtils.d(TAG, "FLING");
 			break;
 		case SCROLL_STATE_TOUCH_SCROLL:
-			if (DEBUG) HomePageUtils.d(TAG, "SCROLL");
+			if (DEBUG) LogUtils.d(TAG, "SCROLL");
 		default:
 			break;
 		}
@@ -772,9 +770,9 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-		if (DEBUG) HomePageUtils.d(TAG, "onScroll");
+		if (DEBUG) LogUtils.d(TAG, "onScroll");
 		mStartIndex = firstVisibleItem;
-        HomePageUtils.i(TAG, "onScroll()");
+        LogUtils.i(TAG, "onScroll()");
 		// 因为三星I91002.3版本如果设置over_scroll_never会出现回弹问题，所以在这里处理一下
 		// 更新12-9-9 2:08：晕死，测试三星2.3.3版本如果反射使用这些属性会报错。
 
@@ -787,12 +785,12 @@ public class PullDownView extends RelativeLayout implements OnScrollOverListener
 			
 			if (firstVisibleItem <= 0 && hasItem) {
 				if (mode != View.OVER_SCROLL_NEVER) {
-					if (DEBUG) HomePageUtils.i(TAG, "set over scroll never");
+					if (DEBUG) LogUtils.i(TAG, "set over scroll never");
 					overScrollModeField.set(localListView, View.OVER_SCROLL_NEVER);
 				}
 			} else if (firstVisibleItem + visibleItemCount >= totalItemCount && hasItem) {
 				if (mode != View.OVER_SCROLL_ALWAYS) {
-					if (DEBUG) HomePageUtils.i(TAG, "set over scroll always");
+					if (DEBUG) LogUtils.i(TAG, "set over scroll always");
 					overScrollModeField.set(localListView, View.OVER_SCROLL_ALWAYS);
 				}
 			}

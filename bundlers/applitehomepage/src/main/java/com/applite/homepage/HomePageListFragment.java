@@ -9,39 +9,35 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RatingBar;
-import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
 import com.applite.bean.HomePageBean;
 import com.applite.bean.HomePageTypeBean;
+import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.applite.data.ListArrayAdapter;
 import com.applite.utils.SPUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
-import com.applite.utils.HomePageUtils;
-import com.applite.utils.LogUtils;
-import com.applite.utils.Utils;
+import com.mit.impl.ImplStatusTag;
 
-import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
 
+import org.apkplug.Bundle.ApkplugOSGIService;
+import org.apkplug.Bundle.OSGIServiceAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osgi.framework.BundleContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,14 +46,13 @@ import java.util.List;
 * Created by hxd on 15-6-9.
 */
 public class HomePageListFragment extends ListFragment implements OnTouchListener,OnScrollListener {
-    private final String TAG = "HomePageListFragment";
+    private final String TAG = "homepage_ListFragment";
     /**
      * The fragment argument representing the section number for this
      * fragment.
      */
     private ListArrayAdapter mListAdapter = null;
     private Activity mActivity;
-    private Context mContext;
     private List<HomePageBean> mData;
     List<HomePageTypeBean> mDataType;
     private int mTable = 0;
@@ -74,6 +69,8 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     private int mPageOder = 0;
     private int mPageMainType = 0;
     private ImplListener mImplListener = new HomePageImplListener();
+    private HomePageListListener mListAdapterListener = new HomePageListListener();
+
     public HomePageListFragment(List<HomePageBean> data, List<HomePageTypeBean> mDataType, int mTable, Activity activity) {
         this.mData = data;
         this.mTable = mTable;
@@ -83,74 +80,72 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        HomePageUtils.i(TAG, "ListFragment.onCreate() yuzm");
+        LogUtils.i(TAG, "ListFragment.onCreate() ");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        HomePageUtils.i(TAG, "onResume yuzm");
+        LogUtils.i(TAG, "onResume ");
     }
 
     @Override
     public void onStart() {
-        HomePageUtils.i(TAG, "onStart yuzm");
+        LogUtils.i(TAG, "onStart ");
         super.onStart();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        HomePageUtils.i(TAG, "onStop");
+        LogUtils.i(TAG, "onStop");
     }
     @Override
     public void onDetach(){
         super.onDetach();
-        HomePageUtils.i(TAG, "onDetach yuzm");
+        LogUtils.i(TAG, "onDetach ");
         ImplAgent.unregisterImplListener(mImplListener);
     }
     @Override
     public void onDestroy() {
         super.onDestroy();
         //ImplAgent.unregisterImplListener(mImplListener);
-        HomePageUtils.i(TAG, "onDestroy");
+        LogUtils.i(TAG, "onDestroy");
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        //HomePageUtils.i(TAG, "onListItemClick.onCreate() yuzm");
+        LogUtils.i(TAG, "onListItemClick, "+position);
         super.onListItemClick(l, v, position, id);
         if (2 == this.mTable) {
             //homePageFragment.postMainType(mActivity);
             FragmentManager fm;
             FragmentTransaction ftx;
-            try {
-                mContext =mActivity;
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            try {
-                Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-                BundleContextFactory.getInstance().getBundleContext().getAndroidContext();
-                if (null != context) {
-                    mContext = context;
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            HomePageFragment hp = HomePageFragment.newInstance(position, mContext);
+            HomePageFragment hp = new HomePageFragment();
             hp.setMainType(true);
             fm = ((FragmentActivity)mActivity).getSupportFragmentManager();
             ftx = fm.beginTransaction();
-            //ftx.hide()
             ftx.replace(hp.getNode(), hp);
-            //ftx.addToBackStack(null);
             ftx.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             ftx.commit();
-            HomePageUtils.i(TAG, "onListItemClick.onCreate() yuzm");
-
+            LogUtils.i(TAG, "onListItemClick.onCreate() ");
+        }else{
+            HomePageBean bean = mData.get(position);
+            try {
+                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+                        bundleContext, ApkplugOSGIService.class,
+                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
+                        OSGIServiceAgent.real_time);   //每次都重新查询
+                agent.getService().ApkplugOSGIService(bundleContext,
+                        Constant.OSGI_SERVICE_DM_FRAGMENT,
+                        0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,bean.getPackagename(),bean.getName(),bean.getImgurl());
+            } catch (Exception e) {
+                // TODO 自动生成的 catch 块
+                e.printStackTrace();
+            }
         }
-        HomePageUtils.i(TAG, "onListItemClick() yuzm l : " + l + " ; v : " + v +
+        LogUtils.i(TAG, "onListItemClick()  l : " + l + " ; v : " + v +
                 " ; id : " + id + " ; position : " + position);
     }
 
@@ -158,8 +153,13 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        HomePageUtils.i(TAG, "onAttach yuzm");
-        mListAdapter = new ListArrayAdapter(mActivity, R.layout.fragment_list, mData, mDataType, mTable);
+        LogUtils.i(TAG, "onAttach ");
+        mListAdapter = new ListArrayAdapter(mActivity,
+                R.layout.fragment_list,
+                mData,
+                mDataType,
+                mTable,
+                mListAdapterListener);
         setListAdapter(mListAdapter);
         ImplAgent.registerImplListener(mImplListener);
     }
@@ -167,7 +167,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        HomePageUtils.i(TAG, "onActivityCreated yuzm");
+        LogUtils.i(TAG, "onActivityCreated ");
         //PullToRefreshListView listView = new PullToRefreshListView(getActivity());
 
         if (savedInstanceState != null) {
@@ -180,7 +180,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        HomePageUtils.i(TAG, "onSaveInstanceState yuzm");
+        LogUtils.i(TAG, "onSaveInstanceState ");
         outState.putInt("curChoice", mCurCheckPosition);
         //outState.putAll();
     }
@@ -201,12 +201,12 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
         } catch (Exception e) {
             e.printStackTrace();
         }
-        HomePageUtils.i(TAG, "ListFragment.onCreateView() yuzm");
+        LogUtils.i(TAG, "ListFragment.onCreateView() ");
         View rootView = mInflater.inflate(R.layout.fragment_tabl, container, false);
         //
         pullDownView = (PullDownView)rootView.findViewById(R.id.pullDownView);
-        HomePageUtils.i(TAG, "ListFragment.onCreateView() yuzm pullDownView : " + pullDownView);
-        HomePageUtils.i(TAG, "ListFragment.onCreateView() yuzm Thread.currentThread().getId() : " +
+        LogUtils.i(TAG, "ListFragment.onCreateView()  pullDownView : " + pullDownView);
+        LogUtils.i(TAG, "ListFragment.onCreateView()  Thread.currentThread().getId() : " +
                 Thread.currentThread().getId());
         if(null != pullDownView) {
             pullDownView.enableAutoFetchMore(true, 0);
@@ -232,7 +232,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
                     getNewData(new Handler() {
                         @Override
                         public void handleMessage(Message msg) {
-                            HomePageUtils.i(TAG, "ListFragment.onLoadMore() yuzm Thread.currentThread().getId() : " +
+                            LogUtils.i(TAG, "ListFragment.onLoadMore()  Thread.currentThread().getId() : " +
                                     Thread.currentThread().getId() + " ; mHomePageData : " + mHomePageData);
                             if(null != mHomePageData) {
                                 mPageDood = mListAdapter.setData(mHomePageData, mHomePageMainType, mTable);
@@ -275,7 +275,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
                     e.printStackTrace();
                 }
 
-                HomePageUtils.i(TAG, "ListFragment.getNewString() yuzm Thread.currentThread().getId() : " +
+                LogUtils.i(TAG, "ListFragment.getNewString()  Thread.currentThread().getId() : " +
                         Thread.currentThread().getId());
                 mHandler.obtainMessage().sendToTarget();
             }
@@ -286,7 +286,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             x = event.getX();
             y = event.getY();
-            HomePageUtils.v(TAG, "yuzm is on touch down x = " + x + " ,y = " + y);
+            LogUtils.v(TAG, " is on touch down x = " + x + " ,y = " + y);
         }
         if (event.getAction() == MotionEvent.ACTION_UP) {
             upx = event.getX();
@@ -294,10 +294,10 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
             int position1 = ((ListView) v).pointToPosition((int) x, (int) y);
             int position2 = ((ListView) v).pointToPosition((int) upx, (int) upy);
 
-            HomePageUtils.v(TAG, "yuzm is on touch x = " + x + " ,y = " + y);
-            HomePageUtils.v(TAG, "yuzm is on touch upx = " + upx + " ,upy = " + upy);
+            LogUtils.v(TAG, " is on touch x = " + x + " ,y = " + y);
+            LogUtils.v(TAG, " is on touch upx = " + upx + " ,upy = " + upy);
 
-            HomePageUtils.v(TAG, "yuzm is on touch positon1 = " + position1 + " ,position2 = " + position2);
+            LogUtils.v(TAG, " is on touch positon1 = " + position1 + " ,position2 = " + position2);
 
             if (position1 == position2 && Math.abs(x - upx) > 10) {
                 View view = ((ListView) v).getChildAt(position1);
@@ -315,9 +315,9 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
         if(null == mFinalHttp) {
             mFinalHttp = new FinalHttp();
         }
-        HomePageUtils.e(TAG, "listPost yuzm mPage : " + mPage);
+        LogUtils.e(TAG, "listPost  mPage : " + mPage);
         AjaxParams params = new AjaxParams();
-        params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", "com.android.applite1.0");
         //params.put("packagename",Utils.getPackgeName(this));
         params.put("app", "applite");
@@ -325,13 +325,13 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
         params.put("page", String.valueOf(mPage));
         params.put("tabtype", mTabType);
         params.put("pullonloading", "pullonloading");
-        mFinalHttp.post(Utils.URL, params, new AjaxCallBack<Object>() {
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
                 Message msg = new Message();
                 String reuslt = (String) o;
-                HomePageUtils.i(TAG, "HomePage网络请求成功，yuzm reuslt:" + reuslt);
+                LogUtils.i(TAG, "HomePage网络请求成功， reuslt:" + reuslt);
                 setData(reuslt, mActivity, mTabType);
 
             }
@@ -339,7 +339,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
-                HomePageUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
+                LogUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
             }
         });
     }
@@ -352,7 +352,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
         HomePageBean hpBeanData = null;
         try {
             JSONObject obj = new JSONObject(data);
-            HomePageUtils.i(TAG, "setData JSONObject data，yuzm obj : " + obj);
+            LogUtils.i(TAG, "setData JSONObject data， obj : " + obj);
             int app_key = obj.getInt("app_key");
             //goods_data
             String mData =null;
@@ -366,9 +366,9 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
             }
 
             JSONArray mJson = new JSONArray(mData);
-            //HomePageUtils.i(TAG, "setData JSONObject data，json : " + json);
-            HomePageUtils.i( TAG,"yuzm mJson.length() : " + mJson.length());
-            HomePageUtils.i( TAG,"yuzm mJson : " + mJson);
+            //LogUtils.i(TAG, "setData JSONObject data，json : " + json);
+            LogUtils.i( TAG," mJson.length() : " + mJson.length());
+            LogUtils.i( TAG," mJson : " + mJson);
             for (int i = 0; i < mJson.length(); i++) {
                 JSONObject object = new JSONObject(mJson.get(i).toString());
                 hpBeanData = new HomePageBean();
@@ -395,10 +395,10 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
                 SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
                         (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);
             }
-            HomePageUtils.i( TAG,"yuzm mJson : " + mJson);
+            LogUtils.i( TAG," mJson : " + mJson);
         } catch (JSONException e) {
             e.printStackTrace();
-            HomePageUtils.e(TAG, "yuzm HomePageJSON解析异常");
+            LogUtils.e(TAG, " HomePageJSON解析异常");
         }
     }
 
@@ -409,8 +409,8 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
 
         String mMainType_data = mObj.getString("maintype_data");
         JSONArray mMainType_json = new JSONArray(mMainType_data);
-        HomePageUtils.i(TAG, "yuzm mMainType_json.length() : " + mMainType_json.length());
-        HomePageUtils.i(TAG, "yuzm mMainType_json : " + mMainType_json);
+        LogUtils.i(TAG, " mMainType_json.length() : " + mMainType_json.length());
+        LogUtils.i(TAG, " mMainType_json : " + mMainType_json);
         for (int i = 0; i < mMainType_json.length(); i++) {
             JSONObject object = new JSONObject(mMainType_json.get(i).toString());
             hpBeanMainType = new HomePageTypeBean();
@@ -425,12 +425,57 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
     }
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
-        HomePageUtils.v(TAG, "onScrollStateChanged yuzm view = " + view + " ,scrollState = " + scrollState);
+        LogUtils.v(TAG, "onScrollStateChanged  view = " + view + " ,scrollState = " + scrollState);
     }
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        HomePageUtils.v(TAG, "onScrollStateChanged yuzm view = " + view + " ,totalItemCount = " + totalItemCount);
+        LogUtils.v(TAG, "onScrollStateChanged  view = " + view + " ,totalItemCount = " + totalItemCount);
+    }
+
+    private HomePageBean findBeanByKey(String key){
+        HomePageBean bean = null;
+        for (int i = 0;i<mData.size();i++){
+            if (key.equals(mData.get(i).getPackagename())){
+                bean = mData.get(i);
+                break;
+            }
+        }
+        return bean;
+    }
+
+    class HomePageListListener implements ListArrayAdapter.ListAdapterListener {
+        @Override
+        public void onDownloadButtonClicked(ImplStatusTag tag) {
+            HomePageBean bean = findBeanByKey(tag.getKey());
+            if (null == bean){
+                return;
+            }
+            switch(tag.getAction()){
+                case ImplStatusTag.ACTION_DOWNLOAD:
+                    ImplAgent.downloadPackage(mActivity,
+                            bean.getPackagename(),
+                            bean.getUrl(),
+                            Constant.extenStorageDirPath,
+                            bean.getName() + ".apk",
+                            3,
+                            false,
+                            bean.getName(),
+                            "",
+                            true,
+                            bean.getImgurl(),
+                            "",
+                            bean.getPackagename());
+                    break;
+                case ImplStatusTag.ACTION_OPEN:
+                    try {
+                        mActivity.startActivity(tag.getIntent());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+        }
     }
 
     class HomePageImplListener implements ImplListener{
@@ -441,40 +486,33 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
                 mListAdapter.notifyDataSetInvalidated();
             }
         };
-        private HomePageBean findBeanByKey(String key){
-            HomePageBean bean = null;
-            for (int i = 0;i<mData.size();i++){
-                if (key.equals(mData.get(i).getPackagename())){
-                    bean = mData.get(i);
-                    break;
-                }
-            }
-            return bean;
-        }
 
         @Override
         public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
-            HomePageUtils.i(TAG,  "onDownloadComplete key="+downloadCompleteRsp.key);
+            LogUtils.i(TAG,  "onDownloadComplete key="+downloadCompleteRsp.key);
             HomePageBean bean = findBeanByKey(downloadCompleteRsp.key);
             if (null != bean){
-                HomePageUtils.i(TAG,  "onDownloadComplete name="+bean.getName()+",status="+bean.getStatus());
+                LogUtils.i(TAG,  "onDownloadComplete name="+bean.getName()+",status="+bean.getStatus());
                 if (bean.getStatus() <= Constant.STATUS_FAILED) {
                     bean.setStatus(downloadCompleteRsp.status);
-                    mActivity.runOnUiThread(mRefreshListRunnable);
                 }
+                bean.setLocalUri(downloadCompleteRsp.localPath);
+                mActivity.runOnUiThread(mRefreshListRunnable);
             }
-            HomePageUtils.i(TAG,  "onDownloadComplete end");
+            LogUtils.i(TAG,  "onDownloadComplete end");
         }
 
         @Override
         public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
-            HomePageUtils.i(TAG,  "onDownloadUpdate  key="+downloadUpdateRsp.key);
+            LogUtils.i(TAG,  "onDownloadUpdate  key="+downloadUpdateRsp.key);
             HomePageBean bean = findBeanByKey(downloadUpdateRsp.key);
             if (null != bean){
-                HomePageUtils.i(TAG,  "onDownloadUpdate name="+bean.getName()+",status="+bean.getStatus());
+                LogUtils.i(TAG,  "onDownloadUpdate name="+bean.getName()+",status="+bean.getStatus());
                 if (bean.getStatus() <= Constant.STATUS_FAILED) {
                     int OriginalStatus = bean.getStatus();
                     bean.setStatus(downloadUpdateRsp.status);
+                    bean.setCurrentBytes(downloadUpdateRsp.progress);
+                    bean.setTotalBytes(100);
                     if (OriginalStatus != bean.getStatus()) {
                         mActivity.runOnUiThread(mRefreshListRunnable);
                     }
@@ -484,11 +522,11 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
 
         @Override
         public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
-            HomePageUtils.i(TAG,  "onPackageAdded key="+packageAddedRsp.key);
+            LogUtils.i(TAG,  "onPackageAdded key="+packageAddedRsp.key);
             HomePageBean bean = findBeanByKey(packageAddedRsp.key);
             if (null != bean){
                 bean.setStatus(Constant.STATUS_INSTALLED);
-                HomePageUtils.i(TAG,  "onPackageAdded name="+bean.getName()+",status="+bean.getStatus());
+                LogUtils.i(TAG,  "onPackageAdded name="+bean.getName()+",status="+bean.getStatus());
                 mActivity.runOnUiThread(mRefreshListRunnable);
             }
         }
@@ -498,7 +536,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
             HomePageBean bean = findBeanByKey(packageRemovedRsp.key);
             if (null != bean){
                 bean.setStatus(Constant.STATUS_INIT);
-                HomePageUtils.i(TAG,  "onPackageRemoved key="+packageRemovedRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
+                LogUtils.i(TAG,  "onPackageRemoved key="+packageRemovedRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
                 mActivity.runOnUiThread(mRefreshListRunnable);
             }
         }
@@ -508,14 +546,14 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
             HomePageBean bean = findBeanByKey(packageChangedRsp.key);
             if (null != bean){
                 bean.setStatus(Constant.STATUS_INSTALLED);
-                HomePageUtils.i(TAG,  "onPackageChanged key="+packageChangedRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
+                LogUtils.i(TAG,  "onPackageChanged key="+packageChangedRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
                 mActivity.runOnUiThread(mRefreshListRunnable);
             }
         }
 
         @Override
         public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
-            HomePageUtils.i(TAG,  "onSystemInstallResult key="+systemInstallResultRsp.key);
+            LogUtils.i(TAG,  "onSystemInstallResult key="+systemInstallResultRsp.key);
             HomePageBean bean = findBeanByKey(systemInstallResultRsp.key);
             if (null != bean){
                 if (systemInstallResultRsp.result == Constant.INSTALL_SUCCEEDED) {
@@ -523,7 +561,7 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
                 }else{
                     bean.setStatus(Constant.STATUS_INSTALL_FAILED);
                 }
-                HomePageUtils.i(TAG,  "onSystemInstallResult name="+bean.getName()+",status="+bean.getStatus());
+                LogUtils.i(TAG,  "onSystemInstallResult name="+bean.getName()+",status="+bean.getStatus());
                 mActivity.runOnUiThread(mRefreshListRunnable);
             }
         }
@@ -535,14 +573,14 @@ public class HomePageListFragment extends ListFragment implements OnTouchListene
                 if (systemDeleteResultRsp.result == Constant.DELETE_SUCCEEDED) {
                     bean.setStatus(Constant.STATUS_INIT);
                 }
-                HomePageUtils.i(TAG,  "onSystemDeleteResult key="+systemDeleteResultRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
+                LogUtils.i(TAG,  "onSystemDeleteResult key="+systemDeleteResultRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
                 mActivity.runOnUiThread(mRefreshListRunnable);
             }
         }
 
         @Override
         public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
-            HomePageUtils.i(TAG,  "onFinish implResponse.action="+implResponse.action);
+            LogUtils.i(TAG,  "onFinish implResponse.action="+implResponse.action);
         }
     }
 

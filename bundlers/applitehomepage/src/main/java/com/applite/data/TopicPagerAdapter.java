@@ -5,13 +5,12 @@ import android.graphics.Color;
 import android.os.Parcelable;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.PagerAdapter;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.applite.common.LogUtils;
 import com.applite.homepage.BundleContextFactory;
 import com.applite.homepage.R;
-import com.applite.utils.HomePageUtils;
 
 import java.util.ArrayList;
 
@@ -38,7 +37,7 @@ public class TopicPagerAdapter extends PagerAdapter{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        HomePageUtils.i(TAG, "isViewFromObject yuzm mContext : " + mContext);
+        LogUtils.i(TAG, "isViewFromObject yuzm mContext : " + mContext);
         leftImg = new ImageView(mContext);
         leftImg.setBackgroundColor(Color.WHITE);
         leftImg.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -54,7 +53,7 @@ public class TopicPagerAdapter extends PagerAdapter{
         //videoFront.setOnClickListener(new MyOnClickListener(1));
         mNewsImages.add(leftImg);
         mNewsImages.add(rightImg);
-        HomePageUtils.i(TAG, "TopicPagerAdapter yuzm mContext : " + mContext);
+        LogUtils.i(TAG, "TopicPagerAdapter yuzm mContext : " + mContext);
     }
     @Override
     public boolean isViewFromObject(View arg0, Object arg1) {
@@ -71,7 +70,7 @@ public class TopicPagerAdapter extends PagerAdapter{
     }
     @Override
     public int getCount() {
-        HomePageUtils.i(TAG, "isViewFromObject yuzm mNewsImages : " + mNewsImages);
+        LogUtils.i(TAG, "isViewFromObject yuzm mNewsImages : " + mNewsImages);
         if (null != mNewsImages) {
             return mNewsImages.size();
         }else {
