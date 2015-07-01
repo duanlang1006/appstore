@@ -9,14 +9,25 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
+
+import com.applite.bean.HomePageApkData;
 import com.applite.bean.HomePageBean;
+import com.applite.bean.HomePageDataBean;
+import com.applite.bean.HomePageTopic;
 import com.applite.bean.HomePageTypeBean;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
@@ -27,6 +38,7 @@ import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
 import com.mit.impl.ImplStatusTag;
 
+import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
@@ -49,17 +61,17 @@ public class HomePageListFragment extends ListFragment {
     private final static int MSG_LOAD_DATA = 0;
 
     private Activity mActivity;
-    private List<HomePageBean> mData;
-    private List<HomePageTypeBean> mDataType;
+    private Context mContext;
+    private HomePageDataBean mData;
+
     private int mTable = 0;
     private View mListFooterView;
     private ListArrayAdapter mListAdapter = null;
     private FinalHttp mFinalHttp;
     int mCurCheckPosition = 0;
     private List<HomePageBean> mHomePageData = new ArrayList<HomePageBean>();
-    private List<HomePageBean> mHomePageOrder = new ArrayList<HomePageBean>();
     private List<HomePageTypeBean> mHomePageMainType = new ArrayList<HomePageTypeBean>();
-    private int mPageDood = 0;
+    private int mPageGood = 0;
     private int mPageOder = 0;
     private int mPageMainType = 0;
     private ImplListener mImplListener = new HomePageImplListener();
@@ -99,22 +111,15 @@ public class HomePageListFragment extends ListFragment {
                 case MSG_LOAD_DATA:
                     switch (mTable) {
                         case 0 :
-                            listPost("goods", mData.size()/10);
+                            listPost("goods", mData.getSubjectData().size()/10);
                             break;
                         case 1 :
-                            listPost("order", mData.size()/10);
+                            listPost("order", mData.getSubjectData().size()/10);
                             break;
                         case 2 :
-                            listPost("maintype", mDataType.size()/10);
+                            listPost("maintype", mData.getSubjectData().size()/10);
                             break;
                     }
-//                    if (isToEnd) {
-//                        Toast.makeText(mActivity, "木有更多数据！", Toast.LENGTH_SHORT).show();
-//                        mListView.removeFooterView(moreView); //移除底部视图
-//                    } else {
-//                        //加载更多数据，这里可以使用异步加载
-//                        postSearch(mEtView.getText().toString(), POST_CLICK_SEARCH, 0);
-//                    }
                     LogUtils.i(TAG, "加载更多数据");
                     break;
                 default:
@@ -124,12 +129,9 @@ public class HomePageListFragment extends ListFragment {
 
         ;
     };
-
-
-    public HomePageListFragment(List<HomePageBean> data, List<HomePageTypeBean> mDataType, int mTable, Activity activity) {
+    public HomePageListFragment(HomePageDataBean data, Activity activity) {
         this.mData = data;
         this.mTable = mTable;
-        this.mDataType = mDataType;
     }
 
     @Override
@@ -144,12 +146,6 @@ public class HomePageListFragment extends ListFragment {
         super.onAttach(activity);
         mActivity = activity;
         ImplAgent.registerImplListener(mImplListener);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        LogUtils.i(TAG, "ListFragment.onCreateView() ");
-        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -182,8 +178,6 @@ public class HomePageListFragment extends ListFragment {
         mListAdapter = new ListArrayAdapter(mActivity,
                 R.layout.fragment_list,
                 mData,
-                mDataType,
-                mTable,
                 mListAdapterListener);
         setListAdapter(mListAdapter);
     }
@@ -226,14 +220,12 @@ public class HomePageListFragment extends ListFragment {
         super.onStop();
         LogUtils.i(TAG, "onStop");
     }
-
     @Override
     public void onDetach(){
         super.onDetach();
         LogUtils.i(TAG, "onDetach ");
         ImplAgent.unregisterImplListener(mImplListener);
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -258,7 +250,7 @@ public class HomePageListFragment extends ListFragment {
             ftx.commit();
             LogUtils.i(TAG, "onListItemClick.onCreate() ");
         }else{
-            HomePageBean bean = mData.get(position);
+            HomePageApkData bean = mData.getSubjectData().get(0).getHomePageApkData().get(position);
             try {
                 BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
                 OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
@@ -267,9 +259,9 @@ public class HomePageListFragment extends ListFragment {
                         OSGIServiceAgent.real_time);   //每次都重新查询
                 agent.getService().ApkplugOSGIService(bundleContext,
                         Constant.OSGI_SERVICE_DM_FRAGMENT,
-                        0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,bean.getPackagename(),bean.getName(),bean.getImgurl());
+                        0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,bean.getPackageName(),bean.getName(),bean.getIconUrl());
             } catch (Exception e) {
-                // TODO 自动生成的 catch 块
+                // T
                 e.printStackTrace();
             }
         }
@@ -371,8 +363,6 @@ public class HomePageListFragment extends ListFragment {
                 mListAdapter = new ListArrayAdapter(mActivity,
                         R.layout.fragment_list,
                         mData,
-                        mDataType,
-                        mTable,
                         mListAdapterListener);
                 getListView().setAdapter(mListAdapter);
             }else{
@@ -406,11 +396,11 @@ public class HomePageListFragment extends ListFragment {
         }
     }
 
-    private HomePageBean findBeanByKey(String key){
-        HomePageBean bean = null;
-        for (int i = 0;i<mData.size();i++){
-            if (key.equals(mData.get(i).getPackagename())){
-                bean = mData.get(i);
+    private HomePageApkData findBeanByKey(String key){
+        HomePageApkData bean = null;
+        for (int i = 0;i<mData.getSubjectData().get(0).getHomePageApkData().size();i++){
+            if (key.equals(mData.getSubjectData().get(0).getHomePageApkData().get(i).getPackageName())){
+                bean = mData.getSubjectData().get(0).getHomePageApkData().get(i);
                 break;
             }
         }
@@ -420,15 +410,15 @@ public class HomePageListFragment extends ListFragment {
     class HomePageListListener implements ListArrayAdapter.ListAdapterListener {
         @Override
         public void onDownloadButtonClicked(ImplStatusTag tag) {
-            HomePageBean bean = findBeanByKey(tag.getKey());
+            HomePageApkData bean = findBeanByKey(tag.getKey());
             if (null == bean){
                 return;
             }
             switch(tag.getAction()){
                 case ImplStatusTag.ACTION_DOWNLOAD:
                     ImplAgent.downloadPackage(mActivity,
-                            bean.getPackagename(),
-                            bean.getUrl(),
+                            bean.getPackageName(),
+                            bean.getRDownloadUrl(),
                             Constant.extenStorageDirPath,
                             bean.getName() + ".apk",
                             3,
@@ -436,9 +426,9 @@ public class HomePageListFragment extends ListFragment {
                             bean.getName(),
                             "",
                             true,
-                            bean.getImgurl(),
+                            bean.getIconUrl(),
                             "",
-                            bean.getPackagename());
+                            bean.getPackageName());
                     break;
                 case ImplStatusTag.ACTION_OPEN:
                     try {
@@ -463,7 +453,7 @@ public class HomePageListFragment extends ListFragment {
         @Override
         public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
             LogUtils.i(TAG,  "onDownloadComplete key="+downloadCompleteRsp.key);
-            HomePageBean bean = findBeanByKey(downloadCompleteRsp.key);
+            HomePageApkData bean = findBeanByKey(downloadCompleteRsp.key);
             if (null != bean){
                 LogUtils.i(TAG,  "onDownloadComplete name="+bean.getName()+",status="+bean.getStatus());
                 if (bean.getStatus() <= Constant.STATUS_FAILED) {
@@ -478,7 +468,7 @@ public class HomePageListFragment extends ListFragment {
         @Override
         public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
             LogUtils.i(TAG,  "onDownloadUpdate  key="+downloadUpdateRsp.key);
-            HomePageBean bean = findBeanByKey(downloadUpdateRsp.key);
+            HomePageApkData bean = findBeanByKey(downloadUpdateRsp.key);
             if (null != bean){
                 LogUtils.i(TAG,  "onDownloadUpdate name="+bean.getName()+",status="+bean.getStatus());
                 if (bean.getStatus() <= Constant.STATUS_FAILED) {
@@ -496,7 +486,7 @@ public class HomePageListFragment extends ListFragment {
         @Override
         public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
             LogUtils.i(TAG,  "onPackageAdded key="+packageAddedRsp.key);
-            HomePageBean bean = findBeanByKey(packageAddedRsp.key);
+            HomePageApkData bean = findBeanByKey(packageAddedRsp.key);
             if (null != bean){
                 bean.setStatus(Constant.STATUS_INSTALLED);
                 LogUtils.i(TAG,  "onPackageAdded name="+bean.getName()+",status="+bean.getStatus());
@@ -506,7 +496,7 @@ public class HomePageListFragment extends ListFragment {
 
         @Override
         public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
-            HomePageBean bean = findBeanByKey(packageRemovedRsp.key);
+            HomePageApkData bean = findBeanByKey(packageRemovedRsp.key);
             if (null != bean){
                 bean.setStatus(Constant.STATUS_INIT);
                 LogUtils.i(TAG,  "onPackageRemoved key="+packageRemovedRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
@@ -516,7 +506,7 @@ public class HomePageListFragment extends ListFragment {
 
         @Override
         public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
-            HomePageBean bean = findBeanByKey(packageChangedRsp.key);
+            HomePageApkData bean = findBeanByKey(packageChangedRsp.key);
             if (null != bean){
                 bean.setStatus(Constant.STATUS_INSTALLED);
                 LogUtils.i(TAG,  "onPackageChanged key="+packageChangedRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
@@ -527,7 +517,7 @@ public class HomePageListFragment extends ListFragment {
         @Override
         public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
             LogUtils.i(TAG,  "onSystemInstallResult key="+systemInstallResultRsp.key);
-            HomePageBean bean = findBeanByKey(systemInstallResultRsp.key);
+            HomePageApkData bean = findBeanByKey(systemInstallResultRsp.key);
             if (null != bean){
                 if (systemInstallResultRsp.result == Constant.INSTALL_SUCCEEDED) {
                     bean.setStatus(Constant.STATUS_INSTALLED);
@@ -541,7 +531,7 @@ public class HomePageListFragment extends ListFragment {
 
         @Override
         public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
-            HomePageBean bean = findBeanByKey(systemDeleteResultRsp.key);
+            HomePageApkData bean = findBeanByKey(systemDeleteResultRsp.key);
             if (null != bean){
                 if (systemDeleteResultRsp.result == Constant.DELETE_SUCCEEDED) {
                     bean.setStatus(Constant.STATUS_INIT);

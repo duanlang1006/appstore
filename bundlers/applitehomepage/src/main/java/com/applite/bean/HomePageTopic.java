@@ -5,16 +5,16 @@ package com.applite.bean;
  */
 public class HomePageTopic {
     private int id;
-    private String mS_IconUrl;
-    private String mS_Name;
-    private String mS_key;
+    private String mT_IconUrl;
+    private String mT_Info;
+    private String mT_key;
     @Override
     public String toString() {
         return "HomePageTopic{" +
                 "id=" + id +
-                ", s_iconurl='" + mS_IconUrl + '\'' +
-                ", s_name='" + mS_Name + '\'' +
-                ", s_key='" + mS_key + '\'' +
+                ", t_iconurl='" + mT_IconUrl + '\'' +
+                ", t_info='" + mT_Info + '\'' +
+                ", t_key='" + mT_key + '\'' +
                 '}';
     }
 
@@ -27,26 +27,26 @@ public class HomePageTopic {
     }
 
     public String getS_IconUrl() {
-        return mS_IconUrl;
+        return mT_IconUrl;
     }
 
     public void setS_IconUrl(String mIconUrl) {
-        this.mS_IconUrl = mIconUrl;
+        this.mT_IconUrl = mIconUrl;
     }
 
-    public String getS_Name() {
-        return mS_Name;
+    public String getS_Info() {
+        return mT_Info;
     }
 
-    public void setS_Name(String mName) {
-        this.mS_Name = mName;
+    public void setS_Info(String mName) {
+        this.mT_Info = mName;
     }
 
     public String getS_key() {
-        return mS_key;
+        return mT_key;
     }
 
     public void setS_key(String mKey) {
-        this.mS_key = mKey;
+        this.mT_key = mKey;
     }
 }
