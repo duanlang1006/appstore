@@ -26,10 +26,6 @@ import java.util.Locale;
 public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
     private static final String TAG = "SectionsPagerAdapter";
     private int mChildCount = 0;
-    private List<HomePageBean> mHomePageGoods = new ArrayList<HomePageBean>();
-    private List<HomePageBean> mHomePageOrder = new ArrayList<HomePageBean>();
-    private List<HomePageTypeBean> mHomePageMainType = new ArrayList<HomePageTypeBean>();
-    private List<HomePageTab> mHPTabContents = new ArrayList<HomePageTab>();
     private Activity mActivity;
     private HomePageDataBean mHomePageDataBean;
 
@@ -48,7 +44,6 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
     public void setHomePageDataBean(HomePageDataBean mData) {
         this.mHomePageDataBean = mData;
-
         LogUtils.i(TAG, "Gson yuzm mHomePageDataBean :"
                 + mHomePageDataBean);
     }
@@ -57,14 +52,12 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
-
-        return new HomePageListFragment(mHomePageDataBean, mActivity);
-
+        return new HomePageListFragment(mHomePageDataBean.getSubjectData().get(position));
     }
 
     @Override
     public int getCount() {
-        LogUtils.i(TAG, "getCount yuzm mHomePageDataBean : " + mHomePageDataBean);
+        LogUtils.i(TAG, "getCount mHomePageDataBean : " + mHomePageDataBean);
         if (null != mHomePageDataBean)
             return mHomePageDataBean.getSubjectData().size();
         else
@@ -81,7 +74,7 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
             e.printStackTrace();
         }
         //LogUtils.i(TAG, "getPageTitle Table yuzm TabtName :" + mHomePageDataBean.getSubjectData().get(position).getS_name());
-        LogUtils.i(TAG, "getPageTitle yuzm mHomePageDataBean : " + mHomePageDataBean);
+        LogUtils.i(TAG, "getPageTitle mHomePageDataBean : " + mHomePageDataBean);
         if (null != mHomePageDataBean)
             return mHomePageDataBean.getSubjectData().get(position).getS_name();
         else
@@ -90,6 +83,7 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
         @Override
         public void notifyDataSetChanged () {
             mChildCount = getCount();
+            LogUtils.i(TAG, "getCount mChildCount : " + mChildCount);
             super.notifyDataSetChanged();
         }
 

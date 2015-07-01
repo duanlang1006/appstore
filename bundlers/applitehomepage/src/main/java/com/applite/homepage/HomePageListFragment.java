@@ -29,6 +29,7 @@ import com.applite.bean.HomePageBean;
 import com.applite.bean.HomePageDataBean;
 import com.applite.bean.HomePageTopic;
 import com.applite.bean.HomePageTypeBean;
+import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
@@ -62,7 +63,7 @@ public class HomePageListFragment extends ListFragment {
 
     private Activity mActivity;
     private Context mContext;
-    private HomePageDataBean mData;
+    private SubjectData mData;
 
     private int mTable = 0;
     private View mListFooterView;
@@ -111,13 +112,13 @@ public class HomePageListFragment extends ListFragment {
                 case MSG_LOAD_DATA:
                     switch (mTable) {
                         case 0 :
-                            listPost("goods", mData.getSubjectData().size()/10);
+                            listPost("goods", mData.getHomePageApkData().size()/10);
                             break;
                         case 1 :
-                            listPost("order", mData.getSubjectData().size()/10);
+                            listPost("order", mData.getHomePageApkData().size()/10);
                             break;
                         case 2 :
-                            listPost("maintype", mData.getSubjectData().size()/10);
+                            listPost("maintype", mData.getHomePageApkData().size()/10);
                             break;
                     }
                     LogUtils.i(TAG, "加载更多数据");
@@ -129,7 +130,7 @@ public class HomePageListFragment extends ListFragment {
 
         ;
     };
-    public HomePageListFragment(HomePageDataBean data, Activity activity) {
+    public HomePageListFragment(SubjectData data) {
         this.mData = data;
         this.mTable = mTable;
     }
@@ -250,7 +251,7 @@ public class HomePageListFragment extends ListFragment {
             ftx.commit();
             LogUtils.i(TAG, "onListItemClick.onCreate() ");
         }else{
-            HomePageApkData bean = mData.getSubjectData().get(0).getHomePageApkData().get(position);
+            HomePageApkData bean = mData.getHomePageApkData().get(position);
             try {
                 BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
                 OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
@@ -398,9 +399,9 @@ public class HomePageListFragment extends ListFragment {
 
     private HomePageApkData findBeanByKey(String key){
         HomePageApkData bean = null;
-        for (int i = 0;i<mData.getSubjectData().get(0).getHomePageApkData().size();i++){
-            if (key.equals(mData.getSubjectData().get(0).getHomePageApkData().get(i).getPackageName())){
-                bean = mData.getSubjectData().get(0).getHomePageApkData().get(i);
+        for (int i = 0;i<mData.getHomePageApkData().size();i++){
+            if (key.equals(mData.getHomePageApkData().get(i).getPackageName())){
+                bean = mData.getHomePageApkData().get(i);
                 break;
             }
         }
