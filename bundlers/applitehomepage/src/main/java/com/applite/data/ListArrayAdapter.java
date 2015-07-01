@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.applite.bean.HomePageApkData;
 import com.applite.bean.HomePageDataBean;
 import com.applite.bean.HomePageTypeBean;
 import com.applite.bean.SubjectData;
@@ -36,15 +37,12 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     private LayoutInflater mInflater = null;
     private Context mContext;
     private int layoutResourceId;
-    private HomePageDataBean mData = null;
+    private SubjectData mData = null;
     private FinalBitmap mFinalBitmap;
-
-
-
 
     private ListAdapterListener mListener = null;
 
-    public ListArrayAdapter(Context context, int resource, HomePageDataBean data,ListAdapterListener listener) {
+    public ListArrayAdapter(Context context, int resource, SubjectData data,ListAdapterListener listener) {
 
         super();
         this.mContext = context;
@@ -72,8 +70,6 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }catch (Exception e){
             e.printStackTrace();
         }
-
-
         LogUtils.i(TAG,"ListAdapter.ListAdapter()");
 
     }
@@ -81,8 +77,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     @Override
     public int getCount() {
         if(null != mData) {
-            LogUtils.i(TAG, "ListAdapter.ListAdapter() yuzm this.data.size() : " + this.mData.getSubjectData().size());
-            return this.mData.getSubjectData().size();
+            LogUtils.i(TAG, "ListAdapter.ListAdapter() yuzm this.data.size() : " + this.mData.getHomePageApkData().size());
+            return this.mData.getHomePageApkData().size();
         }
         return 0;
     }
@@ -125,44 +121,45 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        SubjectData item = null;
-        HomePageTypeBean itemType = null;
+        List<HomePageApkData> item = null;
         try {
             if (null != mData) {
                 LogUtils.i(TAG, "ListAdapter.getView position : " + position);
-                item = mData.getSubjectData().get(position);
+                item = mData.getHomePageApkData();
                 LogUtils.i(TAG, "ListAdapter.getView item : " + item);
-                String localUri = item.getHomePageApkData().get(position).getLocalUri();
+                String localUri = item.get(position).getLocalUri();
                 viewHolder.statusTag = ImplStatusTag.generateTag(mContext,
-                        item.getHomePageApkData().get(position).getPackageName(),
-                        item.getHomePageApkData().get(position).getPackageName(),
-                        item.getHomePageApkData().get(position).getName(),
-                        item.getHomePageApkData().get(position).getIconUrl(),
-                        item.getHomePageApkData().get(position).getStatus(),
-                        item.getHomePageApkData().get(position).getReason(),
-                        item.getHomePageApkData().get(position).getCurrentBytes(),
-                        item.getHomePageApkData().get(position).getTotalBytes(),
+                        item.get(position).getPackageName(),
+                        item.get(position).getPackageName(),
+                        item.get(position).getName(),
+                        item.get(position).getIconUrl(),
+                        item.get(position).getStatus(),
+                        item.get(position).getReason(),
+                        item.get(position).getCurrentBytes(),
+                        item.get(position).getTotalBytes(),
                         (null == localUri) ? null : Uri.parse(localUri),
-                        item.getHomePageApkData().get(position).getMediaType());
+                        item.get(position).getMediaType());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (null != item || null != itemType) {
+        if (null != item) {
             try {
-                mStaring = Float.parseFloat(item.getHomePageApkData().get(position).getRating().toString());
+                mStaring = Float.parseFloat(item.get(position).getRating().toString());
             } catch (Exception e) {
                 mStaring = 0.0f;
             }
-
-             viewHolder.mProgressButton.setTag(viewHolder.statusTag);
-             viewHolder.mProgressButton.setText(viewHolder.statusTag.getActionText());
-             viewHolder.mProgressButton.setOnClickListener(this);
-             viewHolder.mAppName.setText(item.getHomePageApkData().get(position).getName().toString());
-             viewHolder.mAppSize.setText(item.getHomePageApkData().get(position).getCategorySub().toString());
-             viewHolder.mRatingBar.setRating(mStaring / 2.0f);
-             mFinalBitmap.display(viewHolder.mAppIcon, item.getHomePageApkData().get(position).getIconUrl());
-
+            try {
+                //viewHolder.mProgressButton.setTag(viewHolder.statusTag);
+                //viewHolder.mProgressButton.setText(viewHolder.statusTag.getActionText());
+                viewHolder.mProgressButton.setOnClickListener(this);
+                viewHolder.mAppName.setText(item.get(position).getName().toString());
+                viewHolder.mAppSize.setText(item.get(position).getCategorySub().toString());
+                viewHolder.mRatingBar.setRating(mStaring / 2.0f);
+                mFinalBitmap.display(viewHolder.mAppIcon, item.get(position).getIconUrl());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
               //LogUtils.i(TAG, "ListAdapter.getView item : " + item);
               /*LogUtils.i(TAG, "ListAdapter.getView getM_IconUrl : " + itemType.getM_IconUrl());
               try {
@@ -222,7 +219,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         for (int i = 0; null != data && i < data.size(); i++) {
            this.mData.getSubjectData().get(i).getHomePageApkData().add(data.get(i));
         }*/
-        return this.mData.getSubjectData().size();
+        return this.mData.getHomePageApkData().size();
 
     }
 

@@ -339,8 +339,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                 setData(reuslt,mActivity);
                 msg.what = 0;
                 mHandler.sendMessage(msg);
-                mPagerSlidingTabStrip.setViewPager(mViewPager);
-                mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
+
             }
 
             @Override
@@ -390,8 +389,11 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                         }else{
                             LogUtils.e(TAG, "Handler->handleMessage");
                             mSectionsPagerAdapter.setHomePageDataBean(mHomePageDataBean);
+                            mPagerSlidingTabStrip.setViewPager(mViewPager);
+                            mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
                             mViewPager.setVisibility(View.VISIBLE);
                             mSectionsPagerAdapter.notifyDataSetChanged();
+
                         }
                     }catch (Exception e){
                         e.printStackTrace();
