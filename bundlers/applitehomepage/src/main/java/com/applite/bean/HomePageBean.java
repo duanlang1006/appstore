@@ -1,8 +1,6 @@
 package com.applite.bean;
 
-import com.applite.utils.Utils;
-
-import java.util.List;
+import com.applite.common.Constant;
 
 /**
  * Created by LSY on 15-5-22.
@@ -25,6 +23,11 @@ public class HomePageBean {
     private String mM_Name;
     private int mVersionCode;
     private int status;
+    private int reason;
+    private String localUri;
+    private String mediaType;
+    private long currentBytes;
+    private long totalBytes;
     private String mDownloadNumber;
     @Override
     public String toString() {
@@ -47,6 +50,10 @@ public class HomePageBean {
                 ", m_iconurl='" + mM_IconUrl + '\'' +
                 ", m_name='" + mM_Name + '\'' +
                 '}';
+    }
+
+    public HomePageBean() {
+        status = Constant.STATUS_INIT;
     }
 
     public int getStatus() {
@@ -169,5 +176,45 @@ public class HomePageBean {
 
     public void setDownloadNumber(String mDownloadNumber) {
         this.mDownloadNumber = mDownloadNumber;
+    }
+
+    public long getTotalBytes() {
+        return totalBytes;
+    }
+
+    public long getCurrentBytes() {
+        return currentBytes;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public String getLocalUri() {
+        return localUri;
+    }
+
+    public int getReason() {
+        return reason;
+    }
+
+    public void setTotalBytes(long totalBytes) {
+        this.totalBytes = totalBytes;
+    }
+
+    public void setCurrentBytes(long currentBytes) {
+        this.currentBytes = currentBytes;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public void setLocalUri(String localUri) {
+        this.localUri = localUri;
+    }
+
+    public void setReason(int reason) {
+        this.reason = reason;
     }
 }

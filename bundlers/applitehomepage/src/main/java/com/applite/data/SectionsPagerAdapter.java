@@ -7,12 +7,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
 
+import com.applite.common.LogUtils;
 import com.applite.homepage.HomePageListFragment;
 import com.applite.bean.HomePageBean;
 import com.applite.bean.HomePageTab;
 import com.applite.bean.HomePageTypeBean;
 import com.applite.homepage.BundleContextFactory;
-import com.applite.utils.HomePageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,7 @@ import java.util.Locale;
  */
 public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
     private static final String TAG = "SectionsPagerAdapter";
+    private int mChildCount = 0;
     private List<HomePageBean> mHomePageGoods = new ArrayList<HomePageBean>();
     private List<HomePageBean> mHomePageOrder = new ArrayList<HomePageBean>();
     private List<HomePageTypeBean> mHomePageMainType = new ArrayList<HomePageTypeBean>();
@@ -34,7 +35,7 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
     }
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-
+        super.destroyItem(container,position,object);
     }
     public void setHomePageTab(List<HomePageTab> mHomePageTab){
         mHPTabContents = mHomePageTab;
@@ -53,15 +54,16 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
+        LogUtils.d(TAG,"getItem("+position+")");
         switch(position){
             case 0:
-                HomePageUtils.i(TAG, "Table yuzm mHomePageGoods position :" + position);
+                LogUtils.i(TAG, "Table yuzm mHomePageGoods position :" + position);
                 return new HomePageListFragment(mHomePageGoods,null, position, mActivity);
             case 1:
-                HomePageUtils.i(TAG, "Table yuzm mHomePageOrder position :" + position);
+                LogUtils.i(TAG, "Table yuzm mHomePageOrder position :" + position);
                 return new HomePageListFragment(mHomePageOrder,null, position, mActivity);
             case 2:
-                HomePageUtils.i(TAG, "Table yuzm mHomePageMainType position :" + position);
+                LogUtils.i(TAG, "Table yuzm mHomePageMainType position :" + position);
                 return new HomePageListFragment(null,mHomePageMainType, position, mActivity);
             default:
                 return new HomePageListFragment(mHomePageGoods, mHomePageMainType,position, mActivity);
@@ -82,7 +84,23 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
         }catch (Exception e){
             e.printStackTrace();
         }
-        HomePageUtils.i(TAG, "getPageTitle Table yuzm TabtName :" + mHPTabContents.get(position).getName());
+        LogUtils.i(TAG, "getPageTitle Table yuzm TabtName :" + mHPTabContents.get(position).getName());
         return mHPTabContents.get(position).getName();
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        LogUtils.d(TAG,"getItemPosition("+mChildCount+")");
+        if (mChildCount > 0) {
+            mChildCount --;
+            return POSITION_NONE;
+        }
+        return super.getItemPosition(object);
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        mChildCount = getCount();
+        super.notifyDataSetChanged();
     }
 }

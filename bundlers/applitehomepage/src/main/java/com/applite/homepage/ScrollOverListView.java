@@ -7,7 +7,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
 
-import com.applite.utils.HomePageUtils;
+import com.applite.common.LogUtils;
 
 
 /**
@@ -27,19 +27,19 @@ public class ScrollOverListView extends ListView {
 	public ScrollOverListView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
-        HomePageUtils.d(TAG, "ScrollOverListView 3");
+        LogUtils.d(TAG, "ScrollOverListView 3");
 	}
 
 	public ScrollOverListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
-        HomePageUtils.d(TAG, "ScrollOverListView 2");
+        LogUtils.d(TAG, "ScrollOverListView 2");
 	}
 
 	public ScrollOverListView(Context context) {
 		super(context);
 		init();
-        HomePageUtils.d(TAG, "ScrollOverListView 1");
+        LogUtils.d(TAG, "ScrollOverListView 1");
 	}
 
 	private void init(){
@@ -49,9 +49,9 @@ public class ScrollOverListView extends ListView {
 	
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
-        HomePageUtils.d(TAG, "onInterceptTouchEvent");
+        LogUtils.d(TAG, "onInterceptTouchEvent");
 		if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-			if (DEBUG) HomePageUtils.d(TAG, "onInterceptTouchEvent Action down");
+			if (DEBUG) LogUtils.d(TAG, "onInterceptTouchEvent Action down");
 			mLastY = (int) ev.getRawY();
 		}
         //PullToRefreshListFragment pullToRefreshListFragment;
@@ -62,11 +62,11 @@ public class ScrollOverListView extends ListView {
 	public boolean onTouchEvent(MotionEvent ev) {
 		final int action = ev.getAction();
 		final int y = (int) ev.getRawY();
-        HomePageUtils.d(TAG, "onTouchEvent");
+        LogUtils.d(TAG, "onTouchEvent");
 		boolean isHandled = false;
 		switch(action){
 			case MotionEvent.ACTION_DOWN:{
-				if (DEBUG) HomePageUtils.d(TAG, "onTouchEvent action down");
+				if (DEBUG) LogUtils.d(TAG, "onTouchEvent action down");
 				mLastY = y;
 				isHandled = mOnScrollOverListener.onMotionDown(ev);
 				if (isHandled) {
@@ -76,7 +76,7 @@ public class ScrollOverListView extends ListView {
 			}
 			
 			case MotionEvent.ACTION_MOVE:{
-				if (DEBUG) HomePageUtils.d(TAG, "onTouchEvent action move");
+				if (DEBUG) LogUtils.d(TAG, "onTouchEvent action move");
 				final int childCount = getChildCount();
 				if(childCount == 0) {
 					break;
@@ -114,7 +114,7 @@ public class ScrollOverListView extends ListView {
 		        if (firstVisiblePosition + childCount >= itemCount && lastBottom <= end && deltaY < 0) {
 		        	if (DEBUG) Log.d(TAG, "action move pull up");
 		        	isHandled = mOnScrollOverListener.onListViewBottomAndPullUp(ev, deltaY);
-                    HomePageUtils.d(TAG, "onTouchEvent action move pull up yuzm isHandled : " + isHandled);
+                    LogUtils.d(TAG, "onTouchEvent action move pull up yuzm isHandled : " + isHandled);
 		        	if(isHandled){
 		        		break;
 		        	}
@@ -124,7 +124,7 @@ public class ScrollOverListView extends ListView {
 			
 			case MotionEvent.ACTION_CANCEL:
 			case MotionEvent.ACTION_UP:{
-				if (DEBUG) HomePageUtils.d(TAG, "onTouchEvent action move pull up");
+				if (DEBUG) LogUtils.d(TAG, "onTouchEvent action move pull up");
 				isHandled = mOnScrollOverListener.onMotionUp(ev);
 				if (isHandled) {
 					break;
@@ -187,7 +187,7 @@ public class ScrollOverListView extends ListView {
 	public void setTopPosition(int index){
 		if(index < 0)
 			throw new IllegalArgumentException("Top position must > 0");
-        HomePageUtils.d(TAG, "setTopPosition yuzm , index : " + index);
+        LogUtils.d(TAG, "setTopPosition yuzm , index : " + index);
 		mTopPosition = index;
 	}
 	
@@ -199,7 +199,7 @@ public class ScrollOverListView extends ListView {
 	public void setBottomPosition(int index){
 		if(index < 0)
 			throw new IllegalArgumentException("Bottom position must > 0");
-        HomePageUtils.d(TAG, "setBottomPosition yuzm , index : " + index);
+        LogUtils.d(TAG, "setBottomPosition yuzm , index : " + index);
 		mBottomPosition = index;
 	}
 
@@ -210,7 +210,7 @@ public class ScrollOverListView extends ListView {
 	 */
 	public void setOnScrollOverListener(OnScrollOverListener onScrollOverListener){
 		mOnScrollOverListener = onScrollOverListener;
-        HomePageUtils.d(TAG, "setOnScrollOverListener yuzm , index : ");
+        LogUtils.d(TAG, "setOnScrollOverListener yuzm , index : ");
 	}
 	
 	/**

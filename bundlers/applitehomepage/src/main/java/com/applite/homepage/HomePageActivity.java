@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.applite.utils.HomePageUtils;
+import com.applite.common.LogUtils;
 
 public class HomePageActivity extends FragmentActivity {
     private FragmentManager fm;
@@ -23,7 +23,7 @@ public class HomePageActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         mContext = getAndroidContext();
         setContentView(R.layout.activity_main);
-        HomePageUtils.i(TAG, "onCreate yuzm");
+        LogUtils.i(TAG, "onCreate yuzm");
         try {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             if (null != context) {
@@ -33,7 +33,7 @@ public class HomePageActivity extends FragmentActivity {
             e.printStackTrace();
         }
         if (savedInstanceState == null) {
-            hp = new HomePageFragment(mContext);
+            hp = new HomePageFragment();
             hp.setArguments(getIntent().getExtras());
             fm = getSupportFragmentManager();
             ftx = fm.beginTransaction();
@@ -45,7 +45,7 @@ public class HomePageActivity extends FragmentActivity {
     }
     //Add by zhimin.yu
     public Activity getAndroidContext() {
-        HomePageUtils.i(TAG, "getAndroidContext yuzm this : " + this);
+        LogUtils.i(TAG, "getAndroidContext yuzm this : " + this);
         return this;
     }
     public void SetFragment(){
@@ -54,37 +54,37 @@ public class HomePageActivity extends FragmentActivity {
     @Override
     public void onStart(){
         super.onStart();
-        HomePageUtils.i(TAG, "onStart yuzm");
+        LogUtils.i(TAG, "onStart yuzm");
     }
     @Override
     public void onPause(){
         super.onPause();
-        HomePageUtils.i(TAG, "onPause yuzm");
+        LogUtils.i(TAG, "onPause yuzm");
     }
     @Override
     public void onResume(){
         super.onResume();
-        HomePageUtils.i(TAG, "onResume yuzm");
+        LogUtils.i(TAG, "onResume yuzm");
     }
     @Override
     public void onResumeFragments(){
         super.onResumeFragments();
-        HomePageUtils.i(TAG, "onResume yuzm");
+        LogUtils.i(TAG, "onResume yuzm");
     }
     @Override
     public void onStop(){
         super.onStop();
-        HomePageUtils.i(TAG, "onStop yuzm");
+        LogUtils.i(TAG, "onStop yuzm");
     }
     @Override
     public void onDestroy(){
         super.onDestroy();
-        HomePageUtils.i(TAG, "onDestroy yuzm");
+        LogUtils.i(TAG, "onDestroy yuzm");
     }
     @Override
     public void onRestart(){
         super.onRestart();
-        HomePageUtils.i(TAG, "onRestart yuzm");
+        LogUtils.i(TAG, "onRestart yuzm");
     }
 
     @Override
@@ -111,7 +111,7 @@ public class HomePageActivity extends FragmentActivity {
 
     //@Override
     public void onToOtherFragment() {
-        hpOther = new HomePageFragment(getAndroidContext());
+        hpOther = new HomePageFragment();
         fm = getSupportFragmentManager();
         ftx = fm.beginTransaction();
         ftx.hide(hp);
