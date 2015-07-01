@@ -38,7 +38,6 @@ import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by yuzhimin on 6/17/15.
@@ -96,74 +95,71 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        LogUtils.d(TAG, "onAttach activity : " + activity+","+this.getId()+","+mNode);
         mActivity = activity;
+
+        LogUtils.d(TAG, "onAttach activity : " + activity+","+this.getId()+","+mNode);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        LogUtils.d(TAG, "onCreate savedInstanceState : " + savedInstanceState);
         super.onCreate(savedInstanceState);
+
+        LogUtils.d(TAG, "onCreate savedInstanceState : " + savedInstanceState);
         //getArguments();
     }
 
     @Override
     public void onStart(){
         super.onStart();
+
         LogUtils.i(TAG, "onStart");
     }
 
     @Override
     public void onPause(){
         super.onPause();
+
         LogUtils.i(TAG, "onPause");
     }
 
     @Override
     public void onResume(){
         super.onResume();
+
         LogUtils.i(TAG, "onResume");
     }
 
     @Override
     public void onStop(){
         super.onStop();
+
         LogUtils.i(TAG, "onStop");
     }
 
     @Override
     public void onDestroy(){
-        super.onDestroyView();
+        super.onDestroy();
+
         LogUtils.i(TAG, "onDestroy");
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        PagerAdapter adapter = mViewPager.getAdapter();
-        if (null != adapter) {
-            for (int i = 0; i < mViewPager.getAdapter().getCount(); i++) {
-                Fragment f = (Fragment) mViewPager.getAdapter().instantiateItem(mViewPager, i);
-                if (null != f) {
-                    ft.remove(f);
-                }
-            }
-            ft.commit();
-        }
     }
 
     @Override
     public void onDetach(){
         super.onDetach();
+
         LogUtils.i(TAG, "onDetach");
     }
 
     @Override
     public void onDestroyView(){
         super.onDestroyView();
+
         LogUtils.i(TAG, "onDestroyView");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        LogUtils.d(TAG, "onCreateView");
         LayoutInflater mInflater = inflater;
         try {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
@@ -208,6 +204,8 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }else{
             mViewPager.setVisibility(View.VISIBLE);
         }
+
+        LogUtils.d(TAG, "onCreateView");
         return rootView;
     }
 
