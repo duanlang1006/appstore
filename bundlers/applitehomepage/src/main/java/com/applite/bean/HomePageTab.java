@@ -8,7 +8,7 @@ public class HomePageTab {
     private int id;
     private String s_name;
     private String s_key;
-
+    private boolean isTopic;
     @Override
     public String toString() {
         return "HomePageTab{" +
@@ -17,7 +17,12 @@ public class HomePageTab {
                 ", s_name='" + s_name + '\'' +
                 '}';
     }
-
+    public void setTopicStatus(boolean b){
+        this.isTopic = b;
+    }
+    public boolean getTopicStatus(){
+        return isTopic;
+    };
     public int getId() {
         return id;
     }
