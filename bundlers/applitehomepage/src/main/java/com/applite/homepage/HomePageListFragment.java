@@ -177,7 +177,6 @@ public class HomePageListFragment extends ListFragment {
 
         getListView().setOnScrollListener(mOnScrollListener);
         mListAdapter = new ListArrayAdapter(mActivity,
-                R.layout.fragment_list,
                 mData,
                 mListAdapterListener);
         setListAdapter(mListAdapter);
@@ -362,7 +361,6 @@ public class HomePageListFragment extends ListFragment {
             LogUtils.i( TAG," mJson : " + mJson);
             if (null == mListAdapter){
                 mListAdapter = new ListArrayAdapter(mActivity,
-                        R.layout.fragment_list,
                         mData,
                         mListAdapterListener);
                 getListView().setAdapter(mListAdapter);
