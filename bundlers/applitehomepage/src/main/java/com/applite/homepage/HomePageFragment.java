@@ -2,6 +2,7 @@ package com.applite.homepage;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -9,12 +10,24 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
+
 import com.applite.bean.HomePageTypeBean;
+import com.applite.bean.ScreenBean;
+import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
 import com.applite.data.SectionsPagerAdapter;
 import com.applite.utils.SPUtils;
@@ -22,15 +35,21 @@ import com.applite.bean.HomePageBean;
 import com.applite.bean.HomePageTab;
 import com.applite.utils.HomePageUtils;
 import com.applite.utils.Utils;
+
+import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
+import net.tsz.afinal.http.HttpHandler;
+
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +72,19 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     private int mTableType = 0;
     private boolean isMainType = false;
     private static int mNode;
+    private ViewGroup rootView;
+    private View popView;
+    private PopupWindow popupWindow;
+    private LayoutInflater mInflater;
+
+    private List<ScreenBean> mScreenBeanList = new ArrayList<ScreenBean>();
+    private FinalBitmap mFinalBitmap;
+    private String mPopImgUrl;
+    private boolean mPopIsClick = false;
+    private String mPopImgName;
+    private long mPopStartTime;
+    private long mPopEndTime;
+
     public HomePageFragment(Context activity) {
         //mActivity = activity;
     }
@@ -123,6 +155,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         //getArguments();
         HomePageUtils.i(TAG, "onCreate yuzm");
+        mFinalBitmap = FinalBitmap.create(mActivity);
     }
     @Override
     public void onStart(){
@@ -163,7 +196,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        LayoutInflater mInflater = inflater;
+        mInflater = inflater;
         try {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             HomePageUtils.d(TAG, "bundle context=" + context);
@@ -182,7 +215,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }else {
             postMainType();
         }
-        ViewGroup rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_activity_page, container, false);
+        rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_activity_page, container, false);
         mSectionsPagerAdapter = new SectionsPagerAdapter(this.getFragmentManager(),mActivity);
         // Set up the ViewPager with the sections adapter.
         mSectionsPagerAdapter.setHomePageTab(mHPTabContents);
@@ -210,8 +243,173 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }else{
             mViewPager.setVisibility(View.VISIBLE);
         }
+
+        popupWindowPost();
         return rootView;
     }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden){
+            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            actionBar.show();
+        }
+    }
+
+    /**
+     * 插屏请求
+     */
+    private void popupWindowPost(){
+        LogUtils.i(TAG, "插屏网络请求");
+        AjaxParams params = new AjaxParams();
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.put("packagename", mActivity.getPackageName());
+        params.put("app", "applite");
+        params.put("type","screen");
+        mFinalHttp.post(Constant.URL,params,new AjaxCallBack<Object>() {
+            @Override
+            public void onSuccess(Object o) {
+                super.onSuccess(o);
+                String result = (String) o;
+                setData(result);
+                LogUtils.i(TAG, "插屏网络请求成功，result:" + result);
+            }
+
+            @Override
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
+                super.onFailure(t, errorNo, strMsg);
+                LogUtils.e(TAG, "插屏网络请求失败，strMsg:" + strMsg);
+            }
+        });
+    }
+
+    /**
+     * 解析插屏返回数据
+     *
+     * @param result
+     */
+    private void setData(String result) {
+        try {
+            JSONObject object = new JSONObject(result);
+            String app_key = object.getString("app_key");
+            String info = object.getString("plaque_info");
+            if (!TextUtils.isEmpty(info)) {
+                JSONArray array = new JSONArray(info);
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject obj = new JSONObject(array.get(i).toString());
+                    mPopImgName = obj.getString("pl_name");
+                    String spt_key = obj.getString("spt_key");
+                    mPopImgUrl = obj.getString("pl_iconurl");
+                    mPopStartTime = obj.getLong("pl_starttime") * 1000;
+                    mPopEndTime = obj.getLong("pl_endtime") * 1000;
+                }
+                download(mPopImgName+".jpg",mPopImgUrl);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 下载文件
+     */
+    private void download(final String name , String url) {
+        HttpHandler mHttpHandler = mFinalHttp.download(url, //这里是下载的路径
+                AppliteUtils.getAppDir(name), //这是保存到本地的路径
+                true,//true:断点续传 false:不断点续传（全新下载）
+                new AjaxCallBack<File>() {
+
+                    @Override
+                    public void onLoading(long count, long current) {
+                        LogUtils.i(TAG, "下载进度：" + current + "/" + count);
+                    }
+
+                    @Override
+                    public void onSuccess(File t) {
+                        LogUtils.i(TAG, name + "下载成功");
+                        LogUtils.i(TAG, "Utils.getAppDir(name):" + AppliteUtils.getAppDir(name));
+                        SPUtils.put(mActivity, SPUtils.POP_IMG_SAVE_PATH, AppliteUtils.getAppDir(name));
+//                        if (System.currentTimeMillis() > mPopStartTime && System.currentTimeMillis() < mPopEndTime){
+//                            if(SPUtils.get(mActivity,SPUtils.POP_IMGURL,"").equals(mPopImgUrl)){
+//                                if (!(boolean)SPUtils.get(mActivity,SPUtils.POP_IMGURL_ISCLICK,false))
+//                                    initPopuWindow();
+//                            }else {
+                                initPopuWindow();
+//                            }
+//                        }
+//                        SPUtils.put(mActivity,SPUtils.POP_IMGURL,mPopImgUrl);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t, int errorNo, String strMsg) {
+                        super.onFailure(t, errorNo, strMsg);
+                        LogUtils.e(TAG, name + "下载失败，strMsg：" + strMsg);
+                    }
+                });
+    }
+
+    private View.OnClickListener mScreenClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            SPUtils.put(mActivity,SPUtils.POP_IMGURL_ISCLICK,mPopIsClick);
+            switch (v.getId()){
+                case R.id.pop_img_exit:
+                    popupWindow.dismiss();
+                    break;
+                case R.id.pop_img_img:
+
+                    break;
+            }
+        }
+    };
+
+    /**
+     * 实例化PopuWindow
+     */
+    public void initPopuWindow() {
+        if (popupWindow == null) {
+            popView = mInflater.inflate(R.layout.popupwindow_img,null);
+            ImageView mExitView = (ImageView) popView.findViewById(R.id.pop_img_exit);
+            ImageView mImgView = (ImageView) popView.findViewById(R.id.pop_img_img);
+            mExitView.setOnClickListener(mScreenClickListener);
+            mImgView.setOnClickListener(mScreenClickListener);
+            mImgView.setImageBitmap(AppliteUtils.getLoacalBitmap(
+                    (String) SPUtils.get(mActivity, SPUtils.POP_IMG_SAVE_PATH, "")));
+
+            popupWindow = new PopupWindow(popView,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+        ColorDrawable cd = new ColorDrawable(0x000000);
+        popupWindow.setBackgroundDrawable(cd);
+        // 产生背景变暗效果
+        WindowManager.LayoutParams lp = mActivity.getWindow().getAttributes();
+        lp.alpha = 0.4f;
+        mActivity.getWindow().setAttributes(lp);
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setFocusable(true);
+        popupWindow.showAtLocation(rootView.findViewById(R.id.homepage_content), Gravity.CENTER
+                | Gravity.CENTER_HORIZONTAL, 0, 0);
+
+        popupWindow.update();
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            // 在dismiss中恢复透明度
+            public void onDismiss() {
+                WindowManager.LayoutParams lp = mActivity.getWindow()
+                        .getAttributes();
+                lp.alpha = 1f;
+                mActivity.getWindow().setAttributes(lp);
+            }
+        });
+    }
+
+//    private void initViewPop() {
+//        ImageView mExitView = (ImageView) rootView.findViewById(R.id.pop_exit);
+//        GridView mGridView = (GridView) rootView.findViewById(R.id.pop_gv);
+//        TextView mTextView = (TextView) rootView.findViewById(R.id.pop_text);
+//        Button mButton = (Button) rootView.findViewById(R.id.pop_button);
+//    }
 
     @Override
     public void onClick(View v) {

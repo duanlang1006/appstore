@@ -9,19 +9,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.applite.common.Constant;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.main.BundleContextFactory;
-import com.mit.applite.search.main.SearchFragment;
-import com.mit.applite.search.utils.KeyBoardUtils;
 import com.mit.applite.search.utils.SearchUtils;
 
 import net.tsz.afinal.FinalBitmap;
-
-import org.apkplug.Bundle.ApkplugOSGIService;
-import org.apkplug.Bundle.OSGIServiceAgent;
-import org.osgi.framework.BundleContext;
 
 import java.util.List;
 
@@ -31,7 +24,6 @@ import java.util.List;
 public class HotWordAdapter extends BaseAdapter {
 
     private final FinalBitmap mFinalBitmap;
-    private closeKeybordListener mListener;
     private Context context;
     private List<HotWordBean> mHotWordBeans;
     private LayoutInflater mInflater;
@@ -39,7 +31,6 @@ public class HotWordAdapter extends BaseAdapter {
     public HotWordAdapter(Context context, List<HotWordBean> mHotWordBeans) {
         this.mHotWordBeans = mHotWordBeans;
         mFinalBitmap = FinalBitmap.create(context);
-        mListener = (closeKeybordListener) context;
         try {
             Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             this.context = mContext;
@@ -89,18 +80,10 @@ public class HotWordAdapter extends BaseAdapter {
         viewholder.mLl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.closeKeybord();
                 SearchUtils.toDetailFragment(data.getmPackageName(), data.getmName(), data.getmImgUrl());
             }
         });
         return convertView;
-    }
-
-    /**
-     * 隐藏软键盘的接口
-     */
-    public interface closeKeybordListener {
-        void closeKeybord();
     }
 
     class ViewHolder {
