@@ -122,7 +122,6 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(mOnScrollListener);
         mListAdapter = new ListArrayAdapter(mActivity,
-                R.layout.fragment_list,
                 mData,
                 mListAdapterListener);
         mListView.setAdapter(mListAdapter);
