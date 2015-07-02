@@ -76,9 +76,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
     @Override
     public int getCount() {
-        if(null != mData) {
-            LogUtils.i(TAG, "ListAdapter.ListAdapter() yuzm this.data.size() : " + this.mData.getHomePageApkData().size());
-            return this.mData.getHomePageApkData().size();
+        List<HomePageApkData> apkList = mData.getHomePageApkData();
+        if(null != apkList) {
+            LogUtils.i(TAG, "ListAdapter.ListAdapter() yuzm this.data.size() : " + apkList.size());
+            return apkList.size();
         }
         return 0;
     }
@@ -121,31 +122,25 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        List<HomePageApkData> item = null;
-        try {
-            if (null != mData) {
-                LogUtils.i(TAG, "ListAdapter.getView position : " + position);
-                item = mData.getHomePageApkData();
-                LogUtils.i(TAG, "ListAdapter.getView item : " + item);
-                String localUri = item.get(position).getLocalUri();
-                viewHolder.statusTag = ImplStatusTag.generateTag(mContext,
-                        item.get(position).getPackageName(),
-                        item.get(position).getPackageName(),
-                        item.get(position).getName(),
-                        item.get(position).getIconUrl(),
-                        item.get(position).getStatus(),
-                        item.get(position).getReason(),
-                        item.get(position).getCurrentBytes(),
-                        item.get(position).getTotalBytes(),
-                        (null == localUri) ? null : Uri.parse(localUri),
-                        item.get(position).getMediaType());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (null != mData) {
+            viewHolder.data = mData.getHomePageApkData().get(position);
+            String localUri = viewHolder.data.getLocalUri();
+            viewHolder.statusTag = ImplStatusTag.generateTag(mContext,
+                    viewHolder.data.getPackageName(),
+                    viewHolder.data.getPackageName(),
+                    viewHolder.data.getName(),
+                    viewHolder.data.getIconUrl(),
+                    viewHolder.data.getStatus(),
+                    viewHolder.data.getReason(),
+                    viewHolder.data.getCurrentBytes(),
+                    viewHolder.data.getTotalBytes(),
+                    (null == localUri) ? null : Uri.parse(localUri),
+                    viewHolder.data.getMediaType());
+
         }
-        if (null != item) {
+        if (null != viewHolder.data) {
             try {
-                mStaring = Float.parseFloat(item.get(position).getRating().toString());
+                mStaring = Float.parseFloat(viewHolder.data.getRating().toString());
             } catch (Exception e) {
                 mStaring = 0.0f;
             }
@@ -153,10 +148,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 //viewHolder.mProgressButton.setTag(viewHolder.statusTag);
                 //viewHolder.mProgressButton.setText(viewHolder.statusTag.getActionText());
                 viewHolder.mProgressButton.setOnClickListener(this);
-                viewHolder.mAppName.setText(item.get(position).getName().toString());
-                viewHolder.mAppSize.setText(item.get(position).getCategorySub().toString());
+                viewHolder.mAppName.setText(viewHolder.data.getName().toString());
+                viewHolder.mAppSize.setText(viewHolder.data.getCategorySub().toString());
                 viewHolder.mRatingBar.setRating(mStaring / 2.0f);
-                mFinalBitmap.display(viewHolder.mAppIcon, item.get(position).getIconUrl());
+                mFinalBitmap.display(viewHolder.mAppIcon, viewHolder.data.getIconUrl());
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -223,7 +218,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
     }
 
-    class ViewHolder {
+    public class ViewHolder {
         ImageView mAppIcon;
         TextView mAppName;
         TextView mAppSize;
@@ -231,6 +226,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         ImageView mImageView;
         Button mProgressButton;
         ImplStatusTag statusTag;
+        HomePageApkData data;
 
         ViewHolder(View mView){
             this.mAppIcon = (ImageView) mView.findViewById(R.id.imageViewName);
@@ -247,6 +243,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
         public void setStatusTag(ImplStatusTag statusTag) {
             this.statusTag = statusTag;
+        }
+
+        public HomePageApkData getData() {
+            return data;
         }
     }
 

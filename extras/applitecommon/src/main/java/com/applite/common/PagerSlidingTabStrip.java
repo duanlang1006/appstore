@@ -594,6 +594,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 
     public static PagerSlidingTabStrip inflate(Context context,ViewGroup root,boolean attach){
         LayoutInflater mInflater=LayoutInflater.from(context);
+        mInflater = mInflater.cloneInContext(context);
         return (PagerSlidingTabStrip)mInflater.inflate(R.layout.pager_sliding_tab, root,attach);
     }
 

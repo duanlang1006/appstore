@@ -39,7 +39,7 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-
+        super.destroyItem(container, position, object);
     }
 
     public void setHomePageDataBean(HomePageDataBean mData) {
@@ -80,11 +80,20 @@ public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
         else
             return "";
     }
-        @Override
-        public void notifyDataSetChanged () {
-            mChildCount = getCount();
-            LogUtils.i(TAG, "getCount mChildCount : " + mChildCount);
-            super.notifyDataSetChanged();
-        }
 
+    @Override
+    public void notifyDataSetChanged () {
+        mChildCount = getCount();
+        LogUtils.i(TAG, "getCount mChildCount : " + mChildCount);
+        super.notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        if (mChildCount > 0){
+            mChildCount -- ;
+            return POSITION_NONE;
+        }
+        return super.getItemPosition(object);
+    }
 }

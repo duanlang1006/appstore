@@ -9,8 +9,9 @@ public class SubjectData {
     private String s_key;
     private String s_name;
     private String s_datatype;
-    private List<SpecialTopicData> specialtopic_data;
-    private List<HomePageApkData> data;
+    private int step;               //步长
+    private List<SpecialTopicData> specialtopic_data; //专题数据
+    private List<HomePageApkData> data;     //apk数据
 
     public String getS_Key() {
         return s_key;
@@ -46,6 +47,22 @@ public class SubjectData {
     }
     public void setSpecialTopicData(List<SpecialTopicData> mTopicData) {
         this.specialtopic_data = mTopicData;
+    }
+
+    public int getStep() {
+        return step;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
+    }
+
+    public void update(SubjectData other){
+        this.s_key = other.s_key;
+        this.s_name = other.s_name;
+        this.s_datatype = other.s_datatype;
+        this.specialtopic_data = other.specialtopic_data;
+        this.data = other.data;
     }
 
     @Override

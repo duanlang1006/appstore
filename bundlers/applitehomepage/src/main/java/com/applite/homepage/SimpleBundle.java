@@ -16,6 +16,7 @@ import java.util.Hashtable;
 public class SimpleBundle implements BundleActivator{
     static final String TAG = "main_simplebundle";
     private ServiceRegistration mServiceReg = null;
+    private ServiceRegistration mServiceTopicReg = null;
 
     public void start(BundleContext mcontext){
         BundleContextFactory.getInstance().setBundleContext(mcontext);
@@ -29,12 +30,23 @@ public class SimpleBundle implements BundleActivator{
                 ApkplugOSGIService.class.getName(),
                 service,
                 properties);
+
+        properties.put("serviceName", Constant.OSGI_SERVICE_TOPIC_FRAGMENT);
+        //注册一个服务给Host调用
+        mServiceTopicReg = mcontext.registerService(
+                ApkplugOSGIService.class.getName(),
+                service,
+                properties);
     }
    
     public void stop(BundleContext mcontext){
         LogUtils.d(TAG,"simplebundle stop");
         if (null != mServiceReg){
             mServiceReg.unregister();
+        }
+
+        if (null != mServiceTopicReg){
+            mServiceTopicReg.unregister();
         }
     }
 }
