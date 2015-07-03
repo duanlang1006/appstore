@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -346,8 +347,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.action_personal:
-//                launchDownloadManagerFragment();
-                launchUpgradeFragment();
+                launchPersonalFragment();
                 break;
             case R.id.action_search:
                 launchSearchFragment();
@@ -395,25 +395,6 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     }
 
     /****
-     * 下载管理
-     */
-    private void launchDownloadManagerFragment() {
-        try {
-            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            agent.getService().ApkplugOSGIService(bundleContext,
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,
-                    0, Constant.OSGI_SERVICE_DM_FRAGMENT);
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
-    }
-
-    /****
      * 搜索
      */
     private void launchSearchFragment() {
@@ -432,23 +413,15 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-    /**
-     * 升级
+    /***
+     * 进入个人中心
      */
-    private void launchUpgradeFragment() {
-        try {
-            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName="+Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            agent.getService().ApkplugOSGIService(bundleContext,
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,
-                    0, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
+    private void launchPersonalFragment() {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(getId(),new PersonalFragment());
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     /**
