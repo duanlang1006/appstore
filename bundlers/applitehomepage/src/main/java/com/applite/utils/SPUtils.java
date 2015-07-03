@@ -29,6 +29,12 @@ public class SPUtils {
     public static final String LOGO_START_SHOW_TIME = "homepage_start_show_time";
     public static final String LOGO_END_SHOW_TIME = "homepage_end_show_time";
 
+    public static final String POP_START_TIME = "pop_start_time";
+    public static final String POP_END_TIME = "pop_end_time";
+    public static final String POP_IMGURL = "pop_imgurl";
+    public static final String POP_IMGURL_ISCLICK = "pop_imgurl_isclick";
+    public static final String POP_IMG_SAVE_PATH = "pop_img_save_path";
+
     /**
      * 保存数据的方法，我们需要拿到保存数据的具体类型，然后根据类型调用不同的保存方法
      *

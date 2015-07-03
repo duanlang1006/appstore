@@ -583,7 +583,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         if (System.currentTimeMillis() / 1000 >= (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_START_SHOW_TIME, 0L) &&
                 System.currentTimeMillis() / 1000 <= (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_END_SHOW_TIME, 0L)) {
             if (!TextUtils.isEmpty((String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, ""))) {
-                mLogoIV.setImageBitmap(GuideUtils.getLoacalBitmap(
+                mLogoIV.setImageBitmap(AppliteUtils.getLoacalBitmap(
                         (String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, "")));
             }
         }
