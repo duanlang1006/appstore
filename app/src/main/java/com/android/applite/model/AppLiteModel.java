@@ -662,6 +662,9 @@ public class AppLiteModel{
             }
         }else if ("com.dataservice.broadcast".equals(action)){
             Log.d(TAG,"recv com.dataservice.broadcast");
+            String stringValue=intent.getStringExtra("intent");
+            String [] temp = null;
+            temp = stringValue.split(",");
         }
     }
     
