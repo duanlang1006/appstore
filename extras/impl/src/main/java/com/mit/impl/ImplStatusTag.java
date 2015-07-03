@@ -127,6 +127,12 @@ public class ImplStatusTag {
         tag.setIconUrl(iconUrl);
         ImplLog.d("impl_status","status="+status);
         switch (status) {
+            case Constant.STATUS_INIT:
+                tag.setAction(ImplStatusTag.ACTION_DOWNLOAD);
+                tag.setActionText(mResources.getString(R.string.action_install));
+                tag.setStatusText("");
+                tag.setDescText(sizeText);
+                break;
             case Constant.STATUS_FAILED:
                 tag.setAction(ImplStatusTag.ACTION_DOWNLOAD);
                 tag.setActionText(mResources.getString(R.string.action_retry));

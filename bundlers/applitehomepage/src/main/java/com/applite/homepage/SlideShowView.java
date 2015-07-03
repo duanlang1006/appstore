@@ -83,7 +83,7 @@ public class SlideShowView extends FrameLayout implements View.OnClickListener{
         mInflater = mInflater.cloneInContext(context);
         mFinalBitmap = FinalBitmap.create(this.context);
 
-        mInflater.inflate(R.layout.layout_slideshow, this, true);
+        mInflater.inflate(R.layout.slideshow, this, true);
         dotLayout = (LinearLayout)findViewById(R.id.dotLayout);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setFocusable(true);
@@ -255,9 +255,9 @@ public class SlideShowView extends FrameLayout implements View.OnClickListener{
             currentItem = pos;
             for(int i=0;i < dotViewsList.size();i++){
                 if(i == pos){
-                    ((View)dotViewsList.get(pos)).setBackgroundResource(R.drawable.dot_focus);
+                    ((View)dotViewsList.get(pos)).setBackgroundResource(R.drawable.page_indicator_focused);
                 }else {
-                    ((View)dotViewsList.get(i)).setBackgroundResource(R.drawable.dot_blur);
+                    ((View)dotViewsList.get(i)).setBackgroundResource(R.drawable.page_indicator_unfocused);
                 }
             }
         }

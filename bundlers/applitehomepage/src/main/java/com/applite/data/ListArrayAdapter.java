@@ -11,23 +11,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-
 import com.applite.bean.HomePageApkData;
-import com.applite.bean.HomePageDataBean;
-
 import com.applite.bean.SubjectData;
-import com.applite.bean.HomePageBean;
-import com.applite.common.LogUtils;
 import com.applite.homepage.BundleContextFactory;
 import com.mit.impl.ImplStatusTag;
 import com.applite.homepage.R;
 import net.tsz.afinal.FinalBitmap;
-
 import java.lang.reflect.Field;
-
 import java.util.List;
-
-//import android.widget.RelativeLayout.LayoutParams;
 
 /**
  * Created by yuzhimin on 6/17/15.
@@ -42,84 +33,53 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     private ListAdapterListener mListener = null;
     int layoutResourceId = 0;
     public ListArrayAdapter(Context context, SubjectData data,ListAdapterListener listener) {
-
-        super();
         this.mContext = context;
         this.mData = data;
         this.mListener = listener;
         mFinalBitmap = FinalBitmap.create(context);
 
-        LogUtils.i(TAG, "-----------------");
-        if(null != mData) {
-            for (int i = 0; i < mData.getHomePageApkData().size(); i++) {
-                LogUtils.i(TAG, "ListAdapter.ListAdapter() yuzm mData.get(" + i +
-                        ").getName() : " + mData.getHomePageApkData().get(i).getName()
-                        + "/n getIconUrl : " + mData.getHomePageApkData().get(i).getIconUrl());
-            }
-        }
-        LogUtils.i(TAG, "-----------------");
         mInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         try {
-
-            mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            if (null != mContext) {
-                mInflater = LayoutInflater.from(mContext);
-                mInflater = mInflater.cloneInContext(mContext);
-
-                Field field=R.layout.class.getField(mData.getS_DataType());
-                layoutResourceId= field.getInt(new R.layout());
-
-            }
+            Context mcontext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
+            mInflater = LayoutInflater.from(mcontext);
+            mInflater = mInflater.cloneInContext(mcontext);
         }catch (Exception e){
             e.printStackTrace();
         }
-        LogUtils.i(TAG,"ListAdapter.ListAdapter()");
-
+        try {
+            Field field = R.layout.class.getField(mData.getS_datatype());
+            layoutResourceId = field.getInt(new R.layout());
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public int getCount() {
-        List<HomePageApkData> apkList = mData.getHomePageApkData();
+        List<HomePageApkData> apkList = mData.getData();
         if(null != apkList) {
-            LogUtils.i(TAG, "ListAdapter.ListAdapter() yuzm this.data.size() : " + apkList.size());
             return apkList.size();
         }
         return 0;
     }
 
     @Override
-    public HomePageBean getItem(int position) {
-        LogUtils.i(TAG,"ListAdapter.getItem() position : " + position);
+    public Object getItem(int position) {
         return null;
     }
 
     @Override
     public long getItemId(int position) {
-        LogUtils.i(TAG,"ListAdapter.getItemId() position : " + position);
         if (position == 0)
             return 0;
         else
             return position-1;
     }
-    @Override
-    public int getItemViewType(int position) {
-        LogUtils.i(TAG,"ListAdapter.getItemViewType() position : " + position);
-        return position > 0 ? 0 : 1;
-
-    }
-    @Override
-    public int getViewTypeCount() {
-        LogUtils.i(TAG,"ListAdapter.getItemViewType() ");
-        return 2;
-    }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        float mStaring = 0.0f;
         ViewHolder viewHolder = null;
-
-
         if (convertView == null) {
             convertView = mInflater.inflate(layoutResourceId, parent, false);
             viewHolder = new ViewHolder(convertView);
@@ -128,63 +88,34 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (null != mData) {
-            viewHolder.data = mData.getHomePageApkData().get(position);
-            String localUri = viewHolder.data.getLocalUri();
-            viewHolder.statusTag = ImplStatusTag.generateTag(mContext,
-                    viewHolder.data.getPackageName(),
-                    viewHolder.data.getPackageName(),
-                    viewHolder.data.getName(),
-                    viewHolder.data.getIconUrl(),
-                    viewHolder.data.getStatus(),
-                    viewHolder.data.getReason(),
-                    viewHolder.data.getCurrentBytes(),
-                    viewHolder.data.getTotalBytes(),
+        if (null != mData && null != mData.getData()) {
+            HomePageApkData itemData = mData.getData().get(position);
+            viewHolder.setItemData(itemData);
+            String localUri = itemData.getLocalUri();
+            viewHolder.setStatusTag(ImplStatusTag.generateTag(mContext,
+                    itemData.getPackageName(),
+                    itemData.getPackageName(),
+                    itemData.getName(),
+                    itemData.getIconUrl(),
+                    itemData.getStatus(),
+                    itemData.getReason(),
+                    itemData.getCurrentBytes(),
+                    itemData.getTotalBytes(),
                     (null == localUri) ? null : Uri.parse(localUri),
-                    viewHolder.data.getMediaType());
-
-        }
-        if (null != viewHolder.data) {
+                    itemData.getMediaType()));
+            viewHolder.setLayoutStr(mData.getS_datatype());
+            float star = 0.0f;
             try {
-                mStaring = Float.parseFloat(viewHolder.data.getRating().toString());
+                star = Float.parseFloat(itemData.getRating());
             } catch (Exception e) {
-                mStaring = 0.0f;
             }
-
-            //viewHolder.mProgressButton.setTag(viewHolder.statusTag);
-            //viewHolder.mProgressButton.setText(viewHolder.statusTag.getActionText());
-            if (null != viewHolder.mProgressButton) {
-                viewHolder.mProgressButton.setOnClickListener(this);
-            }
-            String mString =null;
-            mString = viewHolder.data.getName().toString();
-            if(null != mString) {
-                viewHolder.mAppName.setText(mString);
-            }
-            if(null !=viewHolder.data.getCategorySub()) {
-                mString = viewHolder.data.getCategorySub().toString();
-                if (null != mString) {
-                    viewHolder.mAppSize.setText(mString);
-                }
-                mString = null;
-            }
-            if(null !=viewHolder.data.getRating()) {
-                mString = viewHolder.data.getRating().toString();
-                if (null != mString) {
-                    viewHolder.mRatingBar.setRating(mStaring / 2.0f);
-                }
-                mString = null;
-            }
-            if(null !=viewHolder.data.getIconUrl()) {
-                mString = viewHolder.data.getIconUrl().toString();
-                if (null != mString) {
-                    mFinalBitmap.display(viewHolder.mAppIcon, mString);
-                }
-                mString = null;
-            }
+            viewHolder.setmRatingBar(star/2.0f);
+            viewHolder.setmProgressButton(viewHolder.statusTag);
+            viewHolder.setmAppIcon(itemData.getIconUrl());
+            viewHolder.setmAppSize(itemData.getCategorysub());
+            viewHolder.setmAppName(itemData.getName());
         }
         return convertView;
-
     }
 
     @Override
@@ -200,52 +131,77 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
     }
 
-    public void setDownloadListener(ListAdapterListener l){
-        mListener = l;
-    }
-
-    public int setData(HomePageDataBean data) {
-        LogUtils.i(TAG, "ListAdapter.setData before data : " + data +
-                "data.size() : " + data.getSubjectData().size());
-        //HomePageUtils.i(TAG, "ListAdapter.setData before mData.size() : " + mData.size());
-        /*LogUtils.i(TAG, "getView() Thread.currentThread().getId() : " +
-                Thread.currentThread().getId());
-        for (int i = 0; null != data && i < data.size(); i++) {
-           this.mData.getSubjectData().get(i).getHomePageApkData().add(data.get(i));
-        }*/
-        return this.mData.getHomePageApkData().size();
-
-    }
-
     public class ViewHolder {
-        ImageView mAppIcon;
-        TextView mAppName;
-        TextView mAppSize;
-        RatingBar mRatingBar;
-        ImageView mImageView;
-        Button mProgressButton;
-        ImplStatusTag statusTag;
-        HomePageApkData data;
+        private ImageView mAppIcon;
+        private TextView mAppName;
+        private TextView mAppSize;
+        private RatingBar mRatingBar;
+        private Button mProgressButton;
+
+        private ImplStatusTag statusTag;
+        private HomePageApkData itemData;
+        private String layoutStr;
 
         ViewHolder(View mView){
             this.mAppIcon = (ImageView) mView.findViewById(R.id.imageViewName);
             this.mAppName = (TextView) mView.findViewById(R.id.textView);
             this.mAppSize = (TextView) mView.findViewById(R.id.textView2);
             this.mRatingBar = (RatingBar) mView.findViewById(R.id.ratingbar_Indicator);
-            this.mImageView = (ImageView) mView.findViewById(R.id.imageView);
             this.mProgressButton = (Button) mView.findViewById(R.id.list_item_progress_button);
         }
-
         public ImplStatusTag getStatusTag() {
             return statusTag;
         }
-
         public void setStatusTag(ImplStatusTag statusTag) {
             this.statusTag = statusTag;
         }
 
-        public HomePageApkData getData() {
-            return data;
+        public void setmAppIcon(String iconUrl) {
+            if (null != this.mAppIcon && null != iconUrl){
+                mFinalBitmap.display(this.mAppIcon, iconUrl);
+            }
+        }
+
+        public void setmAppName(String name) {
+            if (null != this.mAppName && null != name) {
+                this.mAppName.setText(name);
+            }
+        }
+
+        public void setmAppSize(String size) {
+            if (null != this.mAppSize && null != size) {
+                this.mAppSize.setText(size);
+            }
+        }
+
+        public void setmRatingBar(float rating) {
+            if (null != mRatingBar) {
+                this.mRatingBar.setRating(rating);
+            }
+        }
+
+        public void setmProgressButton(ImplStatusTag statusTag) {
+            if (null != mProgressButton){
+                mProgressButton.setTag(statusTag);
+                mProgressButton.setText(statusTag.getActionText());
+                mProgressButton.setOnClickListener(ListArrayAdapter.this);
+            }
+        }
+
+        public HomePageApkData getItemData() {
+            return itemData;
+        }
+
+        public void setItemData(HomePageApkData itemData) {
+            this.itemData = itemData;
+        }
+
+        public String getLayoutStr() {
+            return layoutStr;
+        }
+
+        public void setLayoutStr(String layoutStr) {
+            this.layoutStr = layoutStr;
         }
     }
 

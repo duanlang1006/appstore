@@ -6,17 +6,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ListFragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import com.applite.bean.HomePageApkData;
+import com.applite.bean.HomePageDataBean;
 import com.applite.bean.SpecialTopicData;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
@@ -32,8 +32,6 @@ import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 
 import java.util.ArrayList;
@@ -57,23 +55,11 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     private SlideShowView mTopicView;
     private ListArrayAdapter mListAdapter = null;
     private int mCurCheckPosition = 0;
+    private boolean showHome = false;
     private ImplListener mImplListener = new HomePageImplListener();
     private HomePageListListener mListAdapterListener = new HomePageListListener();
     private MySlideViewListener mSlideViewListener = new MySlideViewListener();
     private MyScrollListener mOnScrollListener = new MyScrollListener();
-    private Handler mHandler = new Handler() {
-        public void handleMessage(android.os.Message msg) {
-            switch (msg.what) {
-                case MSG_LOAD_DATA:
-                    httpRequest();
-                    LogUtils.i(TAG, "加载更多数据");
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
 
     public HomePageListFragment(SubjectData data) {
         this.mData = data;
@@ -83,12 +69,17 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LogUtils.i(TAG, "ListFragment.onCreate() ");
+        Bundle b = getArguments();
+        if (null != b){
+            showHome = true;
+        }
     }
 
     @Override
     public void onAttach(Activity activity) {
         LogUtils.i(TAG, "onAttach ");
         super.onAttach(activity);
+        setHasOptionsMenu(true);
         mActivity = activity;
         ImplAgent.registerImplListener(mImplListener);
     }
@@ -107,12 +98,12 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         } catch (Exception e) {
             e.printStackTrace();
         }
-        View rootView = mInflater.inflate(R.layout.fragment_item_list, container, false);
+        View rootView = mInflater.inflate(R.layout.fragment_homepage_list, container, false);
 
         // Set the adapter
         mListView = (ListView) rootView.findViewById(android.R.id.list);
 
-        if (null == mData || null == mData.getHomePageApkData() || mData.getHomePageApkData().size() == 0){
+        if (null == mData || null == mData.getData() || mData.getData().size() == 0){
             httpRequest();
         }
 
@@ -125,6 +116,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
                 mData,
                 mListAdapterListener);
         mListView.setAdapter(mListAdapter);
+        initActionBar();
         return rootView;
     }
 
@@ -151,28 +143,12 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        LogUtils.i(TAG, "onResume ");
-    }
-
-    @Override
-    public void onStart() {
-        LogUtils.i(TAG, "onStart ");
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        LogUtils.i(TAG, "onStop");
-    }
-    @Override
     public void onDetach(){
         super.onDetach();
         LogUtils.i(TAG, "onDetach ");
         ImplAgent.unregisterImplListener(mImplListener);
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -181,22 +157,40 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case android.R.id.home:
+                ((FragmentActivity)mActivity).getSupportFragmentManager().popBackStack();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (mData.getS_DataType().equals("1")) {
-            //homePageFragment.postMainType(mActivity);
-            FragmentManager fm;
-            FragmentTransaction ftx;
-            HomePageFragment hp = new HomePageFragment();
-            hp.setMainType(true);
-            fm = ((FragmentActivity)mActivity).getSupportFragmentManager();
-            ftx = fm.beginTransaction();
-            ftx.replace(hp.getNode(), hp);
-            ftx.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-            ftx.commit();
-            LogUtils.i(TAG, "onListItemClick.onCreate() ");
-        }else{
-            ListArrayAdapter.ViewHolder viewHolder = (ListArrayAdapter.ViewHolder)view.getTag();
-            HomePageApkData apkData = viewHolder.getData();
+        ListArrayAdapter.ViewHolder viewHolder = (ListArrayAdapter.ViewHolder)view.getTag();
+        if (null == viewHolder){
+            return;
+        }
+        HomePageApkData itemData = viewHolder.getItemData();
+        if (null == itemData){
+            return;
+        }
+        if (viewHolder.getLayoutStr().equals("fragment_categorylist")) {
+            try {
+                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+                        bundleContext, ApkplugOSGIService.class,
+                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
+                        OSGIServiceAgent.real_time);   //每次都重新查询
+                agent.getService().ApkplugOSGIService(bundleContext,
+                        Constant.OSGI_SERVICE_MAIN_FRAGMENT,
+                        0, Constant.OSGI_SERVICE_MAIN_FRAGMENT,itemData.getKey(),itemData.getName());
+            } catch (Exception e) {
+                // TODO 自动生成的 catch 块
+                e.printStackTrace();
+            }
+        }else if (viewHolder.getLayoutStr().equals("fragment_apklist")){
             try {
                 BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
                 OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
@@ -206,9 +200,9 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
                 agent.getService().ApkplugOSGIService(bundleContext,
                         Constant.OSGI_SERVICE_DM_FRAGMENT,
                         0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
-                        apkData.getPackageName(),
-                        apkData.getName(),
-                        apkData.getIconUrl());
+                        itemData.getPackageName(),
+                        itemData.getName(),
+                        itemData.getIconUrl());
             } catch (Exception e) {
                 // T
                 e.printStackTrace();
@@ -216,8 +210,23 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         }
     }
 
+    private void initActionBar(){
+        try {
+            if (showHome) {
+                ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setTitle(mData.getS_name());
+                actionBar.show();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     private void setTopicView(Context context){
-        List<SpecialTopicData> topicList = (null == mData)?null:mData.getSpecialTopicData();
+        List<SpecialTopicData> topicList = (null == mData)?null:mData.getSpecialtopic_data();
         if (null != topicList && topicList.size()>0){
             String[] urls = new String[topicList.size()];
             for(int i = 0;i < topicList.size();i++){
@@ -234,17 +243,17 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         if (null != mMoreView){
             mListView.removeFooterView(mMoreView);
         }
-        mMoreView = inflater.inflate(R.layout.load, null);
+        mMoreView = inflater.inflate(R.layout.more, null);
         mListView.addFooterView(mMoreView);
     }
 
     private void httpRequest() {
-        if(null == mFinalHttp) {
-            mFinalHttp = new FinalHttp();
-        }
         int page = 0;
-        if (null != mData.getHomePageApkData()) {
-            page = mData.getHomePageApkData().size() / 10;
+        if (null != mData.getData()) {
+            page = mData.getData().size() / mData.getStep();
+            if (mData.getData().size()% mData.getStep() != 0){
+                page ++;
+            }
         }
         LogUtils.d(TAG, "httpRequest  mPage : " + page);
         AjaxParams params = new AjaxParams();
@@ -254,39 +263,44 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         params.put("app", "applite");
         params.put("type", "hptab");
         params.put("page", String.valueOf(page));
-        params.put("tabtype", mData.getS_Key());
+        params.put("tabtype", mData.getS_key());
         mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
-                String result = (String) o;
-                LogUtils.i(TAG, "HomePage网络请求成功， result:" + result);
-                try {
-                    String dataStr = new JSONObject(result).get(mData.getS_Key()+"_data").toString();
-                    JSONArray dataArray = new JSONArray(dataStr);
-                    for (int i = 0;i < dataArray.length(); i++) {
-                        HomePageApkData apkData = gson.fromJson((String) dataArray.get(i).toString(), HomePageApkData.class);
-                        mData.getHomePageApkData().add(apkData);
+                LogUtils.i(TAG, "HomePageList网络请求成功，" + (String)o);
+                HomePageDataBean pageData = gson.fromJson((String)o, HomePageDataBean.class);
+                if (null != pageData && null != pageData.getSubjectData()){
+                    for (int i = 0;i < pageData.getSubjectData().size(); i++) {
+                        SubjectData subject = pageData.getSubjectData().get(i);
+                        if (subject.getS_key().equals(mData.getS_key())){
+                            mData.setS_datatype(subject.getS_datatype());
+                            mData.setStep(subject.getStep());
+                            if (null != subject.getData()) {
+                                mData.getData().addAll(subject.getData());
+                            }
+                            break;
+                        }
                     }
-                    mListAdapter.notifyDataSetChanged();
-                }catch(Exception e){
-                    e.printStackTrace();
                 }
+                mListAdapter.notifyDataSetChanged();
+                mMoreView.setVisibility(View.GONE);
             }
 
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
                 LogUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
+                mMoreView.setVisibility(View.GONE);
             }
         });
     }
 
     private HomePageApkData findBeanByKey(String key){
         HomePageApkData bean = null;
-        for (int i = 0;i<mData.getHomePageApkData().size();i++){
-            if (key.equals(mData.getHomePageApkData().get(i).getPackageName())){
-                bean = mData.getHomePageApkData().get(i);
+        for (int i = 0;i<mData.getData().size();i++){
+            if (key.equals(mData.getData().get(i).getPackageName())){
+                bean = mData.getData().get(i);
                 break;
             }
         }
@@ -304,7 +318,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
                 case ImplStatusTag.ACTION_DOWNLOAD:
                     ImplAgent.downloadPackage(mActivity,
                             bean.getPackageName(),
-                            bean.getRDownloadUrl(),
+                            bean.getrDownloadUrl(),
                             Constant.extenStorageDirPath,
                             bean.getName() + ".apk",
                             3,
@@ -440,8 +454,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
             if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
                 LogUtils.i(TAG, "拉到最底部");
                 mMoreView.setVisibility(view.VISIBLE);
-//                mSearchPostPage = mSearchPostPage + 1;
-                mHandler.sendEmptyMessage(MSG_LOAD_DATA);
+                httpRequest();
                 isLastRow = false;
             }
         }
@@ -460,12 +473,14 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     class MySlideViewListener implements SlideShowView.OnSlideViewClickListener{
         @Override
         public void onClick(View v, int position) {
-            SpecialTopicData topicData = mData.getSpecialTopicData().get(position);
+            SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
             SubjectData data = new SubjectData();
-            data.setS_Key(topicData.t_key);
+            data.setS_key(topicData.t_key);
             data.setS_name(topicData.t_info);
-            data.setHomePageApkData(new ArrayList<HomePageApkData>());
-            data.setSpecialTopicData(null);
+            data.setStep(mData.getStep());
+            data.setS_datatype(mData.getS_datatype());
+            data.setData(new ArrayList<HomePageApkData>());
+            data.setSpecialtopic_data(null);
             try {
                 BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
                 OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
