@@ -4,51 +4,42 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
-import android.widget.TextView;
-
-import com.applite.bean.HomePageTypeBean;
 import com.applite.bean.ScreenBean;
+import com.applite.bean.HomePageDataBean;
+import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
-import com.applite.data.SectionsPagerAdapter;
 import com.applite.utils.SPUtils;
-import com.applite.bean.HomePageBean;
-import com.applite.bean.HomePageTab;
-import com.applite.utils.HomePageUtils;
-import com.applite.utils.Utils;
-
 import net.tsz.afinal.FinalBitmap;
+import com.google.gson.Gson;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
 import net.tsz.afinal.http.HttpHandler;
-
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,26 +48,10 @@ import java.util.List;
  * Created by yuzhimin on 6/17/15.
  */
 public class HomePageFragment extends Fragment implements View.OnClickListener{
-    SectionsPagerAdapter mSectionsPagerAdapter;
-    ViewPager mViewPager;
-    PagerSlidingTabStrip mPagerSlidingTabStrip;
-
-    private final String TAG = "HomePageFragment";
+    private final String TAG = "homepage_PagerFragment";
     private Activity mActivity;
-    private FinalHttp mFinalHttp;
-    private List<HomePageBean> mHomePageGoods = new ArrayList<HomePageBean>();
-    private List<HomePageBean> mHomePageOrder = new ArrayList<HomePageBean>();
-    private List<HomePageTypeBean> mHomePageMainType = new ArrayList<HomePageTypeBean>();
-
-    private List<HomePageTab> mHPTabContents = new ArrayList<HomePageTab>();
-    private int mTableType = 0;
-    private boolean isMainType = false;
-    private static int mNode;
-    private ViewGroup rootView;
     private View popView;
     private PopupWindow popupWindow;
-    private LayoutInflater mInflater;
-
     private List<ScreenBean> mScreenBeanList = new ArrayList<ScreenBean>();
     private FinalBitmap mFinalBitmap;
     private String mPopImgUrl;
@@ -85,166 +60,115 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     private long mPopStartTime;
     private long mPopEndTime;
 
-    public HomePageFragment(Context activity) {
-        //mActivity = activity;
-    }
-    int mNum;
+    private LayoutInflater mInflater;
+    private ViewPager mViewPager;
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private PagerSlidingTabStrip mPagerSlidingTabStrip;
 
-    /**
-     * Create a new instance of HomePageFragment, providing "num"
-     * as an argument.
-     */
-    static HomePageFragment newInstance(int num , Context context) {
-        HomePageFragment f = new HomePageFragment(context);
-        // Supply num input as an argument.
-        Bundle args = new Bundle();
-        args.putInt("num", num);
-        f.setArguments(args);
-        return f;
-    }
-    public void setMainType(Boolean b){
-        isMainType =b;
-    }
-    public void saveNode(int mNode){
-        HomePageFragment.mNode = mNode;
-    }
-    public int getNode(){
-        return mNode;
-    }
-    public Boolean getMainType(){
-        return isMainType;
-    }
+    private Gson mGson;
+    private FinalHttp mFinalHttp;
+    private List<SubjectData> mPageData;
 
-    public int getShownIndex() {
-        return getArguments().getInt("index", 0);
+    private String mCategory;   //null：首页   非null:分类
+    private String mTitle;
 
-    }
     private final ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int i, float v, int i2) {
-            mTableType = i;
-            HomePageUtils.d(TAG, "onPageScrolled mTableType : " + mTableType);
         }
 
         @Override
         public void onPageSelected(int i) {
-            mTableType = i;
-            HomePageUtils.d(TAG,"onPageSelected  yuzm mTableType : "+mTableType);
         }
 
         @Override
         public void onPageScrollStateChanged(int i) {
-            HomePageUtils.d(TAG, "onPageScrollStateChanged yuzm mTableType : "+mTableType);
         }
     };
 
+    Runnable mRefreshRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (null == mPageData){
+                mViewPager.setVisibility(View.GONE);
+            }else{
+                mViewPager.setVisibility(View.VISIBLE);
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
+            mPagerSlidingTabStrip.setViewPager(mViewPager);
+//            mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
+        }
+    };
+    private ViewGroup rootView;
+
     public HomePageFragment() {
-        setHasOptionsMenu(true);
+        mGson = new Gson();
+        mFinalHttp = new FinalHttp();
+        mPageData = null;
     }
-    public HomePageFragment(boolean isMainType) {
-        this.isMainType = isMainType;
-    }
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        HomePageUtils.d(TAG, "onAttach yuzm activity : " + activity);
-        mActivity = activity;
-    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        HomePageUtils.d(TAG, "onCreate yuzm savedInstanceState : " + savedInstanceState);
         super.onCreate(savedInstanceState);
-        //getArguments();
-        HomePageUtils.i(TAG, "onCreate yuzm");
-        mFinalBitmap = FinalBitmap.create(mActivity);
+        LogUtils.d(TAG, "onCreate savedInstanceState : " + savedInstanceState);
+        mCategory = null;
+        Bundle b = getArguments();
+        if (null != b){
+            mCategory = b.getString("param1");
+            mTitle = b.getString("param2");
+        }
+        setHasOptionsMenu(true);
     }
-    @Override
-    public void onStart(){
-        super.onStart();
-        HomePageUtils.i(TAG, "onStart yuzm");
-    }
-    @Override
-    public void onPause(){
-        super.onPause();
-        HomePageUtils.i(TAG, "onStart yuzm");
-    }
-    @Override
-    public void onResume(){
-        super.onResume();
-        HomePageUtils.i(TAG, "onResume yuzm");
 
-    }
     @Override
-    public void onStop(){
-        super.onStop();
-        HomePageUtils.i(TAG, "onStop yuzm");
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity = activity;
+        LogUtils.d(TAG, "onAttach ");
     }
-    @Override
-    public void onDestroy(){
-        super.onDestroyView();
-        HomePageUtils.i(TAG, "onDestroy yuzm");
-    }
+
     @Override
     public void onDetach(){
         super.onDetach();
-        HomePageUtils.i(TAG, "onDetach yuzm");
+        LogUtils.i(TAG, "onDetach");
     }
+
     @Override
-    public void onDestroyView(){
-        super.onDestroyView();
-        HomePageUtils.i(TAG, "onDestroyView yuzm");
+    public void onDestroy(){
+        super.onDestroy();
+        LogUtils.i(TAG, "onDestroy");
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mInflater = inflater;
         try {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            HomePageUtils.d(TAG, "bundle context=" + context);
             if (null != context) {
                 mInflater = LayoutInflater.from(context);
                 mInflater = mInflater.cloneInContext(context);
-                HomePageUtils.d(TAG,"bundle mInflater="+mInflater);
             }
         }catch (Exception e){
             e.printStackTrace();
         }
-        HomePageUtils.d(TAG, "onCreateView yuzm  mInflater : " + mInflater);
-        mFinalHttp = new FinalHttp();
-        if(!getMainType()) {
-            post();
-        }else {
-            postMainType();
-        }
-        rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_activity_page, container, false);
-        mSectionsPagerAdapter = new SectionsPagerAdapter(this.getFragmentManager(),mActivity);
-        // Set up the ViewPager with the sections adapter.
-        mSectionsPagerAdapter.setHomePageTab(mHPTabContents);
-        mSectionsPagerAdapter.setHomePageGoods(mHomePageGoods);
-        mSectionsPagerAdapter.setHomePageOrders(mHomePageOrder);
-        mSectionsPagerAdapter.setHomePageMainType(mHomePageMainType);
+
+        rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_homepage_main, container, false);
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        //加入滑动tab管理viewPager
-        mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,container,false);
-        rootView.addView(mPagerSlidingTabStrip,0);
-        mPagerSlidingTabStrip.setViewPager(mViewPager);
-        mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
-
-        //actionbar custom view
-        View customView = mInflater.inflate(R.layout.custom_actionbar_main,container,false);
-        customView.findViewById(R.id.action_dm).setOnClickListener(this);
-        customView.findViewById(R.id.action_search).setOnClickListener(this);
-        customView.findViewById(R.id.action_upgrade).setOnClickListener(this);
-        initActionBar(customView);
-
-        if (mHPTabContents.size() == 0){
+        initActionBar();
+        if (null == mPageData){
             mViewPager.setVisibility(View.GONE);
         }else{
             mViewPager.setVisibility(View.VISIBLE);
         }
+        mPagerSlidingTabStrip.setViewPager(mViewPager);
 
+        httpRequest();
         popupWindowPost();
+        LogUtils.d(TAG, "onCreateView");
         return rootView;
     }
 
@@ -411,44 +335,62 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 //        Button mButton = (Button) rootView.findViewById(R.id.pop_button);
 //    }
 
+    public void onDestroyView(){
+        super.onDestroyView();
+        LogUtils.i(TAG, "onDestroyView");
+    }
+
     @Override
     public void onClick(View v) {
         switch(v.getId()){
-            case R.id.action_dm:
-                launchDownloadManagerFragment();
+            case R.id.action_personal:
+//                launchDownloadManagerFragment();
+                launchUpgradeFragment();
                 break;
             case R.id.action_search:
                 launchSearchFragment();
                 break;
-            case R.id.action_upgrade:
-                launchUpgradeFragment();
-                break;
         }
     }
 
-    private void initActionBar(View customView){
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case android.R.id.home:
+                ((FragmentActivity)mActivity).getSupportFragmentManager().popBackStack();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void initActionBar(){
         try {
+            ViewGroup customView = (ViewGroup)mInflater.inflate(R.layout.actionbar_custom,null);
+            View personal = customView.findViewById(R.id.action_personal);
+            personal.setOnClickListener(this);
+            View search = customView.findViewById(R.id.action_search);
+            search.setOnClickListener(this);
+            //加入滑动tab管理viewPager
+            mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,null,false);
+            customView.addView(mPagerSlidingTabStrip,1);
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-            Log.d(TAG, "initActionBar,customView=" + customView);
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-            actionBar.setDisplayHomeAsUpEnabled(false);
-            actionBar.setTitle("测试");
+            if (null == mCategory) {
+                personal.setVisibility(View.VISIBLE);
+                actionBar.setDisplayHomeAsUpEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(false);
+            }else{
+                actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setTitle(mTitle);
+                personal.setVisibility(View.GONE);
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
             actionBar.setCustomView(customView);
-//            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-//            actionBar.addTab(actionBar.newTab()
-//                    .setText("home")
-//                    .setTag(0)
-//                    .setTabListener(mBarTabListener));
-//            actionBar.addTab(actionBar.newTab()
-//                    .setText("game")
-//                    .setTag(1)
-//                    .setTabListener(mBarTabListener));
             actionBar.show();
         }catch (Exception e){
             e.printStackTrace();
         }
     }
-
 
     /****
      * 下载管理
@@ -507,229 +449,92 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-    public void postMainType(){
-        AjaxParams params = new AjaxParams();
-
-        FinalHttp   mMainFinalHttp = new FinalHttp();
-
-        params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
-        params.put("packagename", "com.android.applite1.0");
-        params.put("type", "hpmaintype");
-        params.put("categorytype", "m_game");
-        mMainFinalHttp.post(Utils.URL, params, new AjaxCallBack<Object>() {
-            @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
-                Message msg = new Message();
-                String reuslt = (String) o;
-                HomePageUtils.i(TAG, "HomePage网络请求成功，yuzm reuslt:" + reuslt);
-                setData(reuslt,mActivity);
-                msg.what = 1;
-                mHandler.sendMessage(msg);
-                mPagerSlidingTabStrip.setViewPager(mViewPager);
-                mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
-            }
-
-            @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
-                HomePageUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
-            }
-        });
-    }
     /**
      * HomePage网络请求
      */
-    public void post() {
-        //Message msg = new Message();
-        if(null == mFinalHttp) {
-            mFinalHttp = new FinalHttp();
-        }
+    private void httpRequest() {
         AjaxParams params = new AjaxParams();
-        params.put("appkey", Utils.getMitMetaDataValue(mActivity, Utils.META_DATA_MIT));
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", "com.android.applite1.0");
-        //params.put("packagename",Utils.getPackgeName(this));
+//        params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
-        params.put("type", "homepage");
-        params.put("tabTitle", "tabtitle");
-        mFinalHttp.post(Utils.URL, params, new AjaxCallBack<Object>() {
+        if (null == mCategory) {
+            params.put("type", "homepage");
+            params.put("tabTitle", "tabtitle");
+        }else{
+            params.put("type", "hpmaintype");
+            params.put("categorytype", mCategory);
+        }
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
-                Message msg = new Message();
-                String reuslt = (String) o;
-                HomePageUtils.i(TAG, "HomePage网络请求成功，yuzm reuslt:" + reuslt);
-                setData(reuslt,mActivity);
-                msg.what = 0;
-                mHandler.sendMessage(msg);
-                mPagerSlidingTabStrip.setViewPager(mViewPager);
-                mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
+                LogUtils.d(TAG,"首页数据："+o.toString());
+                try {
+                    HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
+                    if (1 == data.getAppKey()){
+                        mPageData = data.getSubjectData();
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
+                mActivity.runOnUiThread(mRefreshRunnable);
             }
 
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
-                HomePageUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
+                LogUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
             }
         });
     }
-    /**
-     * 设置数据
-     *
-     * @param data
-     */
-    public void setData(final String data,final Activity mActivity) {
-        HomePageBean hpBeanGoods = null;
-        HomePageBean hpBeanOrders = null;
-        HomePageTypeBean hpBeanMainType = null;
-        HomePageTab hpTab = null;
-        try {
-            JSONObject obj = new JSONObject(data);
-            HomePageUtils.i(TAG, "setData JSONObject data，yuzm obj : " + obj);
-            int app_key = obj.getInt("app_key");
-            String tabStr = obj.getString("subject_data");
-            HomePageUtils.i(TAG, " setData JSONObject data，yuzm tabStr : " + tabStr);
-            JSONArray subjectData = new JSONArray(tabStr);
-            HomePageUtils.i(TAG, "setData JSONObject data,yuzm subjectData : " + subjectData);
-            mHPTabContents.clear();
-            for (int j = 0; j < subjectData.length(); j++) {
-                JSONObject object = new JSONObject(subjectData.get(j).toString());
-                //HomePageUtils.i(TAG, "setData JSONObject data，S_name : " + object.getString("s_name"));
-                hpTab = new HomePageTab();
-                hpTab.setId(1 + (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0));
-                hpTab.setName(object.getString("s_name"));
-                hpTab.setKey(object.getString("s_key"));
-                //HomePageUtils.i(TAG, "setData JSONObject data，hpTab.getName() : " + hpTab.getName());
-                mHPTabContents.add(hpTab);
-                SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
-                        (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);
+
+    class SectionsPagerAdapter extends FragmentStatePagerAdapter {
+        private static final String TAG = "SectionsPagerAdapter";
+        private int mChildCount = 0;
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            super.destroyItem(container, position, object);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return new HomePageListFragment(mPageData.get(position));
+        }
+
+        @Override
+        public int getCount() {
+            return (null != mPageData)?mPageData.size():0;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if (null != mPageData)
+                return mPageData.get(position).getS_name();
+            else
+                return "";
+        }
+
+        @Override
+        public void notifyDataSetChanged () {
+            mChildCount = getCount();
+            super.notifyDataSetChanged();
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            if (mChildCount > 0){
+                mChildCount -- ;
+                return POSITION_NONE;
             }
-            //goods_data
-            String goods_data = obj.getString("goods_data");
-            JSONArray goods_json = new JSONArray(goods_data);
-            //HomePageUtils.i(TAG, "setData JSONObject data，json : " + json);
-            HomePageUtils.i( TAG,"yuzm goods_json.length() : " + goods_json.length());
-            HomePageUtils.i( TAG,"yuzm goods_json : " + goods_json);
-            for (int i = 0; i < goods_json.length(); i++) {
-                JSONObject object = new JSONObject(goods_json.get(i).toString());
-                hpBeanGoods = new HomePageBean();
-                hpBeanGoods.setId(1 + (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0));
-                hpBeanGoods.setPackagename(object.getString("packageName"));
-                hpBeanGoods.setName(object.getString("name"));
-                hpBeanGoods.setImgurl(object.getString("iconUrl"));
-                hpBeanGoods.setUrl(object.getString("rDownloadUrl"));
-                hpBeanGoods.setApkSize(object.getString("apkSize"));
-                hpBeanGoods.setRating(object.getString("rating"));
-                hpBeanGoods.setBrief(object.getString("brief"));
-                hpBeanGoods.setBoxLabel(object.getString("boxLabel"));
-                hpBeanGoods.setCategoryMain(object.getString("categorymain"));
-                hpBeanGoods.setCategorySub(object.getString("categorysub"));
-                hpBeanGoods.setDownloadTimes(object.getString("downloadTimes"));
-                hpBeanGoods.setVersionName(object.getString("versionName"));
-                hpBeanGoods.setmVersionCode(object.getInt("versionCode"));
-                hpBeanGoods.setStatus(Utils.isAppInstalled(mActivity, hpBeanGoods.getPackagename(), hpBeanGoods.getmVersionCode()));
-                mHomePageGoods.add(hpBeanGoods);
-                SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
-                        (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);
-            }
-            //order_data
-            String order_data = obj.getString("order_data");
-            JSONArray orderJson = new JSONArray(order_data);
-            //HomePageUtils.i( TAG," orderJson.length() : " + orderJson.length());
-            HomePageUtils.i( TAG,"yuzm orderJson : " + orderJson);
-            //HomePageUtils.i(TAG, "setData JSONObject data，json : " + json);
-            HomePageUtils.i(TAG,"yuzm orderJson.length() : " + orderJson.length());
-            for (int i = 0; i < orderJson.length(); i++) {
-                JSONObject object = new JSONObject(orderJson.get(i).toString());
-                hpBeanOrders = new HomePageBean();
-                hpBeanOrders.setId(1 + (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0));
-                hpBeanOrders.setPackagename(object.getString("packageName"));
-                hpBeanOrders.setName(object.getString("name"));
-                hpBeanOrders.setImgurl(object.getString("iconUrl"));
-                hpBeanOrders.setUrl(object.getString("rDownloadUrl"));
-                hpBeanOrders.setApkSize(object.getString("apkSize"));
-                hpBeanOrders.setRating(object.getString("rating"));
-                hpBeanOrders.setBrief(object.getString("brief"));
-                hpBeanOrders.setBoxLabel(object.getString("boxLabel"));
-                hpBeanOrders.setCategoryMain(object.getString("categorymain"));
-                hpBeanOrders.setCategorySub(object.getString("categorysub"));
-                hpBeanOrders.setDownloadTimes(object.getString("downloadTimes"));
-                hpBeanOrders.setVersionName(object.getString("versionName"));
-                hpBeanOrders.setmVersionCode(object.getInt("versionCode"));
-                hpBeanOrders.setStatus(Utils.isAppInstalled(mActivity, hpBeanOrders.getPackagename(), hpBeanOrders.getmVersionCode()));
-                mHomePageOrder.add(hpBeanOrders);
-                SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
-                        (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);
-            }
-            //MainType_data
-            String mMainType_data = obj.getString("maintype_data");
-            JSONArray mMainType_json = new JSONArray(mMainType_data);
-            HomePageUtils.i(TAG, "yuzm mMainType_json.length() : " + mMainType_json.length());
-            HomePageUtils.i(TAG, "yuzm mMainType_json : " + mMainType_json);
-            for (int i = 0; i < mMainType_json.length(); i++) {
-                JSONObject object = new JSONObject(mMainType_json.get(i).toString());
-                hpBeanMainType = new HomePageTypeBean();
-                hpBeanMainType.setId(1 + (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0));
-                hpBeanMainType.setM_Name(object.getString("m_name"));
-                hpBeanMainType.setM_IconUrl(object.getString("m_iconurl"));
-                hpBeanMainType.setM_key("m_key");
-                mHomePageMainType.add(hpBeanMainType);
-                SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
-                        (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);
-            }
-            //addAllAppView(mGuideContents);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            HomePageUtils.e(TAG, "HomePageJSON解析异常");
+            return super.getItemPosition(object);
         }
     }
-    /**
-     * 异步回调回来并处理数据
-     */
-    public Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 0:
-                    try {
-                        if (mHPTabContents.size() == 0){
-                            mViewPager.setVisibility(View.GONE);
-                        }else{
-                            HomePageUtils.e(TAG, "Handler->handleMessage yuzm");
-                            mViewPager.setVisibility(View.VISIBLE);
-                            mSectionsPagerAdapter.notifyDataSetChanged();
-                        }
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                    break;
-                case 1:
-                    HomePageUtils.e(TAG, "Handler->handleMessage yuzm mHPTabContents : "
-                            + mHPTabContents + " ; mViewPager : " + mViewPager +
-                            " ; mSectionsPagerAdapter : " + mSectionsPagerAdapter);
-                    try {
-                        if (mHPTabContents.size() == 0){
-                            mViewPager.setVisibility(View.GONE);
-                        }else{
-                            HomePageUtils.e(TAG, "Handler->handleMessage yuzm");
-                            mViewPager.setVisibility(View.VISIBLE);
-                            mSectionsPagerAdapter.notifyDataSetChanged();
-                        }
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                    break;
-                case 2:
-
-                    break;
-                case 3:
-
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 }
 

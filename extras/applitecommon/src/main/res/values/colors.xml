@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="background_tab_pressed">#6633B5E5</color>
+    <color name="slidetab_text_color">#ffAAAAAA</color>
+    <color name="slidetab_selected_text_color">#ff00FF00</color>
+    <color name="slidetab_indicator_color">#FF773E</color>
+    <color name="slidetab_underline_color">#ff7700</color>
 </resources>

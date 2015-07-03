@@ -1,23 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">AppliteLogo</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">ApplitHome</string>
     <string name="action_settings">Settings</string>
 
-    <integer name="guide_tohome">1</integer>
-
-    <string name="title_activity_search">SearchActivity</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_detail">DetailActivity</string>
-
-    <string name="download"> Download </string>
-    <string name="install">Install</string>
-    <string name="pause"> Pause </string>
-    <string name="open">Open</string>
-    <string name="update">Update</string>
-    <string name="wan"> Wan </string>
-    <string name="keep_on">Keep on</string>
-    <string name="title_activity_main">AppliteHomePage</string>
-
+    <string name="load_more">loading...</string>
 </resources>

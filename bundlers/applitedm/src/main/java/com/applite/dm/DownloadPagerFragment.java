@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -34,7 +35,7 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
         ImplLog.d(TAG, "onAttach,"+this);
         super.onAttach(activity);
         mActivity = activity;
-        hasOptionsMenu();
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -79,14 +80,17 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        for (int i = 0;i < mViewPager.getAdapter().getCount();i++){
-            Fragment f = (Fragment)mViewPager.getAdapter().instantiateItem(mViewPager,i);
-            if (null != f){
-                ft.remove(f);
+        PagerAdapter adapter = mViewPager.getAdapter();
+        if (null != adapter) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            for (int i = 0; i < mViewPager.getAdapter().getCount(); i++) {
+                Fragment f = (Fragment) mViewPager.getAdapter().instantiateItem(mViewPager, i);
+                if (null != f) {
+                    ft.remove(f);
+                }
             }
+            ft.commit();
         }
-        ft.commit();
     }
 
     @Override
@@ -103,6 +107,7 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
         try {
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setCustomView(customView);
             actionBar.show();

@@ -7,6 +7,7 @@ public class Constant {
 
     public static final String OSGI_SERVICE_LOGO_FRAGMENT = "osgi.service.logo.fragment";
     public static final String OSGI_SERVICE_MAIN_FRAGMENT = "osgi.service.main.fragment";
+    public static final String OSGI_SERVICE_TOPIC_FRAGMENT = "osgi.service.topic.fragment";
     public static final String OSGI_SERVICE_SETTING_FRAGMENT = "osgi.service.setting.fragment";
     public static final String OSGI_SERVICE_SEARCH_FRAGMENT = "osgi.service.search.fragment";
     public static final String OSGI_SERVICE_DM_FRAGMENT = "osgi.service.dm.fragment";

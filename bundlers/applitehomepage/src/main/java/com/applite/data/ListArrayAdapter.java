@@ -1,350 +1,211 @@
 package com.applite.data;
 
-import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-
-import com.applite.bean.HomePageTypeBean;
-import com.applite.common.Constant;
-import com.applite.bean.HomePageBean;
+import com.applite.bean.HomePageApkData;
+import com.applite.bean.SubjectData;
 import com.applite.homepage.BundleContextFactory;
+import com.mit.impl.ImplStatusTag;
 import com.applite.homepage.R;
-import com.mit.impl.ImplAgent;
-import com.applite.utils.HomePageUtils;
-import com.applite.utils.Utils;
-import com.applite.view.ProgressButton;
-
 import net.tsz.afinal.FinalBitmap;
-
-import java.util.ArrayList;
+import java.lang.reflect.Field;
 import java.util.List;
-
-//import android.widget.RelativeLayout.LayoutParams;
 
 /**
  * Created by yuzhimin on 6/17/15.
  */
-public class ListArrayAdapter extends ArrayAdapter<HomePageBean> {
-    private LayoutInflater mInflater = null;
-//        ViewHolder holderOrders = new ViewHolder();
+public class ListArrayAdapter extends BaseAdapter implements View.OnClickListener {
     private static final String TAG = "homepage_ListArrayAdapter";
-    //        ViewHolder holderMainTypes = new ViewHolder();
-    private Context context;
-    private int layoutResourceId;
-    private List<HomePageBean> mData = null;
-
+    private LayoutInflater mInflater = null;
+    private Context mContext = null;
+    private SubjectData mData = null;
     private FinalBitmap mFinalBitmap;
-    private int mTable = 0;
-    private List<HomePageTypeBean> mDataType = null;
 
-    Context mContext;
-
-
-
-    public ListArrayAdapter(Context context, int resource) {
-        super(context, resource);
-    }
-    public ListArrayAdapter(Context context, int resource, List<HomePageBean> data, List<HomePageTypeBean> dataType, int mTab) {
-
-        super(context, resource, data);
-        this.context = context;
-        this.layoutResourceId = resource;
+    private ListAdapterListener mListener = null;
+    int layoutResourceId = 0;
+    public ListArrayAdapter(Context context, SubjectData data,ListAdapterListener listener) {
+        this.mContext = context;
         this.mData = data;
-        this.mTable = mTab;
-        this.mDataType = dataType;
+        this.mListener = listener;
         mFinalBitmap = FinalBitmap.create(context);
 
-        HomePageUtils.i(TAG, "yuzm-----------------");
-        if(null != mData) {
-            for (int i = 0; i < mData.size(); i++) {
-                HomePageUtils.i(TAG, "ListAdapter.ListAdapter() yuzm mData.get(" + i +
-                        ").getName() : " + mData.get(i).getName());
-            }
-        }
-        HomePageUtils.i(TAG, "yuzm-----------------");
         mInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         try {
-            Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            if (null != mContext) {
-                mInflater = LayoutInflater.from(mContext);
-                mInflater = mInflater.cloneInContext(mContext);
-            }
+            Context mcontext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
+            mInflater = LayoutInflater.from(mcontext);
+            mInflater = mInflater.cloneInContext(mcontext);
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        //pullDownView = (PullDownView)mInflater.findViewById(R.id.pullDownView);
-        //pullDownView.enableAutoFetchMore(true, 0);
-        HomePageUtils.i(TAG,"ListAdapter.ListAdapter()");
-
+        try {
+            Field field = R.layout.class.getField(mData.getS_datatype());
+            layoutResourceId = field.getInt(new R.layout());
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public int getCount() {
-        if(null != mData) {
-            HomePageUtils.i(TAG, "ListAdapter.ListAdapter() yuzm this.data.size() : " + this.mData.size());
-            return this.mData.size();
-        }else if (null != mDataType){
-            return this.mDataType.size();
+        List<HomePageApkData> apkList = mData.getData();
+        if(null != apkList) {
+            return apkList.size();
         }
         return 0;
     }
 
     @Override
-    public HomePageBean getItem(int position) {
-        HomePageUtils.i(TAG,"ListAdapter.getItem() yuzm position : " + position);
+    public Object getItem(int position) {
         return null;
     }
 
     @Override
     public long getItemId(int position) {
-        HomePageUtils.i(TAG,"ListAdapter.getItemId() yuzm position : " + position);
         if (position == 0)
             return 0;
         else
             return position-1;
     }
-    @Override
-    public int getItemViewType(int position) {
-        HomePageUtils.i(TAG,"ListAdapter.getItemViewType() yuzm position : " + position);
-        return position > 0 ? 0 : 1;
-
-    }
-    @Override
-    public int getViewTypeCount() {
-        HomePageUtils.i(TAG,"ListAdapter.getItemViewType() yuzm ");
-        return 2;
-    }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        float mStaring = 0.0f;
-        ViewHolder holderGoods = null;
-        HomePageUtils.i(TAG, "getView() yuzm Thread.currentThread().getId() : " +
-                Thread.currentThread().getId());
-        HomePageUtils.i(TAG, "ListAdapter.getView convertView : " + convertView);
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder = null;
         if (convertView == null) {
-            //HomePageUtils.i(TAG, "ListAdapter.getView container : " + convertView);
-            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-            try {
-                Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-                if (null != mContext) {
-                    inflater = LayoutInflater.from(mContext);
-                    inflater = inflater.cloneInContext(mContext);
-                    //context = mContext;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            try {
-                convertView = inflater.inflate(layoutResourceId, parent, false);
-                holderGoods = new ViewHolder(convertView);
-                convertView.setTag(holderGoods);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            convertView = mInflater.inflate(layoutResourceId, parent, false);
+            viewHolder = new ViewHolder(convertView);
+            convertView.setTag(viewHolder);
         } else {
-            holderGoods = (ViewHolder) convertView.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        HomePageBean item = null;
-        HomePageTypeBean itemType = null;
-        try {
-            if (null != mData) {
-                HomePageUtils.i(TAG, "ListAdapter.getView position : " + position);
-                item = mData.get(position);
-                HomePageUtils.i(TAG, "ListAdapter.getView item : " + item);
-            } else if (null != mDataType) {
-                itemType = mDataType.get(position);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (null != item || null != itemType) {
+        if (null != mData && null != mData.getData()) {
+            HomePageApkData itemData = mData.getData().get(position);
+            viewHolder.setItemData(itemData);
+            String localUri = itemData.getLocalUri();
+            viewHolder.setStatusTag(ImplStatusTag.generateTag(mContext,
+                    itemData.getPackageName(),
+                    itemData.getPackageName(),
+                    itemData.getName(),
+                    itemData.getIconUrl(),
+                    itemData.getStatus(),
+                    itemData.getReason(),
+                    itemData.getCurrentBytes(),
+                    itemData.getTotalBytes(),
+                    (null == localUri) ? null : Uri.parse(localUri),
+                    itemData.getMediaType()));
+            viewHolder.setLayoutStr(mData.getS_datatype());
+            float star = 0.0f;
             try {
-                mStaring = Float.parseFloat(item.getRating().toString());
+                star = Float.parseFloat(itemData.getRating());
             } catch (Exception e) {
-                mStaring = 0.0f;
             }
-            try {
-                switch (mTable) {
-                    case 0:
-                    case 1:
-                        try {
-//                            HomePageUtils.i(TAG, "ListAdapter.getView item:" + item.getName()+","+item.getStatus());
-//                            final int mApkType = Utils.isAppInstalled(context, item.getPackagename(), item.getmVersionCode());
-                            switch (item.getStatus()) {
-                                case Constant.STATUS_INIT:
-                                    holderGoods.mProgressButton.setText("install");
-                                    break;
-                                case Constant.STATUS_PENDING:
-                                case Constant.STATUS_RUNNING:
-                                    holderGoods.mProgressButton.setText("pause");
-                                    break;
-                                case Constant.STATUS_PAUSED:
-                                    holderGoods.mProgressButton.setText("continue");
-                                    break;
-                                case Constant.STATUS_SUCCESSFUL:
-                                    holderGoods.mProgressButton.setText("open");
-                                    break;
-                                case Constant.STATUS_FAILED:
-                                    holderGoods.mProgressButton.setText("retry");
-                                    break;
-                                case Constant.STATUS_PACKAGE_INVALID:
-                                    holderGoods.mProgressButton.setText("retry");
-                                    break;
-                                case Constant.STATUS_PRIVATE_INSTALLING:
-                                    holderGoods.mProgressButton.setText("installing");
-                                    break;
-                                case Constant.STATUS_NORMAL_INSTALLING:
-                                    holderGoods.mProgressButton.setText("installing");
-                                    break;
-                                case Constant.STATUS_INSTALLED:
-                                    holderGoods.mProgressButton.setText("run");
-                                    break;
-                                case Constant.STATUS_INSTALL_FAILED:
-                                    holderGoods.mProgressButton.setText("retry");
-                                    break;
-                            }
-                            final ViewHolder finalViewholder = holderGoods;
-                            final HomePageBean finalItem = item;
-                            String mPackageName = finalItem.getPackagename();
-                            holderGoods.mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
-                                @Override
-                                public void onClickListener() {
-                                    switch (finalItem.getStatus()) {
-                                        case Constant.STATUS_INIT:
-                                        case Constant.STATUS_PENDING:
-                                        case Constant.STATUS_RUNNING:
-                                        case Constant.STATUS_PAUSED:
-                                        case Constant.STATUS_FAILED:
-                                            HomePageUtils.i(TAG, "setOnProgressButtonClickListener yuzm :" + finalItem);
-//                                            Utils.setDownloadViewText(context, finalViewholder.mProgressButton);
-                                            ImplAgent.downloadPackage(context,
-                                                    finalItem.getPackagename(),
-                                                    finalItem.getUrl(),
-                                                    Utils.extenStorageDirPath,
-                                                    finalItem.getName() + ".apk",
-                                                    3,
-                                                    false,
-                                                    finalItem.getName(),
-                                                    "",
-                                                    true,
-                                                    finalItem.getImgurl(),
-                                                    "",
-                                                    finalItem.getPackagename());
-
-                                            break;
-                                        case Constant.STATUS_SUCCESSFUL:
-                                            break;
-                                        case Constant.STATUS_PACKAGE_INVALID:
-                                            break;
-                                        case Constant.STATUS_PRIVATE_INSTALLING:
-                                            break;
-                                        case Constant.STATUS_NORMAL_INSTALLING:
-                                            break;
-                                        case Constant.STATUS_INSTALLED:
-                                            Utils.startApp(context, finalItem.getPackagename());
-                                            break;
-                                        case Constant.STATUS_INSTALL_FAILED:
-                                            break;
-                                    }
-                                }
-                            });
-                            mFinalBitmap.display(holderGoods.mAppIcon, item.getImgurl());
-                            holderGoods.mAppName.setText(item.getName().toString());
-                            holderGoods.mAppSize.setText(item.getCategorySub().toString());
-                            holderGoods.mRatingBar.setRating(mStaring / 2.0f);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            //holderGoods.mAppIcon.setImageResource(R.drawable.buffer);
-                        }
-                        break;
-                    case 2:
-                        //HomePageUtils.i(TAG, "ListAdapter.getView item : " + item);
-                        HomePageUtils.i(TAG, "ListAdapter.getView getM_IconUrl : " + itemType.getM_IconUrl());
-                        try {
-                            if ((null != itemType.getM_IconUrl())) {
-                                mFinalBitmap.display(holderGoods.mAppIcon, itemType.getM_IconUrl());
-                            } else {
-                                holderGoods.mAppIcon.setImageResource(R.drawable.buffer);
-                            }
-                            convertView.findViewById(R.id.imageView).setVisibility(View.VISIBLE);
-                            holderGoods.mImageView.setImageResource(R.drawable.back);
-                            holderGoods.mAppName.setText(itemType.getM_Name().toString());
-                            convertView.findViewById(R.id.textView2).setVisibility(View.GONE);
-                            convertView.findViewById(R.id.ratingbar_Indicator).setVisibility(View.GONE);
-                            convertView.findViewById(R.id.list_item_progress_button).setVisibility(View.GONE);
-                        } catch (Exception e) {
-                            holderGoods.mAppIcon.setImageResource(R.drawable.buffer);
-                            convertView.findViewById(R.id.imageView).setVisibility(View.VISIBLE);
-                            holderGoods.mImageView.setImageResource(R.drawable.back);
-                            holderGoods.mAppName.setText(itemType.getM_Name().toString());
-                            convertView.findViewById(R.id.textView2).setVisibility(View.GONE);
-                            convertView.findViewById(R.id.ratingbar_Indicator).setVisibility(View.GONE);
-                            convertView.findViewById(R.id.list_item_progress_button).setVisibility(View.GONE);
-                            e.printStackTrace();
-                        }
-                        break;
-                }
-
-            } catch (Exception e) {
-//                HomePageUtils.i(TAG, "ListAdapter.getView Exception holderGoods : " + holderGoods);
-                e.printStackTrace();
-            }
-        }else {
-//            HomePageUtils.i(TAG, "ListAdapter.getView yuzm item : " + item);
+            viewHolder.setmRatingBar(star/2.0f);
+            viewHolder.setmProgressButton(viewHolder.statusTag);
+            viewHolder.setmAppIcon(itemData.getIconUrl());
+            viewHolder.setmAppSize(itemData.getCategorysub());
+            viewHolder.setmAppName(itemData.getName());
         }
         return convertView;
-
     }
 
-    public int setData(List<HomePageBean> data,List<HomePageTypeBean> dataType, int mType) {
-        HomePageUtils.i(TAG, "ListAdapter.setData yuzm before data : " + data +
-                "data.size() : " + data.size());
-        //HomePageUtils.i(TAG, "ListAdapter.setData yuzm before mData.size() : " + mData.size());
-        HomePageUtils.i(TAG, "getView() yuzm Thread.currentThread().getId() : " +
-                Thread.currentThread().getId());
-        switch (mType) {
-            case 0 :
-            case 1 : for (int i = 0; null != data && i < data.size(); i++) {
-                        this.mData.add(data.get(i));
-                    }
-                return this.mData.size();
-            case 2 :  for (int i = 0; null != data && i < data.size(); i++) {
-                        this.mDataType.add(dataType.get(i));
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.list_item_progress_button){
+            Object obj = v.getTag();
+            if (obj instanceof ImplStatusTag){
+                ImplStatusTag tag = (ImplStatusTag)obj;
+                if (null != mListener){
+                    mListener.onDownloadButtonClicked(tag);
                 }
-                return this.mDataType.size();
-            default:
-                return 0;
+            }
         }
-
-        //HomePageUtils.i(TAG, "ListAdapter.setData yuzm after mData.size() : " + mData.size());
     }
 
-    class ViewHolder {
-        public ImageView mAppIcon;
-        public TextView mAppName;
-        public TextView mAppSize;
-        public RatingBar mRatingBar;
-        public Button mAppInstall;
-        public ImageView mImageView;
-        public ProgressButton mProgressButton;
+    public class ViewHolder {
+        private ImageView mAppIcon;
+        private TextView mAppName;
+        private TextView mAppSize;
+        private RatingBar mRatingBar;
+        private Button mProgressButton;
+
+        private ImplStatusTag statusTag;
+        private HomePageApkData itemData;
+        private String layoutStr;
+
         ViewHolder(View mView){
             this.mAppIcon = (ImageView) mView.findViewById(R.id.imageViewName);
             this.mAppName = (TextView) mView.findViewById(R.id.textView);
             this.mAppSize = (TextView) mView.findViewById(R.id.textView2);
             this.mRatingBar = (RatingBar) mView.findViewById(R.id.ratingbar_Indicator);
-            this.mImageView = (ImageView) mView.findViewById(R.id.imageView);
-            this.mProgressButton = (ProgressButton) mView.findViewById(R.id.list_item_progress_button);
+            this.mProgressButton = (Button) mView.findViewById(R.id.list_item_progress_button);
         }
+        public ImplStatusTag getStatusTag() {
+            return statusTag;
+        }
+        public void setStatusTag(ImplStatusTag statusTag) {
+            this.statusTag = statusTag;
+        }
+
+        public void setmAppIcon(String iconUrl) {
+            if (null != this.mAppIcon && null != iconUrl){
+                mFinalBitmap.display(this.mAppIcon, iconUrl);
+            }
+        }
+
+        public void setmAppName(String name) {
+            if (null != this.mAppName && null != name) {
+                this.mAppName.setText(name);
+            }
+        }
+
+        public void setmAppSize(String size) {
+            if (null != this.mAppSize && null != size) {
+                this.mAppSize.setText(size);
+            }
+        }
+
+        public void setmRatingBar(float rating) {
+            if (null != mRatingBar) {
+                this.mRatingBar.setRating(rating);
+            }
+        }
+
+        public void setmProgressButton(ImplStatusTag statusTag) {
+            if (null != mProgressButton){
+                mProgressButton.setTag(statusTag);
+                mProgressButton.setText(statusTag.getActionText());
+                mProgressButton.setOnClickListener(ListArrayAdapter.this);
+            }
+        }
+
+        public HomePageApkData getItemData() {
+            return itemData;
+        }
+
+        public void setItemData(HomePageApkData itemData) {
+            this.itemData = itemData;
+        }
+
+        public String getLayoutStr() {
+            return layoutStr;
+        }
+
+        public void setLayoutStr(String layoutStr) {
+            this.layoutStr = layoutStr;
+        }
+    }
+
+    public interface ListAdapterListener {
+        public void onDownloadButtonClicked(ImplStatusTag tag);
     }
 }
