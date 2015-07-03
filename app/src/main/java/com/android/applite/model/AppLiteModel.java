@@ -18,6 +18,7 @@ package com.android.applite.model;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -26,6 +27,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -40,6 +45,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
 import android.os.SystemClock;
+import android.support.v4.app.NotificationCompat;
 import android.text.format.DateUtils;
 import android.util.Log;
 
@@ -48,6 +54,7 @@ import com.android.dsc.downloads.DownloadManager;
 import com.applite.android.R;
 import com.applite.util.AppliteConfig;
 import com.google.gson.Gson;
+import com.mit.market.MitMarketActivity;
 
 /**
  * Maintains in-memory state of the Launcher. It is expected that there should
@@ -620,6 +627,7 @@ public class AppLiteModel{
     void onReceive(Context context, Intent intent) {
         // TODO Auto-generated method stub
         final String action = intent.getAction();
+        NotificationManager manager;
         if(Intent.ACTION_TIME_CHANGED.equals(action)){
             forceReload();
         }
@@ -660,8 +668,82 @@ public class AppLiteModel{
             }else{
                 Log.d(TAG,action+",package:"+packageName+",not found");
             }
-        }else if ("com.dataservice.broadcast".equals(action)){
-            Log.d(TAG,"recv com.dataservice.broadcast");
+        }else if ("com.dataservice.broadcast".equals(action)) {
+            /*
+            *字段说明
+            *"SBUR,ACTION,packagename,title,desc,icon_url,intent"
+            *ACTION : android.intent.action.MAIN
+            *packagename : com.applite.android
+            *title : title
+            *desc : desc
+            *icon_url :
+            *intent : intent
+            */
+            String stringValue = intent.getStringExtra("intent");
+            Log.d(TAG, "onReceive stringValue : " + stringValue);
+            int mRequestCode = 1;
+            String[] mString = null;
+            mString = stringValue.split(",");
+            for(int i=0;i<mString.length;i++){
+                Log.d(TAG, "onReceive mString[" + i + "] : " + mString[i]);
+            }
+
+            String mAction = null;
+            String mPackageName = null;
+            String mTitle = null;
+            String mDesc = null;
+            String mIconUrl = null;
+            String mIntent = null;
+            if (null != mString) {
+                mAction = mString[0];
+                mPackageName = mString[1];
+                mTitle = mString[2];
+                mDesc = mString[3];
+                mIconUrl = mString[4];
+                mIntent = mString[5];
+            }
+            Intent mPlayIntent =null;
+
+            //myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Log.i(TAG, "mAction : " + mAction
+                    + "; mPackageName : " + mPackageName
+                    + "; mTitle : " + mTitle
+                    + "; mDesc : " + mDesc
+                    + "; mIconUrl : " + mIconUrl
+                    + "; mIntent : " + mIntent);
+            if(context.getPackageName().equals(mPackageName)) {
+                manager = (NotificationManager) context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+                ComponentName cn =null;
+                if(null ==mIntent || null == mAction || null == mPackageName){
+                    mPlayIntent = new Intent(context, MitMarketActivity.class);
+                }else {
+                    try {
+                        mPlayIntent = Intent.parseUri(mIntent, 0);
+                        mPlayIntent.getDataString();
+                        cn = new ComponentName(mPackageName,
+                                mPlayIntent.getDataString());
+                        mPlayIntent.setComponent(cn);
+                        //mPlayIntent.setAction(mAction);
+                    }catch (URISyntaxException e){
+                        e.printStackTrace();
+                    }
+
+                }
+                Log.i(TAG, "mPlayIntent : " + mPlayIntent +" ; mPlayIntent.getDataString()"+mPlayIntent.getDataString());
+                PendingIntent pendingIntent = PendingIntent.getActivity(
+                        context,
+                        mRequestCode,
+                        mPlayIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+                Log.i(TAG, "pendingIntent : " + pendingIntent );
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+                builder.setContentTitle(mTitle).setContentText(mDesc).
+                        setSmallIcon(R.drawable.ic_launcher).
+                        setDefaults(Notification.DEFAULT_ALL).
+                        setContentIntent(pendingIntent).
+                        setAutoCancel(true).setSubText(mPackageName);
+                manager.notify(mRequestCode, builder.build());
+            }
         }
     }
     
@@ -816,7 +898,6 @@ public class AppLiteModel{
     
     /**
      * Removes the specified item from the database
-     * @param context
      * @param item
      */
     void deleteItemFromDatabase(final IAppInfo item) {
