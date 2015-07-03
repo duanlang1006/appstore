@@ -35,7 +35,7 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
         ImplLog.d(TAG, "onAttach,"+this);
         super.onAttach(activity);
         mActivity = activity;
-        hasOptionsMenu();
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -107,6 +107,7 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
         try {
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setCustomView(customView);
             actionBar.show();

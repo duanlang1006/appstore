@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">首页</string>
+    <string name="action_settings">设置</string>
+    <string name="load_more">加载数据中...</string>
+</resources>

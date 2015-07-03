@@ -4,51 +4,34 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ListFragment;
-import android.util.Log;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.RatingBar;
-import android.widget.TextView;
-import android.widget.AbsListView.OnScrollListener;
-
 import com.applite.bean.HomePageApkData;
-import com.applite.bean.HomePageBean;
 import com.applite.bean.HomePageDataBean;
-import com.applite.bean.HomePageTopic;
-import com.applite.bean.HomePageTypeBean;
+import com.applite.bean.SpecialTopicData;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.data.ListArrayAdapter;
-import com.applite.utils.SPUtils;
+import com.google.gson.Gson;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
 import com.mit.impl.ImplStatusTag;
-
-import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
-
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 
 import java.util.ArrayList;
@@ -57,102 +40,53 @@ import java.util.List;
 /**
 * Created by hxd on 15-6-9.
 */
-public class HomePageListFragment extends ListFragment {
+public class HomePageListFragment extends Fragment implements AbsListView.OnItemClickListener{
     private final static String TAG = "homepage_ListFragment";
     private final static int MSG_LOAD_DATA = 0;
 
+    private FinalHttp mFinalHttp = new FinalHttp();
+    private Gson gson = new Gson();
+
     private Activity mActivity;
-    private Context mContext;
     private SubjectData mData;
 
-    private int mTable = 0;
-    private View mListFooterView;
+    private ListView mListView;
+    private View mMoreView;
+    private SlideShowView mTopicView;
     private ListArrayAdapter mListAdapter = null;
-    private FinalHttp mFinalHttp;
-    int mCurCheckPosition = 0;
-    private List<HomePageBean> mHomePageData = new ArrayList<HomePageBean>();
-    private List<HomePageTypeBean> mHomePageMainType = new ArrayList<HomePageTypeBean>();
-    private int mPageGood = 0;
-    private int mPageOder = 0;
-    private int mPageMainType = 0;
+    private int mCurCheckPosition = 0;
+    private boolean showHome = false;
     private ImplListener mImplListener = new HomePageImplListener();
     private HomePageListListener mListAdapterListener = new HomePageListListener();
-    private SlideShowView.OnSlideViewClickListener mSlideViewListener = new SlideShowView.OnSlideViewClickListener(){
-        @Override
-        public void onClick(View v, int position) {
-            LogUtils.d(TAG,"OnSlideViewClickListener,"+position);
-        }
-    };
-    private AbsListView.OnScrollListener mOnScrollListener = new AbsListView.OnScrollListener() {
-        private boolean isLastRow = false;
-        @Override
-        public void onScrollStateChanged(AbsListView view, int scrollState) {
-            if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
-                LogUtils.i(TAG, "拉到最底部");
-                mListFooterView.setVisibility(view.VISIBLE);
-//                mSearchPostPage = mSearchPostPage + 1;
-                mHandler.sendEmptyMessage(MSG_LOAD_DATA);
-                isLastRow = false;
-            }
-        }
+    private MySlideViewListener mSlideViewListener = new MySlideViewListener();
+    private MyScrollListener mOnScrollListener = new MyScrollListener();
 
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                             int totalItemCount) {
-            //判断是否滚到最后一行
-            if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount > 0) {
-                LogUtils.i(TAG, "滚到最后一行");
-                isLastRow = true;
-            }
-        }
-    };
-    private Handler mHandler = new Handler() {
-        public void handleMessage(android.os.Message msg) {
-            switch (msg.what) {
-                case MSG_LOAD_DATA:
-                    switch (mTable) {
-                        case 0 :
-                            listPost("goods", mData.getHomePageApkData().size()/10);
-                            break;
-                        case 1 :
-                            listPost("order", mData.getHomePageApkData().size()/10);
-                            break;
-                        case 2 :
-                            listPost("maintype", mData.getHomePageApkData().size()/10);
-                            break;
-                    }
-                    LogUtils.i(TAG, "加载更多数据");
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        ;
-    };
     public HomePageListFragment(SubjectData data) {
         this.mData = data;
-        this.mTable = mTable;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LogUtils.i(TAG, "ListFragment.onCreate() ");
+        Bundle b = getArguments();
+        if (null != b){
+            showHome = true;
+        }
     }
 
     @Override
     public void onAttach(Activity activity) {
         LogUtils.i(TAG, "onAttach ");
         super.onAttach(activity);
+        setHasOptionsMenu(true);
         mActivity = activity;
         ImplAgent.registerImplListener(mImplListener);
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        LogUtils.i(TAG, "ListFragment.onViewCreated() ");
-        super.onViewCreated(view, savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        LogUtils.i(TAG, "ListFragment.onCreateView() ");
         Context context = mActivity;
         LayoutInflater mInflater = LayoutInflater.from(context);
         try {
@@ -164,23 +98,28 @@ public class HomePageListFragment extends ListFragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        SlideShowView slideView = new SlideShowView(context);
-        getListView().addHeaderView(slideView);
-        slideView.setOnViewClickListener(mSlideViewListener);
-        slideView.setImageUrls(
-                new String[]{"http://192.168.1.104/test_pic/q1.jpg",
-                "http://192.168.1.104/test_pic/q2.jpg",
-                        "http://192.168.1.104/test_pic/q1.jpg",
-                        "http://192.168.1.104/test_pic/q2.jpg"});
-        mListFooterView = mInflater.inflate(R.layout.load, null);
-        getListView().addFooterView(mListFooterView);
+        View rootView = mInflater.inflate(R.layout.fragment_homepage_list, container, false);
 
-        getListView().setOnScrollListener(mOnScrollListener);
+        // Set the adapter
+        mListView = (ListView) rootView.findViewById(android.R.id.list);
+
+        if (null == mData || null == mData.getData() || mData.getData().size() == 0){
+            httpRequest();
+        }
+
+        setTopicView(context);
+        setMoreView(mInflater);
+
+        mListView.setOnItemClickListener(this);
+        mListView.setOnScrollListener(mOnScrollListener);
         mListAdapter = new ListArrayAdapter(mActivity,
                 mData,
                 mListAdapterListener);
-        setListAdapter(mListAdapter);
+        mListView.setAdapter(mListAdapter);
+        initActionBar();
+        return rootView;
     }
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -204,28 +143,12 @@ public class HomePageListFragment extends ListFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        LogUtils.i(TAG, "onResume ");
-    }
-
-    @Override
-    public void onStart() {
-        LogUtils.i(TAG, "onStart ");
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        LogUtils.i(TAG, "onStop");
-    }
-    @Override
     public void onDetach(){
         super.onDetach();
         LogUtils.i(TAG, "onDetach ");
         ImplAgent.unregisterImplListener(mImplListener);
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -234,23 +157,40 @@ public class HomePageListFragment extends ListFragment {
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        LogUtils.i(TAG, "onListItemClick, "+position);
-        super.onListItemClick(l, v, position, id);
-        if (2 == this.mTable) {
-            //homePageFragment.postMainType(mActivity);
-            FragmentManager fm;
-            FragmentTransaction ftx;
-            HomePageFragment hp = new HomePageFragment();
-            hp.setMainType(true);
-            fm = ((FragmentActivity)mActivity).getSupportFragmentManager();
-            ftx = fm.beginTransaction();
-            ftx.replace(hp.getNode(), hp);
-            ftx.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-            ftx.commit();
-            LogUtils.i(TAG, "onListItemClick.onCreate() ");
-        }else{
-            HomePageApkData bean = mData.getHomePageApkData().get(position);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case android.R.id.home:
+                ((FragmentActivity)mActivity).getSupportFragmentManager().popBackStack();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        ListArrayAdapter.ViewHolder viewHolder = (ListArrayAdapter.ViewHolder)view.getTag();
+        if (null == viewHolder){
+            return;
+        }
+        HomePageApkData itemData = viewHolder.getItemData();
+        if (null == itemData){
+            return;
+        }
+        if (viewHolder.getLayoutStr().equals("fragment_categorylist")) {
+            try {
+                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+                        bundleContext, ApkplugOSGIService.class,
+                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
+                        OSGIServiceAgent.real_time);   //每次都重新查询
+                agent.getService().ApkplugOSGIService(bundleContext,
+                        Constant.OSGI_SERVICE_MAIN_FRAGMENT,
+                        0, Constant.OSGI_SERVICE_MAIN_FRAGMENT,itemData.getKey(),itemData.getName());
+            } catch (Exception e) {
+                // TODO 自动生成的 catch 块
+                e.printStackTrace();
+            }
+        }else if (viewHolder.getLayoutStr().equals("fragment_apklist")){
             try {
                 BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
                 OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
@@ -259,147 +199,108 @@ public class HomePageListFragment extends ListFragment {
                         OSGIServiceAgent.real_time);   //每次都重新查询
                 agent.getService().ApkplugOSGIService(bundleContext,
                         Constant.OSGI_SERVICE_DM_FRAGMENT,
-                        0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,bean.getPackageName(),bean.getName(),bean.getIconUrl());
+                        0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
+                        itemData.getPackageName(),
+                        itemData.getName(),
+                        itemData.getIconUrl());
             } catch (Exception e) {
                 // T
                 e.printStackTrace();
             }
         }
-        LogUtils.i(TAG, "onListItemClick()  l : " + l + " ; v : " + v +
-                " ; id : " + id + " ; position : " + position);
     }
 
-
-    /**
-     * 上拉加载网络请求
-     */
-    public void listPost(final String mTabType ,final int mPage) {
-        //Message msg = new Message();
-        if(null == mFinalHttp) {
-            mFinalHttp = new FinalHttp();
+    private void initActionBar(){
+        try {
+            if (showHome) {
+                ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+                actionBar.setDisplayShowCustomEnabled(false);
+                actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setTitle(mData.getS_name());
+                actionBar.show();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        LogUtils.e(TAG, "listPost  mPage : " + mPage);
+    }
+
+    private void setTopicView(Context context){
+        List<SpecialTopicData> topicList = (null == mData)?null:mData.getSpecialtopic_data();
+        if (null != topicList && topicList.size()>0){
+            String[] urls = new String[topicList.size()];
+            for(int i = 0;i < topicList.size();i++){
+                urls[i] = topicList.get(i).t_iconurl;
+            }
+            mTopicView = new SlideShowView(context);
+            mTopicView.setImageUrls(urls);
+            mTopicView.setOnViewClickListener(mSlideViewListener);
+            mListView.addHeaderView(mTopicView);
+        }
+    }
+
+    private void setMoreView(LayoutInflater inflater){
+        if (null != mMoreView){
+            mListView.removeFooterView(mMoreView);
+        }
+        mMoreView = inflater.inflate(R.layout.more, null);
+        mListView.addFooterView(mMoreView);
+    }
+
+    private void httpRequest() {
+        int page = 0;
+        if (null != mData.getData()) {
+            page = mData.getData().size() / mData.getStep();
+            if (mData.getData().size()% mData.getStep() != 0){
+                page ++;
+            }
+        }
+        LogUtils.d(TAG, "httpRequest  mPage : " + page);
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", "com.android.applite1.0");
         //params.put("packagename",Utils.getPackgeName(this));
         params.put("app", "applite");
         params.put("type", "hptab");
-        params.put("page", String.valueOf(mPage));
-        params.put("tabtype", mTabType);
-        params.put("pullonloading", "pullonloading");
+        params.put("page", String.valueOf(page));
+        params.put("tabtype", mData.getS_key());
         mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
-                Message msg = new Message();
-                String reuslt = (String) o;
-                LogUtils.i(TAG, "HomePage网络请求成功， reuslt:" + reuslt);
-                setData(reuslt, mActivity, mTabType);
-
+                LogUtils.i(TAG, "HomePageList网络请求成功，" + (String)o);
+                HomePageDataBean pageData = gson.fromJson((String)o, HomePageDataBean.class);
+                if (null != pageData && null != pageData.getSubjectData()){
+                    for (int i = 0;i < pageData.getSubjectData().size(); i++) {
+                        SubjectData subject = pageData.getSubjectData().get(i);
+                        if (subject.getS_key().equals(mData.getS_key())){
+                            mData.setS_datatype(subject.getS_datatype());
+                            mData.setStep(subject.getStep());
+                            if (null != subject.getData()) {
+                                mData.getData().addAll(subject.getData());
+                            }
+                            break;
+                        }
+                    }
+                }
+                mListAdapter.notifyDataSetChanged();
+                mMoreView.setVisibility(View.GONE);
             }
 
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
                 LogUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
+                mMoreView.setVisibility(View.GONE);
             }
         });
-    }
-    /**
-     * 设置数据
-     *
-     * @param data
-     */
-    public void setData(final String data, final Activity mActivity, final String mType) {
-        HomePageBean hpBeanData = null;
-        try {
-            JSONObject obj = new JSONObject(data);
-            LogUtils.i(TAG, "setData JSONObject data， obj : " + obj);
-            int app_key = obj.getInt("app_key");
-            //goods_data
-            String dataStr =null;
-            switch (mType){
-                case "goods" : dataStr = obj.getString("goods_data");
-                    break;
-                case "order" : dataStr = obj.getString("order_data");
-                    break;
-                case "maintype" : dataStr =obj.getString("maintype_data");
-                      setDateMainType(obj);
-            }
-
-            JSONArray mJson = new JSONArray(dataStr);
-            //LogUtils.i(TAG, "setData JSONObject data，json : " + json);
-            LogUtils.i( TAG," mJson.length() : " + mJson.length());
-            LogUtils.i( TAG," mJson : " + mJson);
-            for (int i = 0; i < mJson.length(); i++) {
-                JSONObject object = new JSONObject(mJson.get(i).toString());
-                hpBeanData = new HomePageBean();
-                hpBeanData.setId(1 + (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0));
-                hpBeanData.setPackagename(object.getString("packageName"));
-                hpBeanData.setName(object.getString("name"));
-                hpBeanData.setImgurl(object.getString("iconUrl"));
-                hpBeanData.setUrl(object.getString("rDownloadUrl"));
-                hpBeanData.setApkSize(object.getString("apkSize"));
-                hpBeanData.setRating(object.getString("rating"));
-                hpBeanData.setBrief(object.getString("brief"));
-                hpBeanData.setBoxLabel(object.getString("boxLabel"));
-                hpBeanData.setCategoryMain(object.getString("categorymain"));
-                hpBeanData.setCategorySub(object.getString("categorysub"));
-                hpBeanData.setDownloadTimes(object.getString("downloadTimes"));
-                hpBeanData.setVersionName(object.getString("versionName"));
-                try {
-                    hpBeanData.setmVersionCode(object.getInt("versionCode"));
-                }catch (Exception e){
-                    hpBeanData.setmVersionCode(0);
-                    e.printStackTrace();
-                }
-                mHomePageData.add(hpBeanData);
-                SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
-                        (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);
-            }
-            LogUtils.i( TAG," mJson : " + mJson);
-            if (null == mListAdapter){
-                mListAdapter = new ListArrayAdapter(mActivity,
-                        mData,
-                        mListAdapterListener);
-                getListView().setAdapter(mListAdapter);
-            }else{
-                mListAdapter.notifyDataSetChanged();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            LogUtils.e(TAG, " HomePageJSON解析异常");
-        }
-    }
-
-    public void setDateMainType(JSONObject mObj) throws JSONException {
-
-        HomePageTypeBean hpBeanMainType = null;
-        //MainType_data
-
-        String mMainType_data = mObj.getString("maintype_data");
-        JSONArray mMainType_json = new JSONArray(mMainType_data);
-        LogUtils.i(TAG, " mMainType_json.length() : " + mMainType_json.length());
-        LogUtils.i(TAG, " mMainType_json : " + mMainType_json);
-        for (int i = 0; i < mMainType_json.length(); i++) {
-            JSONObject object = new JSONObject(mMainType_json.get(i).toString());
-            hpBeanMainType = new HomePageTypeBean();
-            hpBeanMainType.setId(1 + (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0));
-            hpBeanMainType.setM_Name(object.getString("m_name"));
-            hpBeanMainType.setM_IconUrl(object.getString("m_iconurl"));
-            hpBeanMainType.setM_key("m_key");
-            mHomePageMainType.add(hpBeanMainType);
-            SPUtils.put(mActivity, SPUtils.HOMEPAGE_POSITION,
-                    (Integer) SPUtils.get(mActivity, SPUtils.HOMEPAGE_POSITION, 0) + 1);
-        }
     }
 
     private HomePageApkData findBeanByKey(String key){
         HomePageApkData bean = null;
-        for (int i = 0;i<mData.getHomePageApkData().size();i++){
-            if (key.equals(mData.getHomePageApkData().get(i).getPackageName())){
-                bean = mData.getHomePageApkData().get(i);
+        for (int i = 0;i<mData.getData().size();i++){
+            if (key.equals(mData.getData().get(i).getPackageName())){
+                bean = mData.getData().get(i);
                 break;
             }
         }
@@ -417,7 +318,7 @@ public class HomePageListFragment extends ListFragment {
                 case ImplStatusTag.ACTION_DOWNLOAD:
                     ImplAgent.downloadPackage(mActivity,
                             bean.getPackageName(),
-                            bean.getRDownloadUrl(),
+                            bean.getrDownloadUrl(),
                             Constant.extenStorageDirPath,
                             bean.getName() + ".apk",
                             3,
@@ -546,5 +447,53 @@ public class HomePageListFragment extends ListFragment {
         }
     }
 
-}
+    class MyScrollListener implements AbsListView.OnScrollListener{
+        private boolean isLastRow = false;
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
+                LogUtils.i(TAG, "拉到最底部");
+                mMoreView.setVisibility(view.VISIBLE);
+                httpRequest();
+                isLastRow = false;
+            }
+        }
 
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                             int totalItemCount) {
+            //判断是否滚到最后一行
+            if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount > 0) {
+                LogUtils.i(TAG, "滚到最后一行");
+                isLastRow = true;
+            }
+        }
+    }
+
+    class MySlideViewListener implements SlideShowView.OnSlideViewClickListener{
+        @Override
+        public void onClick(View v, int position) {
+            SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
+            SubjectData data = new SubjectData();
+            data.setS_key(topicData.t_key);
+            data.setS_name(topicData.t_info);
+            data.setStep(mData.getStep());
+            data.setS_datatype(mData.getS_datatype());
+            data.setData(new ArrayList<HomePageApkData>());
+            data.setSpecialtopic_data(null);
+            try {
+                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+                        bundleContext, ApkplugOSGIService.class,
+                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
+                        OSGIServiceAgent.real_time);   //每次都重新查询
+                agent.getService().ApkplugOSGIService(bundleContext,
+                        Constant.OSGI_SERVICE_DM_FRAGMENT,
+                        0, Constant.OSGI_SERVICE_TOPIC_FRAGMENT,data);
+            } catch (Exception e) {
+                // T
+                e.printStackTrace();
+            }
+        }
+    }
+}
