@@ -28,9 +28,12 @@ import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
 
+import org.apkplug.Bundle.ApkplugOSGIService;
+import org.apkplug.Bundle.OSGIServiceAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osgi.framework.BundleContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -291,12 +294,34 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
 
                     mDataContents.add(bean);
                 }
+                if (array.length() > 0)
+                    showUpdateNotification(array.length());
+                mAdapter = new UpdateAdapter(mActivity, mDataContents);
+                mListView.setAdapter(mAdapter);
             }
-            mAdapter = new UpdateAdapter(mActivity, mDataContents);
-            mListView.setAdapter(mAdapter);
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.i(TAG, "更新管理返回的JSON解析失败");
         }
     }
+
+    /**
+     * 发送更新通知
+     */
+    private void showUpdateNotification(int number) {
+        try {
+            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+                    bundleContext, ApkplugOSGIService.class,
+                    "(serviceName=" + Constant.OSGI_SERVICE_HOST_OPT + ")", //服务查询条件
+                    OSGIServiceAgent.real_time);   //每次都重新查询
+            agent.getService().ApkplugOSGIService(bundleContext,
+                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,
+                    2, number);
+        } catch (Exception e) {
+            // TODO 自动生成的 catch 块
+            e.printStackTrace();
+        }
+    }
+
 }

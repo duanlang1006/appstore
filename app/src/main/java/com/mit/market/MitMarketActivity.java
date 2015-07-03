@@ -1,5 +1,6 @@
 package com.mit.market;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +34,9 @@ public class MitMarketActivity extends ApkPluginActivity {
                     break;
                 case 1:
                     MitApkplugCloudAgent.download(MitMarketActivity.this,new ApkplugQueryModel<ApkplugModel>(),new MyApkplugDownloadCallback());
+                    break;
+                case 2:
+                    UpdateNotification.getInstance().showNot(MitMarketActivity.this, objects[0].toString());
                     break;
             }
             return null;
@@ -104,6 +108,14 @@ public class MitMarketActivity extends ApkPluginActivity {
             }
         }
         return super.onMenuOpened(featureId, menu);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Intent mIntent = getIntent();
+        if ("UpdteFragment".equals(mIntent.getExtras().get("show_fragment")))
+            launchFragment(R.id.container, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
     }
 
     @Override

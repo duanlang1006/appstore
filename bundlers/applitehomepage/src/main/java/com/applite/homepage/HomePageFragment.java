@@ -488,7 +488,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-    /****
+    /**
      * 升级
      */
     private void launchUpgradeFragment() {
