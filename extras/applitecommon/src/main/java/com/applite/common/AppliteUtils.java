@@ -5,11 +5,15 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 
 /**
@@ -185,6 +189,22 @@ public class AppliteUtils {
         }
         path += filename;
         return path;
+    }
+
+    /**
+     * 加载本地图片
+     *
+     * @param path
+     * @return
+     */
+    public static Bitmap getLoacalBitmap(String path) {
+        try {
+            FileInputStream fis = new FileInputStream(path);
+            return BitmapFactory.decodeStream(fis);  ///把流转化为Bitmap图片
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

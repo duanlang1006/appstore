@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_margin="10dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:textColor="@color/black"
+                android:text="别人都装啦。。。"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+
+            <ImageView
+                android:id="@+id/pop_exit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/exit_bg" />
+        </LinearLayout>
+
+        <View
+            android:layout_marginBottom="10dp"
+            android:background="@color/dividing_line"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"></View>
+
+        <GridView
+            android:id="@+id/pop_gv"
+            android:numColumns="3"
+            android:verticalSpacing="10dp"
+            android:horizontalSpacing="10dp"
+            android:layout_width="fill_parent"
+            android:layout_height="180dp"></GridView>
+
+        <View
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/dividing_line"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"></View>
+
+        <TextView
+            android:id="@+id/pop_text"
+            android:text="已选7/9,共250.0MB"
+            android:textColor="@color/black"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/pop_button"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center"
+            android:text="立即下载"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>
