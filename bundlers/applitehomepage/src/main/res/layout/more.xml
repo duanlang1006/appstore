@@ -20,7 +20,7 @@
         android:id="@+id/loadmore_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18dip"
-        android:text="数据加载中..." />
+        android:text="@string/load_more"
+        style="@style/MoreText"/>
 
 </LinearLayout>

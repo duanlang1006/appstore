@@ -21,6 +21,10 @@
     <string name="keep_on">继续</string>
     <string name="srarch_content_no_null">搜索内容不能为空！</string>
 
+    <string name="post_failure">数据请求失败！</string>
+    <string name="no_data">没有更多数据！</string>
+    <string name="loading">数据加载中...</string>
+
     <string name="download_start">安装</string>
     <string name="download_pending">等待下载</string>
     <string name="download_running">正在下载</string>

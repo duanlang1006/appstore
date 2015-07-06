@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">下载管理</string>
+    <string name="action_settings">设置</string>
+    <string name="dm_downloading">下载中</string>
+    <string name="dm_downloaded">已下载</string>
+</resources>
