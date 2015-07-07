@@ -45,6 +45,7 @@ public class ScrollOverListView extends ListView {
 	private void init(){
 		mTopPosition = 0;
 		mBottomPosition = 0;
+
 	}
 	
 	@Override
