@@ -16,14 +16,14 @@
 ** limitations under the License.
 */
 -->
-<com.applite.dm.DownloadItem
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:paddingTop="2dp"
     android:paddingBottom="2dp"
-    android:descendantFocusability="blocksDescendants">
+    android:background="@drawable/download_item_background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -52,21 +52,13 @@
                 android:layout_alignParentTop="true"
                 style="@style/ItemTitleText"/>
 
-            <ProgressBar
-                android:id="@android:id/progress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/download_title"
-                style="?android:attr/progressBarStyleHorizontal"/>
-
             <TextView android:id="@+id/size_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
                 android:text = "size_text"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@android:id/progress"
+                android:layout_below="@+id/download_title"
                 style="@style/ItemSizeText" />
 
             <TextView
@@ -77,14 +69,23 @@
                 android:maxLines="1"
                 android:text = "domain"
                 android:layout_alignParentRight="true"
-                android:layout_below="@android:id/progress"
+                android:layout_below="@+id/download_title"
                 android:paddingLeft="8dip"
                 style="@style/ItemStatusText" />
+
+            <ProgressBar
+                android:id="@android:id/progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/domain"
+                style="?android:attr/progressBarStyleHorizontal"/>
         </RelativeLayout>
         <Button
             android:id="@+id/button_op"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:focusable="false"
             android:clickable="false"
             style="@style/DownloadOptButton"/>
     </LinearLayout>
@@ -93,24 +94,27 @@
         android:layout_height="wrap_content"
         android:id="@+id/extra_line"
         android:layout_gravity="center_vertical"
-        android:minHeight="@dimen/download_item_icon_size"
-        android:padding="2dp"
+        android:padding="0dp"
         android:gravity="center"
-        android:visibility="gone">
+        android:visibility="visible">
         <Button
             android:id="@+id/button_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:focusable="false"
             android:clickable="false"
             android:text="@string/delete_download"
+            android:minHeight="20dp"
             style="@style/DownloadOptButton"/>
         <Button
             android:id="@+id/button_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:focusable="false"
             android:clickable="false"
             android:layout_toRightOf="@id/button_delete"
             android:text="@string/detail_download"
+            android:minHeight="20dp"
             style="@style/DownloadOptButton"/>
     </RelativeLayout>
-</com.applite.dm.DownloadItem>
+</LinearLayout>

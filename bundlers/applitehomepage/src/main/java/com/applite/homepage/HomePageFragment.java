@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -42,6 +43,7 @@ import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import java.io.File;
 import java.util.ArrayList;
+
 import java.util.List;
 
 /**
@@ -86,6 +88,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }
     };
 
+
     Runnable mRefreshRunnable = new Runnable() {
         @Override
         public void run() {
@@ -123,8 +126,20 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = activity;
         LogUtils.d(TAG, "onAttach ");
+        mActivity = activity;
+        mInflater = LayoutInflater.from(mActivity);
+        try {
+            Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
+            if (null != context) {
+                mInflater = LayoutInflater.from(context);
+                mInflater = mInflater.cloneInContext(context);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+//        initActionBar();
     }
 
     @Override
@@ -142,17 +157,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mInflater = inflater;
-        try {
-            Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            if (null != context) {
-                mInflater = LayoutInflater.from(context);
-                mInflater = mInflater.cloneInContext(context);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
+        LogUtils.d(TAG, "onCreateView");
         rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_homepage_main, container, false);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
@@ -168,7 +173,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 
         httpRequest();
         popupWindowPost();
-        LogUtils.d(TAG, "onCreateView");
+
         return rootView;
     }
 
@@ -347,8 +352,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.action_personal:
-//                launchDownloadManagerFragment();
-                launchUpgradeFragment();
+                launchPersonalFragment();
                 break;
             case R.id.action_search:
                 launchSearchFragment();
@@ -360,7 +364,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case android.R.id.home:
-                ((FragmentActivity)mActivity).getSupportFragmentManager().popBackStack();
+                getFragmentManager().popBackStack();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -396,25 +400,6 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     }
 
     /****
-     * 下载管理
-     */
-    private void launchDownloadManagerFragment() {
-        try {
-            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            agent.getService().ApkplugOSGIService(bundleContext,
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,
-                    0, Constant.OSGI_SERVICE_DM_FRAGMENT);
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
-    }
-
-    /****
      * 搜索
      */
     private void launchSearchFragment() {
@@ -433,23 +418,15 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-    /**
-     * 升级
+    /***
+     * 进入个人中心
      */
-    private void launchUpgradeFragment() {
-        try {
-            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName="+Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            agent.getService().ApkplugOSGIService(bundleContext,
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,
-                    0, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
+    private void launchPersonalFragment() {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(getId(),new PersonalFragment());
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     /**

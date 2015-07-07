@@ -7,12 +7,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.mit.impl.ImplStatusTag;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplConfig;
@@ -46,7 +49,7 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        ImplLog.d(DownloadPagerFragment.TAG,"onCreate,"+this);
+        ImplLog.d(DownloadPagerFragment.TAG, "onCreate," + this);
         super.onCreate(savedInstanceState);
         Bundle b = getArguments();
         mStatusFlags = b.getInt("statusFilter");
@@ -55,7 +58,7 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ImplLog.d(DownloadPagerFragment.TAG,"onCreateView,"+this);
+        ImplLog.d(DownloadPagerFragment.TAG, "onCreateView," + this);
         LayoutInflater mInflater = inflater;
         try {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
@@ -68,8 +71,8 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
         }
         View view = mInflater.inflate(R.layout.fragment_download_list, container, false);
         mListview = (ListView) view.findViewById(android.R.id.list);
-//        mListview.setOnItemClickListener(this);
         mListview.setEmptyView(view.findViewById(R.id.empty));
+//        mListview.setOnItemClickListener(this);
         setAdapter();
         return view;
     }
@@ -80,20 +83,20 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
         mActivity = activity;
         ImplAgent.registerImplListener(mImplListener);
         databaseHelper = new ImplDatabaseHelper(mActivity);
-        ImplLog.d(DownloadPagerFragment.TAG,"onAttach,"+this);
+        ImplLog.d(DownloadPagerFragment.TAG, "onAttach," + this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         ImplAgent.unregisterImplListener(mImplListener);
-        ImplLog.d(DownloadPagerFragment.TAG,"onDetach,"+this);
+        ImplLog.d(DownloadPagerFragment.TAG, "onDetach," + this);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ImplLog.d(DownloadPagerFragment.TAG,"onDestroyView,"+this);
+        ImplLog.d(DownloadPagerFragment.TAG, "onDestroyView," + this);
     }
 
     /**
@@ -111,16 +114,17 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (!(view instanceof DownloadItem)){
-            return;
-        }
-        DownloadItem item = (DownloadItem)view;
-        View extra = view.findViewById(R.id.extra_line);
-        if (extra.getVisibility() == View.GONE){
-            extra.setVisibility(View.VISIBLE);
-        }else if (extra.getVisibility() == View.VISIBLE){
-            extra.setVisibility(View.GONE);
-        }
+//        View extra = view.findViewById(R.id.extra_line);
+//        if (null != extra) {
+//            if (extra.getVisibility() == View.GONE) {
+//                extra.setVisibility(View.VISIBLE);
+//            } else if (extra.getVisibility() == View.VISIBLE) {
+//                extra.setVisibility(View.GONE);
+//            }
+//        }
+//        LogUtils.d("applite_dm","onItemClick,"+view+","+position);
+//        mAdapter.setChecked(mListview.getCheckedItemPosition());
+//        mAdapter.notifyDataSetInvalidated();
     }
 
     private void setAdapter(){
@@ -175,7 +179,7 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
         }
     }
 
-    private class DownloadItemListener implements DownloadItem.DownloadSelectListener{
+    private class DownloadItemListener implements DownloadAdapter.DownloadSelectListener{
         @Override
         public void onDownloadButtonClicked(ImplStatusTag tag) {
             ImplInfo info = ImplConfig.findInfoByKey(databaseHelper,tag.getKey());

@@ -8,8 +8,8 @@ android {
         applicationId "com.applite.android"
         minSdkVersion 10
         targetSdkVersion 21
-        versionCode 19
-        versionName "2.0.019"
+        versionCode 20
+        versionName "2.0.020"
         multiDexEnabled true
         manifestPlaceholders = [UMENG_CHANNEL_VALUE: "leadexceed_buildin"]
     }

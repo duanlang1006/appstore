@@ -5,38 +5,30 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="horizontal"
-    android:descendantFocusability="blocksDescendants">
+    android:descendantFocusability="blocksDescendants"
+    android:baselineAligned="true">
 
     <ImageView
-        android:layout_margin="5dp"
-        android:background="@drawable/buffer"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_margin="@dimen/categoryList_icon_margin"
+        android:layout_width="@dimen/categoryList_icon_width"
+        android:layout_height="@dimen/categoryList_icon_height"
         android:id="@+id/imageViewName"
         android:visibility="visible"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:focusable="false"
         android:focusableInTouchMode="false"/>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/categoryList_name_width"
         android:layout_height="wrap_content"
         android:text="ApkName"
-        android:id="@+id/textView"
+        android:id="@+id/apkName"
         android:visibility="visible"
-        android:textSize="16sp"
-        android:textColor="#ff000000"
-        android:textStyle="bold"
-        android:ellipsize="end"
-        android:focusable="false"
-        android:focusableInTouchMode="false"/>
+        style="@style/categoryListName"/>
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:visibility="invisible"
-        android:focusable="false"/>
+        android:layout_width="@dimen/categoryList_listArrow_width"
+        android:layout_height="@dimen/categoryList_listArrow_height"
+        android:id="@+id/categoryListArrow"
+        android:visibility="visible"
+        style="@style/categoryListArrow"/>
 </LinearLayout>

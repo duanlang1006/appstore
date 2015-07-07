@@ -11,4 +11,7 @@
     <color name="dividing_line">#a0a0a0</color>
     <color name="progress_foreground">#00CC00</color>
     <color name="loading_text_color">#FF000000</color>
+    <color name="listView_line_color">#ff001212</color>
+    <color name="categoryList_test_color">#ff000000</color>
+    <color name="apkList_apkName_color">#ff000000</color>
 </resources>

@@ -160,7 +160,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case android.R.id.home:
-                ((FragmentActivity)mActivity).getSupportFragmentManager().popBackStack();
+                getFragmentManager().popBackStack();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -198,7 +198,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
                         "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
                         OSGIServiceAgent.real_time);   //每次都重新查询
                 agent.getService().ApkplugOSGIService(bundleContext,
-                        Constant.OSGI_SERVICE_DM_FRAGMENT,
+                        Constant.OSGI_SERVICE_MAIN_FRAGMENT,
                         0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
                         itemData.getPackageName(),
                         itemData.getName(),

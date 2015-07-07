@@ -118,7 +118,10 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
 
-        <receiver android:name="com.android.applite.model.AppLiteReceiver" >
+        <receiver
+            android:name="com.android.applite.model.AppLiteReceiver"
+            android:exported="true"
+            android:process=":remote">
             <intent-filter>
                 <action android:name="android.intent.action.DATE_CHANGED"/>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
