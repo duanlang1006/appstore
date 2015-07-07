@@ -13,6 +13,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import com.applite.bean.HomePageApkData;
 import com.applite.bean.SubjectData;
+import com.applite.common.LogUtils;
 import com.applite.homepage.BundleContextFactory;
 import com.mit.impl.ImplStatusTag;
 import com.applite.homepage.R;
@@ -87,9 +88,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-
+        LogUtils.d(TAG, "getView() mData : " + mData);
         if (null != mData && null != mData.getData()) {
             HomePageApkData itemData = mData.getData().get(position);
+            LogUtils.d(TAG, "getView() itemData : " + itemData);
             viewHolder.setItemData(itemData);
             String localUri = itemData.getLocalUri();
             viewHolder.setStatusTag(ImplStatusTag.generateTag(mContext,
@@ -112,8 +114,9 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             viewHolder.setmRatingBar(star/2.0f);
             viewHolder.setmProgressButton(viewHolder.statusTag);
             viewHolder.setmAppIcon(itemData.getIconUrl());
-            viewHolder.setmAppSize(itemData.getCategorysub());
+            viewHolder.setCategorySub(itemData.getCategorysub());
             viewHolder.setmAppName(itemData.getName());
+            viewHolder.setImageListArrow();
         }
         return convertView;
     }
@@ -134,20 +137,21 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     public class ViewHolder {
         private ImageView mAppIcon;
         private TextView mAppName;
-        private TextView mAppSize;
+        private TextView mCategorySub;
         private RatingBar mRatingBar;
         private Button mProgressButton;
 
         private ImplStatusTag statusTag;
         private HomePageApkData itemData;
         private String layoutStr;
-
+        private ImageView mCategoryListArrow;
         ViewHolder(View mView){
             this.mAppIcon = (ImageView) mView.findViewById(R.id.imageViewName);
-            this.mAppName = (TextView) mView.findViewById(R.id.textView);
-            this.mAppSize = (TextView) mView.findViewById(R.id.textView2);
+            this.mAppName = (TextView) mView.findViewById(R.id.apkName);
+            this.mCategorySub = (TextView) mView.findViewById(R.id.categorySub);
             this.mRatingBar = (RatingBar) mView.findViewById(R.id.ratingbar_Indicator);
             this.mProgressButton = (Button) mView.findViewById(R.id.list_item_progress_button);
+            this.mCategoryListArrow = (ImageView) mView.findViewById(R.id.categoryListArrow);
         }
         public ImplStatusTag getStatusTag() {
             return statusTag;
@@ -159,6 +163,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         public void setmAppIcon(String iconUrl) {
             if (null != this.mAppIcon && null != iconUrl){
                 mFinalBitmap.display(this.mAppIcon, iconUrl);
+            }else {
+                mAppIcon.setImageResource(R.drawable.buffer);
             }
         }
 
@@ -168,9 +174,9 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             }
         }
 
-        public void setmAppSize(String size) {
-            if (null != this.mAppSize && null != size) {
-                this.mAppSize.setText(size);
+        public void setCategorySub(String size) {
+            if (null != this.mCategorySub && null != size) {
+                this.mCategorySub.setText(size);
             }
         }
 
@@ -196,6 +202,11 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             this.itemData = itemData;
         }
 
+        public void setImageListArrow(){
+            if(null != mCategoryListArrow) {
+                mCategoryListArrow.setImageResource(R.drawable.back);
+            }
+        }
         public String getLayoutStr() {
             return layoutStr;
         }

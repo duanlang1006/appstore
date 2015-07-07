@@ -6,10 +6,22 @@
     android:background="@color/white"
     tools:context="com.applite.homepage.ItemFragment">
 
-    <ListView android:id="@android:id/list" android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/listView_marginBottom"
+        android:layout_marginTop="@dimen/listView_marginTop"
+        android:minHeight="@dimen/listView_minHeight"
+        android:divider="@color/listView_line_color"
+        android:dividerHeight="@dimen/listView_divider_Height"
+        android:footerDividersEnabled="false"
+        android:headerDividersEnabled="true"/>
 
-    <TextView android:id="@android:id/empty" android:layout_width="match_parent"
-        android:layout_height="match_parent" android:gravity="center" />
+    <TextView
+        android:id="@android:id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" />
 
 </FrameLayout>
