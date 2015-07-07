@@ -283,7 +283,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
         if (hidden) {
             closeKeybord();
         } else {
-            KeyBoardUtils.openKeybord(mEtView, mActivity);
+            if (mListView.getVisibility() == View.GONE)
+                KeyBoardUtils.openKeybord(mEtView, mActivity);
         }
     }
 

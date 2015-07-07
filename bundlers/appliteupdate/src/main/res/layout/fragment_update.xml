@@ -2,40 +2,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/white"
+    android:orientation="vertical"
     tools:context="com.mit.appliteupdate.main.UpdateFragment">
 
     <TextView
-        android:padding="5dp"
-        android:gravity="center"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="5dp"
         android:text="更新管理"
-        android:textSize="20sp"
-        android:textColor="#000000" />
+        android:textColor="#000000"
+        android:textSize="20sp" />
 
     <LinearLayout
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <TextView
-            android:layout_margin="5dp"
-            android:text="可更新"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:text="可更新"
+            android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/update_all_update"
-            android:text="全部更新"
-            android:textColor="@color/qingse"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="全部更新"
+            android:textColor="@color/qingse" />
 
     </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="3dp"
+        android:background="@color/dividing_line"></View>
 
     <ListView
         android:id="@+id/update_listview"
