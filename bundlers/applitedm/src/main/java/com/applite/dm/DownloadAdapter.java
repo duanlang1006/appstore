@@ -33,22 +33,24 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.mit.impl.ImplStatusTag;
-import com.applite.dm.DownloadItem.DownloadSelectListener;
 import com.mit.impl.ImplConfig;
 import net.tsz.afinal.FinalBitmap;
+import net.tsz.afinal.FinalHttp;
+
 import java.text.DateFormat;
 import java.util.List;
 
 /**
  * List adapter for Cursors returned by {@link com.android.dsc.downloads.DownloadManager}.
  */
-public class DownloadAdapter extends CursorAdapter {
+public class DownloadAdapter extends CursorAdapter implements View.OnClickListener{
     private Context mContext;
     private DownloadSelectListener mDownloadSelectionListener;
     private Resources mResources;
     private LayoutInflater mInflater;
     private DateFormat mDateFormat;
     private DateFormat mTimeFormat;
+    private int mCheckedItemPosition = -1;
 
     private int mKeyColumnId;
     private int mTitleColumnId;
@@ -103,27 +105,37 @@ public class DownloadAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        DownloadItem view = (DownloadItem) mInflater.inflate(R.layout.download_list_item, null);
-        view.setSelectListener(mDownloadSelectionListener);
+        View view = mInflater.inflate(R.layout.download_list_item, null);
         return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        if (!(view instanceof DownloadItem)) {
-            return;
-        }
         DownloadItemViewHolder viewHolder = (DownloadItemViewHolder)view.getTag();
         if (null == viewHolder) {
             viewHolder = new DownloadItemViewHolder();
-            viewHolder.actionBtn = (Button) view.findViewById(R.id.button_op);
+            viewHolder.actionBtn = (TextView) view.findViewById(R.id.button_op);
+            viewHolder.deleteButton = (TextView) view.findViewById(R.id.button_delete);
+            viewHolder.detailButton = (TextView) view.findViewById(R.id.button_detail);
             viewHolder.progressBar = (ProgressBar) view.findViewById(android.R.id.progress);
             viewHolder.descView = (TextView) view.findViewById(R.id.size_text);
             viewHolder.titleView = (TextView) view.findViewById(R.id.download_title);
             viewHolder.statusView = (TextView) view.findViewById(R.id.domain);
             viewHolder.iconView = (ImageView) view.findViewById(R.id.download_icon);
+            viewHolder.extra = view.findViewById(R.id.extra_line);
             view.setTag(viewHolder);
+            viewHolder.actionBtn.setTag(viewHolder);
+            viewHolder.deleteButton.setTag(viewHolder);
+            viewHolder.detailButton.setTag(viewHolder);
         }
+
+        viewHolder.position = cursor.getPosition();
+        viewHolder.actionBtn.setOnClickListener(this);
+        viewHolder.deleteButton.setOnClickListener(this);
+        viewHolder.detailButton.setOnClickListener(this);
+
+        view.setOnClickListener(this);
+
         Cursor c = getCursor();
         String localUri = c.getString(mLocalUriColumnId);
         viewHolder.statusTag = ImplStatusTag.generateTag(mContext,
@@ -153,181 +165,42 @@ public class DownloadAdapter extends CursorAdapter {
         viewHolder.statusView.setText(viewHolder.statusTag.getStatusText());
         setIcon(viewHolder.iconView);
         setProgress(viewHolder.progressBar,viewHolder.statusTag.getPercent());
+        if (mCheckedItemPosition == cursor.getPosition()){
+            viewHolder.extra.setVisibility(View.VISIBLE);
+        }else{
+            viewHolder.extra.setVisibility(View.GONE);
+        }
     }
 
-//    private ImplStatusTag getItemTag(){
-//        Cursor c = getCursor();
-//        String key = c.getString(mKeyColumnId);
-//        int reason = c.getInt(mReasonColumnId);
-//        int status = c.getInt(mStatusColumnId);
-//        ImplStatusTag tag = new ImplStatusTag(key,c.getString(mPackageColumnId));
-//        switch (status) {
-//            case Constant.STATUS_FAILED:
-//                tag.setAction(ImplStatusTag.ACTION_DOWNLOAD);
-//                tag.setActionString(mResources.getString(R.string.retry_download));
-//                if (DownloadManager.ERROR_INSUFFICIENT_SPACE == reason){
-//                    tag.setStatusString(mResources.getString(R.string.download_error_insufficient_space));
-//                }else{
-//                    tag.setStatusString(mResources.getString(R.string.download_error));
-//                }
-//                tag.setDescString(getSizeText());
-//                break;
-//
-//            case Constant.STATUS_SUCCESSFUL:
-//                tag.setAction(ImplStatusTag.ACTION_OPEN);
-//                tag.setActionString(mResources.getString(R.string.open_download));
-//                tag.setStatusString(mResources.getString(R.string.download_success));
-//                tag.setDescString(getSizeText());
-//                Uri localUri = Uri.parse(c.getString(mLocalUriColumnId));
-//                String mediaType = c.getString(mMediaTypeColumnId);
-//                tag.setIntent(getOpenDownloadIntent(localUri,mediaType));
-//                if ("application/vnd.android.package-archive".equals(mediaType)) {
-//                    PackageInfo archivePkg = mPackageManager.getPackageArchiveInfo(
-//                            localUri.getPath(), PackageManager.GET_ACTIVITIES);
-//                    if (null != archivePkg){
-//                        tag.setAction(ImplStatusTag.ACTION_OPEN);
-//                        tag.setDescString(String.format(mResources.getString(R.string.apk_version),archivePkg.versionName));
-//                        Intent intent = getLaunchDownloadIntent(archivePkg.packageName);
-//                        tag.setIntent(intent);
-//                        if (null == intent){
-//                            tag.setActionString(mResources.getString(R.string.install));
-//                        }else{
-//                            tag.setActionString(mResources.getString(R.string.run));
-//                        }
-//                    }else{//下载apk解析错误
-//                        tag.setAction(ImplStatusTag.ACTION_DOWNLOAD);
-//                        tag.setStatusString(mResources.getString(R.string.apk_invalid));
-//                        tag.setActionString(mResources.getString(R.string.retry_download));
-//                        tag.setDescString(getSizeText());
-//                        tag.setIntent(null);
-//                    }
-//                }
-//                break;
-//
-//            case Constant.STATUS_PENDING:
-//            case Constant.STATUS_RUNNING:
-//                tag.setAction(ImplStatusTag.ACTION_DOWNLOAD);
-//                tag.setStatusString(mResources.getString(R.string.download_running));
-//                tag.setActionString(mResources.getString(R.string.pause_download));
-//                tag.setDescString(getSizeText());
-//                tag.setIntent(null);
-//                break;
-//
-//            case Constant.STATUS_PAUSED:
-//                tag.setAction(ImplStatusTag.ACTION_DOWNLOAD);
-//                switch (reason) {
-//                    case DownloadManager.PAUSED_QUEUED_FOR_WIFI:
-//                        tag.setStatusString(mResources.getString(R.string.download_queued));
-//                        tag.setActionString(mResources.getString(R.string.pause_download));
-//                        break;
-//                    case DownloadManager.PAUSED_BY_APP:
-//                        tag.setStatusString(mResources.getString(R.string.download_paused));
-//                        tag.setActionString(mResources.getString(R.string.conti_download));
-//                        break;
-//                    case DownloadManager.PAUSED_WAITING_FOR_NETWORK:
-//                        tag.setStatusString(mResources.getString(R.string.download_waiting_for_network));
-//                        tag.setActionString(mResources.getString(R.string.pause_download));
-//                        break;
-//                    default:
-//                        tag.setStatusString(mResources.getString(R.string.download_running));
-//                        tag.setActionString(mResources.getString(R.string.pause_download));
-//                        break;
-//                }
-//                tag.setDescString(getSizeText());
-//                tag.setIntent(null);
-//                break;
-//            case Constant.STATUS_INSTALLED:
-//                try {
-//                    PackageInfo installPkg = mPackageManager.getPackageInfo(tag.getPackageName(),PackageManager.GET_ACTIVITIES);
-//                    tag.setAction(ImplStatusTag.ACTION_OPEN);
-//                    tag.setStatusString(mResources.getString(R.string.installed));
-//                    tag.setActionString(mResources.getString(R.string.apk_run));
-//                    tag.setIntent(getLaunchDownloadIntent(tag.getPackageName()));
-//                    tag.setDescString(String.format(mResources.getString(R.string.apk_version),installPkg.versionName));
-//                } catch (PackageManager.NameNotFoundException e) {
-//                    e.printStackTrace();
-//                    tag.setAction(ImplStatusTag.ACTION_DOWNLOAD);
-//                    tag.setStatusString(mResources.getString(R.string.apk_packagename_invalid));
-//                    tag.setActionString(mResources.getString(R.string.retry_download));
-//                    tag.setDescString(getSizeText());
-//                    tag.setIntent(null);
-//                }
-//                break;
-//            case Constant.STATUS_PRIVATE_INSTALLING:
-//                tag.setAction(ImplStatusTag.ACTION_INSTALL);
-//                tag.setStatusString(mResources.getString(R.string.installing));
-//                tag.setActionString(mResources.getString(R.string.open_download));
-//                tag.setDescString(getSizeText());
-//                tag.setIntent(null);
-//                break;
-//            case Constant.STATUS_NORMAL_INSTALLING:
-//                tag.setAction(ImplStatusTag.ACTION_INSTALL);
-//                tag.setStatusString(mResources.getString(R.string.installing));
-//                tag.setActionString(mResources.getString(R.string.open_download));
-//                tag.setDescString(getSizeText());
-//                tag.setIntent(null);
-//                break;
-//            case Constant.STATUS_PACKAGE_INVALID:
-//                tag.setAction(ImplStatusTag.ACTION_DOWNLOAD);
-//                tag.setStatusString(mResources.getString(R.string.package_invalid));
-//                tag.setActionString(mResources.getString(R.string.open_download));
-//                tag.setDescString(getSizeText());
-//                tag.setIntent(null);
-//                break;
-//            case Constant.STATUS_INSTALL_FAILED:
-//                tag.setAction(ImplStatusTag.ACTION_DOWNLOAD);
-//                tag.setStatusString(mResources.getString(R.string.install_failed));
-//                tag.setActionString(mResources.getString(R.string.open_download));
-//                tag.setDescString(getSizeText());
-//                tag.setIntent(null);
-//                break;
-//        }
-//        return tag;
-//    }
-
-//    private Intent getOpenDownloadIntent(Uri localUri,String mediaType) {
-//        Intent intent = new Intent(Intent.ACTION_VIEW);
-//        intent.setDataAndType(localUri, mediaType);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//        return intent;
-//    }
-//
-//    private Intent getLaunchDownloadIntent(String packageName) {
-//        Intent intent = mPackageManager.getLaunchIntentForPackage(packageName);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-//        return intent;
-//    }
-//
-//    private String getDateString() {
-//        Date date = new Date(getCursor().getLong(mDateColumnId));
-//        if (date.before(getStartOfToday())) {
-//            return mDateFormat.format(date);
-//        } else {
-//            return mTimeFormat.format(date);
-//        }
-//    }
-
-//    private Date getStartOfToday() {
-//        Calendar today = new GregorianCalendar();
-//        today.set(Calendar.HOUR_OF_DAY, 0);
-//        today.set(Calendar.MINUTE, 0);
-//        today.set(Calendar.SECOND, 0);
-//        today.set(Calendar.MILLISECOND, 0);
-//        return today.getTime();
-//    }
-//
-//    private String getSizeText() {
-//        long totalBytes = getCursor().getLong(mTotalBytesColumnId);
-//        long currentBytes = getCursor().getLong(mCurrentBytesColumnId);
-//        StringBuffer sizeText = new StringBuffer();
-//        if (totalBytes >= 0) {
-//            sizeText.append(Formatter.formatFileSize(mContext, currentBytes));
-//            sizeText.append("/");
-//            sizeText.append(Formatter.formatFileSize(mContext, totalBytes));
-//        }
-//        return sizeText.toString();
-//    }
-
+    @Override
+    public void onClick(View v) {
+        DownloadAdapter.DownloadItemViewHolder viewHoler = (DownloadAdapter.DownloadItemViewHolder)v.getTag();
+        switch(v.getId()){
+            case R.id.button_delete:
+                if (null != mDownloadSelectionListener) {
+                    mDownloadSelectionListener.onDeleteButtonClicked(viewHoler.statusTag);
+                }
+                break;
+            case R.id.button_detail:
+                if (null != mDownloadSelectionListener) {
+                    mDownloadSelectionListener.onDetailButtonClicked(viewHoler.statusTag);
+                }
+                break;
+            case R.id.button_op:
+                if (null != mDownloadSelectionListener) {
+                    mDownloadSelectionListener.onDownloadButtonClicked(viewHoler.statusTag);
+                }
+                break;
+            default:
+                if (mCheckedItemPosition == viewHoler.position){
+                    mCheckedItemPosition = -1;
+                }else{
+                    mCheckedItemPosition = viewHoler.position;
+                }
+                notifyDataSetInvalidated();
+                break;
+        }
+    }
 
     private void setIcon(ImageView iconView) {
         Cursor c = getCursor();
@@ -351,11 +224,6 @@ public class DownloadAdapter extends CursorAdapter {
         }
     }
 
-//    private void setTextForView(View parent, int textViewId, String text) {
-//        TextView view = (TextView) parent.findViewById(textViewId);
-//        view.setText(text);
-//    }
-//
     private void setProgress(ProgressBar progressBar,int percent){
         progressBar.setIndeterminate(false);
         progressBar.setMax(100);
@@ -368,8 +236,18 @@ public class DownloadAdapter extends CursorAdapter {
         TextView titleView;
         TextView descView;
         TextView statusView;
-        Button actionBtn;
+        TextView actionBtn;
+        TextView deleteButton;
+        TextView detailButton;
         ImageView iconView;
         ImplStatusTag statusTag;
+        View extra;
+        int position;
+    }
+
+    interface DownloadSelectListener {
+        public void onDownloadButtonClicked(ImplStatusTag tag);
+        public void onDeleteButtonClicked(ImplStatusTag tag);
+        public void onDetailButtonClicked(ImplStatusTag tag);
     }
 }

@@ -19,18 +19,22 @@
         <item name="android:textColor">@color/download_item_size</item>
     </style>
 
-    <style name="DownloadOptButton">
-        <item name="android:textSize">14sp</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:layout_margin">0dp</item>
-        <item name="android:padding">0dp</item>
-    </style>
-
     <style name="DownloadListEmpty">
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:gravity">center</item>
         <item name="android:textColor">@color/download_item_title</item>
     </style>
+
+    <style name="DownloadOptButton" parent="android:TextAppearance.Medium">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:padding">0dp</item>
+    </style>
+    <!--<item name="android:minHeight">32dp</item>-->
+    <!--<item name="android:minWidth">48dp</item>-->
+
 </resources>
