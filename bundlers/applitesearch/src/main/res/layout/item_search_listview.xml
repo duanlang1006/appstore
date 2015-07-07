@@ -22,7 +22,7 @@
 
             <ImageView
                 android:layout_margin="5dp"
-                android:background="@drawable/ic_launcher"
+                android:background="@drawable/apk_default_bg"
                 android:id="@+id/list_item_img"
                 android:layout_width="60dp"
                 android:layout_height="60dp" />

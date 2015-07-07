@@ -2,17 +2,20 @@ package com.mit.market;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
 import android.view.Window;
 
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.mit.bean.ApkplugModel;
 import com.mit.bean.ApkplugQueryModel;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
 import com.mit.mitupdatesdk.MitApkplugCloudAgent;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
 import com.applite.android.R;
 import org.apkplug.Bundle.ApkplugOSGIService;
@@ -54,8 +57,15 @@ public class MitMarketActivity extends ApkPluginActivity {
 //        ImplAgent.registerImplListener(mImplListener);
 
         MitUpdateAgent.update(this);
+        MitMobclickAgent.onEvent(this, "OpenApk");
+
         if (savedInstanceState == null) {
             launchFragment(R.id.container,Constant.OSGI_SERVICE_LOGO_FRAGMENT);
+        }
+
+        Intent mIntent = getIntent();
+        if (Constant.UPDATE_FRAGMENT_NOT.equals(mIntent.getStringExtra("update"))){
+            launchFragment(R.id.container, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
         }
     }
 
@@ -113,8 +123,9 @@ public class MitMarketActivity extends ApkPluginActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Intent mIntent = getIntent();
-        if ("UpdteFragment".equals(mIntent.getExtras().get("show_fragment")))
+//        Intent mIntent = getIntent();
+        setIntent(intent);
+        if (Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update")))
             launchFragment(R.id.container, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
     }
 
