@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background_tab_pressed">#FFFFFFFF</color>
     <color name="background_list">#FFFFFFFF</color>
-    <color name="download_item_title">#FF000000</color>
+    <color name="download_item_title">#FF414141</color>
     <color name="download_item_size">#FF777777</color>
     <color name="download_item_status">#FF777777</color>
+    <color name="download_item_devider">#ee909990</color>
+    <color name="download_item_background_pressed">#6633B5E5</color>
 </resources>
