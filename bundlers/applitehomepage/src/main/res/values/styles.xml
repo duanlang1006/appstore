@@ -11,4 +11,54 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="categoryListName" parent="android:TextAppearance.Medium">
+        <item name="android:textSize">@dimen/categoryList_text_size</item>
+        <item name="android:textColor">@color/categoryList_test_color</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginTop">@dimen/categoryList_text_marginTop</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:focusable">false</item>
+        <item name="android:focusableInTouchMode">false</item>
+    </style>
+
+    <style name="categoryListArrow">
+        <item name="android:layout_marginLeft">@dimen/categoryList_image_marginLeft</item>
+        <item name="android:layout_marginTop">@dimen/categoryList_image_marginTop</item>
+        <item name="android:focusable">false</item>
+        <item name="android:focusableInTouchMode">false</item>
+    </style>
+
+    <style name="apkListIcon">
+        <item name="android:visibility">visible</item>
+        <item name="android:layout_marginBottom">@dimen/apkList_iconMarginBottom</item>
+        <item name="android:layout_marginTop">@dimen/apkList_iconMarginTop</item>
+        <item name="android:focusable">false</item>
+        <item name="android:focusableInTouchMode">false</item>
+    </style>
+
+    <style name="apkListName">
+        <item name="android:visibility">visible</item>
+        <item name="android:textSize">@dimen/apkList_nameText_size</item>
+        <item name="android:textColor">@color/apkList_apkName_color</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:focusable">false</item>
+        <item name="android:focusableInTouchMode">false</item>
+    </style>
+
+    <style name="apkListRating">
+        <item name="android:numStars">5</item>
+        <item name="android:focusable">false</item>
+        <item name="android:focusableInTouchMode">false</item>
+    </style>
+
+    <style name="apkListBottom">
+        <item name="android:layout_marginTop">@dimen/apkList_bottom_marginTop</item>
+        <item name="android:layout_marginLeft">@dimen/apkList_bottom_marginLeft</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:focusable">false</item>
+        <item name="android:focusableInTouchMode">false</item>
+    </style>
 </resources>
