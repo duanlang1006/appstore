@@ -110,6 +110,7 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
             actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setCustomView(customView);
+            actionBar.setDisplayShowTitleEnabled(false);
             actionBar.show();
         }catch (Exception e){
             e.printStackTrace();
