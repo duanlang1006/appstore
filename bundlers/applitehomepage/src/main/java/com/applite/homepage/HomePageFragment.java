@@ -159,7 +159,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         LogUtils.d(TAG, "onCreateView");
         rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_homepage_main, container, false);
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
@@ -181,8 +181,9 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (!hidden){
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-            actionBar.show();
+            LogUtils.i(TAG, "重新显示ActionBar");
+            initActionBar();
+            mActivity.runOnUiThread(mRefreshRunnable);
         }
     }
 
