@@ -375,8 +375,11 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
             View search = customView.findViewById(R.id.action_search);
             search.setOnClickListener(this);
             //加入滑动tab管理viewPager
-            mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,null,false);
-            customView.addView(mPagerSlidingTabStrip,1);
+            //mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,null,false);
+
+            ViewGroup title = (ViewGroup)customView.findViewById(R.id.action_title);
+            mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,title,false);
+            title.addView(mPagerSlidingTabStrip);
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
             if (null == mCategory) {
