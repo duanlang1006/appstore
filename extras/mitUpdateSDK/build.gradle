@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    provided files('../../app/libs/umeng-analytics-v5.4.2.jar')
+    provided files('../../app/reflibs/umeng-analytics-v5.5.3.jar')
     provided files('../../app/libs/umeng-update-v2.6.0.1.jar')
 }
 
