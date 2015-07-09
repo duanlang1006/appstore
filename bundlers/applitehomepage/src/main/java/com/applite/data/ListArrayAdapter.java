@@ -13,6 +13,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import com.applite.bean.HomePageApkData;
 import com.applite.bean.SubjectData;
+import com.applite.common.AppliteUtils;
 import com.applite.common.LogUtils;
 import com.applite.homepage.BundleContextFactory;
 import com.mit.impl.ImplStatusTag;
@@ -115,6 +116,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             viewHolder.setmProgressButton(viewHolder.statusTag);
             viewHolder.setmAppIcon(itemData.getIconUrl());
             viewHolder.setCategorySub(itemData.getCategorysub());
+            viewHolder.setAppSize(itemData.getApkSize());
             viewHolder.setmAppName(itemData.getName());
             viewHolder.setImageListArrow();
         }
@@ -138,6 +140,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private ImageView mAppIcon;
         private TextView mAppName;
         private TextView mCategorySub;
+        private TextView mAppSize;
         private RatingBar mRatingBar;
         private Button mProgressButton;
 
@@ -146,9 +149,11 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private String layoutStr;
         private ImageView mCategoryListArrow;
         ViewHolder(View mView){
+
             this.mAppIcon = (ImageView) mView.findViewById(R.id.imageViewName);
             this.mAppName = (TextView) mView.findViewById(R.id.apkName);
             this.mCategorySub = (TextView) mView.findViewById(R.id.categorySub);
+            this.mAppSize = (TextView) mView.findViewById(R.id.apkSize);
             this.mRatingBar = (RatingBar) mView.findViewById(R.id.ratingbar_Indicator);
             this.mProgressButton = (Button) mView.findViewById(R.id.list_item_progress_button);
             this.mCategoryListArrow = (ImageView) mView.findViewById(R.id.categoryListArrow);
@@ -174,9 +179,18 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             }
         }
 
-        public void setCategorySub(String size) {
-            if (null != this.mCategorySub && null != size) {
-                this.mCategorySub.setText(size);
+        public void setCategorySub(String categorySub) {
+            if (null != this.mCategorySub && null != categorySub) {
+                this.mCategorySub.setText(categorySub);
+            }
+        }
+
+        public void setAppSize(String size){
+            if (null != this.mAppSize && null != size) {
+                String mSize = AppliteUtils.bytes2kb(Long.parseLong(size));
+                if (null != mSize) {
+                    this.mAppSize.setText(mSize);
+                }
             }
         }
 
