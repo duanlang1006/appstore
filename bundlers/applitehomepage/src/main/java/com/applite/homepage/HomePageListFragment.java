@@ -202,7 +202,8 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
                         0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
                         itemData.getPackageName(),
                         itemData.getName(),
-                        itemData.getIconUrl());
+                        itemData.getIconUrl(),
+                        Constant.OSGI_SERVICE_MAIN_FRAGMENT);
             } catch (Exception e) {
                 // T
                 e.printStackTrace();

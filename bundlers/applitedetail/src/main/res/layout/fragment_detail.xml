@@ -8,6 +8,7 @@
     tools:context="com.mit.detail.DetailFragment">
 
     <LinearLayout
+        android:visibility="gone"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"

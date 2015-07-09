@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -61,7 +62,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private String mPackageName;
     private String mName;
     private String mImgUrl;
-    private int mApkType;
+    private int mApkType = -1;
     private ProgressButton mProgressButton;
     private int mVersionCode;
     private Context mContext;
@@ -164,6 +165,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mApkName = bundle.getString("name");
         mImgUrl = bundle.getString("imgUrl");
         LogUtils.i(TAG, "mApkName:" + mApkName + "------mPackageName:" + mPackageName + "------mImgUrl:" + mImgUrl);
+        initActionBar();
     }
 
     @Override
@@ -180,8 +182,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             mInflater = LayoutInflater.from(context);
             mInflater = mInflater.cloneInContext(context);
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-            actionBar.hide();
             mContext = context;
         } catch (Exception e) {
             e.printStackTrace();
@@ -197,6 +197,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         initView();
         if (!TextUtils.isEmpty(mPackageName))
             post(mPackageName);
+
+        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -204,6 +206,29 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     public void onDetach() {
         super.onDetach();
         ImplAgent.unregisterImplListener(mImplListener);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case android.R.id.home:
+                getFragmentManager().popBackStack();
+                return super.onOptionsItemSelected(item);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void initActionBar() {
+        try {
+            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setDisplayShowCustomEnabled(false);
+            actionBar.setTitle(mApkName);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -236,7 +261,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     } else {
 //                        mProgressBar.setVisibility(View.VISIBLE);
 //                        Utils.setDownloadViewText(mContext, mProgressButton);
-                        requestDownload();
+                        if (!TextUtils.isEmpty(mDownloadUrl))
+                            requestDownload();
                     }
                 }
             }
@@ -342,11 +368,14 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             //判断应用是否安装
             mApkType = AppliteUtils.isAppInstalled(mActivity, mPackageName, mVersionCode);
             if (mApkType == Constant.INSTALLED) {
+                LogUtils.i(TAG, "应用已安装");
                 mProgressButton.setText(mContext.getResources().getString(R.string.open));
             } else if (mApkType == Constant.INSTALLED_UPDATE) {
                 mProgressButton.setText(mContext.getResources().getString(R.string.update));
+                LogUtils.i(TAG, "应用有更新");
             } else if (mApkType == Constant.UNINSTALLED) {
                 mProgressButton.setText(mContext.getResources().getString(R.string.install));
+                LogUtils.i(TAG, "应用未安装");
             }
         } catch (JSONException e) {
             e.printStackTrace();

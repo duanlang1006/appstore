@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -232,6 +233,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
     };
     private TextView mMoreText;
     private ProgressBar mMoreProgressBar;
+    private LayoutInflater mInflater;
+    private String mEtViewText;//页面隐藏时mEtView里面的字
 
     public SearchFragment() {
     }
@@ -253,13 +256,11 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        LayoutInflater mInflater = inflater;
+        mInflater = inflater;
         try {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             mInflater = LayoutInflater.from(context);
             mInflater = mInflater.cloneInContext(context);
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-            actionBar.hide();
             mContext = context;
         } catch (Exception e) {
             e.printStackTrace();
@@ -274,6 +275,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
         initView();
         if (mHotWordBeans.size() == 0)
             postHotWord();
+
+        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -281,10 +284,12 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (hidden) {
+            mEtViewText = mEtView.getText().toString();
             closeKeybord();
         } else {
             if (mListView.getVisibility() == View.GONE)
                 KeyBoardUtils.openKeybord(mEtView, mActivity);
+            initActionBar();
         }
     }
 
@@ -309,21 +314,57 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
         ImplAgent.unregisterImplListener(mImplListener);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case android.R.id.home:
+                getFragmentManager().popBackStack();
+                return super.onOptionsItemSelected(item);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void initActionBar() {
+        try {
+            ViewGroup customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_search, null);
+            mBackView = (ImageButton) customView.findViewById(R.id.search_back);
+            mBackView.setOnClickListener(this);
+            mEtView = (EditText) customView.findViewById(R.id.search_et);
+            if (null != mEtViewText)
+                mEtView.setText(mEtViewText);
+            mSearchView = (ImageButton) customView.findViewById(R.id.search_search);
+            mSearchView.setOnClickListener(this);
+            mDeleteView = (ImageView) customView.findViewById(R.id.search_delete);
+            mDeleteView.setOnClickListener(this);
+
+            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setCustomView(customView);
+            actionBar.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 初始化控件
      */
     private void initView() {
+        initActionBar();
+
         mMoreText = (TextView) moreView.findViewById(R.id.loadmore_text);
         mMoreProgressBar = (ProgressBar) moreView.findViewById(R.id.load_progressbar);
 
         mHotWordLL = (LinearLayout) rootView.findViewById(R.id.hot_word_ll);
         mNoNetworkIV = (ImageView) rootView.findViewById(R.id.hot_word_no_network);
-        mBackView = (ImageButton) rootView.findViewById(R.id.search_back);
-        mEtView = (EditText) rootView.findViewById(R.id.search_et);
-        mSearchView = (ImageButton) rootView.findViewById(R.id.search_search);
+//        mBackView = (ImageButton) rootView.findViewById(R.id.search_back);
+//        mEtView = (EditText) rootView.findViewById(R.id.search_et);
+//        mSearchView = (ImageButton) rootView.findViewById(R.id.search_search);
         mListView = (ListView) rootView.findViewById(R.id.search_listview);
         mGridView = (GridView) rootView.findViewById(R.id.search_gv);
-        mDeleteView = (ImageView) rootView.findViewById(R.id.search_delete);
+//        mDeleteView = (ImageView) rootView.findViewById(R.id.search_delete);
         mHotChangeView = (TextView) rootView.findViewById(R.id.hot_word_change);
         mPreloadListView = (ListView) rootView.findViewById(R.id.search_preload_listview);
         mPreloadListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -345,9 +386,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
         mEtView.addTextChangedListener(mTextWatcher);
 
         mHotChangeView.setOnClickListener(this);
-        mDeleteView.setOnClickListener(this);
-        mBackView.setOnClickListener(this);
-        mSearchView.setOnClickListener(this);
+//        mDeleteView.setOnClickListener(this);
+//        mBackView.setOnClickListener(this);
+//        mSearchView.setOnClickListener(this);
     }
 
     private TextWatcher mTextWatcher = new TextWatcher() {
