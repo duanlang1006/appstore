@@ -3,11 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/categoryListView"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="horizontal"
-    android:descendantFocusability="blocksDescendants"
-    android:baselineAligned="true">
-
+    android:layout_height="fill_parent">
+    <LinearLayout
+        android:layout_margin="2dp"
+        android:gravity="center_vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
     <ImageView
         android:layout_margin="@dimen/categoryList_icon_margin"
         android:layout_width="@dimen/categoryList_icon_width"
@@ -16,19 +18,26 @@
         android:visibility="visible"
         android:focusable="false"
         android:focusableInTouchMode="false"/>
-
-    <TextView
-        android:layout_width="@dimen/categoryList_name_width"
-        android:layout_height="wrap_content"
-        android:text="ApkName"
-        android:id="@+id/apkName"
-        android:visibility="visible"
-        style="@style/categoryListName"/>
-
-    <ImageView
-        android:layout_width="@dimen/categoryList_listArrow_width"
-        android:layout_height="@dimen/categoryList_listArrow_height"
-        android:id="@+id/categoryListArrow"
-        android:visibility="visible"
-        style="@style/categoryListArrow"/>
+        <LinearLayout
+            android:layout_gravity="center_vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">>
+            <TextView
+                android:layout_width="@dimen/categoryList_name_width"
+                android:layout_height="wrap_content"
+                android:text="ApkName"
+                android:id="@+id/apkName"
+                android:visibility="visible"
+                style="@style/categoryListName"/>
+        </LinearLayout>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/categoryListArrow"
+            android:visibility="visible"
+            android:background="@drawable/back"
+            style="@style/categoryListArrow"/>
+    </LinearLayout>
 </LinearLayout>

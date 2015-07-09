@@ -3,12 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/pullDownView"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="horizontal"
-    android:descendantFocusability="blocksDescendants"
-    android:baselineAligned="true"
-    android:weightSum="1">
-
+    android:layout_height="fill_parent">
+    <LinearLayout
+        android:layout_margin="2dp"
+        android:gravity="center_vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
     <ImageView
         android:layout_margin="@dimen/apkList_iconMargin"
         android:layout_width="@dimen/apkList_icon_width"
@@ -16,10 +17,10 @@
         android:id="@+id/imageViewName"
         style="@style/apkListIcon"/>
     <LinearLayout
+        android:layout_gravity="center_vertical"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:id="@+id/linearLayout"
-        android:layout_marginTop="@dimen/apkList_textStar_marginTop"
         android:orientation="vertical">
         <TextView
             android:layout_width="@dimen/apkList_iconMinWidth"
@@ -36,19 +37,32 @@
             android:numStars ="5"
             android:focusable = "false"
             android:focusableInTouchMode = "false"/>
+        <LinearLayout
+            android:layout_margin="2dp"
+            android:gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="categorySub"
             android:id="@+id/categorySub"
-            android:visibility="visible"
-            android:focusable="false"
-            android:focusableInTouchMode="false"/>
+            style="@style/apkListCategorySub"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.0M"
+            android:id="@+id/apkSize"
+            style="@style/apkListSize"/>
+        </LinearLayout>
     </LinearLayout>
+
     <Button
         android:id="@+id/list_item_progress_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="install"
         style="@style/apkListBottom"/>
-
+    </LinearLayout>
 </LinearLayout>
