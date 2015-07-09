@@ -11,7 +11,10 @@
     <color name="dividing_line">#a0a0a0</color>
     <color name="progress_foreground">#00CC00</color>
     <color name="loading_text_color">#FF000000</color>
-    <color name="listView_line_color">#ff001212</color>
-    <color name="categoryList_test_color">#ff000000</color>
-    <color name="apkList_apkName_color">#ff000000</color>
+    <color name="listView_line_color">#9a999a</color>
+    <color name="categoryList_text_color">#414141</color>
+    <color name="apkList_apkName_color">#414141</color>
+    <color name="apkList_category_color">#9a999a</color>
+    <color name="apkList_size_color">#9a999a</color>
+    <color name="apkList_bottom_color">#9a999a</color>
 </resources>

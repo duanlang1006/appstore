@@ -18,6 +18,7 @@ import com.mit.mitupdatesdk.MitApkplugCloudAgent;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
 import com.applite.android.R;
+
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -28,15 +29,15 @@ import java.lang.reflect.Method;
 
 public class MitMarketActivity extends ApkPluginActivity {
     private static final String TAG = "applite_MitMarketActivity";
-    private ApkplugOSGIService mOptService = new ApkplugOSGIService(){
+    private ApkplugOSGIService mOptService = new ApkplugOSGIService() {
         @Override
         public Object ApkplugOSGIService(BundleContext bundleContext, String from, int type, Object... objects) {
-            switch(type){
+            switch (type) {
                 case 0:
-                    launchFragment(R.id.container,objects);
+                    launchFragment(R.id.container, objects);
                     break;
                 case 1:
-                    MitApkplugCloudAgent.download(MitMarketActivity.this,new ApkplugQueryModel<ApkplugModel>(),new MyApkplugDownloadCallback());
+                    MitApkplugCloudAgent.download(MitMarketActivity.this, new ApkplugQueryModel<ApkplugModel>(), new MyApkplugDownloadCallback());
                     break;
                 case 2:
                     UpdateNotification.getInstance().showNot(MitMarketActivity.this, objects[0].toString());
@@ -53,19 +54,19 @@ public class MitMarketActivity extends ApkPluginActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mit_market);
         setOverflowShowingAlways();
-        mOptReg = registerOSGIService(Constant.OSGI_SERVICE_HOST_OPT,mOptService);
+        mOptReg = registerOSGIService(Constant.OSGI_SERVICE_HOST_OPT, mOptService);
 //        ImplAgent.registerImplListener(mImplListener);
 
         MitUpdateAgent.update(this);
         MitMobclickAgent.onEvent(this, "OpenApk");
 
-        if (savedInstanceState == null) {
-            launchFragment(R.id.container,Constant.OSGI_SERVICE_LOGO_FRAGMENT);
-        }
-
         Intent mIntent = getIntent();
-        if (Constant.UPDATE_FRAGMENT_NOT.equals(mIntent.getStringExtra("update"))){
+        if (Constant.UPDATE_FRAGMENT_NOT.equals(mIntent.getStringExtra("update"))) {
             launchFragment(R.id.container, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
+        } else {
+            if (savedInstanceState == null) {
+                launchFragment(R.id.container, Constant.OSGI_SERVICE_LOGO_FRAGMENT);
+            }
         }
     }
 
@@ -128,6 +129,8 @@ public class MitMarketActivity extends ApkPluginActivity {
         if (Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update")))
             launchFragment(R.id.container, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
     }
+
+
 
     @Override
     protected void onDestroy() {

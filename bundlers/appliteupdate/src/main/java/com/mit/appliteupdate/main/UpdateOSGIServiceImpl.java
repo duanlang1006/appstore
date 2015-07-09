@@ -23,12 +23,12 @@ public class UpdateOSGIServiceImpl implements ApkplugOSGIService {
             Fragment fg = new UpdateFragment();
             FragmentTransaction ft = fgm.beginTransaction();
             if (null == fgm.findFragmentByTag(Constant.OSGI_SERVICE_UPDATE_FRAGMENT)) {
-                if (null != fgm.findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT)) {
-                    ft.hide(fgm.findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT));//得到首页Fragment，然后隐藏
-                    ft.add(node, fg, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
-                } else {
+//                if (null != fgm.findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT)) {
+//                    ft.hide(fgm.findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT));//得到首页Fragment，然后隐藏
+//                    ft.add(node, fg, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
+//                } else {
                     ft.replace(node, fg, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
-                }
+//                }
                 ft.addToBackStack(null);
                 ft.commit();
             }

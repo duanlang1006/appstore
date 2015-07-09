@@ -4,19 +4,19 @@
     android:layout_height="match_parent">
 
     <ImageView
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/pop_img_img"
+        android:background="@drawable/ic_launcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
         android:id="@+id/pop_img_exit"
         android:layout_margin="10dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:background="@drawable/exit_bg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <ImageView
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/pop_img_img"
-        android:background="@drawable/ic_launcher"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
