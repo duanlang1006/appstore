@@ -3,9 +3,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-
 import com.applite.util.AppliteConfig;
-import com.mit.impl.ImplAgent;
+import com.mit.market.MyIntentService;
 
 
 public class AppLiteReceiver extends BroadcastReceiver {
@@ -19,7 +18,7 @@ public class AppLiteReceiver extends BroadcastReceiver {
         }else if ("com.dataservice.broadcast".equals(intent.getAction())){
             AppLiteModel.getInstance(context).onReceive(context,intent);
         }else{
-            ImplAgent.onReceive(context,intent);
+            MyIntentService.startByOriginIntent(context,intent);
         }
     }
 }

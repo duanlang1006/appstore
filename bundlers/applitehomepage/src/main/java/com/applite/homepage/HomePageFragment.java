@@ -362,7 +362,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         switch(item.getItemId()){
             case android.R.id.home:
                 getFragmentManager().popBackStack();
-                break;
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
