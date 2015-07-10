@@ -46,4 +46,6 @@ public class Constant {
     public static final int INSTALLED = 0; // 表示已经安装，且跟现在这个apk文件是一个版本
     public static final int UNINSTALLED = 1; // 表示未安装
     public static final int INSTALLED_UPDATE = 2; // 表示已经安装，版本比现在这个版本要低，可以点击按钮更新
+
+    public static final String UPDATE_FRAGMENT_NOT = "show_update_fragment";
 }

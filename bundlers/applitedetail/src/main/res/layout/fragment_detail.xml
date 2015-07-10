@@ -1,152 +1,156 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/white"
+    android:orientation="vertical"
     tools:context="com.mit.detail.DetailFragment">
 
     <LinearLayout
-        android:gravity="center"
-        android:orientation="horizontal"
+        android:visibility="gone"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/detail_back"
-            android:background="@drawable/back_bg"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/back_bg" />
 
         <TextView
-            android:layout_margin="10dp"
-            android:gravity="center_vertical"
-            android:text="英雄联盟"
             android:id="@+id/detail_name"
-            android:textSize="20sp"
-            android:textColor="@color/black"
-            android:singleLine="true"
-            android:ellipsize="end"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:text="英雄联盟"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
 
         <ImageButton
             android:id="@+id/detail_search"
-            android:background="@drawable/more"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/more"
+            android:visibility="invisible" />
     </LinearLayout>
 
     <ImageView
-        android:background="@color/dividing_line"
         android:layout_width="fill_parent"
-        android:layout_height="1dp" />
+        android:layout_height="1dp"
+        android:background="@color/dividing_line" />
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
         <ScrollView
-            android:layout_marginBottom="50dp"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_height="fill_parent"
+            android:layout_marginBottom="50dp">
 
             <LinearLayout
                 android:id="@+id/detail_vp_container"
-                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
                 android:clipChildren="false"
                 android:layerType="software"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
+                android:orientation="vertical">
 
                 <RelativeLayout
-                    android:layout_marginBottom="5dp"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp">
 
                     <ImageView
-                        android:layout_margin="10dp"
-                        android:background="@drawable/ic_launcher"
                         android:id="@+id/detail_apkimg"
                         android:layout_width="80dp"
-                        android:layout_height="80dp" />
+                        android:layout_height="80dp"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/apk_default_bg" />
 
                     <LinearLayout
-                        android:gravity="center_vertical"
-                        android:layout_toRightOf="@id/detail_apkimg"
-                        android:orientation="vertical"
                         android:layout_width="fill_parent"
-                        android:layout_height="100dp">
+                        android:layout_height="100dp"
+                        android:layout_toRightOf="@id/detail_apkimg"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/detail_name1"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:singleLine="true"
                             android:text="英雄联盟"
                             android:textColor="@color/black"
-                            android:singleLine="true"
-                            android:ellipsize="end"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content" />
+                            android:textSize="15sp" />
 
                         <RatingBar
-                            android:layout_marginTop="3dp"
-                            android:layout_marginBottom="3dp"
                             android:id="@+id/detail_xing"
                             style="?android:attr/ratingBarStyleSmall"
-                            android:numStars="5"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="3dp"
+                            android:layout_marginTop="3dp"
+                            android:numStars="5" />
 
                         <TextView
                             android:id="@+id/detail_apksize_and_company"
-                            android:text="1446546546545"
                             android:layout_width="fill_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:textSize="12sp" />
                     </LinearLayout>
                 </RelativeLayout>
 
                 <HorizontalScrollView
-                    android:scrollbars="none"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
 
                     <LinearLayout
                         android:id="@+id/detail_viewpager_img_ll"
-                        android:orientation="horizontal"
                         android:layout_width="fill_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
 
                         <ImageView
-                            android:visibility="gone"
                             android:id="@+id/detail_preview_img1"
-                            android:layout_marginTop="5dp"
-                            android:layout_marginBottom="5dp"
-                            android:background="@drawable/detail_default_img"
                             android:layout_width="1dp"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/detail_default_img"
+                            android:visibility="gone" />
 
                     </LinearLayout>
                 </HorizontalScrollView>
 
                 <LinearLayout
-                    android:layout_margin="10dp"
-                    android:orientation="vertical"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:layout_marginBottom="10dp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
                         android:text="@string/app_detail" />
 
                     <TextView
-                        android:layout_marginRight="10dp"
-                        android:layout_marginBottom="10dp"
                         android:id="@+id/detail_content"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginRight="10dp"
                         android:textColor="@color/black" />
                 </LinearLayout>
 
@@ -155,41 +159,42 @@
         </ScrollView>
 
         <LinearLayout
-            android:layout_alignParentBottom="true"
-            android:gravity="center"
             android:layout_width="fill_parent"
             android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
             android:orientation="vertical">
 
             <ProgressBar
-                android:visibility="invisible"
-                style="?android:attr/progressBarStyleHorizontal"
                 android:id="@+id/detail_progress"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="5dp"
-                android:max="100" />
+                android:max="100"
+                android:visibility="invisible" />
 
             <Button
-                android:visibility="gone"
                 android:id="@+id/detail_download"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_margin="5dp"
+                android:background="@drawable/download"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
                 android:text="@string/install"
-                android:background="@drawable/download"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:visibility="gone" />
 
             <com.mit.applite.view.ProgressButton
                 android:id="@+id/detail_progress_button"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                app:max="100"
                 app:background="@color/dividing_line"
                 app:foreground="@color/progress_foreground"
+                app:max="100"
+                app:progress="0"
                 app:text="@string/install"
-                app:textcolor="@color/black"
-                app:progress="0" />
+                app:textSize="15sp"
+                app:textcolor="@color/black" />
         </LinearLayout>
     </RelativeLayout>
 

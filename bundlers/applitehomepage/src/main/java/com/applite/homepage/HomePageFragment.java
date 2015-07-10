@@ -159,7 +159,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         LogUtils.d(TAG, "onCreateView");
         rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_homepage_main, container, false);
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
@@ -181,8 +181,9 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (!hidden){
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-            actionBar.show();
+            LogUtils.i(TAG, "重新显示ActionBar");
+            initActionBar();
+            mActivity.runOnUiThread(mRefreshRunnable);
         }
     }
 
@@ -200,9 +201,11 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
-                String result = (String) o;
-                setData(result);
-                LogUtils.i(TAG, "插屏网络请求成功，result:" + result);
+                if (null != o){
+                    String result = (String) o;
+                    setData(result);
+                    LogUtils.i(TAG, "插屏网络请求成功，result:" + result);
+                }
             }
 
             @Override
@@ -233,7 +236,8 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                     mPopStartTime = obj.getLong("pl_starttime") * 1000;
                     mPopEndTime = obj.getLong("pl_endtime") * 1000;
                 }
-                download(mPopImgName+".jpg",mPopImgUrl);
+                if (!TextUtils.isEmpty(mPopImgUrl))
+                    download(mPopImgName+".jpg",mPopImgUrl);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -259,14 +263,14 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                         LogUtils.i(TAG, name + "下载成功");
                         LogUtils.i(TAG, "Utils.getAppDir(name):" + AppliteUtils.getAppDir(name));
                         SPUtils.put(mActivity, SPUtils.POP_IMG_SAVE_PATH, AppliteUtils.getAppDir(name));
-//                        if (System.currentTimeMillis() > mPopStartTime && System.currentTimeMillis() < mPopEndTime){
+                        if (System.currentTimeMillis() > mPopStartTime && System.currentTimeMillis() < mPopEndTime){
 //                            if(SPUtils.get(mActivity,SPUtils.POP_IMGURL,"").equals(mPopImgUrl)){
 //                                if (!(boolean)SPUtils.get(mActivity,SPUtils.POP_IMGURL_ISCLICK,false))
 //                                    initPopuWindow();
 //                            }else {
                                 initPopuWindow();
 //                            }
-//                        }
+                        }
 //                        SPUtils.put(mActivity,SPUtils.POP_IMGURL,mPopImgUrl);
                     }
 

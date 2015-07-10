@@ -47,7 +47,7 @@ public class SearchUtils {
                     OSGIServiceAgent.real_time);   //每次都重新查询
             agent.getService().ApkplugOSGIService(bundleContext,
                     Constant.OSGI_SERVICE_SEARCH_FRAGMENT,
-                    0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT, packageName, name, imgUrl);
+                    0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT, packageName, name, imgUrl,Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
         } catch (Exception e) {
             // TODO 自动生成的 catch 块
             e.printStackTrace();

@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -20,6 +21,7 @@ import com.applite.common.LogUtils;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.adapter.UpdateAdapter;
 import com.mit.appliteupdate.bean.DataBean;
+import com.mit.appliteupdate.utils.UpdateSPUtils;
 import com.mit.appliteupdate.utils.UpdateUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
@@ -164,6 +166,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
+        initActionBar();
     }
 
     @Override
@@ -181,8 +184,6 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             mInflater = LayoutInflater.from(context);
             mInflater = mInflater.cloneInContext(context);
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-            actionBar.hide();
             mContext = context;
         } catch (Exception e) {
             e.printStackTrace();
@@ -196,6 +197,8 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
         rootView = mInflater.inflate(R.layout.fragment_update, container, false);
         initView();
         post();
+
+        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -203,6 +206,16 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     public void onDetach() {
         super.onDetach();
         ImplAgent.unregisterImplListener(mImplListener);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case android.R.id.home:
+                getFragmentManager().popBackStack();
+                return super.onOptionsItemSelected(item);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -231,6 +244,19 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.no_update), Toast.LENGTH_SHORT).show();
                 }
                 break;
+        }
+    }
+
+    private void initActionBar(){
+        try {
+            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setDisplayShowCustomEnabled(false);
+            actionBar.setTitle("更新管理");
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.show();
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -294,8 +320,13 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
 
                     mDataContents.add(bean);
                 }
-                if (array.length() > 0)
-                    showUpdateNotification(array.length());
+                if (array.length() > 0) {
+                    if (System.currentTimeMillis() >
+                            (Long) UpdateSPUtils.get(mActivity, UpdateSPUtils.UPDATE_NOT_SHOW, 0L)) {
+                        showUpdateNotification(array.length());
+                        UpdateSPUtils.put(mActivity, UpdateSPUtils.UPDATE_NOT_SHOW, System.currentTimeMillis() + 24 * 60 * 60 * 1000);
+                    }
+                }
                 mAdapter = new UpdateAdapter(mActivity, mDataContents);
                 mListView.setAdapter(mAdapter);
             }

@@ -71,33 +71,29 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     private FinalHttp mFinalHttp;
     private ImageView mLogoIV;
 
-    private static final int FINSH_LOGO = 1;
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case FINSH_LOGO:
-                    new Handler().postDelayed(new Runnable() {//自动跳转到首页
-                        @Override
-                        public void run() {
-                            toHome();
-                        }
-                    }, (long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_SHOW_TIME, 3000L));
-                    break;
-            }
-        }
-    };
     private Activity mActivity;
     private View rootView;
     private LayoutInflater mInflater;
     private ViewGroup container;
-
     private int[] mX;//APK的X坐标数组
+
     private int[] mY;//APK的Y坐标数组
     private boolean[] mApkMovePath = new boolean[10];//APK移动方向数组  true右  false左
     private int POST_ALL_APK = -1;
     private List<View> mApkList = new ArrayList<View>();//存放APK的list
     private boolean mShuttingdown = false;
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+            }
+        }
+    };
+    private Runnable mThread = new Runnable() {//延时线程
+        public void run() {
+            toHome();
+        }
+    };
 
     public GuideFragment() {
     }
@@ -143,7 +139,8 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         } else {
             rootView = mInflater.inflate(R.layout.fragment_logo, container, false);
             logoInitView();
-            mHandler.sendEmptyMessageDelayed(FINSH_LOGO, 1000);
+            mHandler.postDelayed(mThread,
+                    (long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_SHOW_TIME, 3000L));
             if (System.currentTimeMillis() / 1000 >
                     (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_NEXT_TIME, 0L)) {
                 logoPost();
@@ -154,9 +151,16 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        LogUtils.i(TAG, "onDestroyView");
+        mShuttingdown = true;
+        mHandler.removeCallbacks(mThread);//关闭延时线程
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
-        mShuttingdown = true;
     }
 
     /**
