@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import com.applite.bean.ScreenBean;
@@ -73,6 +74,8 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 
     private String mCategory;   //null：首页   非null:分类
     private String mTitle;
+
+    private View mRetrybtn;
 
     private final ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
@@ -170,6 +173,21 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
             mViewPager.setVisibility(View.VISIBLE);
         }
         mPagerSlidingTabStrip.setViewPager(mViewPager);
+
+        boolean networkState = NetworkDetector.detect(getActivity());
+        LogUtils.i(TAG, "networkState = " + networkState);
+        if(networkState == false){
+            ViewGroup offnetView = (ViewGroup)mInflater.inflate(R.layout.off_net_custom, container, false);
+            mRetrybtn = offnetView.findViewById(R.id.retry_btn);
+            mRetrybtn.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View paramView){
+                    LogUtils.i(TAG, "click the retry button ");
+                    httpRequest();
+                    popupWindowPost();
+                }
+            });
+            return offnetView;
+        }
 
         httpRequest();
         popupWindowPost();
