@@ -106,6 +106,8 @@ public class AppLiteApplication extends Application {
             Log.e(TAG,"Could not create : " + ex);
             ex.printStackTrace();
         }
+
+
     }
 
     public static boolean isScreenLarge() {

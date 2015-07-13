@@ -83,10 +83,12 @@ public class ImplAgent {
     };
 
     static {
-        sImplList.add(ImplDownload.getInstance());
+        ImplDownload download = ImplDownload.getInstance();
+        sImplList.add(download);
 //        sImplList.add(ImplFakeDownload.getInstance());
         sImplList.add(ImplPackageManager.getInstance());
         registerImplListener(mDefaultListener);
+        ImplLog.d(TAG,"ImplAgent.mListenerSet = "+mListenerSet+",download="+download);
     }
 
 
@@ -196,6 +198,7 @@ public class ImplAgent {
 
     static void notify(boolean success,ImplAgent.ImplResponse rsp){
         for (ImplListener listener:mListenerSet){
+            ImplLog.d(TAG,"notify,listener="+listener);
             if (rsp instanceof DownloadCompleteRsp){
                 listener.onDownloadComplete(success,(DownloadCompleteRsp)rsp);
             }else if (rsp instanceof DownloadUpdateRsp){

@@ -153,6 +153,10 @@
             android:theme="@style/android:Theme.Light" />
         <!--==================apkplug=======================================-->
 
+        <service android:name="com.mit.market.MyIntentService"
+            android:exported="false" >
+        </service>
+
         <meta-data android:name="MIT_APPKEY" android:value="B+JV6gaSBbNdn1evBeJTwwjbA7JSylCOUGZbOANhWGBZYQY1VGJROFY4Wjo=" />
         <meta-data android:name="UMENG_CHANNEL" android:value="${UMENG_CHANNEL_VALUE}" />
         <meta-data android:name="UMENG_APPKEY" android:value="53c77d9c56240b2447001087" />
