@@ -51,7 +51,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchFragment extends Fragment implements View.OnClickListener {
+public class SearchFragment extends Fragment implements View.OnClickListener, SearchApkAdapter.UpdateInatsllButtonText {
 
     private static final String TAG = "SearchFragment";
     private ImageButton mBackView;
@@ -316,7 +316,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 getFragmentManager().popBackStack();
                 return super.onOptionsItemSelected(item);
@@ -456,6 +456,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(mActivity, AppliteUtils.getString(mContext, R.string.srarch_content_no_null),
                             Toast.LENGTH_SHORT).show();
                 } else {
+                    closeKeybord();
                     mListView.setSelection(0);
                     if (mSearchText.equals(mEtView.getText().toString())) {
                         mListView.setVisibility(View.VISIBLE);
@@ -464,7 +465,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                         isToEnd = false;
                         mSearchPostPage = 0;
                         postSearch(mEtView.getText().toString());
-                        closeKeybord();
                         isHotWordLayoutVisibility(View.GONE);
                     }
                 }
@@ -551,7 +551,18 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                     bean.setmVersionCode(obj.getInt("versionCode"));
                     bean.setmDownloadUrl(obj.getString("rDownloadUrl"));
 
-                    bean.setmShowButtonText(AppliteUtils.getString(mContext, R.string.install));
+                    int mApkType = AppliteUtils.isAppInstalled(mActivity, obj.getString("packageName"), obj.getInt("versionCode"));
+                    switch (mApkType){
+                        case Constant.INSTALLED:
+                            bean.setmShowButtonText(AppliteUtils.getString(mContext, R.string.open));
+                            break;
+                        case Constant.UNINSTALLED:
+                            bean.setmShowButtonText(AppliteUtils.getString(mContext, R.string.install));
+                            break;
+                        case Constant.INSTALLED_UPDATE:
+                            bean.setmShowButtonText(AppliteUtils.getString(mContext, R.string.update));
+                            break;
+                    }
                     mSearchApkContents.add(bean);
                     ImplAgent.queryDownload(mActivity, bean.getmPackageName());
                 }
@@ -562,7 +573,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
                 moreView.setVisibility(View.GONE);
 
                 if (null == mAdapter) {
-                    mAdapter = new SearchApkAdapter(mActivity, mSearchApkContents);
+                    mAdapter = new SearchApkAdapter(mActivity, mSearchApkContents, this);
                     mListView.setAdapter(mAdapter);
                 } else {
                     mAdapter.notifyDataSetChanged();
@@ -739,4 +750,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
             isHotWordLayoutVisibility(View.VISIBLE);
     }
 
+    @Override
+    public void updateText() {
+        mActivity.runOnUiThread(mNotifyRunnable);
+    }
 }

@@ -8,11 +8,11 @@
     tools:context="com.mit.detail.DetailFragment">
 
     <LinearLayout
-        android:visibility="gone"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <ImageButton
             android:id="@+id/detail_back"
@@ -41,6 +41,53 @@
             android:visibility="invisible" />
     </LinearLayout>
 
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp">
+
+        <ImageView
+            android:id="@+id/detail_apkimg"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/apk_default_bg" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="100dp"
+            android:layout_toRightOf="@id/detail_apkimg"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/detail_name1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="英雄联盟"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <RatingBar
+                android:id="@+id/detail_xing"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:numStars="5" />
+
+            <TextView
+                android:id="@+id/detail_apksize_and_company"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
     <ImageView
         android:layout_width="fill_parent"
         android:layout_height="1dp"
@@ -63,53 +110,6 @@
                 android:layerType="software"
                 android:orientation="vertical">
 
-                <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp">
-
-                    <ImageView
-                        android:id="@+id/detail_apkimg"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:layout_margin="10dp"
-                        android:background="@drawable/apk_default_bg" />
-
-                    <LinearLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="100dp"
-                        android:layout_toRightOf="@id/detail_apkimg"
-                        android:gravity="center_vertical"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/detail_name1"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:singleLine="true"
-                            android:text="英雄联盟"
-                            android:textColor="@color/black"
-                            android:textSize="15sp" />
-
-                        <RatingBar
-                            android:id="@+id/detail_xing"
-                            style="?android:attr/ratingBarStyleSmall"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="3dp"
-                            android:layout_marginTop="3dp"
-                            android:numStars="5" />
-
-                        <TextView
-                            android:id="@+id/detail_apksize_and_company"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/black"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-                </RelativeLayout>
-
                 <HorizontalScrollView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -121,40 +121,27 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
-                        <ImageView
-                            android:id="@+id/detail_preview_img1"
-                            android:layout_width="1dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="5dp"
-                            android:layout_marginTop="5dp"
-                            android:background="@drawable/detail_default_img"
-                            android:visibility="gone" />
-
                     </LinearLayout>
                 </HorizontalScrollView>
 
-                <LinearLayout
-                    android:layout_width="fill_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:orientation="vertical">
+                    android:text="@string/app_detail"
+                    android:textColor="@color/black" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:text="@string/app_detail" />
-
-                    <TextView
-                        android:id="@+id/detail_content"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginRight="10dp"
-                        android:textColor="@color/black" />
-                </LinearLayout>
-
+                <TextView
+                    android:id="@+id/detail_content"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:ellipsize="end"
+                    android:textColor="@color/black" />
             </LinearLayout>
+
 
         </ScrollView>
 

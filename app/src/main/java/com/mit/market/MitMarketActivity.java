@@ -57,8 +57,8 @@ public class MitMarketActivity extends ApkPluginActivity {
         mOptReg = registerOSGIService(Constant.OSGI_SERVICE_HOST_OPT, mOptService);
 //        ImplAgent.registerImplListener(mImplListener);
 
+        MitUpdateAgent.setDebug(true);
         MitUpdateAgent.update(this);
-        MitMobclickAgent.onEvent(this, "OpenApk");
 
         Intent mIntent = getIntent();
         if (Constant.UPDATE_FRAGMENT_NOT.equals(mIntent.getStringExtra("update"))) {
@@ -68,6 +68,12 @@ public class MitMarketActivity extends ApkPluginActivity {
                 launchFragment(R.id.container, Constant.OSGI_SERVICE_LOGO_FRAGMENT);
             }
         }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        MitMobclickAgent.onEvent(this, "OpenApk");
     }
 
     @Override

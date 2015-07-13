@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.main.BundleContextFactory;
@@ -34,14 +35,20 @@ import java.util.List;
 public class SearchApkAdapter extends BaseAdapter {
 
     private final FinalBitmap mFinalBitmap;
+    private final UpdateInatsllButtonText mListener;
     private LayoutInflater mInflater;
     private Context context;
     public List<SearchBean> mSearchBeans;
+    private Context mActivity;
+    public interface UpdateInatsllButtonText{
+        void updateText();
+    }
 
-
-    public SearchApkAdapter(Context context, List<SearchBean> mSearchBeans) {
+    public SearchApkAdapter(Context context, List<SearchBean> mSearchBeans ,UpdateInatsllButtonText listener) {
+        mListener = listener;
         this.mSearchBeans = mSearchBeans;
         mFinalBitmap = FinalBitmap.create(context);
+        mActivity = context;
         try {
             Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             this.context = mContext;
@@ -52,15 +59,6 @@ public class SearchApkAdapter extends BaseAdapter {
             mInflater = LayoutInflater.from(context);
             this.context = context;
         }
-    }
-
-    public void setList(List list) {
-        mSearchBeans = list;
-        notifyDataSetChanged();
-    }
-
-    public List getList() {
-        return mSearchBeans;
     }
 
     @Override
@@ -107,7 +105,7 @@ public class SearchApkAdapter extends BaseAdapter {
             }
         });
 
-        final int mApkType = AppliteUtils.isAppInstalled(context, data.getmPackageName(), data.getmVersionCode());
+        final int mApkType = AppliteUtils.isAppInstalled(mActivity, data.getmPackageName(), data.getmVersionCode());
 //        if (mApkType == Utils.INSTALLED) {
 //            viewholder.mBt.setText(context.getResources().getString(R.string.open));
 //        } else if (mApkType == Utils.INSTALLED_UPDATE) {
@@ -139,19 +137,12 @@ public class SearchApkAdapter extends BaseAdapter {
 //                }
 //            }
 //        });
-        if (mApkType == Constant.INSTALLED) {
-            viewholder.mProgressButton.setText(context.getResources().getString(R.string.open));
-        } else if (mApkType == Constant.INSTALLED_UPDATE) {
-            viewholder.mProgressButton.setText(context.getResources().getString(R.string.update));
-        } else if (mApkType == Constant.UNINSTALLED) {
-            viewholder.mProgressButton.setText(context.getResources().getString(R.string.install));
-        }
         viewholder.mProgressButton.setText(data.getmShowButtonText());
         viewholder.mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
             public void onClickListener() {
                 if (mApkType == Constant.INSTALLED) {
-                    AppliteUtils.startApp(context, data.getmPackageName());
+                    AppliteUtils.startApp(mActivity, data.getmPackageName());
                 } else {
 //                    Utils.setDownloadViewText(context, finalViewholder.mProgressButton);
                     ImplAgent.downloadPackage(context,
