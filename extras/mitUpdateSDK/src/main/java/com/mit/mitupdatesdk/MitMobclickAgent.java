@@ -129,9 +129,9 @@ public class MitMobclickAgent {
             SPUtils.put(context, SPUtils.INNER_VERSION, s, SPUtils.SDK_FILE_NAME);
 
             JSONObject obj = new JSONObject(info);
-            boolean state = obj.getBoolean("state");
+            int state = obj.getInt("status");
             long next = obj.getInt("next") * 60 * 60 * 1000 + System.currentTimeMillis();
-            if (state) {
+            if (state == 1) {
                 mSPMapPostAfter = getAllMap(context);
                 if (Utils.MapToJsonStr(mSPMapPostAgo).equals(Utils.MapToJsonStr(mSPMapPostAfter))) {
                     SPUtils.clear(context, SPUtils.MOBCLICK_FILE_NAME);

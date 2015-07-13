@@ -74,6 +74,7 @@ public class AppliteUtils {
     public static int isAppInstalled(Context context, String packageName, int versionCode) {
         PackageManager pm = context.getPackageManager();
         try {
+            LogUtils.i(TAG, packageName);
             PackageInfo pakageinfo = pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
             if (versionCode == pakageinfo.versionCode) {
                 LogUtils.i(TAG, "已经安装，不用更新，可以卸载该应用");
@@ -81,8 +82,12 @@ public class AppliteUtils {
             } else if (versionCode > pakageinfo.versionCode) {
                 LogUtils.i(TAG, "已经安装，有更新");
                 return Constant.INSTALLED_UPDATE;
+            } else if (versionCode < pakageinfo.versionCode) {
+                LogUtils.i(TAG, "已经安装，本地版本较新，服务器需更新");
+                return Constant.INSTALLED;
             }
         } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
             LogUtils.i(TAG, "未安装该应用，可以安装");
             return Constant.UNINSTALLED;
         }

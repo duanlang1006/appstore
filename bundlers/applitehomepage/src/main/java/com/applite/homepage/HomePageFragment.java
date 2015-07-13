@@ -31,6 +31,8 @@ import com.applite.common.PagerSlidingTabStrip;
 import com.applite.utils.SPUtils;
 import net.tsz.afinal.FinalBitmap;
 import com.google.gson.Gson;
+import com.mit.mitupdatesdk.MitMobclickAgent;
+
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
@@ -378,6 +380,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                 break;
             case R.id.action_search:
                 launchSearchFragment();
+                MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
                 break;
         }
     }

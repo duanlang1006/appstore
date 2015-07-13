@@ -7,4 +7,7 @@
     <color name="dividing_line">#a0a0a0</color>
     <color name="progress_foreground">#00CC00</color>
     <color name="qingse">#00ced1</color>
+
+    <color name="install_button_nor">#05db69</color>
+    <color name="install_button_sel">#03db57</color>
 </resources>
