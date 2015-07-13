@@ -61,6 +61,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     private MySlideViewListener mSlideViewListener = new MySlideViewListener();
     private MyScrollListener mOnScrollListener = new MyScrollListener();
 
+    private boolean isend;
     public HomePageListFragment(SubjectData data) {
         this.mData = data;
     }
@@ -284,6 +285,13 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
                         }
                     }
                 }
+                if(pageData.getSubjectData().get(0).getData().isEmpty()){
+                    LogUtils.i(TAG, "咿呀咿呀哟");
+                    isend = true;
+                }else{
+                    isend = false;
+                }
+
                 mListAdapter.notifyDataSetChanged();
                 mMoreView.setVisibility(View.GONE);
             }
@@ -454,8 +462,10 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         public void onScrollStateChanged(AbsListView view, int scrollState) {
             if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
                 LogUtils.i(TAG, "拉到最底部");
-                mMoreView.setVisibility(view.VISIBLE);
                 httpRequest();
+                if(!isend){
+                    mMoreView.setVisibility(view.VISIBLE);
+                }
                 isLastRow = false;
             }
         }
