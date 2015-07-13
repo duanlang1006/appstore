@@ -1,9 +1,11 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="horizontal"
+    android:layout_gravity="center_horizontal"
     android:gravity="center"
-    tools:context="com.mit.homepage.TestActivity">
+    tools:context="com.mit.homepage.TestActivity"
+    android:weightSum="1">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -12,7 +14,8 @@
         android:id="@+id/action_personal"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:layout_gravity="center_vertical"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
         android:layout_weight="0"/>
 
     <!--<TextView-->
@@ -26,6 +29,16 @@
         <!--android:background="@android:color/white"-->
         <!--android:hint="I'm search view"/>-->
 
+    <LinearLayout
+        android:id="@+id/action_title"
+        android:layout_toRightOf="@+id/action_personal"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="0.55">
+    </LinearLayout>
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,6 +46,8 @@
         android:id="@+id/action_search"
         android:paddingLeft="3dp"
         android:paddingRight="3dp"
-        android:layout_gravity="center_vertical"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dp"
+        android:layout_centerVertical="true"
         android:layout_weight="0"/>
-</LinearLayout>
+</RelativeLayout>

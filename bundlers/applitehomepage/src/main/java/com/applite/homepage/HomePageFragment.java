@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import com.applite.bean.ScreenBean;
@@ -75,6 +76,8 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 
     private String mCategory;   //null：首页   非null:分类
     private String mTitle;
+
+    private View mRetrybtn;
 
     private final ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
@@ -172,6 +175,21 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
             mViewPager.setVisibility(View.VISIBLE);
         }
         mPagerSlidingTabStrip.setViewPager(mViewPager);
+
+        boolean networkState = NetworkDetector.detect(getActivity());
+        LogUtils.i(TAG, "networkState = " + networkState);
+        if(networkState == false){
+            ViewGroup offnetView = (ViewGroup)mInflater.inflate(R.layout.off_net_custom, container, false);
+            mRetrybtn = offnetView.findViewById(R.id.retry_btn);
+            mRetrybtn.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View paramView){
+                    LogUtils.i(TAG, "click the retry button ");
+                    httpRequest();
+                    popupWindowPost();
+                }
+            });
+            return offnetView;
+        }
 
         httpRequest();
         popupWindowPost();
@@ -382,18 +400,23 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
             View search = customView.findViewById(R.id.action_search);
             search.setOnClickListener(this);
             //加入滑动tab管理viewPager
-            mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,null,false);
-            customView.addView(mPagerSlidingTabStrip,1);
+            //mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,null,false);
+
+            ViewGroup title = (ViewGroup)customView.findViewById(R.id.action_title);
+            mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,title,false);
+            title.addView(mPagerSlidingTabStrip);
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
             if (null == mCategory) {
                 personal.setVisibility(View.VISIBLE);
+                title.setVisibility(View.VISIBLE);
                 actionBar.setDisplayHomeAsUpEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(false);
             }else{
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setTitle(mTitle);
                 personal.setVisibility(View.GONE);
+                title.setVisibility(View.GONE);
                 actionBar.setDisplayHomeAsUpEnabled(true);
             }
             actionBar.setCustomView(customView);
