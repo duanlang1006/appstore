@@ -210,7 +210,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 getFragmentManager().popBackStack();
                 return super.onOptionsItemSelected(item);
