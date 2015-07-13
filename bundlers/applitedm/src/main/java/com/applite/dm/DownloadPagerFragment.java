@@ -55,7 +55,7 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
         }
         View rootView = mInflater.inflate(R.layout.fragment_download_pager, container, false);
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
-        mViewPager.setAdapter(new SectionsPagerAdapter(this.getFragmentManager()));
+        mViewPager.setAdapter(new SectionsPagerAdapter(getChildFragmentManager()));
 //        mPagerSlidingTabStrip = (PagerSlidingTabStrip)inflater.inflate(R.layout.pager_sliding_tab,container,false);
         mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,container,false);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
@@ -97,8 +97,8 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case android.R.id.home:
-                ((FragmentActivity)mActivity).getSupportFragmentManager().popBackStack();
-                break;
+                getFragmentManager().popBackStack();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

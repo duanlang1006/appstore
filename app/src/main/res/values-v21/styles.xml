@@ -4,7 +4,7 @@
     <style name="AppTheme" parent="@style/AppBaseTheme">
         <item name="android:windowNoTitle">true</item>
         <!-- 底部导航栏颜色 -->
-        <item name="android:navigationBarColor">#FF444444</item>
+        <!--<item name="android:navigationBarColor">#FF444444</item>-->
     </style>
     <!--<style name="AppBaseTheme" parent="android:Theme.Material.Light">-->
         <!--<item name="android:windowBackground">@null</item>-->

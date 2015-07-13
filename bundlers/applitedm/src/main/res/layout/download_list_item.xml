@@ -104,7 +104,6 @@
             android:focusable="false"
             android:clickable="false"
             android:text="@string/delete_download"
-            android:minHeight="20dp"
             style="@style/DownloadOptButton"/>
         <Button
             android:id="@+id/button_detail"
@@ -114,7 +113,6 @@
             android:clickable="false"
             android:layout_toRightOf="@id/button_delete"
             android:text="@string/detail_download"
-            android:minHeight="20dp"
             style="@style/DownloadOptButton"/>
     </RelativeLayout>
 </LinearLayout>
