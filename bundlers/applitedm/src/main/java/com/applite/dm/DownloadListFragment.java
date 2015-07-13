@@ -258,31 +258,37 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
 
         @Override
         public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
+            ImplLog.d(TAG,  "onPackageAdded key="+packageAddedRsp.key);
             mActivity.runOnUiThread(mNotifyRunnable);
         }
 
         @Override
         public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
+            ImplLog.d(TAG,  "onPackageRemoved key="+packageRemovedRsp.key);
             mActivity.runOnUiThread(mNotifyRunnable);
         }
 
         @Override
         public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
+            ImplLog.d(TAG,  "onPackageChanged key="+packageChangedRsp.key);
             mActivity.runOnUiThread(mNotifyRunnable);
         }
 
         @Override
         public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
+            ImplLog.d(TAG,  "onSystemInstallResult "+systemInstallResultRsp.key+","+systemInstallResultRsp.result);
             mActivity.runOnUiThread(mNotifyRunnable);
         }
 
         @Override
         public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
+            ImplLog.d(TAG,  "onSystemDeleteResult "+systemDeleteResultRsp.key+","+systemDeleteResultRsp.result);
             mActivity.runOnUiThread(mNotifyRunnable);
         }
 
         @Override
         public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
+            ImplLog.d(TAG,  "onFinish action="+implResponse.action);
             mActivity.runOnUiThread(mNotifyRunnable);
         }
     }

@@ -7,16 +7,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import com.applite.util.AppliteConfig;
+import com.mit.market.MyIntentService;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-
 import com.applite.android.R;
-import com.applite.util.AppliteConfig;
-import com.mit.impl.ImplAgent;
 import com.mit.market.MitMarketActivity;
-
-import java.net.URISyntaxException;
-
 
 public class AppLiteReceiver extends BroadcastReceiver {
     private static final String TAG = "AppLiteReceiver";
@@ -32,7 +28,7 @@ public class AppLiteReceiver extends BroadcastReceiver {
             setRemind(context,intent);
             //AppLiteModel.getInstance(context).onReceive(context,intent);
         }else{
-            ImplAgent.onReceive(context,intent);
+            MyIntentService.startByOriginIntent(context,intent);
         }
     }
 

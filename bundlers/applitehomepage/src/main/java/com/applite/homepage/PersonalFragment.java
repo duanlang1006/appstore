@@ -47,13 +47,13 @@ public class PersonalFragment extends Fragment implements View.OnClickListener{
         View view = mInflater.inflate(R.layout.fragment_personal, container, false);
         view.findViewById(R.id.action_upgrade).setOnClickListener(this);
         view.findViewById(R.id.action_dm).setOnClickListener(this);
+        initActionBar();
         return view;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        initActionBar();
         setHasOptionsMenu(true);
     }
 
@@ -67,7 +67,7 @@ public class PersonalFragment extends Fragment implements View.OnClickListener{
         switch(item.getItemId()){
             case android.R.id.home:
                 getFragmentManager().popBackStack();
-                break;
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
