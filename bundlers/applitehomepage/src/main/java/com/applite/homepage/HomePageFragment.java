@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
@@ -159,19 +158,22 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         LogUtils.d(TAG, "onCreateView");
         rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_homepage_main, container, false);
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
+        if (null == mSectionsPagerAdapter){
+            mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
+        }
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         initActionBar();
         if (null == mPageData){
             mViewPager.setVisibility(View.GONE);
+            httpRequest();
         }else{
             mViewPager.setVisibility(View.VISIBLE);
         }
         mPagerSlidingTabStrip.setViewPager(mViewPager);
 
-        httpRequest();
+
         popupWindowPost();
 
         return rootView;
@@ -347,6 +349,8 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     public void onDestroyView(){
         super.onDestroyView();
         LogUtils.i(TAG, "onDestroyView");
+        mViewPager = null;
+        mPagerSlidingTabStrip = null;
     }
 
     @Override
@@ -425,7 +429,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     private void launchPersonalFragment() {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(getId(),new PersonalFragment());
+        ft.replace(getId(),new PersonalFragment(),"personal");
         ft.addToBackStack(null);
         ft.commit();
     }
@@ -472,7 +476,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     }
 
     class SectionsPagerAdapter extends FragmentStatePagerAdapter {
-        private static final String TAG = "SectionsPagerAdapter";
+        private static final String TAG = "homepage_adapter";
         private int mChildCount = 0;
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -481,11 +485,13 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
+            LogUtils.d(TAG,"destroyItem,"+position);
             super.destroyItem(container, position, object);
         }
 
         @Override
         public Fragment getItem(int position) {
+            LogUtils.d(TAG,"getItem,"+position);
             return new HomePageListFragment(mPageData.get(position));
         }
 
