@@ -62,6 +62,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     private MyScrollListener mOnScrollListener = new MyScrollListener();
 
     private boolean isend;
+    private boolean sendhttpreq = true;
     public HomePageListFragment(SubjectData data) {
         this.mData = data;
     }
@@ -286,11 +287,11 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
                     }
                 }
                 if(pageData.getSubjectData().get(0).getData().isEmpty()){
-                    LogUtils.i(TAG, "咿呀咿呀哟");
                     isend = true;
                 }else{
                     isend = false;
                 }
+                sendhttpreq = true;
 
                 mListAdapter.notifyDataSetChanged();
                 mMoreView.setVisibility(View.GONE);
@@ -300,6 +301,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
                 LogUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
+                sendhttpreq = true;
                 mMoreView.setVisibility(View.GONE);
             }
         });
@@ -462,9 +464,12 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         public void onScrollStateChanged(AbsListView view, int scrollState) {
             if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
                 LogUtils.i(TAG, "拉到最底部");
-                httpRequest();
                 if(!isend){
                     mMoreView.setVisibility(view.VISIBLE);
+                }
+                if(sendhttpreq){
+                    httpRequest();
+                    sendhttpreq = false;
                 }
                 isLastRow = false;
             }
