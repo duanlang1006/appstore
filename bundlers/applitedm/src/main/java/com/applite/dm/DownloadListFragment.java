@@ -23,6 +23,7 @@ import com.mit.impl.ImplDatabaseHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
 import com.mit.impl.ImplLog;
+import com.umeng.analytics.MobclickAgent;
 
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
@@ -84,6 +85,18 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
         ImplAgent.registerImplListener(mImplListener);
         databaseHelper = new ImplDatabaseHelper(mActivity);
         ImplLog.d(DownloadPagerFragment.TAG, "onAttach," + this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart("DownloadListFragment"); //统计页面
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd("DownloadListFragment");
     }
 
     @Override

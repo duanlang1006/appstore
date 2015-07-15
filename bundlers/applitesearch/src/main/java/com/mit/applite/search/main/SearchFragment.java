@@ -38,6 +38,7 @@ import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.KeyBoardUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
+import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
@@ -296,6 +297,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     @Override
     public void onResume() {
         super.onResume();
+        MobclickAgent.onPageStart("SearchFragment"); //统计页面
         mEtView.setFocusable(true);
         mEtView.setFocusableInTouchMode(true);
         mEtView.requestFocus();
@@ -305,6 +307,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     @Override
     public void onPause() {
         super.onPause();
+        MobclickAgent.onPageEnd("SearchFragment");
         closeKeybord();
     }
 

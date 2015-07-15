@@ -30,17 +30,35 @@
 
     </LinearLayout>
 
-    <View
-        android:visibility="gone"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="3dp"
-        android:background="@color/dividing_line"></View>
-
     <ListView
         android:id="@+id/update_listview"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"></ListView>
 
-    </ListView>
+
+    <LinearLayout
+        android:id="@+id/update_stats"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/update_stats_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/no_update" />
+
+        <Button
+            android:id="@+id/update_post_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="5dp"
+            android:text="点击重新请求"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+
 </LinearLayout>

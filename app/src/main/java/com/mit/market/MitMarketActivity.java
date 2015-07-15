@@ -18,6 +18,7 @@ import com.mit.mitupdatesdk.MitApkplugCloudAgent;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
 import com.applite.android.R;
+import com.umeng.analytics.MobclickAgent;
 
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.osgi.framework.BundleContext;
@@ -57,6 +58,8 @@ public class MitMarketActivity extends ApkPluginActivity {
         mOptReg = registerOSGIService(Constant.OSGI_SERVICE_HOST_OPT, mOptService);
 //        ImplAgent.registerImplListener(mImplListener);
 
+        MobclickAgent.openActivityDurationTrack(false);//禁止默认的页面统计方式
+        MobclickAgent.updateOnlineConfig(this);
         MitUpdateAgent.setDebug(true);
         MitUpdateAgent.update(this);
 
@@ -74,6 +77,17 @@ public class MitMarketActivity extends ApkPluginActivity {
     protected void onRestart() {
         super.onRestart();
         MitMobclickAgent.onEvent(this, "OpenApk");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);       //统计时长
+    }
+
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 
     @Override

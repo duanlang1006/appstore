@@ -32,6 +32,7 @@ import com.applite.utils.SPUtils;
 import net.tsz.afinal.FinalBitmap;
 import com.google.gson.Gson;
 import com.mit.mitupdatesdk.MitMobclickAgent;
+import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
@@ -196,6 +197,18 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         popupWindowPost();
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart("HomePageFragment"); //统计页面
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd("HomePageFragment");
     }
 
     @Override
@@ -455,6 +468,8 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(getId(),new PersonalFragment(),"personal");
+//        ft.hide(fm.findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT));//得到首页Fragment，然后隐藏
+//        ft.add(getId(),new PersonalFragment(),"personal");
         ft.addToBackStack(null);
         ft.commit();
     }
