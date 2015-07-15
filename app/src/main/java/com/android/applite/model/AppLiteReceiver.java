@@ -35,7 +35,7 @@ public class AppLiteReceiver extends BroadcastReceiver {
     private void setRemind(Context context,Intent intent){
         /*
         *字段说明
-        *"SBUR,ACTION,packagename,title,desc,icon_url,intent"
+        *"SUBR,ACTION,packagename,title,desc,icon_url,intent"
         *ACTION : android.intent.action.MAIN
         *packagename : com.applite.android
         *title : title
@@ -66,19 +66,23 @@ public class AppLiteReceiver extends BroadcastReceiver {
             mIntent = mString[5];
         }
         Intent mPlayIntent =null;
+        mIntent = mString[5].replace("_**_",";");
 
         //myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        Log.i(TAG, "mAction : " + mAction
-                + "; mPackageName : " + mPackageName
-                + "; mTitle : " + mTitle
-                + "; mDesc : " + mDesc
-                + "; mIconUrl : " + mIconUrl
-                + "; mIntent : " + mIntent);
+        Log.i(TAG, "mAction: " + mAction
+                + " ; mPackageName: " + mPackageName
+                + " ; mTitle: " + mTitle
+                + " ; mDesc: " + mDesc
+                + " ; mIconUrl: " + mIconUrl
+                + " ; mIntent: " + mIntent);
         if(context.getPackageName().equals(mPackageName)) {
             manager = (NotificationManager) context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
             ComponentName cn =null;
             if(null ==mIntent || null == mAction || null == mPackageName){
                 mPlayIntent = new Intent(context, MitMarketActivity.class);
+                mPlayIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                String intentstr = mPlayIntent.toUri(0).toString();
+                Log.d(TAG, "mPlayIntent= " + intentstr);
             }else {
                 try {
                     mPlayIntent = Intent.parseUri(mIntent, 0);
@@ -102,11 +106,12 @@ public class AppLiteReceiver extends BroadcastReceiver {
                     PendingIntent.FLAG_UPDATE_CURRENT);
             Log.i(TAG, "pendingIntent : " + pendingIntent );
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-            builder.setContentTitle(mTitle).setContentText(mDesc).
-                    setSmallIcon(R.drawable.ic_launcher).
-                    setDefaults(Notification.DEFAULT_ALL).
-                    setContentIntent(pendingIntent).
-                    setAutoCancel(true).setSubText(mPackageName);
+            builder.setContentTitle(mTitle)
+                   .setContentText(mDesc)
+                   .setSmallIcon(R.drawable.notification_applite)
+                   .setDefaults(Notification.DEFAULT_ALL)
+                   .setContentIntent(pendingIntent)
+                   .setAutoCancel(true);
             manager.notify(mRequestCode, builder.build());
         }
 
