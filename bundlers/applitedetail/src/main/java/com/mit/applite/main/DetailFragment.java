@@ -27,6 +27,7 @@ import com.mit.applite.view.ProgressButton;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
+import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
@@ -125,6 +126,16 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
         setHasOptionsMenu(true);
         return rootView;
+    }
+
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart("DetailFragment"); //统计页面
+    }
+
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd("DetailFragment");
     }
 
     @Override

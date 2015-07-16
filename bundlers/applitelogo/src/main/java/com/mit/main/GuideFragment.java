@@ -38,6 +38,7 @@ import com.mit.bean.GuideBean;
 import com.mit.impl.ImplAgent;
 import com.mit.utils.GuideUtils;
 import com.mit.utils.GuideSPUtils;
+import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
@@ -148,6 +149,18 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart("GuideFragment"); //统计页面
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd("GuideFragment");
     }
 
     @Override

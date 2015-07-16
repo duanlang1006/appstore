@@ -21,6 +21,7 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.data.ListArrayAdapter;
+import com.applite.utils.HomepageUtils;
 import com.google.gson.Gson;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
@@ -59,6 +60,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     private MyScrollListener mOnScrollListener = new MyScrollListener();
 
     private boolean isend;
+    private boolean sendhttpreq = true;
     public HomePageListFragment(SubjectData data) {
         this.mData = data;
     }
@@ -252,6 +254,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
                 page ++;
             }
         }
+        LogUtils.i(TAG, mData+"");
         LogUtils.d(TAG, "httpRequest  mPage : " + page);
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
@@ -281,11 +284,11 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
                     }
                 }
                 if(pageData.getSubjectData().get(0).getData().isEmpty()){
-                    LogUtils.i(TAG, "咿呀咿呀哟");
                     isend = true;
                 }else{
                     isend = false;
                 }
+                sendhttpreq = true;
 
                 mListAdapter.notifyDataSetChanged();
                 mMoreView.setVisibility(View.GONE);
@@ -295,6 +298,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
                 LogUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
+                sendhttpreq = true;
                 mMoreView.setVisibility(View.GONE);
             }
         });
@@ -337,9 +341,12 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         public void onScrollStateChanged(AbsListView view, int scrollState) {
             if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
                 LogUtils.i(TAG, "拉到最底部");
-                httpRequest();
                 if(!isend){
                     mMoreView.setVisibility(view.VISIBLE);
+                }
+                if(sendhttpreq){
+                    httpRequest();
+                    sendhttpreq = false;
                 }
                 isLastRow = false;
             }
@@ -360,26 +367,27 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         @Override
         public void onClick(View v, int position) {
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
-            SubjectData data = new SubjectData();
-            data.setS_key(topicData.t_key);
-            data.setS_name(topicData.t_info);
-            data.setStep(mData.getStep());
-            data.setS_datatype(mData.getS_datatype());
-            data.setData(new ArrayList<HomePageApkData>());
-            data.setSpecialtopic_data(null);
-            try {
-                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                        bundleContext, ApkplugOSGIService.class,
-                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                        OSGIServiceAgent.real_time);   //每次都重新查询
-                agent.getService().ApkplugOSGIService(bundleContext,
-                        Constant.OSGI_SERVICE_DM_FRAGMENT,
-                        0, Constant.OSGI_SERVICE_TOPIC_FRAGMENT,data);
-            } catch (Exception e) {
-                // T
-                e.printStackTrace();
-            }
+            HomepageUtils.toTopicFragment(topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype());
+//            SubjectData data = new SubjectData();
+//            data.setS_key(topicData.t_key);
+//            data.setS_name(topicData.t_info);
+//            data.setStep(mData.getStep());
+//            data.setS_datatype(mData.getS_datatype());
+//            data.setData(new ArrayList<HomePageApkData>());
+//            data.setSpecialtopic_data(null);
+//            try {
+//                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+//                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+//                        bundleContext, ApkplugOSGIService.class,
+//                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
+//                        OSGIServiceAgent.real_time);   //每次都重新查询
+//                agent.getService().ApkplugOSGIService(bundleContext,
+//                        Constant.OSGI_SERVICE_DM_FRAGMENT,
+//                        0, Constant.OSGI_SERVICE_TOPIC_FRAGMENT,data);
+//            } catch (Exception e) {
+//                // T
+//                e.printStackTrace();
+//            }
         }
     }
 }

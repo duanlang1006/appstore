@@ -39,6 +39,7 @@ import com.mit.applite.search.utils.KeyBoardUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
+import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
@@ -87,6 +88,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     private boolean isToEnd = false;//服务器数据是否到底
     private String mSearchText = "";//当前搜索的关键字
     private boolean isSearchPost = true;//上拉加载是否可以请求服务器
+    private int mShowHotWordNumber = 9;
 
     private Runnable mNotifyRunnable = new Runnable() {
         @Override
@@ -209,8 +211,12 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
             mEtViewText = mEtView.getText().toString();
             closeKeybord();
         } else {
-            if (mListView.getVisibility() == View.GONE)
+            if (mListView.getVisibility() == View.GONE){
+                mEtView.setFocusable(true);
+                mEtView.setFocusableInTouchMode(true);
+                mEtView.requestFocus();
                 KeyBoardUtils.openKeybord(mEtView, mActivity);
+            }
             initActionBar();
         }
     }
@@ -218,6 +224,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     @Override
     public void onResume() {
         super.onResume();
+        MobclickAgent.onPageStart("SearchFragment"); //统计页面
         mEtView.setFocusable(true);
         mEtView.setFocusableInTouchMode(true);
         mEtView.requestFocus();
@@ -227,6 +234,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     @Override
     public void onPause() {
         super.onPause();
+        MobclickAgent.onPageEnd("SearchFragment");
         closeKeybord();
     }
 
@@ -394,7 +402,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
             case R.id.hot_word_change:
                 mChangeNumbew = mChangeNumbew + 1;
                 mShowHotData.clear();
-                if (mHotWordBeans.size() / 8 <= mChangeNumbew)
+                if (mHotWordBeans.size() / mShowHotWordNumber <= mChangeNumbew)
                     mChangeNumbew = 0;
                 setHotWordShowData(mChangeNumbew);
                 break;
@@ -626,8 +634,10 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 bean.setmName(object.getString("name"));
                 bean.setmPackageName(object.getString("packageName"));
                 bean.setmImgUrl(object.getString("iconUrl"));
-//                bean.setmType(object.getString(""));
-                bean.setmType(1 + "");
+                bean.setmType(object.getInt("ishotword"));
+
+                bean.setmStep(object.getInt("step"));
+                bean.setmDataType(object.getString("s_datatype"));
                 mHotWordBeans.add(bean);
             }
             setHotWordShowData(0);
@@ -642,8 +652,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
      * 设置在线热词显示的数据
      */
     private void setHotWordShowData(int position) {
-        if (mHotWordBeans.size() > 8) {
-            for (int i = 0 + 8 * position; i < 8 + 8 * position; i++) {
+        if (mHotWordBeans.size() > mShowHotWordNumber) {
+            for (int i = 0 + mShowHotWordNumber * position; i < mShowHotWordNumber + mShowHotWordNumber * position; i++) {
                 mShowHotData.add(mHotWordBeans.get(i));
             }
         } else {

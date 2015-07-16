@@ -2,6 +2,7 @@ package com.applite.homepage;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,7 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import com.applite.bean.ScreenBean;
@@ -28,10 +31,12 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
+import com.applite.utils.HomepageUtils;
 import com.applite.utils.SPUtils;
 import net.tsz.afinal.FinalBitmap;
 import com.google.gson.Gson;
 import com.mit.mitupdatesdk.MitMobclickAgent;
+import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
@@ -60,7 +65,6 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     private FinalBitmap mFinalBitmap;
     private String mPopImgUrl;
     private boolean mPopIsClick = false;
-    private String mPopImgName;
     private long mPopStartTime;
     private long mPopEndTime;
 
@@ -76,7 +80,15 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     private String mCategory;   //null：首页   非null:分类
     private String mTitle;
 
-    private View mRetrybtn;
+    //private View mLoadingView;
+    private View mOffnetView;
+
+    private ImageView loadingView;
+    AnimationDrawable LoadingAnimation;
+
+    private Button mRetrybtn;
+    private View offnetImg;
+    private boolean refreshflag;
 
     private final ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
@@ -96,6 +108,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     Runnable mRefreshRunnable = new Runnable() {
         @Override
         public void run() {
+            LogUtils.i(TAG, "mRefreshRunnable run");
             if (null == mPageData){
                 mViewPager.setVisibility(View.GONE);
             }else{
@@ -107,6 +120,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }
     };
     private ViewGroup rootView;
+    private SubjectData mPopData = new SubjectData();
 
     public HomePageFragment() {
         mGson = new Gson();
@@ -162,7 +176,36 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         LogUtils.d(TAG, "onCreateView");
+
+        boolean networkState = NetworkDetector.detect(getActivity());
+        LogUtils.i(TAG, "networkState = " + networkState);
+
         rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_homepage_main, container, false);
+
+        //mLoadingView = rootView.findViewById(R.id.top_parent);
+        //loadingView = (ImageView)rootView.findViewById(R.id.loading_img);
+        //loadingView.setBackgroundResource(R.drawable.loading_animation);
+        //LoadingAnimation = (AnimationDrawable) loadingView.getBackground();
+
+        mOffnetView = rootView.findViewById(R.id.middle_parent);
+        offnetImg = (ImageView)rootView.findViewById(R.id.off_img);
+        mRetrybtn = (Button)rootView.findViewById(R.id.retry_btn);
+
+        //mLoadingView.setVisibility(View.GONE);
+        mOffnetView.setVisibility(View.GONE);
+
+        if(!networkState){
+             mOffnetView.setVisibility(View.VISIBLE);
+
+             mRetrybtn.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View paramView){
+                    LogUtils.i(TAG, "click the retry button ");
+                    httpRequest();
+                    popupWindowPost();
+                }
+            });
+        }
+
         if (null == mSectionsPagerAdapter){
             mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
         }
@@ -178,24 +221,21 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }
         mPagerSlidingTabStrip.setViewPager(mViewPager);
 
-        boolean networkState = NetworkDetector.detect(getActivity());
-        LogUtils.i(TAG, "networkState = " + networkState);
-        if(networkState == false){
-            ViewGroup offnetView = (ViewGroup)mInflater.inflate(R.layout.off_net_custom, container, false);
-            mRetrybtn = offnetView.findViewById(R.id.retry_btn);
-            mRetrybtn.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View paramView){
-                    LogUtils.i(TAG, "click the retry button ");
-                    httpRequest();
-                    popupWindowPost();
-                }
-            });
-            return offnetView;
-        }
-
         popupWindowPost();
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart("HomePageFragment"); //统计页面
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd("HomePageFragment");
     }
 
     @Override
@@ -251,14 +291,16 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                 JSONArray array = new JSONArray(info);
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject obj = new JSONObject(array.get(i).toString());
-                    mPopImgName = obj.getString("pl_name");
-                    String spt_key = obj.getString("spt_key");
+                    mPopData.setS_key(obj.getString("spt_key"));
+                    mPopData.setS_name(obj.getString("pl_name"));
+                    mPopData.setStep(obj.getInt("step"));
+                    mPopData.setS_datatype(obj.getString("s_datatype"));
                     mPopImgUrl = obj.getString("pl_iconurl");
                     mPopStartTime = obj.getLong("pl_starttime") * 1000;
                     mPopEndTime = obj.getLong("pl_endtime") * 1000;
                 }
                 if (!TextUtils.isEmpty(mPopImgUrl))
-                    download(mPopImgName+".jpg",mPopImgUrl);
+                    download(mPopData.getS_name()+".jpg",mPopImgUrl);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -307,12 +349,12 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         @Override
         public void onClick(View v) {
             SPUtils.put(mActivity,SPUtils.POP_IMGURL_ISCLICK,mPopIsClick);
+            popupWindow.dismiss();
             switch (v.getId()){
                 case R.id.pop_img_exit:
-                    popupWindow.dismiss();
                     break;
                 case R.id.pop_img_img:
-
+                    HomepageUtils.toTopicFragment(mPopData.getS_key(), mPopData.getS_name(), mPopData.getStep(), mPopData.getS_datatype());
                     break;
             }
         }
@@ -463,6 +505,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
      * HomePage网络请求
      */
     private void httpRequest() {
+        LogUtils.i(TAG, "httpRequest");
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", "com.android.applite1.0");
@@ -475,11 +518,16 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
             params.put("type", "hpmaintype");
             params.put("categorytype", mCategory);
         }
+        mOffnetView.setVisibility(View.GONE);
+        //mLoadingView.setVisibility(View.VISIBLE);
+        //LoadingAnimation.start();
+
         mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
-                LogUtils.d(TAG,"首页数据："+o.toString());
+                //LogUtils.d(TAG, "首页数据：");
+                LogUtils.i(TAG, "获取首页数据");
                 try {
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
                     if (1 == data.getAppKey()){
@@ -488,13 +536,16 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-
+                //mOffnetView.setVisibility(View.GONE);
+                //mLoadingView.setVisibility(View.GONE);
                 mActivity.runOnUiThread(mRefreshRunnable);
             }
 
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
+                //mLoadingView.setVisibility(View.GONE);
+                mOffnetView.setVisibility(View.VISIBLE);
                 LogUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
             }
         });
