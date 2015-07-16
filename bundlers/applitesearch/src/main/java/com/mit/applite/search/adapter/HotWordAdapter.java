@@ -72,15 +72,20 @@ public class HotWordAdapter extends BaseAdapter {
             viewholder = (ViewHolder) convertView.getTag();
         }
         final HotWordBean data = mHotWordBeans.get(position);
-        if (Integer.parseInt(data.getmType()) == 1) {
-            mFinalBitmap.display(viewholder.mImg, data.getmImgUrl());
-            viewholder.mImg.setVisibility(View.VISIBLE);
-        }
+//        if (Integer.parseInt(data.getmType()) == 0) {
+//            mFinalBitmap.display(viewholder.mImg, data.getmImgUrl());
+//            viewholder.mImg.setVisibility(View.VISIBLE);
+//        }
         viewholder.mTv.setText(data.getmName());
+
         viewholder.mLl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SearchUtils.toDetailFragment(data.getmPackageName(), data.getmName(), data.getmImgUrl());
+                if (data.getmType() == 0) {//进入应用详情
+                    SearchUtils.toDetailFragment(data.getmPackageName(), data.getmName(), data.getmImgUrl());
+                } else if (data.getmType() == 1) {//进入专题
+                    SearchUtils.toTopicFragment(data.getmPackageName(), data.getmName(), data.getmStep(), data.getmDataType());
+                }
             }
         });
         return convertView;

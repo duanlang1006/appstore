@@ -47,9 +47,28 @@ public class SearchUtils {
                     OSGIServiceAgent.real_time);   //每次都重新查询
             agent.getService().ApkplugOSGIService(bundleContext,
                     Constant.OSGI_SERVICE_SEARCH_FRAGMENT,
-                    0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT, packageName, name, imgUrl,Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
+                    0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT, packageName, name, imgUrl, Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
         } catch (Exception e) {
             // TODO 自动生成的 catch 块
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 去主题页面
+     */
+    public static void toTopicFragment(String key, String name, int step, String datatype) {
+        try {
+            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+                    bundleContext, ApkplugOSGIService.class,
+                    "(serviceName=" + Constant.OSGI_SERVICE_HOST_OPT + ")", //服务查询条件
+                    OSGIServiceAgent.real_time);   //每次都重新查询
+            agent.getService().ApkplugOSGIService(bundleContext,
+                    Constant.OSGI_SERVICE_SEARCH_FRAGMENT,
+                    0, Constant.OSGI_SERVICE_TOPIC_FRAGMENT, key, name, step, datatype);
+        } catch (Exception e) {
+            // T
             e.printStackTrace();
         }
     }

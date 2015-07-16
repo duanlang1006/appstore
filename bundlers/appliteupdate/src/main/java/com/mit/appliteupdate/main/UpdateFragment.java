@@ -319,6 +319,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                 super.onFailure(t, errorNo, strMsg);
                 LogUtils.i(TAG, "更新请求失败，strMsg：" + strMsg);
                 setStatsLayoutVisibility(View.VISIBLE, mContext.getResources().getDrawable(R.drawable.post_failure));
+                mStatsButton.setVisibility(View.VISIBLE);
                 mPostStats = true;
             }
         });
@@ -355,6 +356,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                 }
                 if (array.length() == 0) {
                     setStatsLayoutVisibility(View.VISIBLE, mContext.getResources().getDrawable(R.drawable.no_update));
+                    mStatsButton.setVisibility(View.GONE);
                 } else {
                     setStatsLayoutVisibility(View.GONE, null);
                     if (System.currentTimeMillis() >
