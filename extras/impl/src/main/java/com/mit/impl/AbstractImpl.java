@@ -1,46 +1,20 @@
 package com.mit.impl;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Handler;
-import android.os.HandlerThread;
-
-import com.android.dsc.downloads.Downloads;
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 
 /**
  * Created by hxd on 15-6-10.
  */
 public abstract class AbstractImpl implements ImplInterface{
-//    Gson gson = null;
-//    SharedPreferences sp = null;
-    ImplDatabaseHelper databaseHelper;
-
-//    @Override
-//    public void init(Context context) {
-//        mHandler = new Handler();
-//        gson = new Gson();
-//        sp = context.getSharedPreferences("impl",Context.MODE_PRIVATE);
-//    }
+    static ImplDatabaseHelper databaseHelper;
 
     @Override
     public boolean request(ImplAgent.ImplRequest cmd) {
-//        if (null == gson){
-//            gson = new Gson();
-//        }
-
         if (null == databaseHelper){
             databaseHelper = new ImplDatabaseHelper(cmd.context);
         }
-//        if (null == sp){
-//            sp = cmd.context.getSharedPreferences("impl",Context.MODE_PRIVATE);
-//        }
         return false;
     }
 
@@ -49,34 +23,8 @@ public abstract class AbstractImpl implements ImplInterface{
 
     }
 
-//    void save(String key,long downloadId,String packageName,
-//              String iconDir,String iconUrl,
-//              String url,
-//              String title,String desc){
-//        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-//        ImplInfo info = findInfoByKey(key);
-//        if (null != info){
-//            info.setKey(key);
-//            info.setDownloadId(downloadId);
-//            info.setDownloadUrl(url);
-//            info.setPackageName(packageName);
-//            info.setIconPath(iconDir);
-//            info.setIconUrl(iconUrl);
-//            info.setTitle(title);
-//            info.setDescription(desc);
-//            db.update(ImplConfig.TABLE_IMPL,
-//                    info.getContentValues(),
-//                    ImplConfig.KEY+"=?",
-//                    new String[]{String.valueOf(key.hashCode())});
-//        }else {
-//            info = new ImplInfo(key,url,downloadId,packageName,iconDir,iconUrl,title,desc);
-//            db.insert(ImplConfig.TABLE_IMPL,null,info.getContentValues());
-//        }
-////        sp.edit().putString(key,info.toJson(gson)).apply();
-//    }
-
     void save(ImplInfo info){
-        ImplInfo infoIndb = ImplConfig.findInfoByKey(databaseHelper,info.getKey());
+        ImplInfo infoIndb = findInfoByKey(info.getKey());
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
         if (null != infoIndb){
             db.update(ImplConfig.TABLE_IMPL,
@@ -86,7 +34,6 @@ public abstract class AbstractImpl implements ImplInterface{
         }else {
             db.insert(ImplConfig.TABLE_IMPL,null,info.getContentValues());
         }
-//        sp.edit().putString(info.getKey(),info.toJson(gson)).apply();
     }
 
     void update(ImplInfo info){
@@ -103,5 +50,120 @@ public abstract class AbstractImpl implements ImplInterface{
                 ImplConfig.COLUMN_KEY+"=?",
                 new String[]{key});
 //        sp.edit().remove(key).apply();
+    }
+
+
+    ImplInfo findInfoByDownloadId(long id){
+        ImplInfo info = null;
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        Cursor c = null;
+        try{
+            c = db.query(ImplConfig.TABLE_IMPL,
+                    null,
+                    ImplConfig.COLUMN_DOWNLOADID + " = ?",
+                    new String[]{String.valueOf(id)},
+                    null,null,null);
+            c.moveToFirst();
+            info = ImplInfo.from(c);
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            if (null != c){
+                c.close();
+            }
+        }
+        return info;
+    }
+
+    ImplInfo findInfoByPackageName(String pkgName){
+        ImplInfo info = null;
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        Cursor c = null;
+        try{
+            c = db.query(ImplConfig.TABLE_IMPL,
+                    null,
+                    ImplConfig.COLUMN_PACKAGENAME + " = ?",
+                    new String[]{pkgName},
+                    null,null,null);
+            c.moveToFirst();
+            info = ImplInfo.from(c);
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            if (null != c){
+                c.close();
+            }
+        }
+        return info;
+    }
+
+    ImplInfo findInfoByKey(String key){
+        ImplInfo info = null;
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        Cursor c = null;
+        try{
+            c = db.query(ImplConfig.TABLE_IMPL,
+                    null,
+                    ImplConfig.COLUMN_KEY + " = ?",
+                    new String[]{key},
+                    null, null, null);
+            if (null != c && c.moveToFirst()) {
+                info = ImplInfo.from(c);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            if (null != c){
+                c.close();
+            }
+        }
+        return info;
+    }
+
+    List<ImplInfo> findInfoByKeyBatch(String[] keys){
+        List<ImplInfo> infoList = new ArrayList<ImplInfo>();
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        String clause = getWhereClauseForKeys(keys);
+        String[] args = getWhereArgsForKeys(keys);
+        Cursor c = null;
+        try{
+            c = db.query(ImplConfig.TABLE_IMPL, null, clause, args, null, null, null);
+            c.moveToFirst();
+            do {
+                ImplInfo info = ImplInfo.from(c);
+                if (null != info){
+                    infoList.add(info);
+                }
+            }while(c.moveToNext());
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            if (null != c){
+                c.close();
+            }
+        }
+        return infoList;
+    }
+
+    static String getWhereClauseForKeys(String[] keys) {
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append("(");
+        for (int i = 0; i < keys.length; i++) {
+            if (i > 0) {
+                whereClause.append("OR ");
+            }
+            whereClause.append(ImplConfig.COLUMN_KEY);
+            whereClause.append(" = ? ");
+        }
+        whereClause.append(")");
+        return whereClause.toString();
+    }
+
+    static String[] getWhereArgsForKeys(String[] keys) {
+        String[] whereArgs = new String[keys.length];
+        for (int i = 0; i < keys.length; i++) {
+            whereArgs[i] = keys[i];
+        }
+        return whereArgs;
     }
 }

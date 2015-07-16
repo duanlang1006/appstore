@@ -1,5 +1,7 @@
 package com.mit.appliteupdate.bean;
 
+import com.mit.impl.ImplInfo;
+
 /**
  * Created by LSY on 15-6-23.
  */
@@ -11,7 +13,9 @@ public class DataBean {
     private long mSize;
     private int mVersionCode;
     private String mVersionName;
-    private String mShowText;
+//    private String mShowText;
+
+    private ImplInfo mImplInfo;
 
     @Override
     public String toString() {
@@ -26,13 +30,13 @@ public class DataBean {
                 '}';
     }
 
-    public String getmShowText() {
-        return mShowText;
-    }
-
-    public void setmShowText(String mShowText) {
-        this.mShowText = mShowText;
-    }
+//    public String getmShowText() {
+//        return mShowText;
+//    }
+//
+//    public void setmShowText(String mShowText) {
+//        this.mShowText = mShowText;
+//    }
 
     public String getmVersionName() {
         return mVersionName;
@@ -88,5 +92,13 @@ public class DataBean {
 
     public void setmVersionCode(int mVersionCode) {
         this.mVersionCode = mVersionCode;
+    }
+
+    public ImplInfo getImplInfo() {
+        return mImplInfo;
+    }
+
+    public void setImplInfo(ImplInfo mImplInfo) {
+        this.mImplInfo = mImplInfo;
     }
 }
