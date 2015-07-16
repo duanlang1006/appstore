@@ -2,6 +2,7 @@ package com.applite.homepage;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,7 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import com.applite.bean.ScreenBean;
@@ -77,7 +80,15 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     private String mCategory;   //null：首页   非null:分类
     private String mTitle;
 
-    private View mRetrybtn;
+    //private View mLoadingView;
+    private View mOffnetView;
+
+    private ImageView loadingView;
+    AnimationDrawable LoadingAnimation;
+
+    private Button mRetrybtn;
+    private View offnetImg;
+    private boolean refreshflag;
 
     private final ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
@@ -97,6 +108,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     Runnable mRefreshRunnable = new Runnable() {
         @Override
         public void run() {
+            LogUtils.i(TAG, "mRefreshRunnable run");
             if (null == mPageData){
                 mViewPager.setVisibility(View.GONE);
             }else{
@@ -164,7 +176,36 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         LogUtils.d(TAG, "onCreateView");
+
+        boolean networkState = NetworkDetector.detect(getActivity());
+        LogUtils.i(TAG, "networkState = " + networkState);
+
         rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_homepage_main, container, false);
+
+        //mLoadingView = rootView.findViewById(R.id.top_parent);
+        //loadingView = (ImageView)rootView.findViewById(R.id.loading_img);
+        //loadingView.setBackgroundResource(R.drawable.loading_animation);
+        //LoadingAnimation = (AnimationDrawable) loadingView.getBackground();
+
+        mOffnetView = rootView.findViewById(R.id.middle_parent);
+        offnetImg = (ImageView)rootView.findViewById(R.id.off_img);
+        mRetrybtn = (Button)rootView.findViewById(R.id.retry_btn);
+
+        //mLoadingView.setVisibility(View.GONE);
+        mOffnetView.setVisibility(View.GONE);
+
+        if(!networkState){
+             mOffnetView.setVisibility(View.VISIBLE);
+
+             mRetrybtn.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View paramView){
+                    LogUtils.i(TAG, "click the retry button ");
+                    httpRequest();
+                    popupWindowPost();
+                }
+            });
+        }
+
         if (null == mSectionsPagerAdapter){
             mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
         }
@@ -179,21 +220,6 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
             mViewPager.setVisibility(View.VISIBLE);
         }
         mPagerSlidingTabStrip.setViewPager(mViewPager);
-
-        boolean networkState = NetworkDetector.detect(getActivity());
-        LogUtils.i(TAG, "networkState = " + networkState);
-        if(networkState == false){
-            ViewGroup offnetView = (ViewGroup)mInflater.inflate(R.layout.off_net_custom, container, false);
-            mRetrybtn = offnetView.findViewById(R.id.retry_btn);
-            mRetrybtn.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View paramView){
-                    LogUtils.i(TAG, "click the retry button ");
-                    httpRequest();
-                    popupWindowPost();
-                }
-            });
-            return offnetView;
-        }
 
         popupWindowPost();
 
@@ -479,6 +505,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
      * HomePage网络请求
      */
     private void httpRequest() {
+        LogUtils.i(TAG, "httpRequest");
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", "com.android.applite1.0");
@@ -491,11 +518,16 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
             params.put("type", "hpmaintype");
             params.put("categorytype", mCategory);
         }
+        mOffnetView.setVisibility(View.GONE);
+        //mLoadingView.setVisibility(View.VISIBLE);
+        //LoadingAnimation.start();
+
         mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
-                LogUtils.d(TAG,"首页数据："+o.toString());
+                //LogUtils.d(TAG, "首页数据：");
+                LogUtils.i(TAG, "获取首页数据");
                 try {
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
                     if (1 == data.getAppKey()){
@@ -504,13 +536,16 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-
+                //mOffnetView.setVisibility(View.GONE);
+                //mLoadingView.setVisibility(View.GONE);
                 mActivity.runOnUiThread(mRefreshRunnable);
             }
 
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
+                //mLoadingView.setVisibility(View.GONE);
+                mOffnetView.setVisibility(View.VISIBLE);
                 LogUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
             }
         });
