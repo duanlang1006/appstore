@@ -23,6 +23,7 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.data.ListArrayAdapter;
+import com.applite.utils.HomepageUtils;
 import com.google.gson.Gson;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
@@ -258,6 +259,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
                 page ++;
             }
         }
+        LogUtils.i(TAG, mData+"");
         LogUtils.d(TAG, "httpRequest  mPage : " + page);
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
@@ -490,26 +492,27 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         @Override
         public void onClick(View v, int position) {
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
-            SubjectData data = new SubjectData();
-            data.setS_key(topicData.t_key);
-            data.setS_name(topicData.t_info);
-            data.setStep(mData.getStep());
-            data.setS_datatype(mData.getS_datatype());
-            data.setData(new ArrayList<HomePageApkData>());
-            data.setSpecialtopic_data(null);
-            try {
-                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                        bundleContext, ApkplugOSGIService.class,
-                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                        OSGIServiceAgent.real_time);   //每次都重新查询
-                agent.getService().ApkplugOSGIService(bundleContext,
-                        Constant.OSGI_SERVICE_DM_FRAGMENT,
-                        0, Constant.OSGI_SERVICE_TOPIC_FRAGMENT,data);
-            } catch (Exception e) {
-                // T
-                e.printStackTrace();
-            }
+            HomepageUtils.toTopicFragment(topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype());
+//            SubjectData data = new SubjectData();
+//            data.setS_key(topicData.t_key);
+//            data.setS_name(topicData.t_info);
+//            data.setStep(mData.getStep());
+//            data.setS_datatype(mData.getS_datatype());
+//            data.setData(new ArrayList<HomePageApkData>());
+//            data.setSpecialtopic_data(null);
+//            try {
+//                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+//                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+//                        bundleContext, ApkplugOSGIService.class,
+//                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
+//                        OSGIServiceAgent.real_time);   //每次都重新查询
+//                agent.getService().ApkplugOSGIService(bundleContext,
+//                        Constant.OSGI_SERVICE_DM_FRAGMENT,
+//                        0, Constant.OSGI_SERVICE_TOPIC_FRAGMENT,data);
+//            } catch (Exception e) {
+//                // T
+//                e.printStackTrace();
+//            }
         }
     }
 }

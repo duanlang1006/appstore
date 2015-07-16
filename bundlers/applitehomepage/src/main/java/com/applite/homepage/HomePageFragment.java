@@ -28,10 +28,12 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
+import com.applite.utils.HomepageUtils;
 import com.applite.utils.SPUtils;
 import net.tsz.afinal.FinalBitmap;
 import com.google.gson.Gson;
 import com.mit.mitupdatesdk.MitMobclickAgent;
+import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
@@ -60,7 +62,6 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     private FinalBitmap mFinalBitmap;
     private String mPopImgUrl;
     private boolean mPopIsClick = false;
-    private String mPopImgName;
     private long mPopStartTime;
     private long mPopEndTime;
 
@@ -107,6 +108,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }
     };
     private ViewGroup rootView;
+    private SubjectData mPopData = new SubjectData();
 
     public HomePageFragment() {
         mGson = new Gson();
@@ -199,6 +201,18 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart("HomePageFragment"); //统计页面
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd("HomePageFragment");
+    }
+
+    @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (!hidden){
@@ -251,14 +265,16 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                 JSONArray array = new JSONArray(info);
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject obj = new JSONObject(array.get(i).toString());
-                    mPopImgName = obj.getString("pl_name");
-                    String spt_key = obj.getString("spt_key");
+                    mPopData.setS_key(obj.getString("spt_key"));
+                    mPopData.setS_name(obj.getString("pl_name"));
+                    mPopData.setStep(obj.getInt("step"));
+                    mPopData.setS_datatype(obj.getString("s_datatype"));
                     mPopImgUrl = obj.getString("pl_iconurl");
                     mPopStartTime = obj.getLong("pl_starttime") * 1000;
                     mPopEndTime = obj.getLong("pl_endtime") * 1000;
                 }
                 if (!TextUtils.isEmpty(mPopImgUrl))
-                    download(mPopImgName+".jpg",mPopImgUrl);
+                    download(mPopData.getS_name()+".jpg",mPopImgUrl);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -307,12 +323,12 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         @Override
         public void onClick(View v) {
             SPUtils.put(mActivity,SPUtils.POP_IMGURL_ISCLICK,mPopIsClick);
+            popupWindow.dismiss();
             switch (v.getId()){
                 case R.id.pop_img_exit:
-                    popupWindow.dismiss();
                     break;
                 case R.id.pop_img_img:
-
+                    HomepageUtils.toTopicFragment(mPopData.getS_key(), mPopData.getS_name(), mPopData.getStep(), mPopData.getS_datatype());
                     break;
             }
         }

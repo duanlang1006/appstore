@@ -2,6 +2,7 @@ package com.mit.appliteupdate.main;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -11,6 +12,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +29,7 @@ import com.mit.appliteupdate.utils.UpdateSPUtils;
 import com.mit.appliteupdate.utils.UpdateUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplListener;
+import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
@@ -158,6 +163,10 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
         }
     };
     private Context mContext;
+    private LinearLayout mStatsLayout;
+    private ImageView mStatsImgView;
+    private Button mStatsButton;
+    private boolean mPostStats = true;
 
     public UpdateFragment() {
     }
@@ -203,6 +212,18 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart("UpdateFragment"); //统计页面
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd("UpdateFragment");
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         ImplAgent.unregisterImplListener(mImplListener);
@@ -210,7 +231,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 getFragmentManager().popBackStack();
                 return super.onOptionsItemSelected(item);
@@ -244,10 +265,14 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.no_update), Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case R.id.update_post_button:
+                if (mPostStats)
+                    post();
+                break;
         }
     }
 
-    private void initActionBar(){
+    private void initActionBar() {
         try {
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.setDisplayShowTitleEnabled(true);
@@ -255,7 +280,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
             actionBar.setTitle("更新管理");
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.show();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -263,11 +288,16 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     private void initView() {
         mAllUpdateView = (TextView) rootView.findViewById(R.id.update_all_update);
         mListView = (ListView) rootView.findViewById(R.id.update_listview);
+        mStatsLayout = (LinearLayout) rootView.findViewById(R.id.update_stats);
+        mStatsImgView = (ImageView) rootView.findViewById(R.id.update_stats_img);
+        mStatsButton = (Button) rootView.findViewById(R.id.update_post_button);
 
+        mStatsButton.setOnClickListener(this);
         mAllUpdateView.setOnClickListener(this);
     }
 
     private void post() {
+        mPostStats = false;
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", mActivity.getPackageName());
@@ -281,12 +311,16 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                 String resulit = (String) o;
                 LogUtils.i(TAG, "更新请求成功，resulit：" + resulit);
                 resolve(resulit);
+                mPostStats = true;
             }
 
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
                 LogUtils.i(TAG, "更新请求失败，strMsg：" + strMsg);
+                setStatsLayoutVisibility(View.VISIBLE, mContext.getResources().getDrawable(R.drawable.post_failure));
+                mStatsButton.setVisibility(View.VISIBLE);
+                mPostStats = true;
             }
         });
     }
@@ -320,7 +354,11 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
 
                     mDataContents.add(bean);
                 }
-                if (array.length() > 0) {
+                if (array.length() == 0) {
+                    setStatsLayoutVisibility(View.VISIBLE, mContext.getResources().getDrawable(R.drawable.no_update));
+                    mStatsButton.setVisibility(View.GONE);
+                } else {
+                    setStatsLayoutVisibility(View.GONE, null);
                     if (System.currentTimeMillis() >
                             (Long) UpdateSPUtils.get(mActivity, UpdateSPUtils.UPDATE_NOT_SHOW, 0L)) {
                         showUpdateNotification(array.length());
@@ -333,6 +371,23 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.i(TAG, "更新管理返回的JSON解析失败");
+        }
+    }
+
+    /**
+     * 判断StatsView显示状态
+     */
+    private void setStatsLayoutVisibility(int visibility, Drawable drawable) {
+        switch (visibility) {
+            case View.GONE:
+                mStatsLayout.setVisibility(visibility);
+                mListView.setVisibility(View.VISIBLE);
+                break;
+            case View.VISIBLE:
+                mListView.setVisibility(View.GONE);
+                mStatsImgView.setBackground(drawable);
+                mStatsLayout.setVisibility(visibility);
+                break;
         }
     }
 
