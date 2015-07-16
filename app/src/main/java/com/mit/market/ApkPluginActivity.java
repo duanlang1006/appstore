@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.android.applite.plugin.AppLiteApplication;
 import com.applite.android.R;
+import com.applite.common.LogUtils;
 import com.mit.bean.ApkplugDownloadCallback;
 import com.mit.bean.ApkplugModel;
 import com.mit.bean.ApkplugQueryModel;
@@ -264,6 +265,7 @@ public abstract class ApkPluginActivity extends ActionBarActivity {
     class MyApkplugUpdateCallback implements ApkplugUpdateCallback{
         @Override
         public void onSuccess(int status, final ApkplugQueryModel<ApkplugModel> apkplugModel) {
+            LogUtils.d(TAG,"ApkplugUpdateCallback,status="+status);
             if (ApkplugUpdateCallback.success != status){
                 return;
             }

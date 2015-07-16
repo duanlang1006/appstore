@@ -24,6 +24,7 @@ import com.mit.appliteupdate.bean.DataBean;
 import com.mit.appliteupdate.utils.UpdateSPUtils;
 import com.mit.appliteupdate.utils.UpdateUtils;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
 
 import net.tsz.afinal.FinalHttp;
@@ -58,102 +59,23 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
         }
     };
     private ImplListener mImplListener = new ImplListener() {
-        @Override
-        public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
+        private DataBean findBean(String key){
+            DataBean bean = null;
             for (int i = 0; i < mDataContents.size(); i++) {
-                if (downloadCompleteRsp.key.equals(mDataContents.get(i).getmPackageName())) {
-                    switch (downloadCompleteRsp.status) {
-                        case Constant.STATUS_SUCCESSFUL:
-                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.download_success));
-                            mActivity.runOnUiThread(mNotifyRunnable);
-                            break;
-                    }
+                if (mDataContents.get(i).getmPackageName().equals(key)) {
+                    bean = mDataContents.get(i);
+                    break;
                 }
             }
+            return bean;
         }
 
         @Override
-        public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
-            for (int i = 0; i < mDataContents.size(); i++) {
-                if (downloadUpdateRsp.key.equals(mDataContents.get(i).getmPackageName())) {
-                    String OriginalShowText = mDataContents.get(i).getmShowText();
-
-                    switch (downloadUpdateRsp.status) {
-                        case Constant.STATUS_PENDING:
-                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.download_pending));
-                            break;
-                        case Constant.STATUS_RUNNING:
-                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.download_running));
-                            break;
-                        case Constant.STATUS_PAUSED:
-                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.download_paused));
-                            break;
-                        case Constant.STATUS_FAILED:
-                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.download_failed));
-                            break;
-                        case Constant.STATUS_NORMAL_INSTALLING:
-                            break;
-                    }
-
-                    String CurrentShowText = mDataContents.get(i).getmShowText();
-                    if (!OriginalShowText.equals(CurrentShowText))
-                        mActivity.runOnUiThread(mNotifyRunnable);
-                    LogUtils.i(TAG, OriginalShowText + "-------" + CurrentShowText);
-                }
-            }
-        }
-
-        @Override
-        public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
-
-        }
-
-        @Override
-        public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
-
-        }
-
-        @Override
-        public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
-
-        }
-
-        @Override
-        public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
-            for (int i = 0; i < mDataContents.size(); i++) {
-                if (systemInstallResultRsp.key.equals(mDataContents.get(i).getmPackageName())) {
-                    switch (systemInstallResultRsp.result) {
-                        case Constant.STATUS_PACKAGE_INVALID:
-                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.package_invalid));
-                            Toast.makeText(mActivity, AppliteUtils.getString(mContext, R.string.package_invalid),
-                                    Toast.LENGTH_SHORT).show();
-                            break;
-                        case Constant.STATUS_INSTALL_FAILED:
-                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.install_failed));
-                            break;
-                        case Constant.STATUS_INSTALLED:
-                            mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.start_up));
-                            break;
-                    }
-                    mActivity.runOnUiThread(mNotifyRunnable);
-                }
-            }
-        }
-
-        @Override
-        public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
-
-        }
-
-        @Override
-        public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
-            if (implResponse instanceof ImplAgent.InstallPackageRsp) {
-                for (int i = 0; i < mDataContents.size(); i++) {
-                    if (((ImplAgent.InstallPackageRsp) implResponse).key.equals(mDataContents.get(i).getmPackageName())) {
-                        mDataContents.get(i).setmShowText(AppliteUtils.getString(mContext, R.string.installing));
-                        mActivity.runOnUiThread(mNotifyRunnable);
-                    }
-                }
+        public void onUpdate(boolean b, ImplInfo implInfo) {
+            DataBean bean = findBean(implInfo.getKey());
+            if (null == bean){
+                bean.setImplInfo(implInfo);
+                mActivity.runOnUiThread(mNotifyRunnable);
             }
         }
     };
@@ -316,7 +238,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                     bean.setmUrl(obj.getString("rDownloadUrl"));
                     bean.setmSize(obj.getLong("apkSize"));
 
-                    bean.setmShowText(AppliteUtils.getString(mContext, R.string.install));
+//                    bean.setmShowText(AppliteUtils.getString(mContext, R.string.install));
 
                     mDataContents.add(bean);
                 }

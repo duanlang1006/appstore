@@ -1,5 +1,6 @@
 package com.mit.impl;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
@@ -47,111 +48,4 @@ public class ImplConfig implements BaseColumns{
         return builder.toString();
     }
 
-    public static ImplInfo findInfoByDownloadId(ImplDatabaseHelper dbHelper,long id){
-        ImplInfo info = null;
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor c = db.query(TABLE_IMPL,
-                null,
-                COLUMN_DOWNLOADID + " = ?",
-                new String[]{String.valueOf(id)},
-                null,null,null);
-        try{
-            c.moveToFirst();
-            info = ImplInfo.from(c);
-        }catch(Exception e){
-            e.printStackTrace();
-        }finally {
-            if (null != c){
-                c.close();
-            }
-        }
-        return info;
-    }
-
-    public static ImplInfo findInfoByPackageName(ImplDatabaseHelper dbHelper,String pkgName){
-        ImplInfo info = null;
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor c = db.query(TABLE_IMPL,
-                null,
-                COLUMN_PACKAGENAME + " = ?",
-                new String[]{pkgName},
-                null,null,null);
-        try{
-            c.moveToFirst();
-            info = ImplInfo.from(c);
-        }catch(Exception e){
-            e.printStackTrace();
-        }finally {
-            if (null != c){
-                c.close();
-            }
-        }
-        return info;
-    }
-
-    public static ImplInfo findInfoByKey(ImplDatabaseHelper dbHelper,String key){
-        ImplInfo info = null;
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor c = db.query(TABLE_IMPL,
-                null,
-                COLUMN_KEY + " = ?",
-                new String[]{key},
-                null, null, null);
-        try{
-            if (null != c && c.moveToFirst()) {
-                info = ImplInfo.from(c);
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-        }finally {
-            if (null != c){
-                c.close();
-            }
-        }
-        return info;
-    }
-
-    public static List<ImplInfo> findInfoByKeyBatch(ImplDatabaseHelper dbHelper,String[] keys){
-        List<ImplInfo> infoList = new ArrayList<ImplInfo>();
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor c = db.query(TABLE_IMPL, null, getWhereClauseForKeys(keys), getWhereArgsForKeys(keys), null, null, null);
-        try{
-            c.moveToFirst();
-            do {
-                ImplInfo info = ImplInfo.from(c);
-                if (null != info){
-                    infoList.add(info);
-                }
-            }while(c.moveToNext());
-        }catch(Exception e){
-            e.printStackTrace();
-        }finally {
-            if (null != c){
-                c.close();
-            }
-        }
-        return infoList;
-    }
-
-    static String getWhereClauseForKeys(String[] keys) {
-        StringBuilder whereClause = new StringBuilder();
-        whereClause.append("(");
-        for (int i = 0; i < keys.length; i++) {
-            if (i > 0) {
-                whereClause.append("OR ");
-            }
-            whereClause.append(COLUMN_KEY);
-            whereClause.append(" = '?' ");
-        }
-        whereClause.append(")");
-        return whereClause.toString();
-    }
-
-    static String[] getWhereArgsForKeys(String[] keys) {
-        String[] whereArgs = new String[keys.length];
-        for (int i = 0; i < keys.length; i++) {
-            whereArgs[i] = keys[i];
-        }
-        return whereArgs;
-    }
 }

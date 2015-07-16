@@ -22,7 +22,7 @@
 //import android.widget.Button;
 //import android.widget.LinearLayout;
 //
-//import com.mit.impl.ImplStatusTag;
+//import com.mit.impl.ImplimplInfo;
 //
 //
 ///**
@@ -38,9 +38,9 @@
 //    private DownloadSelectListener mListener;
 //
 //    static interface DownloadSelectListener {
-//        public void onDownloadButtonClicked(ImplStatusTag tag);
-//        public void onDeleteButtonClicked(ImplStatusTag tag);
-//        public void onDetailButtonClicked(ImplStatusTag tag);
+//        public void onDownloadButtonClicked(ImplimplInfo tag);
+//        public void onDeleteButtonClicked(ImplimplInfo tag);
+//        public void onDetailButtonClicked(ImplimplInfo tag);
 //    }
 //
 //    public DownloadItem(Context context, AttributeSet attrs) {
@@ -79,13 +79,13 @@
 //        DownloadAdapter.DownloadItemViewHolder viewHoler = (DownloadAdapter.DownloadItemViewHolder)getTag();
 //        switch(v.getId()){
 //            case R.id.button_delete:
-//                mListener.onDeleteButtonClicked(viewHoler.statusTag);
+//                mListener.onDeleteButtonClicked(viewHoler.implInfo);
 //                break;
 //            case R.id.button_detail:
-//                mListener.onDetailButtonClicked(viewHoler.statusTag);
+//                mListener.onDetailButtonClicked(viewHoler.implInfo);
 //                break;
 //            case R.id.button_op:
-//                mListener.onDownloadButtonClicked(viewHoler.statusTag);
+//                mListener.onDownloadButtonClicked(viewHoler.implInfo);
 //                break;
 //        }
 //    }

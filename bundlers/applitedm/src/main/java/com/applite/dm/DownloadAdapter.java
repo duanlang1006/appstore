@@ -27,17 +27,20 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.mit.impl.ImplStatusTag;
-import com.mit.impl.ImplConfig;
-import net.tsz.afinal.FinalBitmap;
-import net.tsz.afinal.FinalHttp;
 
-import java.text.DateFormat;
+import com.applite.common.Constant;
+import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
+import net.tsz.afinal.FinalBitmap;
+
+import org.apkplug.Bundle.ApkplugOSGIService;
+import org.apkplug.Bundle.OSGIServiceAgent;
+import org.osgi.framework.BundleContext;
+
 import java.util.List;
 
 /**
@@ -45,34 +48,15 @@ import java.util.List;
  */
 public class DownloadAdapter extends CursorAdapter implements View.OnClickListener{
     private Context mContext;
-    private DownloadSelectListener mDownloadSelectionListener;
     private Resources mResources;
     private LayoutInflater mInflater;
-    private DateFormat mDateFormat;
-    private DateFormat mTimeFormat;
     private int mCheckedItemPosition = -1;
-
-    private int mKeyColumnId;
-    private int mTitleColumnId;
-    private int mStatusColumnId;
-    private int mReasonColumnId;
-    private int mTotalBytesColumnId;
-    private int mCurrentBytesColumnId;
-    private int mMediaTypeColumnId;
-    private int mLocalUriColumnId;
-    private int mDateColumnId;
-    private int mPackageColumnId;
-    private int mIconUrlColumnId;
-
     private FinalBitmap mFinalBitmap;
-    private PackageManager mPackageManager;
 
-    public DownloadAdapter(Context context, Cursor cursor,
-                           DownloadSelectListener selectionListener) {
+    public DownloadAdapter(Context context, Cursor cursor) {
         super(context, cursor,true);
         mContext = context;
         mFinalBitmap = FinalBitmap.create(mContext);
-        mPackageManager = mContext.getPackageManager();
         mResources = mContext.getResources();
         mInflater = LayoutInflater.from(mContext);
         try {
@@ -85,22 +69,6 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        mDownloadSelectionListener = selectionListener;
-        mDateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
-        mTimeFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
-        mKeyColumnId = cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_KEY);
-        mTitleColumnId = cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_TITLE);
-        mStatusColumnId = cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_STATUS);
-        mReasonColumnId = cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_REASON);
-        mTotalBytesColumnId = cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_TOTAL_BYTES);
-        mCurrentBytesColumnId = cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_CURRENT_BYTES);
-        mMediaTypeColumnId = cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_MIMETYPE);
-        mLocalUriColumnId = cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_LOCALURI);
-        mDateColumnId =
-                cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_LAST_MODIFIED_TIMESTAMP);
-        mPackageColumnId = cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_PACKAGENAME);
-        mIconUrlColumnId = cursor.getColumnIndexOrThrow(ImplConfig.COLUMN_ICON_URL);
     }
 
     @Override
@@ -135,36 +103,7 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         viewHolder.detailButton.setOnClickListener(this);
 
         view.setOnClickListener(this);
-
-        Cursor c = getCursor();
-        String localUri = c.getString(mLocalUriColumnId);
-        viewHolder.statusTag = ImplStatusTag.generateTag(mContext,
-                c.getString(mKeyColumnId),
-                c.getString(mPackageColumnId),
-                c.getString(mTitleColumnId),
-                c.getString(mIconUrlColumnId),
-                c.getInt(mStatusColumnId),
-                c.getInt(mReasonColumnId),
-                c.getLong(mCurrentBytesColumnId),
-                c.getLong(mTotalBytesColumnId),
-                (null == localUri) ? null : Uri.parse(localUri),
-                c.getString(mMediaTypeColumnId));
-
-        viewHolder.actionBtn.setText(viewHolder.statusTag.getActionText());
-        if (viewHolder.statusTag.getAction() == ImplStatusTag.ACTION_INSTALL){
-            viewHolder.actionBtn.setEnabled(false);
-        }else{
-            viewHolder.actionBtn.setEnabled(true);
-        }
-        viewHolder.descView.setText(viewHolder.statusTag.getDescText());
-        String title = cursor.getString(mTitleColumnId);
-        if (title.isEmpty()) {
-            title = mResources.getString(R.string.missing_title);
-        }
-        viewHolder.titleView.setText(title);
-        viewHolder.statusView.setText(viewHolder.statusTag.getStatusText());
-        setIcon(viewHolder.iconView);
-        setProgress(viewHolder.progressBar,viewHolder.statusTag.getPercent());
+        viewHolder.setImplInfo(ImplInfo.from(cursor));
         if (mCheckedItemPosition == cursor.getPosition()){
             viewHolder.extra.setVisibility(View.VISIBLE);
         }else{
@@ -177,18 +116,41 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         DownloadAdapter.DownloadItemViewHolder viewHoler = (DownloadAdapter.DownloadItemViewHolder)v.getTag();
         switch(v.getId()){
             case R.id.button_delete:
-                if (null != mDownloadSelectionListener) {
-                    mDownloadSelectionListener.onDeleteButtonClicked(viewHoler.statusTag);
-                }
+                ImplAgent.requestDownloadDelete(mContext,viewHoler.implInfo.getKey());
                 break;
             case R.id.button_detail:
-                if (null != mDownloadSelectionListener) {
-                    mDownloadSelectionListener.onDetailButtonClicked(viewHoler.statusTag);
+                try {
+                    BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+                    OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+                            bundleContext, ApkplugOSGIService.class,
+                            "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
+                            OSGIServiceAgent.real_time);   //每次都重新查询
+                    agent.getService().ApkplugOSGIService(bundleContext,
+                            Constant.OSGI_SERVICE_DM_FRAGMENT,
+                            0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
+                            viewHoler.implInfo.getPackageName(),
+                            viewHoler.implInfo.getTitle(),
+                            viewHoler.implInfo.getIconUrl(),
+                            Constant.OSGI_SERVICE_DM_FRAGMENT);
+                } catch (Exception e) {
+                    // TODO 自动生成的 catch 块
+                    e.printStackTrace();
                 }
                 break;
             case R.id.button_op:
-                if (null != mDownloadSelectionListener) {
-                    mDownloadSelectionListener.onDownloadButtonClicked(viewHoler.statusTag);
+                switch(viewHoler.implInfo.getAction(mContext)){
+                    case ImplInfo.ACTION_DOWNLOAD:
+                        if (null != viewHoler.implInfo){
+                            ImplAgent.downloadToggle(mContext, viewHoler.implInfo.getKey());
+                        }
+                        break;
+                    default:
+                        try {
+                            mContext.startActivity(viewHoler.implInfo.getActionIntent(mContext));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
                 }
                 break;
             default:
@@ -202,13 +164,9 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         }
     }
 
-    private void setIcon(ImageView iconView) {
-        Cursor c = getCursor();
-        String mediaType = c.getString(mMediaTypeColumnId);
-        String iconUrl = c.getString(c.getColumnIndex(ImplConfig.COLUMN_ICON_URL));
-
+    private void setIcon(ImplInfo info,ImageView iconView) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromParts("file", "", null), mediaType);
+        intent.setDataAndType(Uri.fromParts("file", "", null), info.getMimeType());
         PackageManager pm = mContext.getPackageManager();
         List<ResolveInfo> list = pm.queryIntentActivities(intent,
                 PackageManager.MATCH_DEFAULT_ONLY);
@@ -219,8 +177,8 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
             Drawable icon = list.get(0).activityInfo.loadIcon(pm);
             iconView.setImageDrawable(icon);
         }
-        if(null != iconUrl){
-            mFinalBitmap.display(iconView, iconUrl);
+        if(null != info.getIconUrl()){
+            mFinalBitmap.display(iconView, info.getIconUrl());
         }
     }
 
@@ -240,14 +198,27 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         TextView deleteButton;
         TextView detailButton;
         ImageView iconView;
-        ImplStatusTag statusTag;
+        ImplInfo implInfo;
         View extra;
         int position;
-    }
 
-    interface DownloadSelectListener {
-        public void onDownloadButtonClicked(ImplStatusTag tag);
-        public void onDeleteButtonClicked(ImplStatusTag tag);
-        public void onDetailButtonClicked(ImplStatusTag tag);
+        void setImplInfo(ImplInfo info){
+            this.implInfo = info;
+            actionBtn.setText(implInfo.getActionText(mContext));
+//            if (implInfo.getAction(mContext) == ImplInfo.ACTION_INSTALL){
+//                actionBtn.setEnabled(false);
+//            }else{
+//                actionBtn.setEnabled(true);
+//            }
+            descView.setText(implInfo.getDescText(mContext));
+            String title = implInfo.getTitle();
+            if(null == title && title.isEmpty()) {
+                title = mResources.getString(R.string.missing_title);
+            }
+            titleView.setText(title);
+            statusView.setText(implInfo.getStatusText(mContext));
+            setIcon(info,iconView);
+            setProgress(progressBar,implInfo.getProgress());
+        }
     }
 }

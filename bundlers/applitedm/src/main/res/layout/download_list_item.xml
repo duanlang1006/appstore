@@ -23,6 +23,7 @@
     android:orientation="vertical"
     android:paddingTop="2dp"
     android:paddingBottom="2dp"
+    android:descendantFocusability="blocksDescendants"
     android:background="@drawable/download_item_background">
 
     <LinearLayout
@@ -86,7 +87,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:focusable="false"
-            android:clickable="false"
             style="@style/DownloadOptButton"/>
     </LinearLayout>
     <RelativeLayout
@@ -102,7 +102,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:focusable="false"
-            android:clickable="false"
             android:text="@string/delete_download"
             style="@style/DownloadOptButton"/>
         <Button
@@ -110,7 +109,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:focusable="false"
-            android:clickable="false"
             android:layout_toRightOf="@id/button_delete"
             android:text="@string/detail_download"
             style="@style/DownloadOptButton"/>

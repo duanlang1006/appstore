@@ -510,8 +510,11 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            LogUtils.d(TAG,"destroyItem,"+position);
-            super.destroyItem(container, position, object);
+            Fragment f = (Fragment)object;
+            if (f.isAdded()) {
+                LogUtils.d(TAG,"destroyItem,"+position);
+                super.destroyItem(container, position, object);
+            }
         }
 
         @Override
