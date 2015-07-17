@@ -37,6 +37,7 @@ import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.KeyBoardUtils;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
 import com.umeng.analytics.MobclickAgent;
 
@@ -94,102 +95,23 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         }
     };
     private ImplListener mImplListener = new ImplListener() {
-        @Override
-        public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
+        private SearchBean findBean(String key){
+            SearchBean bean = null;
             for (int i = 0; i < mSearchApkContents.size(); i++) {
-                if (downloadCompleteRsp.key.equals(mSearchApkContents.get(i).getmPackageName())) {
-                    switch (downloadCompleteRsp.status) {
-                        case Constant.STATUS_SUCCESSFUL:
-                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.download_success));
-                            mActivity.runOnUiThread(mNotifyRunnable);
-                            break;
-                    }
+                if (mSearchApkContents.get(i).getmPackageName().equals(key)) {
+                    bean = mSearchApkContents.get(i);
+                    break;
                 }
             }
+            return bean;
         }
 
         @Override
-        public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
-            for (int i = 0; i < mSearchApkContents.size(); i++) {
-                if (downloadUpdateRsp.key.equals(mSearchApkContents.get(i).getmPackageName())) {
-                    String OriginalShowText = mSearchApkContents.get(i).getmShowButtonText();
-
-                    switch (downloadUpdateRsp.status) {
-                        case Constant.STATUS_PENDING:
-                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.download_pending));
-                            break;
-                        case Constant.STATUS_RUNNING:
-                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.download_running));
-                            break;
-                        case Constant.STATUS_PAUSED:
-                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.download_paused));
-                            break;
-                        case Constant.STATUS_FAILED:
-                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.download_failed));
-                            break;
-                        case Constant.STATUS_NORMAL_INSTALLING:
-                            break;
-                    }
-
-                    String CurrentShowText = mSearchApkContents.get(i).getmShowButtonText();
-                    if (!OriginalShowText.equals(CurrentShowText))
-                        mActivity.runOnUiThread(mNotifyRunnable);
-                    LogUtils.i(TAG, OriginalShowText + "-------" + CurrentShowText);
-                }
-            }
-        }
-
-        @Override
-        public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
-
-        }
-
-        @Override
-        public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
-
-        }
-
-        @Override
-        public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
-
-        }
-
-        @Override
-        public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
-            for (int i = 0; i < mSearchApkContents.size(); i++) {
-                if (systemInstallResultRsp.key.equals(mSearchApkContents.get(i).getmPackageName())) {
-                    switch (systemInstallResultRsp.result) {
-                        case Constant.STATUS_PACKAGE_INVALID:
-                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.package_invalid));
-                            Toast.makeText(mActivity, AppliteUtils.getString(mContext, R.string.package_invalid),
-                                    Toast.LENGTH_SHORT).show();
-                            break;
-                        case Constant.STATUS_INSTALL_FAILED:
-                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.install_failed));
-                            break;
-                        case Constant.STATUS_INSTALLED:
-                            mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.start_up));
-                            break;
-                    }
-                    mActivity.runOnUiThread(mNotifyRunnable);
-                }
-            }
-        }
-
-        @Override
-        public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
-
-        }
-
-        @Override
-        public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
-            if (implResponse instanceof ImplAgent.InstallPackageRsp) {
-                for (int i = 0; i < mSearchApkContents.size(); i++) {
-                    if (((ImplAgent.InstallPackageRsp) implResponse).key.equals(mSearchApkContents.get(i).getmPackageName())) {
-                        mSearchApkContents.get(i).setmShowButtonText(AppliteUtils.getString(mContext, R.string.installing));
-                        mActivity.runOnUiThread(mNotifyRunnable);
-                    }
-                }
+        public void onUpdate(boolean b, ImplInfo implInfo) {
+            SearchBean bean = findBean(implInfo.getKey());
+            if (null != bean ){
+                bean.setImplInfo(implInfo);
+                mActivity.runOnUiThread(mNotifyRunnable);
             }
         }
     };
@@ -549,18 +471,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                     bean.setmVersionCode(obj.getInt("versionCode"));
                     bean.setmDownloadUrl(obj.getString("rDownloadUrl"));
 
-                    int mApkType = AppliteUtils.isAppInstalled(mActivity, obj.getString("packageName"), obj.getInt("versionCode"));
-                    switch (mApkType){
-                        case Constant.INSTALLED:
-                            bean.setmShowButtonText(AppliteUtils.getString(mContext, R.string.open));
-                            break;
-                        case Constant.UNINSTALLED:
-                            bean.setmShowButtonText(AppliteUtils.getString(mContext, R.string.install));
-                            break;
-                        case Constant.INSTALLED_UPDATE:
-                            bean.setmShowButtonText(AppliteUtils.getString(mContext, R.string.update));
-                            break;
-                    }
                     mSearchApkContents.add(bean);
                     ImplAgent.queryDownload(mActivity, bean.getmPackageName());
                 }

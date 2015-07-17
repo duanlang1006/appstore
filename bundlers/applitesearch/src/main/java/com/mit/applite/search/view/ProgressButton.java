@@ -176,7 +176,7 @@ public class ProgressButton extends View {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_UP:
-                buttonClickListener.onClickListener();
+                buttonClickListener.onClickListener(this);
                 break;
             default:
                 break;
@@ -189,6 +189,6 @@ public class ProgressButton extends View {
     }
 
     public interface OnProgressButtonClickListener {
-        public void onClickListener();
+        public void onClickListener(View v);
     }
 }

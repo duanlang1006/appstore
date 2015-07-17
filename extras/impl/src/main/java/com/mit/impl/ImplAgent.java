@@ -1,9 +1,7 @@
 package com.mit.impl;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -22,82 +20,13 @@ public class ImplAgent {
         sWorkerThread.start();
     }
     static final Handler mWorkHandler = new Handler(sWorkerThread.getLooper());
-//    static ImplDatabaseHelper databaseHelper;
     private static Set<ImplListener> mListenerSet = new HashSet<ImplListener>();
     private static List<ImplInterface> sImplList = new ArrayList<ImplInterface>();
-    private static ImplListener mDefaultListener= new ImplListener() {
-        @Override
-        public void onDownloadComplete(boolean success, DownloadCompleteRsp rsp) {
-            switch(rsp.status){
-                case DownloadManager.STATUS_SUCCESSFUL:
-                    String localPath = null;
-                    try {
-                        localPath = Uri.parse(rsp.localPath).getPath();
-                    }catch(Exception e){
-                    }
-                    if (null != localPath) {
-                        ImplAgent.requestPackageInstall(rsp.context, rsp.key, localPath, rsp.packageName, true);
-                    }
-                    ImplLog.d(TAG,"onDownloadComplete,STATUS_SUCCESSFUL,"+rsp.key+","+rsp.localPath);
-                    break;
-                case DownloadManager.STATUS_FAILED:
-                    ImplLog.d(TAG,"onDownloadComplete,STATUS_FAILED,"+rsp.key+","+rsp.localPath);
-                    break;
-            }
-        }
-
-        @Override
-        public void onDownloadUpdate(boolean success, DownloadUpdateRsp rsp) {
-            ImplLog.d(TAG,"onDownloadUpdate,"+rsp.key+","+rsp.status+","+rsp.progress);
-        }
-
-        @Override
-        public void onPackageAdded(boolean success, PackageAddedRsp rsp) {
-            ImplLog.d(TAG,"onPackageAdded,"+rsp.key);
-        }
-
-        @Override
-        public void onPackageRemoved(boolean success, PackageRemovedRsp rsp) {
-            ImplLog.d(TAG,"onPackageRemoved,"+rsp.key);
-        }
-
-        @Override
-        public void onPackageChanged(boolean success, PackageChangedRsp rsp) {
-            ImplLog.d(TAG,"onPackageChanged,"+rsp.key);
-        }
-
-        @Override
-        public void onSystemInstallResult(boolean success, SystemInstallResultRsp rsp) {
-            ImplLog.d(TAG,"onSystemInstallResult,"+rsp.key+","+rsp.result);
-        }
-
-        @Override
-        public void onSystemDeleteResult(boolean success, SystemDeleteResultRsp rsp) {
-            ImplLog.d(TAG,"onSystemDeleteResult,"+rsp.key+","+rsp.result);
-        }
-
-        @Override
-        public void onFinish(boolean success, ImplResponse rsp) {
-            ImplLog.d(TAG,"onFinish,"+rsp.action);
-        }
-    };
 
     static {
-        ImplDownload download = ImplDownload.getInstance();
-        sImplList.add(download);
-//        sImplList.add(ImplFakeDownload.getInstance());
+        sImplList.add(ImplDownload.getInstance());
         sImplList.add(ImplPackageManager.getInstance());
-        registerImplListener(mDefaultListener);
-        ImplLog.d(TAG,"ImplAgent.mListenerSet = "+mListenerSet+",download="+download);
     }
-
-
-//    public static void init(Context context){
-//        for (ImplInterface impl:sImplList){
-//            impl.init(context);
-//        }
-//        registerImplListener(mDefaultListener);
-//    }
 
     public static void registerImplListener(ImplListener listener){
         mListenerSet.add(listener);
@@ -107,29 +36,32 @@ public class ImplAgent {
         mListenerSet.remove(listener);
     }
 
-    public static boolean onReceive(Context context,Intent intent){
-        boolean handled = false;
-        String action = intent.getAction();
-        Log.d(TAG,"onReceive,"+action);
-        if (ImplInterface.IMPL_ACTION_PACKAGE_ADDED.equals(action)){
-            request(new PackageAddedReq(context,intent));
-        }else if (ImplInterface.IMPL_ACTION_PACKAGE_CHANGED.equals(action)){
-            request(new PackageChangedReq(context,intent));
-        }else if (ImplInterface.IMPL_ACTION_PACKAGE_REMOVED.equals(action)){
-            request(new PackageRemovedReq(context,intent));
-        }else if (ImplInterface.IMPL_ACTION_SYSTEM_INSTALL_RESULT.equals(action)){
-            request(new SystemInstallResultReq(context,intent));
-        }else if (ImplInterface.IMPL_ACTION_SYSTEM_DELETE_RESULT.equals(action)){
-            request(new SystemDeleteResultReq(context,intent));
-        }else if (ImplInterface.IMPL_ACTION_DOWNLOAD_COMPLETE.equals(action)){
-            request(new DownloadCompleteReq(context,intent));
-        }
-
-        return handled;
+    public static boolean onReceive(final Context context,final Intent intent){
+        mWorkHandler.post(new Runnable(){
+            @Override
+            public void run() {
+                String action = intent.getAction();
+                Log.d(TAG,"onReceive,"+action);
+                if (ImplInterface.IMPL_ACTION_PACKAGE_ADDED.equals(action)){
+                    request(new PackageAddedReq(context,intent));
+                }else if (ImplInterface.IMPL_ACTION_PACKAGE_CHANGED.equals(action)){
+                    request(new PackageChangedReq(context,intent));
+                }else if (ImplInterface.IMPL_ACTION_PACKAGE_REMOVED.equals(action)){
+                    request(new PackageRemovedReq(context,intent));
+                }else if (ImplInterface.IMPL_ACTION_SYSTEM_INSTALL_RESULT.equals(action)){
+                    request(new SystemInstallResultReq(context,intent));
+                }else if (ImplInterface.IMPL_ACTION_SYSTEM_DELETE_RESULT.equals(action)){
+                    request(new SystemDeleteResultReq(context,intent));
+                }else if (ImplInterface.IMPL_ACTION_DOWNLOAD_COMPLETE.equals(action)){
+                    request(new DownloadCompleteReq(context,intent));
+                }
+            }
+        });
+        return true;
     }
 
     public static void queryDownload(Context context,String... keys){
-        request(new DownloadUpdateReq(context,keys));
+        request(new DownloadQueryReq(context,keys));
     }
 
     /***
@@ -183,48 +115,30 @@ public class ImplAgent {
         request(new DeletePackageReq(context,key,packageName,silent));
     }
 
-    public static Handler getWorkHandler(){
-        return mWorkHandler;
-    }
-
-    private static void request(ImplRequest cmd) {
-        // TODO Auto-generated method stub
-        for (ImplInterface impl:sImplList){
-            if (impl.request(cmd)){
-                break;
-            }
-        }
-    }
-
-    static void notify(boolean success,ImplAgent.ImplResponse rsp){
-        for (ImplListener listener:mListenerSet){
-            ImplLog.d(TAG,"notify,listener="+listener);
-            if (rsp instanceof DownloadCompleteRsp){
-                listener.onDownloadComplete(success,(DownloadCompleteRsp)rsp);
-            }else if (rsp instanceof DownloadUpdateRsp){
-                listener.onDownloadUpdate(success,(DownloadUpdateRsp)rsp);
-            }else if (rsp instanceof PackageAddedRsp){
-                listener.onPackageAdded(success,(PackageAddedRsp)rsp);
-            }else if (rsp instanceof PackageRemovedRsp){
-                listener.onPackageRemoved(success,(PackageRemovedRsp)rsp);
-            }else if (rsp instanceof PackageChangedRsp){
-                listener.onPackageChanged(success,(PackageChangedRsp)rsp);
-            }else if (rsp instanceof SystemInstallResultRsp){
-                listener.onSystemInstallResult(success,(SystemInstallResultRsp)rsp);
-            }else if (rsp instanceof SystemDeleteResultRsp){
-                listener.onSystemDeleteResult(success, (SystemDeleteResultRsp) rsp);
-            }else {
-                listener.onFinish(success, rsp);
-            }
-        }
-    }
-
-//    static ImplDatabaseHelper getDatabaseHelper(Context context){
-//        if (null == databaseHelper){
-//            databaseHelper = new ImplDatabaseHelper(context);
-//        }
-//        return databaseHelper;
+//    public static Handler getWorkHandler(){
+//        return mWorkHandler;
 //    }
+
+    private static void request(final ImplRequest cmd) {
+        // TODO Auto-generated method stub
+        mWorkHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                for (ImplInterface impl:sImplList){
+                    if (impl.request(cmd)){
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    static void notify(boolean success,ImplInfo info){
+        for (ImplListener listener:mListenerSet){
+//            ImplLog.d(TAG,"notify statusTag,listener="+listener);
+            listener.onUpdate(success, info);
+        }
+    }
 
     ///===================================================================
     public static abstract class ImplRequest{
@@ -232,14 +146,6 @@ public class ImplAgent {
         public String action;
 
         protected ImplRequest(Context context, String action) {
-            this.context = context;
-            this.action = action;
-        }
-    }
-    public static abstract class ImplResponse{
-        Context context;
-        public String action;
-        protected ImplResponse(Context context, String action) {
             this.context = context;
             this.action = action;
         }
@@ -279,13 +185,6 @@ public class ImplAgent {
         }
     }
 
-    public static class DownloadPackageRsp extends ImplResponse{
-        public String key;
-        DownloadPackageRsp(Context context,String key) {
-            super(context,ImplInterface.IMPL_ACTION_DOWNLOAD);
-            this.key = key;
-        }
-    }
     ///===================================================================
 
     public static class DownloadCompleteReq extends ImplRequest{
@@ -297,19 +196,6 @@ public class ImplAgent {
         }
     }
 
-    public static class DownloadCompleteRsp extends ImplResponse{
-        public String key;
-        public String localPath;  //uri
-        public String packageName;
-        public int status;
-        DownloadCompleteRsp(Context context,String key,int status,String localPath,String packageName) {
-            super(context,ImplInterface.IMPL_ACTION_DOWNLOAD_COMPLETE);
-            this.key = key;
-            this.localPath = localPath;
-            this.status = status;
-            this.packageName = packageName;
-        }
-    }
     ///===================================================================
 
     public static class FakeDownloadReq extends  ImplRequest{
@@ -322,29 +208,12 @@ public class ImplAgent {
         }
     }
 
-    public static class FakeDownloadRsp extends ImplResponse{
-        public String key;
-        FakeDownloadRsp(Context context,String key) {
-            super(context,ImplInterface.IMPL_ACTION_FAKE_DOWNLOAD);
-            this.key = key;
-        }
-    }
     ///===================================================================
     public static class DeleteDownloadReq extends ImplRequest{
         String key;
         DeleteDownloadReq(Context context,String key) {
             super(context,ImplInterface.IMPL_ACTION_DOWNLOAD_DELETE);
             this.key = key;
-        }
-    }
-
-    public static class DeleteDownloadRsp extends ImplResponse{
-        String key;
-        boolean result;
-        DeleteDownloadRsp(Context context,String key,boolean result) {
-            super(context,ImplInterface.IMPL_ACTION_DOWNLOAD_DELETE);
-            this.key = key;
-            this.result = result;
         }
     }
 
@@ -358,19 +227,6 @@ public class ImplAgent {
         }
     }
 
-    ///===================================================================
-    public static class DownloadUpdateRsp extends ImplResponse{
-        public String key;
-        public int status;
-        public int progress;
-
-        DownloadUpdateRsp(Context context,String key, int status, int progress) {
-            super(context,ImplInterface.IMPL_ACTION_DOWNLOAD_UPDATE);
-            this.key = key;
-            this.status = status;
-            this.progress = progress;
-        }
-    }
     ///===================================================================
 
     public static class InstallPackageReq extends ImplRequest{
@@ -388,16 +244,6 @@ public class ImplAgent {
         }
     }
 
-    public static class InstallPackageRsp extends ImplResponse{
-        public String key;
-        public boolean silent;
-
-        InstallPackageRsp(Context context,String key, boolean silent) {
-            super(context,ImplInterface.IMPL_ACTION_INSTALL_PACKAGE);
-            this.key = key;
-            this.silent = silent;
-        }
-    }
     ///===================================================================
     public static class DeletePackageReq extends ImplRequest{
         String key;
@@ -412,16 +258,6 @@ public class ImplAgent {
         }
     }
 
-    public static class DeletePackageRsp extends ImplResponse{
-        public String key;
-        public boolean silent;
-
-        DeletePackageRsp(Context context,String key, boolean silent) {
-            super(context,ImplInterface.IMPL_ACTION_DELETE_PACKAGE);
-            this.key = key;
-            this.silent = silent;
-        }
-    }
     ///===================================================================
     public static class PackageAddedReq extends ImplRequest{
 //        String key;
@@ -433,13 +269,6 @@ public class ImplAgent {
         }
     }
 
-    public static class PackageAddedRsp extends ImplResponse{
-        public String key;
-        PackageAddedRsp(Context context,String key) {
-            super(context,ImplInterface.IMPL_ACTION_PACKAGE_ADDED);
-            this.key = key;
-        }
-    }
     ///===================================================================
     public static class PackageRemovedReq extends ImplRequest{
 //        String key;
@@ -448,13 +277,6 @@ public class ImplAgent {
             super(context,ImplInterface.IMPL_ACTION_PACKAGE_REMOVED);
 //            this.key = key;
             this.intent = intent;
-        }
-    }
-    public static class PackageRemovedRsp extends ImplResponse{
-        public String key;
-        PackageRemovedRsp(Context context,String key) {
-            super(context,ImplInterface.IMPL_ACTION_PACKAGE_REMOVED);
-            this.key = key;
         }
     }
     ///===================================================================
@@ -468,13 +290,6 @@ public class ImplAgent {
         }
     }
 
-    public static class PackageChangedRsp extends ImplResponse{
-        public String key;
-        PackageChangedRsp(Context context,String key) {
-            super(context,ImplInterface.IMPL_ACTION_PACKAGE_CHANGED);
-            this.key = key;
-        }
-    }
     ///===================================================================
     public static class SystemInstallResultReq extends ImplRequest{
 //        String key;
@@ -486,15 +301,6 @@ public class ImplAgent {
         }
     }
 
-    public static class SystemInstallResultRsp extends ImplResponse{
-        public String key;
-        public int result;
-        SystemInstallResultRsp(Context context,String key,int result) {
-            super(context,ImplInterface.IMPL_ACTION_SYSTEM_INSTALL_RESULT);
-            this.key = key;
-            this.result = result;
-        }
-    }
     ///===================================================================
     public static class SystemDeleteResultReq extends ImplRequest{
         Intent intent;
@@ -504,22 +310,13 @@ public class ImplAgent {
         }
     }
 
-    public static class SystemDeleteResultRsp extends ImplResponse{
-        public String key;
-        public int result;
-        SystemDeleteResultRsp(Context context,String key,int result) {
-            super(context,ImplInterface.IMPL_ACTION_SYSTEM_DELETE_RESULT);
-            this.key = key;
-            this.result = result;
-        }
-    }
     ///===================================================================
 
-    public static class DownloadUpdateReq extends ImplRequest{
+    public static class DownloadQueryReq extends ImplRequest{
         String[] keys;
 
-        public DownloadUpdateReq(Context context, String[] keys) {
-            super(context, ImplInterface.IMPL_ACTION_DOWNLOAD_UPDATE);
+        public DownloadQueryReq(Context context, String[] keys) {
+            super(context, ImplInterface.IMPL_ACTION_QUERY);
             this.keys = keys;
         }
     }
