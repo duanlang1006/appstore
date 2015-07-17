@@ -1,7 +1,6 @@
 package com.applite.data;
 
 import android.content.Context;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +13,10 @@ import android.widget.TextView;
 import com.applite.bean.HomePageApkData;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
-import com.applite.common.LogUtils;
+import com.applite.common.Constant;
 import com.applite.homepage.BundleContextFactory;
-import com.mit.impl.ImplStatusTag;
+import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 import com.applite.homepage.R;
 import net.tsz.afinal.FinalBitmap;
 import java.lang.reflect.Field;
@@ -32,12 +32,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     private SubjectData mData = null;
     private FinalBitmap mFinalBitmap;
 
-    private ListAdapterListener mListener = null;
     int layoutResourceId = 0;
-    public ListArrayAdapter(Context context, SubjectData data,ListAdapterListener listener) {
+    public ListArrayAdapter(Context context, SubjectData data) {
         this.mContext = context;
         this.mData = data;
-        this.mListener = listener;
         mFinalBitmap = FinalBitmap.create(context);
 
         mInflater = (LayoutInflater) context
@@ -89,23 +87,16 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        LogUtils.d(TAG, "getView() mData : " + mData);
         if (null != mData && null != mData.getData()) {
             HomePageApkData itemData = mData.getData().get(position);
-            LogUtils.d(TAG, "getView() itemData : " + itemData);
+            if (null == itemData.getImplInfo()){
+                ImplAgent.queryDownload(mContext,itemData.getPackageName());
+                ImplInfo info = ImplInfo.create(mContext, itemData.getPackageName(), itemData.getrDownloadUrl(), itemData.getPackageName());
+                itemData.setImplInfo(info);
+            }
+
             viewHolder.setItemData(itemData);
-            String localUri = itemData.getLocalUri();
-            viewHolder.setStatusTag(ImplStatusTag.generateTag(mContext,
-                    itemData.getPackageName(),
-                    itemData.getPackageName(),
-                    itemData.getName(),
-                    itemData.getIconUrl(),
-                    itemData.getStatus(),
-                    itemData.getReason(),
-                    itemData.getCurrentBytes(),
-                    itemData.getTotalBytes(),
-                    (null == localUri) ? null : Uri.parse(localUri),
-                    itemData.getMediaType()));
+//            viewHolder.setStatusTag(itemData.getImplInfo());
             viewHolder.setLayoutStr(mData.getS_datatype());
             float star = 0.0f;
             try {
@@ -113,7 +104,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             } catch (Exception e) {
             }
             viewHolder.setmRatingBar(star/2.0f);
-            viewHolder.setmProgressButton(viewHolder.statusTag);
+            viewHolder.setmProgressButton(itemData);
             viewHolder.setmAppIcon(itemData.getIconUrl());
             viewHolder.setCategorySub(itemData.getCategorysub());
             viewHolder.setAppSize(itemData.getApkSize());
@@ -127,10 +118,33 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     public void onClick(View v) {
         if (v.getId() == R.id.list_item_progress_button){
             Object obj = v.getTag();
-            if (obj instanceof ImplStatusTag){
-                ImplStatusTag tag = (ImplStatusTag)obj;
-                if (null != mListener){
-                    mListener.onDownloadButtonClicked(tag);
+            if (obj instanceof HomePageApkData){
+                HomePageApkData bean = (HomePageApkData)obj;
+                ImplInfo tag = bean.getImplInfo();
+                switch(tag.getAction(mContext)){
+                    case ImplInfo.ACTION_DOWNLOAD:
+                        ImplAgent.downloadPackage(mContext,
+                                bean.getPackageName(),
+                                bean.getrDownloadUrl(),
+                                Constant.extenStorageDirPath,
+                                bean.getName() + ".apk",
+                                3,
+                                false,
+                                bean.getName(),
+                                "",
+                                true,
+                                bean.getIconUrl(),
+                                "",
+                                bean.getPackageName());
+                        break;
+
+                    default:
+                        try {
+                            mContext.startActivity(tag.getActionIntent(mContext));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
                 }
             }
         }
@@ -144,12 +158,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private RatingBar mRatingBar;
         private Button mProgressButton;
 
-        private ImplStatusTag statusTag;
         private HomePageApkData itemData;
         private String layoutStr;
         private ImageView mCategoryListArrow;
         ViewHolder(View mView){
-
             this.mAppIcon = (ImageView) mView.findViewById(R.id.imageViewName);
             this.mAppName = (TextView) mView.findViewById(R.id.apkName);
             this.mCategorySub = (TextView) mView.findViewById(R.id.categorySub);
@@ -158,13 +170,6 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             this.mProgressButton = (Button) mView.findViewById(R.id.list_item_progress_button);
             this.mCategoryListArrow = (ImageView) mView.findViewById(R.id.categoryListArrow);
         }
-        public ImplStatusTag getStatusTag() {
-            return statusTag;
-        }
-        public void setStatusTag(ImplStatusTag statusTag) {
-            this.statusTag = statusTag;
-        }
-
         public void setmAppIcon(String iconUrl) {
             if (null != this.mAppIcon && null != iconUrl){
                 mFinalBitmap.display(this.mAppIcon, iconUrl);
@@ -200,10 +205,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             }
         }
 
-        public void setmProgressButton(ImplStatusTag statusTag) {
-            if (null != mProgressButton){
-                mProgressButton.setTag(statusTag);
-                mProgressButton.setText(statusTag.getActionText());
+        public void setmProgressButton(HomePageApkData itemData) {
+            if (null != mProgressButton ){
+                mProgressButton.setTag(itemData);
+                mProgressButton.setText(itemData.getImplInfo().getActionText(mContext));
                 mProgressButton.setOnClickListener(ListArrayAdapter.this);
             }
         }
@@ -228,9 +233,5 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         public void setLayoutStr(String layoutStr) {
             this.layoutStr = layoutStr;
         }
-    }
-
-    public interface ListAdapterListener {
-        public void onDownloadButtonClicked(ImplStatusTag tag);
     }
 }

@@ -45,6 +45,7 @@ android {
 }
 
 dependencies {
+    provided 'com.umeng.analytics:analytics:latest.integration'
     provided files('../../app/libs/afinal_0.5.1_bin.jar')
     provided files('../../app/reflibs/osgi2.8.0.jar')
     provided files('../../app/reflibs/android-support-v4.jar')

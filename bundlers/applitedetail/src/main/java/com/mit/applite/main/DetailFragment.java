@@ -25,7 +25,9 @@ import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.mit.applite.view.ProgressButton;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
+import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
@@ -62,93 +64,17 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private String mPackageName;
     private String mName;
     private String mImgUrl;
-    private int mApkType = -1;
     private ProgressButton mProgressButton;
     private int mVersionCode;
     private Context mContext;
+    private ImplInfo mImplInfo = null;
     private ImplListener mImplListener = new ImplListener() {
         @Override
-        public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
-            if (downloadCompleteRsp.key.equals(mPackageName)) {
-                switch (downloadCompleteRsp.status) {
-                    case Constant.STATUS_SUCCESSFUL:
-                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_success));
-                        break;
-                }
-            }
-        }
-
-        @Override
-        public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
-            if (downloadUpdateRsp.key.equals(mPackageName)) {
-                switch (downloadUpdateRsp.status) {
-                    case Constant.STATUS_PENDING:
-                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_pending));
-                        break;
-                    case Constant.STATUS_RUNNING:
-                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_running));
-                        break;
-                    case Constant.STATUS_PAUSED:
-                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_paused));
-                        break;
-                    case Constant.STATUS_FAILED:
-                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.download_failed));
-                        break;
-                    case Constant.STATUS_NORMAL_INSTALLING:
-                        break;
-                }
-
-//              mProgressBar.setProgress(downloadUpdateRsp.progress);
-                mProgressButton.setProgress(downloadUpdateRsp.progress);
-                if (downloadUpdateRsp.progress >= 100) {
-//                  mProgressBar.setVisibility(View.INVISIBLE);
-//                  mDownloadView.setText(getResources().getString(R.string.open));
-//                    mProgressButton.setText(mContext.getResources().getString(R.string.open));
-                }
-            }
-        }
-
-        @Override
-        public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
-        }
-
-        @Override
-        public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
-        }
-
-        @Override
-        public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
-        }
-
-        @Override
-        public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
-            if (systemInstallResultRsp.key.equals(mPackageName)) {
-                switch (systemInstallResultRsp.result) {
-                    case Constant.STATUS_PACKAGE_INVALID:
-                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.package_invalid));
-                        Toast.makeText(mActivity, AppliteUtils.getString(mContext, R.string.package_invalid),
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case Constant.STATUS_INSTALL_FAILED:
-                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.install_failed));
-                        break;
-                    case Constant.STATUS_INSTALLED:
-                        mProgressButton.setText(AppliteUtils.getString(mContext, R.string.start_up));
-                        break;
-                }
-            }
-        }
-
-        @Override
-        public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
-        }
-
-        @Override
-        public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
-            if (implResponse instanceof ImplAgent.InstallPackageRsp) {
-                if (((ImplAgent.InstallPackageRsp) implResponse).key.equals(mPackageName)) {
-                    mProgressButton.setText(AppliteUtils.getString(mContext, R.string.installing));
-                }
+        public void onUpdate(boolean b, ImplInfo implInfo) {
+            if (implInfo.getKey().equals(mPackageName)) {
+                mImplInfo = implInfo;
+                mProgressButton.setText(implInfo.getActionText(mActivity));
+                mProgressButton.setProgress(implInfo.getProgress());
             }
         }
     };
@@ -200,6 +126,16 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
         setHasOptionsMenu(true);
         return rootView;
+    }
+
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart("DetailFragment"); //统计页面
+    }
+
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd("DetailFragment");
     }
 
     @Override
@@ -256,13 +192,19 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onClickListener() {
                 if (!TextUtils.isEmpty(mPackageName)) {
-                    if (mApkType == Constant.INSTALLED) {
-                        AppliteUtils.startApp(mActivity, mPackageName);
-                    } else {
-//                        mProgressBar.setVisibility(View.VISIBLE);
-//                        Utils.setDownloadViewText(mContext, mProgressButton);
-                        if (!TextUtils.isEmpty(mDownloadUrl))
-                            requestDownload();
+                    if (null != mImplInfo){
+                        switch(mImplInfo.getAction(mActivity)){
+                            case ImplInfo.ACTION_DOWNLOAD:
+                                requestDownload();
+                                break;
+                            default:
+                                try{
+                                    mActivity.startActivity(mImplInfo.getActionIntent(mActivity));
+                                }catch(Exception e){
+                                    e.printStackTrace();
+                                }
+                                break;
+                        }
                     }
                 }
             }
@@ -364,19 +306,11 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             }
 
             ImplAgent.queryDownload(mActivity, mPackageName);
-
-            //判断应用是否安装
-            mApkType = AppliteUtils.isAppInstalled(mActivity, mPackageName, mVersionCode);
-            if (mApkType == Constant.INSTALLED) {
-                LogUtils.i(TAG, "应用已安装");
-                mProgressButton.setText(mContext.getResources().getString(R.string.open));
-            } else if (mApkType == Constant.INSTALLED_UPDATE) {
-                mProgressButton.setText(mContext.getResources().getString(R.string.update));
-                LogUtils.i(TAG, "应用有更新");
-            } else if (mApkType == Constant.UNINSTALLED) {
-                mProgressButton.setText(mContext.getResources().getString(R.string.install));
-                LogUtils.i(TAG, "应用未安装");
+            if (null == mImplInfo){
+                mImplInfo = ImplInfo.create(mActivity,mPackageName,mDownloadUrl,mPackageName);
             }
+            mProgressButton.setText(mImplInfo.getActionText(mActivity));
+            mProgressButton.setProgress(mImplInfo.getProgress());
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.e(TAG, "应用详情JSON解析失败");

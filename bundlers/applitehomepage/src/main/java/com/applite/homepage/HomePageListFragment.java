@@ -3,9 +3,7 @@ package com.applite.homepage;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
@@ -23,10 +21,11 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.data.ListArrayAdapter;
+import com.applite.utils.HomepageUtils;
 import com.google.gson.Gson;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
-import com.mit.impl.ImplStatusTag;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
@@ -57,7 +56,6 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     private int mCurCheckPosition = 0;
     private boolean showHome = false;
     private ImplListener mImplListener = new HomePageImplListener();
-    private HomePageListListener mListAdapterListener = new HomePageListListener();
     private MySlideViewListener mSlideViewListener = new MySlideViewListener();
     private MyScrollListener mOnScrollListener = new MyScrollListener();
 
@@ -114,9 +112,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
 
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(mOnScrollListener);
-        mListAdapter = new ListArrayAdapter(mActivity,
-                mData,
-                mListAdapterListener);
+        mListAdapter = new ListArrayAdapter(mActivity,mData);
         mListView.setAdapter(mListAdapter);
         initActionBar();
         return rootView;
@@ -258,6 +254,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
                 page ++;
             }
         }
+        LogUtils.i(TAG, mData+"");
         LogUtils.d(TAG, "httpRequest  mPage : " + page);
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
@@ -318,143 +315,23 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         return bean;
     }
 
-    class HomePageListListener implements ListArrayAdapter.ListAdapterListener {
-        @Override
-        public void onDownloadButtonClicked(ImplStatusTag tag) {
-            HomePageApkData bean = findBeanByKey(tag.getKey());
-            if (null == bean){
-                return;
-            }
-            switch(tag.getAction()){
-                case ImplStatusTag.ACTION_DOWNLOAD:
-                    ImplAgent.downloadPackage(mActivity,
-                            bean.getPackageName(),
-                            bean.getrDownloadUrl(),
-                            Constant.extenStorageDirPath,
-                            bean.getName() + ".apk",
-                            3,
-                            false,
-                            bean.getName(),
-                            "",
-                            true,
-                            bean.getIconUrl(),
-                            "",
-                            bean.getPackageName());
-                    break;
-                case ImplStatusTag.ACTION_OPEN:
-                    try {
-                        mActivity.startActivity(tag.getIntent());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    break;
-            }
-        }
-    }
-
     class HomePageImplListener implements ImplListener{
         private final String TAG = "impl_homepage";
         private Runnable mRefreshListRunnable = new Runnable(){
             @Override
             public void run() {
-                mListAdapter.notifyDataSetInvalidated();
+                mListAdapter.notifyDataSetChanged();
             }
         };
 
         @Override
-        public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
-            LogUtils.i(TAG,  "onDownloadComplete key="+downloadCompleteRsp.key);
-            HomePageApkData bean = findBeanByKey(downloadCompleteRsp.key);
+        public void onUpdate(boolean success, ImplInfo implInfo) {
+            HomePageApkData bean = findBeanByKey(implInfo.getKey());
             if (null != bean){
-                LogUtils.i(TAG,  "onDownloadComplete name="+bean.getName()+",status="+bean.getStatus());
-                if (bean.getStatus() <= Constant.STATUS_FAILED) {
-                    bean.setStatus(downloadCompleteRsp.status);
-                }
-                bean.setLocalUri(downloadCompleteRsp.localPath);
+                LogUtils.i(TAG,  HomePageListFragment.this+",onUpdate name="+bean.getName()+",status="+implInfo.getStatus());
+                bean.setImplInfo(implInfo);
                 mActivity.runOnUiThread(mRefreshListRunnable);
             }
-            LogUtils.i(TAG,  "onDownloadComplete end");
-        }
-
-        @Override
-        public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
-            LogUtils.i(TAG,  "onDownloadUpdate  key="+downloadUpdateRsp.key);
-            HomePageApkData bean = findBeanByKey(downloadUpdateRsp.key);
-            if (null != bean){
-                LogUtils.i(TAG,  "onDownloadUpdate name="+bean.getName()+",status="+bean.getStatus());
-                if (bean.getStatus() <= Constant.STATUS_FAILED) {
-                    int OriginalStatus = bean.getStatus();
-                    bean.setStatus(downloadUpdateRsp.status);
-                    bean.setCurrentBytes(downloadUpdateRsp.progress);
-                    bean.setTotalBytes(100);
-                    if (OriginalStatus != bean.getStatus()) {
-                        mActivity.runOnUiThread(mRefreshListRunnable);
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
-            LogUtils.i(TAG,  "onPackageAdded key="+packageAddedRsp.key);
-            HomePageApkData bean = findBeanByKey(packageAddedRsp.key);
-            if (null != bean){
-                bean.setStatus(Constant.STATUS_INSTALLED);
-                LogUtils.i(TAG,  "onPackageAdded name="+bean.getName()+",status="+bean.getStatus());
-                mActivity.runOnUiThread(mRefreshListRunnable);
-            }
-        }
-
-        @Override
-        public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
-            HomePageApkData bean = findBeanByKey(packageRemovedRsp.key);
-            if (null != bean){
-                bean.setStatus(Constant.STATUS_INIT);
-                LogUtils.i(TAG,  "onPackageRemoved key="+packageRemovedRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
-                mActivity.runOnUiThread(mRefreshListRunnable);
-            }
-        }
-
-        @Override
-        public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
-            HomePageApkData bean = findBeanByKey(packageChangedRsp.key);
-            if (null != bean){
-                bean.setStatus(Constant.STATUS_INSTALLED);
-                LogUtils.i(TAG,  "onPackageChanged key="+packageChangedRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
-                mActivity.runOnUiThread(mRefreshListRunnable);
-            }
-        }
-
-        @Override
-        public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
-            LogUtils.i(TAG,  "onSystemInstallResult key="+systemInstallResultRsp.key);
-            HomePageApkData bean = findBeanByKey(systemInstallResultRsp.key);
-            if (null != bean){
-                if (systemInstallResultRsp.result == Constant.INSTALL_SUCCEEDED) {
-                    bean.setStatus(Constant.STATUS_INSTALLED);
-                }else{
-                    bean.setStatus(Constant.STATUS_INSTALL_FAILED);
-                }
-                LogUtils.i(TAG,  "onSystemInstallResult name="+bean.getName()+",status="+bean.getStatus());
-                mActivity.runOnUiThread(mRefreshListRunnable);
-            }
-        }
-
-        @Override
-        public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
-            HomePageApkData bean = findBeanByKey(systemDeleteResultRsp.key);
-            if (null != bean){
-                if (systemDeleteResultRsp.result == Constant.DELETE_SUCCEEDED) {
-                    bean.setStatus(Constant.STATUS_INIT);
-                }
-                LogUtils.i(TAG,  "onSystemDeleteResult key="+systemDeleteResultRsp.key+",name="+bean.getName()+",status="+bean.getStatus());
-                mActivity.runOnUiThread(mRefreshListRunnable);
-            }
-        }
-
-        @Override
-        public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
-            LogUtils.i(TAG,  "onFinish implResponse.action="+implResponse.action);
         }
     }
 
@@ -490,26 +367,27 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         @Override
         public void onClick(View v, int position) {
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
-            SubjectData data = new SubjectData();
-            data.setS_key(topicData.t_key);
-            data.setS_name(topicData.t_info);
-            data.setStep(mData.getStep());
-            data.setS_datatype(mData.getS_datatype());
-            data.setData(new ArrayList<HomePageApkData>());
-            data.setSpecialtopic_data(null);
-            try {
-                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                        bundleContext, ApkplugOSGIService.class,
-                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                        OSGIServiceAgent.real_time);   //每次都重新查询
-                agent.getService().ApkplugOSGIService(bundleContext,
-                        Constant.OSGI_SERVICE_DM_FRAGMENT,
-                        0, Constant.OSGI_SERVICE_TOPIC_FRAGMENT,data);
-            } catch (Exception e) {
-                // T
-                e.printStackTrace();
-            }
+            HomepageUtils.toTopicFragment(topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype());
+//            SubjectData data = new SubjectData();
+//            data.setS_key(topicData.t_key);
+//            data.setS_name(topicData.t_info);
+//            data.setStep(mData.getStep());
+//            data.setS_datatype(mData.getS_datatype());
+//            data.setData(new ArrayList<HomePageApkData>());
+//            data.setSpecialtopic_data(null);
+//            try {
+//                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+//                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+//                        bundleContext, ApkplugOSGIService.class,
+//                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
+//                        OSGIServiceAgent.real_time);   //每次都重新查询
+//                agent.getService().ApkplugOSGIService(bundleContext,
+//                        Constant.OSGI_SERVICE_DM_FRAGMENT,
+//                        0, Constant.OSGI_SERVICE_TOPIC_FRAGMENT,data);
+//            } catch (Exception e) {
+//                // T
+//                e.printStackTrace();
+//            }
         }
     }
 }

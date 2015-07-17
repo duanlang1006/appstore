@@ -9,6 +9,7 @@
     <string name="download_status_running">In progress</string>
     <string name="download_status_queued">Queued</string>
     <string name="download_status_paused">Paused</string>
+    <string name="download_status_waiting">Waiting</string>
 
     <string name="apk_version">version:%1$s</string>
 
@@ -18,6 +19,7 @@
     <string name="action_install" >Install</string>
     <string name="action_run" >Run</string>
     <string name="action_resume" >Resume</string>
+    <string name="action_waiting" >Waiting</string>
 
     <string name="install_status_success" >Installed</string>
     <string name="install_status_failed" >Install failed</string>

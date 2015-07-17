@@ -1,5 +1,7 @@
 package com.applite.bean;
 
+import com.mit.impl.ImplInfo;
+
 /**
  * Created by yuzhimin on 6/30/15.
  */
@@ -18,13 +20,8 @@ public class HomePageApkData {
     private String rDownloadUrl;
     private String apkSize;
     private String brief;
-    private int reason;
-    private String localUri;
-    private String mediaType;
-    private long currentBytes;
-    private long totalBytes;
-    private int status;
     private String mDownloadNumber;
+    private ImplInfo implInfo;
 
     @Override
     public String toString() {
@@ -103,28 +100,8 @@ public class HomePageApkData {
         return brief;
     }
 
-    public int getReason() {
-        return reason;
-    }
-
-    public String getLocalUri() {
-        return localUri;
-    }
-
-    public String getMediaType() {
-        return mediaType;
-    }
-
-    public long getCurrentBytes() {
-        return currentBytes;
-    }
-
-    public long getTotalBytes() {
-        return totalBytes;
-    }
-
-    public int getStatus() {
-        return status;
+    public ImplInfo getImplInfo() {
+        return implInfo;
     }
 
     public String getmDownloadNumber() {
@@ -187,31 +164,11 @@ public class HomePageApkData {
         this.brief = brief;
     }
 
-    public void setReason(int reason) {
-        this.reason = reason;
-    }
-
-    public void setLocalUri(String localUri) {
-        this.localUri = localUri;
-    }
-
-    public void setMediaType(String mediaType) {
-        this.mediaType = mediaType;
-    }
-
-    public void setCurrentBytes(long currentBytes) {
-        this.currentBytes = currentBytes;
-    }
-
-    public void setTotalBytes(long totalBytes) {
-        this.totalBytes = totalBytes;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
     public void setmDownloadNumber(String mDownloadNumber) {
         this.mDownloadNumber = mDownloadNumber;
+    }
+
+    public void setImplInfo(ImplInfo implInfo) {
+        this.implInfo = implInfo;
     }
 }
