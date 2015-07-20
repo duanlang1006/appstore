@@ -29,4 +29,6 @@
     <string name="installed">Install OK,click this to launch.</string>
     <string name="start_up">"Start up"</string>
 
+    <string name="refresh">刷新试试...</string>
+
 </resources>
