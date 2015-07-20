@@ -101,7 +101,7 @@ public class ImplPackageManager extends AbstractImpl {
         ImplAgent.InstallPackageReq implCmd = (ImplAgent.InstallPackageReq)cmd;
         ImplInfo implInfo = findInfoByPackageName(implCmd.packageName);
         if (null == implInfo){
-            implInfo = ImplInfo.create(implCmd.context,implCmd.key,"",implCmd.packageName);
+            implInfo = ImplInfo.create(implCmd.context,implCmd.key,"",implCmd.packageName,0);
             implInfo.setLocalPath(implCmd.localPath);
         }
 
@@ -159,7 +159,7 @@ public class ImplPackageManager extends AbstractImpl {
         ImplAgent.DeletePackageReq implCmd = (ImplAgent.DeletePackageReq)cmd;
         ImplInfo implInfo = findInfoByPackageName(implCmd.packageName);
         if (null == implInfo){
-            implInfo = ImplInfo.create(implCmd.context,implCmd.key,"",implCmd.packageName);
+            implInfo = ImplInfo.create(implCmd.context,implCmd.key,"",implCmd.packageName,0);
         }
         ImplLog.d(TAG,"handlePackageDeleteReq,"+implInfo.getKey()+","+implInfo.getTitle());
         try{

@@ -91,7 +91,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             HomePageApkData itemData = mData.getData().get(position);
             if (null == itemData.getImplInfo()){
                 ImplAgent.queryDownload(mContext,itemData.getPackageName());
-                ImplInfo info = ImplInfo.create(mContext, itemData.getPackageName(), itemData.getrDownloadUrl(), itemData.getPackageName());
+                ImplInfo info = ImplInfo.create(mContext, itemData.getPackageName(), itemData.getrDownloadUrl(),
+                        itemData.getPackageName(),itemData.getVersionCode());
                 itemData.setImplInfo(info);
             }
 
@@ -135,7 +136,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                                 true,
                                 bean.getIconUrl(),
                                 "",
-                                bean.getPackageName());
+                                bean.getPackageName(),
+                                bean.getVersionCode());
                         break;
 
                     default:

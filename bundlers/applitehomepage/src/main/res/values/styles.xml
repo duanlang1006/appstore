@@ -80,4 +80,15 @@
         <item name="android:focusable">false</item>
         <item name="android:focusableInTouchMode">false</item>
     </style>
+
+    <style name="personalListText">
+        <item name="android:textColor">@color/personal_text_color</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:focusable">false</item>
+        <item name="android:focusableInTouchMode">false</item>
+    </style>
 </resources>

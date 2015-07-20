@@ -85,7 +85,8 @@ public class UpdateAdapter extends BaseAdapter {
         ImplInfo implInfo = data.getImplInfo();
         if (null == implInfo){
             ImplAgent.queryDownload(mContext,data.getmPackageName());
-            implInfo = ImplInfo.create(mContext,data.getmPackageName(),data.getmUrl(),data.getmPackageName());
+            implInfo = ImplInfo.create(mContext,data.getmPackageName(),data.getmUrl(),
+                    data.getmPackageName(),data.getmVersionCode());
         }
         viewholder.mBt.setText(implInfo.getActionText(mActivity));
         viewholder.mBt.setTag(implInfo);
@@ -107,7 +108,8 @@ public class UpdateAdapter extends BaseAdapter {
                                 true,
                                 data.getmImgUrl(),
                                 "",
-                                data.getmPackageName());
+                                data.getmPackageName(),
+                                data.getmVersionCode());
                         break;
                     default:
                         try{

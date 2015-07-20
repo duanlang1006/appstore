@@ -49,10 +49,17 @@ public class ImplInfo {
         this.lastMod = System.currentTimeMillis();
     }
 
-    public static ImplInfo create(Context context,String key,String downloadUrl,String packageName){
+    public static ImplInfo create(Context context,String key,String downloadUrl,String packageName,int versionCode){
         ImplInfo info = new ImplInfo(key,downloadUrl,packageName);
-        if (null != getLaunchDownloadIntent(context, packageName) ){
-            info.setStatus(Constant.STATUS_INSTALLED);
+        try {
+            PackageInfo pakageinfo = context.getPackageManager().getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+            if (versionCode <= pakageinfo.versionCode) {
+                info.setStatus(Constant.STATUS_INSTALLED);
+            }else{
+                info.setStatus(Constant.STATUS_UPGRADE);
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
         }
         return info;
     }
@@ -200,6 +207,10 @@ public class ImplInfo {
                 }
                 break;
 
+            case Constant.STATUS_UPGRADE:
+                action = ACTION_DOWNLOAD;
+                break;
+
             case Constant.STATUS_PRIVATE_INSTALLING:
             case Constant.STATUS_NORMAL_INSTALLING:
                 action = ACTION_INSTALL;
@@ -280,6 +291,10 @@ public class ImplInfo {
                 }
                 break;
 
+            case Constant.STATUS_UPGRADE:
+                actionText = mResources.getString(R.string.action_upgrade);
+                break;
+
             case Constant.STATUS_PRIVATE_INSTALLING:
             case Constant.STATUS_NORMAL_INSTALLING:
             case Constant.STATUS_PACKAGE_INVALID:
@@ -355,6 +370,10 @@ public class ImplInfo {
                 }
                 break;
 
+            case Constant.STATUS_UPGRADE:
+                statusText = mResources.getString(R.string.install_status_upgrade);
+                break;
+
             case Constant.STATUS_PRIVATE_INSTALLING:
             case Constant.STATUS_NORMAL_INSTALLING:
                 statusText = mResources.getString(R.string.install_status_installing);
@@ -405,6 +424,10 @@ public class ImplInfo {
                 }
                 break;
 
+            case Constant.STATUS_UPGRADE:
+                descText = mResources.getString(R.string.install_status_upgrade);
+                break;
+
             case Constant.STATUS_PRIVATE_INSTALLING:
             case Constant.STATUS_NORMAL_INSTALLING:
             case Constant.STATUS_PACKAGE_INVALID:
@@ -453,6 +476,10 @@ public class ImplInfo {
                     e.printStackTrace();
                     actionIntent = null;
                 }
+                break;
+
+            case Constant.STATUS_UPGRADE:
+                actionIntent = null;
                 break;
 
             case Constant.STATUS_PACKAGE_INVALID:

@@ -89,8 +89,12 @@ public class ImplAgent {
                                 boolean visible,
                                 String iconUrl,
                                 String iconDir,
-                                String pkg){
-        request(new DownloadPackageReq(context,key,url,publicDir,filename,networkFlag,roming,title,desc,visible,iconUrl,iconDir,pkg));
+                                String pkg,
+                                int versionCode){
+        request(new DownloadPackageReq(context,key,
+                url,publicDir,filename,
+                networkFlag,roming,title,desc,visible,
+                iconUrl,iconDir,pkg,versionCode));
     }
 
     public static void downloadToggle(Context context,String key){
@@ -165,10 +169,11 @@ public class ImplAgent {
         String iconUrl;
         String iconDir;
         String packageName;
+        int versionCode;
 
         DownloadPackageReq(Context context,String key, String url, String publicDir,String filename,
                            int networkFlag, boolean roming, String title, String desc,
-                           boolean visible, String iconUrl, String iconDir, String packageName) {
+                           boolean visible, String iconUrl, String iconDir, String packageName,int versionCode) {
             super(context,ImplInterface.IMPL_ACTION_DOWNLOAD);
             this.key = key;
             this.url = url;
@@ -182,6 +187,7 @@ public class ImplAgent {
             this.iconUrl = iconUrl;
             this.iconDir = iconDir;
             this.packageName = packageName;
+            this.versionCode = versionCode;
         }
     }
 
