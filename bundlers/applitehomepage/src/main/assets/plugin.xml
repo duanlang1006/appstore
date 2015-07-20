@@ -4,7 +4,7 @@
 	Bundle-Name="applite_homepage"
 	Bundle-SymbolicName="applite.plugin.homepage"
 	Bundle-Version="1.0"
-	date="2015.5.26"
+	date="2015.7.10"
 	provider-name=""
 	provider-url="" 
 	Bundle-Activator="com.applite.homepage.SimpleBundle"

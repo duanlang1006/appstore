@@ -16,7 +16,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_margin="5dp"
-            android:background="@drawable/apk_default_bg" />
+            android:src="@drawable/apk_default_bg" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -38,13 +38,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
-                android:text="v1.0-v1.2" />
+                android:text="v1.0-v1.2"
+                android:textColor="@color/dividing_line" />
 
             <TextView
                 android:id="@+id/item_update_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3.6MB" />
+                android:text="3.6MB"
+                android:textColor="@color/dividing_line" />
         </LinearLayout>
 
         <Button
@@ -53,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:background="@drawable/install_button_bg"
-            android:padding="10dp"
+            android:padding="5dp"
             android:text="@string/install" />
     </LinearLayout>
 </LinearLayout>

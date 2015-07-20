@@ -20,6 +20,7 @@ import com.mit.applite.search.main.BundleContextFactory;
 import com.mit.applite.search.utils.SearchUtils;
 import com.mit.applite.search.view.ProgressButton;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 
 import net.tsz.afinal.FinalBitmap;
 
@@ -105,59 +106,40 @@ public class SearchApkAdapter extends BaseAdapter {
             }
         });
 
-        final int mApkType = AppliteUtils.isAppInstalled(mActivity, data.getmPackageName(), data.getmVersionCode());
-//        if (mApkType == Utils.INSTALLED) {
-//            viewholder.mBt.setText(context.getResources().getString(R.string.open));
-//        } else if (mApkType == Utils.INSTALLED_UPDATE) {
-//            viewholder.mBt.setText(context.getResources().getString(R.string.update));
-//        } else if (mApkType == Utils.UNINSTALLED) {
-//            viewholder.mBt.setText(context.getResources().getString(R.string.install));
-//        }
-//        final ViewHolder finalViewholder = viewholder;
-//        viewholder.mBt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (mApkType == Utils.INSTALLED) {
-//                    Utils.startApp(context, data.getmPackageName());
-//                } else {
-//                    Utils.setDownloadViewText(context, finalViewholder.mBt);
-//                    ImplAgent.downloadPackage(context,
-//                            data.getmPackageName(),
-//                            data.getmDownloadUrl(),
-//                            Utils.extenStorageDirPath,
-//                            data.getmName() + ".apk",
-//                            3,
-//                            false,
-//                            data.getmName(),
-//                            "",
-//                            true,
-//                            data.getmImgUrl(),
-//                            "",
-//                            data.getmPackageName());
-//                }
-//            }
-//        });
-        viewholder.mProgressButton.setText(data.getmShowButtonText());
+        ImplInfo info = data.getImplInfo();
+        if (null == info){
+            ImplAgent.queryDownload(mActivity,data.getmPackageName());
+            info = ImplInfo.create(mActivity,data.getmPackageName(),data.getmDownloadUrl(),data.getmPackageName());
+        }
+        viewholder.mProgressButton.setText(info.getActionText(mActivity));
+        viewholder.mProgressButton.setTag(info);
         viewholder.mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
-            public void onClickListener() {
-                if (mApkType == Constant.INSTALLED) {
-                    AppliteUtils.startApp(mActivity, data.getmPackageName());
-                } else {
-//                    Utils.setDownloadViewText(context, finalViewholder.mProgressButton);
-                    ImplAgent.downloadPackage(context,
-                            data.getmPackageName(),
-                            data.getmDownloadUrl(),
-                            Constant.extenStorageDirPath,
-                            data.getmName() + ".apk",
-                            3,
-                            false,
-                            data.getmName(),
-                            "",
-                            true,
-                            data.getmImgUrl(),
-                            "",
-                            data.getmPackageName());
+            public void onClickListener(View view) {
+                ImplInfo info = (ImplInfo)view.getTag();
+                switch (info.getAction(mActivity)){
+                    case ImplInfo.ACTION_DOWNLOAD:
+                        ImplAgent.downloadPackage(context,
+                                data.getmPackageName(),
+                                data.getmDownloadUrl(),
+                                Constant.extenStorageDirPath,
+                                data.getmName() + ".apk",
+                                3,
+                                false,
+                                data.getmName(),
+                                "",
+                                true,
+                                data.getmImgUrl(),
+                                "",
+                                data.getmPackageName());
+                        break;
+                    default:
+                        try{
+                            mActivity.startActivity(info.getActionIntent(mActivity));
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+                        break;
                 }
             }
         });

@@ -16,13 +16,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
-import com.mit.impl.ImplStatusTag;
+import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplConfig;
 import com.mit.impl.ImplDatabaseHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
 import com.mit.impl.ImplLog;
+import com.umeng.analytics.MobclickAgent;
 
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
@@ -36,7 +37,6 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
     private ListView mListview;
     private DownloadAdapter mAdapter;
     private Integer mStatusFlags = null;
-    private DownloadItemListener mDownloadSelectListener = new DownloadItemListener();
     private ImplDatabaseHelper databaseHelper;
     private ImplListener mImplListener = new DownloadImplListener();
 
@@ -84,6 +84,18 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
         ImplAgent.registerImplListener(mImplListener);
         databaseHelper = new ImplDatabaseHelper(mActivity);
         ImplLog.d(DownloadPagerFragment.TAG, "onAttach," + this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart("DownloadListFragment"); //统计页面
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd("DownloadListFragment");
     }
 
     @Override
@@ -171,61 +183,11 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
         Cursor cursor = db.query(ImplConfig.TABLE_IMPL,null,selection,null,null,null,orderBy);
         if (null == mAdapter){
             if (null != cursor) {
-                mAdapter = new DownloadAdapter(mActivity, cursor, mDownloadSelectListener);
+                mAdapter = new DownloadAdapter(mActivity, cursor);
                 mListview.setAdapter(mAdapter);
             }
         }else{
             mAdapter.changeCursor(cursor);
-        }
-    }
-
-    private class DownloadItemListener implements DownloadAdapter.DownloadSelectListener{
-        @Override
-        public void onDownloadButtonClicked(ImplStatusTag tag) {
-            ImplInfo info = ImplConfig.findInfoByKey(databaseHelper,tag.getKey());
-            if (null == info){
-                return;
-            }
-            switch(tag.getAction()){
-                case ImplStatusTag.ACTION_DOWNLOAD:
-                    if (null != info){
-                        ImplAgent.downloadToggle(mActivity,info.getKey());
-                    }
-                    break;
-                case ImplStatusTag.ACTION_OPEN:
-                    try {
-                        mActivity.startActivity(tag.getIntent());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    break;
-            }
-        }
-
-        @Override
-        public void onDeleteButtonClicked(ImplStatusTag tag) {
-            ImplInfo info = ImplConfig.findInfoByKey(databaseHelper,tag.getKey());
-            if (null == info){
-                return;
-            }
-            ImplAgent.requestDownloadDelete(mActivity,info.getKey());
-        }
-
-        @Override
-        public void onDetailButtonClicked(ImplStatusTag tag) {
-            try {
-                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                        bundleContext, ApkplugOSGIService.class,
-                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                        OSGIServiceAgent.real_time);   //每次都重新查询
-                agent.getService().ApkplugOSGIService(bundleContext,
-                        Constant.OSGI_SERVICE_DM_FRAGMENT,
-                        0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,tag.getPackageName(),tag.getTitle(),tag.getIconUrl());
-            } catch (Exception e) {
-                // TODO 自动生成的 catch 块
-                e.printStackTrace();
-            }
         }
     }
 
@@ -239,56 +201,15 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
                     if (null != c && ! c.isClosed()){
                         c.requery();
                     }
+                    mAdapter.notifyDataSetChanged();
                 }else {
                     setAdapter();
                 }
             }
         };
-        @Override
-        public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
-            ImplLog.d(TAG,  "onDownloadComplete key="+downloadCompleteRsp.key+","+downloadCompleteRsp.localPath);
-            mActivity.runOnUiThread(mNotifyRunnable);
-        }
 
         @Override
-        public void onDownloadUpdate(boolean success, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
-            ImplLog.d(TAG,  "onDownloadUpdate key="+downloadUpdateRsp.key+","+downloadUpdateRsp.status);
-            mActivity.runOnUiThread(mNotifyRunnable);
-        }
-
-        @Override
-        public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
-            ImplLog.d(TAG,  "onPackageAdded key="+packageAddedRsp.key);
-            mActivity.runOnUiThread(mNotifyRunnable);
-        }
-
-        @Override
-        public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
-            ImplLog.d(TAG,  "onPackageRemoved key="+packageRemovedRsp.key);
-            mActivity.runOnUiThread(mNotifyRunnable);
-        }
-
-        @Override
-        public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
-            ImplLog.d(TAG,  "onPackageChanged key="+packageChangedRsp.key);
-            mActivity.runOnUiThread(mNotifyRunnable);
-        }
-
-        @Override
-        public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
-            ImplLog.d(TAG,  "onSystemInstallResult "+systemInstallResultRsp.key+","+systemInstallResultRsp.result);
-            mActivity.runOnUiThread(mNotifyRunnable);
-        }
-
-        @Override
-        public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
-            ImplLog.d(TAG,  "onSystemDeleteResult "+systemDeleteResultRsp.key+","+systemDeleteResultRsp.result);
-            mActivity.runOnUiThread(mNotifyRunnable);
-        }
-
-        @Override
-        public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
-            ImplLog.d(TAG,  "onFinish action="+implResponse.action);
+        public void onUpdate(boolean b, ImplInfo implInfo) {
             mActivity.runOnUiThread(mNotifyRunnable);
         }
     }

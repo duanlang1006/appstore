@@ -15,6 +15,7 @@ import com.mit.appliteupdate.main.BundleContextFactory;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.bean.DataBean;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 
 import net.tsz.afinal.FinalBitmap;
 
@@ -25,6 +26,7 @@ import java.util.List;
  */
 public class UpdateAdapter extends BaseAdapter {
 
+    private Context mActivity;
     private FinalBitmap mFinalBitmap;
     private Context mContext;
     private List<DataBean> mDatas;
@@ -33,6 +35,7 @@ public class UpdateAdapter extends BaseAdapter {
     public UpdateAdapter(Context context, List<DataBean> mDatas) {
         this.mDatas = mDatas;
         mFinalBitmap = FinalBitmap.create(context);
+        mActivity = context;
         try {
             Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             this.mContext = mContext;
@@ -78,23 +81,43 @@ public class UpdateAdapter extends BaseAdapter {
         mFinalBitmap.display(viewholder.mImg, data.getmImgUrl());
         viewholder.mVersionName.setText("V "+data.getmVersionName());
         viewholder.mApkSize.setText(AppliteUtils.bytes2kb(data.getmSize()));
-        viewholder.mBt.setText(data.getmShowText());
+
+        ImplInfo implInfo = data.getImplInfo();
+        if (null == implInfo){
+            ImplAgent.queryDownload(mContext,data.getmPackageName());
+            implInfo = ImplInfo.create(mContext,data.getmPackageName(),data.getmUrl(),data.getmPackageName());
+        }
+        viewholder.mBt.setText(implInfo.getActionText(mActivity));
+        viewholder.mBt.setTag(implInfo);
         viewholder.mBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ImplAgent.downloadPackage(mContext,
-                        data.getmPackageName(),
-                        data.getmUrl(),
-                        Constant.extenStorageDirPath,
-                        data.getmName() + ".apk",
-                        3,
-                        false,
-                        data.getmName(),
-                        "",
-                        true,
-                        data.getmImgUrl(),
-                        "",
-                        data.getmPackageName());
+                ImplInfo info = (ImplInfo)v.getTag();
+                switch(info.getAction(mContext)){
+                    case ImplInfo.ACTION_DOWNLOAD:
+                        ImplAgent.downloadPackage(mContext,
+                                data.getmPackageName(),
+                                data.getmUrl(),
+                                Constant.extenStorageDirPath,
+                                data.getmName() + ".apk",
+                                3,
+                                false,
+                                data.getmName(),
+                                "",
+                                true,
+                                data.getmImgUrl(),
+                                "",
+                                data.getmPackageName());
+                        break;
+                    default:
+                        try{
+                            mContext.startActivity(info.getActionIntent(mContext));
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
+                        break;
+                }
+
             }
         });
         return convertView;

@@ -12,7 +12,7 @@ public interface ImplInterface {
     public final static String IMPL_ACTION_DOWNLOAD ="impl.action.DOWNLOAD";
     public final static String IMPL_ACTION_DOWNLOAD_TOGGLE ="impl.action.DOWNLOAD.TOGGLE";
     public final static String IMPL_ACTION_FAKE_DOWNLOAD ="impl.action.FAKE_DOWNLOAD";
-    public final static String IMPL_ACTION_DOWNLOAD_UPDATE ="impl.action.DOWNLOAD_UPDATE";
+//    public final static String IMPL_ACTION_DOWNLOAD_UPDATE ="impl.action.DOWNLOAD_UPDATE";
     public final static String IMPL_ACTION_DOWNLOAD_DELETE ="impl.action.DOWNLOAD_DELETE";
     public final static String IMPL_ACTION_DOWNLOAD_COMPLETE = DownloadManager.ACTION_DOWNLOAD_COMPLETE;
 
@@ -25,7 +25,6 @@ public interface ImplInterface {
     public final static String IMPL_ACTION_SYSTEM_DELETE_RESULT = "com.installer.system.delete.result";
 
 
-//    public void init(Context context);
     public boolean request(ImplAgent.ImplRequest cmd);
     public void cancel(ImplAgent.ImplRequest cmd);
 }

@@ -1,23 +1,30 @@
 package com.mit.market;
 
+import android.app.DownloadManager;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.mit.bean.ApkplugModel;
 import com.mit.bean.ApkplugQueryModel;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
+import com.mit.impl.ImplLog;
 import com.mit.mitupdatesdk.MitApkplugCloudAgent;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
 import com.applite.android.R;
+import com.umeng.analytics.MobclickAgent;
 
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.osgi.framework.BundleContext;
@@ -47,7 +54,31 @@ public class MitMarketActivity extends ApkPluginActivity {
         }
     };
     private ServiceRegistration mOptReg;
-//    private ImplListener mImplListener = new MitImplListener();
+    private ImplListener mImplListener= new ImplListener() {
+        @Override
+        public void onUpdate(boolean success, ImplInfo info) {
+            switch(info.getStatus()){
+                case Constant.STATUS_SUCCESSFUL:
+                    String localPath = null;
+                    try {
+                        localPath = Uri.parse(info.getLocalPath()).getPath();
+                    }catch(Exception e){
+                    }
+                    if (null != localPath) {
+                        ImplAgent.requestPackageInstall(MitMarketActivity.this, info.getKey(), localPath, info.getPackageName(), true);
+                    }
+                    ImplLog.d(TAG, "onDownloadComplete,STATUS_SUCCESSFUL," + info.getKey() + "," + localPath);
+
+                    break;
+                case Constant.STATUS_FAILED:
+                    Toast.makeText(MitMarketActivity.this,info.getTitle()+" 下载失败",Toast.LENGTH_SHORT).show();
+                    break;
+                case Constant.STATUS_PACKAGE_INVALID:
+                    Toast.makeText(MitMarketActivity.this,info.getTitle()+" 下载apk不合法",Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +86,10 @@ public class MitMarketActivity extends ApkPluginActivity {
         setContentView(R.layout.activity_mit_market);
         setOverflowShowingAlways();
         mOptReg = registerOSGIService(Constant.OSGI_SERVICE_HOST_OPT, mOptService);
-//        ImplAgent.registerImplListener(mImplListener);
+        ImplAgent.registerImplListener(mImplListener);
 
+        MobclickAgent.openActivityDurationTrack(false);//禁止默认的页面统计方式
+        MobclickAgent.updateOnlineConfig(this);
         MitUpdateAgent.setDebug(true);
         MitUpdateAgent.update(this);
 
@@ -74,6 +107,17 @@ public class MitMarketActivity extends ApkPluginActivity {
     protected void onRestart() {
         super.onRestart();
         MitMobclickAgent.onEvent(this, "OpenApk");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);       //统计时长
+    }
+
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 
     @Override
@@ -142,7 +186,7 @@ public class MitMarketActivity extends ApkPluginActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterOSGIService(mOptReg);
-//        ImplAgent.unregisterImplListener(mImplListener);
+        ImplAgent.unregisterImplListener(mImplListener);
     }
 
     private void setOverflowShowingAlways() {
@@ -155,47 +199,4 @@ public class MitMarketActivity extends ApkPluginActivity {
             e.printStackTrace();
         }
     }
-
-//    class MitImplListener implements ImplListener {
-//        private final String TAG = "impl_activity";
-//        @Override
-//        public void onDownloadComplete(boolean b, ImplAgent.DownloadCompleteRsp downloadCompleteRsp) {
-//            ImplLog.d(TAG, "onDownloadComplete key=" + downloadCompleteRsp.key);
-//        }
-//
-//        @Override
-//        public void onDownloadUpdate(boolean b, ImplAgent.DownloadUpdateRsp downloadUpdateRsp) {
-//            ImplLog.d(TAG,  "onDownloadUpdate  key="+downloadUpdateRsp.key);
-//        }
-//
-//        @Override
-//        public void onPackageAdded(boolean b, ImplAgent.PackageAddedRsp packageAddedRsp) {
-//            ImplLog.d(TAG,  "onPackageAdded key="+packageAddedRsp.key);
-//        }
-//
-//        @Override
-//        public void onPackageRemoved(boolean b, ImplAgent.PackageRemovedRsp packageRemovedRsp) {
-//            ImplLog.d(TAG,  "onSystemDeleteResult key="+packageRemovedRsp.key);
-//        }
-//
-//        @Override
-//        public void onPackageChanged(boolean b, ImplAgent.PackageChangedRsp packageChangedRsp) {
-//            ImplLog.d(TAG,  "onSystemDeleteResult key="+packageChangedRsp.key);
-//        }
-//
-//        @Override
-//        public void onSystemInstallResult(boolean b, ImplAgent.SystemInstallResultRsp systemInstallResultRsp) {
-//            ImplLog.d(TAG,  "onSystemDeleteResult key="+systemInstallResultRsp.key+",result="+systemInstallResultRsp.result);
-//        }
-//
-//        @Override
-//        public void onSystemDeleteResult(boolean b, ImplAgent.SystemDeleteResultRsp systemDeleteResultRsp) {
-//            ImplLog.d(TAG,  "onSystemDeleteResult key="+systemDeleteResultRsp.key+",result="+systemDeleteResultRsp.result);
-//        }
-//
-//        @Override
-//        public void onFinish(boolean b, ImplAgent.ImplResponse implResponse) {
-//            ImplLog.d(TAG,  "onFinish implResponse.action="+implResponse.action);
-//        }
-//    }
 }

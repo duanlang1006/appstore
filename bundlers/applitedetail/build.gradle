@@ -49,6 +49,7 @@ android {
 }
 
 dependencies {
+    provided 'com.umeng.analytics:analytics:latest.integration'
     provided files('libs/afinal_0.5.1_bin.jar')
     provided files('../../app/reflibs/osgi2.8.0.jar')
     provided files('../../extras/applitecommon/applite-common-v1.0.jar')

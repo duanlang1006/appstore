@@ -26,9 +26,10 @@
         <item name="android:textColor">@color/download_item_title</item>
     </style>
 
-    <style name="DownloadOptButton" parent="android:TextAppearance.Medium">
+    <style name="DownloadOptButton" parent="@android:style/Widget.Button">
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@drawable/item_button_text_color</item>
+        <item name="android:background">@drawable/item_button_bg</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_margin">0dp</item>

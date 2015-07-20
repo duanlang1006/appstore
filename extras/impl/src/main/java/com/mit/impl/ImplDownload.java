@@ -2,12 +2,11 @@ package com.mit.impl;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.util.Pair;
 import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
 import com.android.dsc.downloads.DownloadManager;
+import com.applite.common.Constant;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -15,10 +14,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ImplDownload extends AbstractImpl{
+class ImplDownload extends AbstractImpl{
     private static final String TAG = "impl_download";
     private SparseArray<Method> mCmdList = new SparseArray<Method>();
-    private RealRunnable mDlRunnable;
+    private RefreshTask refreshTask;
     private DownloadManager dm;
     private boolean inited = false;
     private static ImplDownload mInstance = null;
@@ -27,7 +26,7 @@ public class ImplDownload extends AbstractImpl{
             mInstance = new ImplDownload();
         }
     }
-    
+
     public static ImplDownload getInstance(){
         if (null == mInstance){
             initInstance();
@@ -54,32 +53,22 @@ public class ImplDownload extends AbstractImpl{
     }
 
     private void init(Context context) {
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-        String sql = "select * from "+ImplConfig.TABLE_IMPL;
-        Cursor c = db.rawQuery(sql,null);
-        try{
-            c.moveToFirst();
-            do {
-                ImplInfo info = ImplInfo.from(c);
-                if (null != info){
-                    mDlRunnable.add(context,info);
-                }
-            }while(c.moveToNext());
-        }catch(Exception e){
-            e.printStackTrace();
-        }finally {
-            if (null != c){
-                c.close();
-            }
-        }
-//        Map<String,String> map = (Map<String,String>)sp.getAll();
-//        for (String key : map.keySet()){
-//            String json = map.get(key);
-//            if (null != json && json.length()>0) {
-//                ImplInfo info = gson.fromJson(json,ImplInfo.class);
+//        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+//        String sql = "select * from "+ImplConfig.TABLE_IMPL;
+//        Cursor c = db.rawQuery(sql,null);
+//        try{
+//            c.moveToFirst();
+//            do {
+//                ImplInfo info = ImplInfo.from(context,c);
 //                if (null != info){
-//                    mDlRunnable.add(context,info);
+//                    refreshTask.add(context,info);
 //                }
+//            }while(c.moveToNext());
+//        }catch(Exception e){
+//            e.printStackTrace();
+//        }finally {
+//            if (null != c){
+//                c.close();
 //            }
 //        }
         inited = true;
@@ -91,8 +80,8 @@ public class ImplDownload extends AbstractImpl{
         if (null == dm) {
             dm = DownloadManager.getInstance(cmd.context);
         }
-        if (null == mDlRunnable) {
-            mDlRunnable = new RealRunnable();
+        if (null == refreshTask) {
+            refreshTask = new RefreshTask();
         }
         if (!inited){
             init(cmd.context);
@@ -136,56 +125,27 @@ public class ImplDownload extends AbstractImpl{
         return ret;
     }
 
-//    private ImplInfo getImplInfo(String key){
-//        ImplInfo info = null;
-//        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-//        String sql = "select * from "+ImplConfig.TABLE_IMPL+" where "+ImplConfig.KEY+" = "+key;
-//        Cursor c = db.rawQuery(sql,null);
-//        try{
-//            c.moveToFirst();
-//            info = ImplInfo.from(c);
-//            if (null != info){
-//                mDlRunnable.add(context,info);
-//            }
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }finally {
-//            if (null != c){
-//                c.close();
-//            }
-//        }
-//
-////        String json = sp.getString(key,null);
-////        if (null != json) {
-////            info = (ImplInfo) gson.fromJson(json, ImplInfo.class);
-////        }
-//        return info;
-//    }
-
     private boolean handleQueryReq(ImplAgent.ImplRequest cmd){
-        ImplAgent.DownloadUpdateReq implCmd = (ImplAgent.DownloadUpdateReq)cmd;
+        ImplAgent.DownloadQueryReq implCmd = (ImplAgent.DownloadQueryReq)cmd;
         ImplLog.d(TAG,"handleQueryReq,"+implCmd.keys);
-        List<ImplInfo> infoList = ImplConfig.findInfoByKeyBatch(databaseHelper,implCmd.keys);
+        List<ImplInfo> infoList = findInfoByKeyBatch(implCmd.keys);
         for (ImplInfo info:infoList){
-            mDlRunnable.add(cmd.context, info);
+            if (info.getStatus()<= Constant.STATUS_FAILED) {
+                refreshTask.addCache(info);
+            }
+            ImplAgent.notify(true,info);
         }
-
-        return true;
+        return false;
     }
 
     private boolean handleDownloadReq(ImplAgent.ImplRequest cmd) {
         // TODO Auto-generated method stub
         ImplAgent.DownloadPackageReq implCmd = (ImplAgent.DownloadPackageReq)cmd;
-        long id = 0;
-        ImplInfo info = ImplConfig.findInfoByKey(databaseHelper,implCmd.key);
-        if (null != info){
-            ImplLog.d(TAG,"handleDownloadReq,"+info.getDownloadId()+","+info.getKey()+","+info.getTitle());
-            id = info.getDownloadId();
-        }else {
-            ImplLog.d(TAG, "handleDownloadReq," + id);
-        }
-        if (existInDownloadDb(id)){
-            mDlRunnable.add(cmd.context,info);
+        ImplLog.d(TAG,"handleDownloadReq,"+implCmd.key+","+implCmd.title);
+
+        ImplInfo info = findInfoByKey(implCmd.key);
+        if (null != info && existInDownloadDb(info.getDownloadId())){
+            refreshTask.addCache(info);
             toggleDownload(cmd.context, info);
         }else{
             try{
@@ -206,15 +166,17 @@ public class ImplDownload extends AbstractImpl{
                 request.setDestinationInExternalPublicDir(implCmd.publicDir, implCmd.filename);
                 request.setTitle(implCmd.title);
                 request.setDescription(implCmd.desc);
-                id = dm.enqueue(request);
+                long id = dm.enqueue(request);
 
-                info = new ImplInfo(implCmd.key,
-                        implCmd.url, id,
-                        implCmd.packageName,
-                        implCmd.iconDir,implCmd.iconUrl,
-                        implCmd.title,implCmd.desc);
-                mDlRunnable.add(cmd.context,info);
+                info = ImplInfo.create(implCmd.context,implCmd.key,implCmd.url,implCmd.packageName);
+                info.setDownloadId(id)
+                        .setIconUrl(implCmd.iconUrl)
+                        .setIconPath(implCmd.iconDir)
+                        .setTitle(implCmd.title)
+                        .setDescription(implCmd.desc);
                 save(info);
+
+                refreshTask.addCache(info);
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -228,7 +190,7 @@ public class ImplDownload extends AbstractImpl{
         if (id <= 0){
             return false;
         }
-        ImplInfo info = ImplConfig.findInfoByDownloadId(databaseHelper,id);
+        ImplInfo info = findInfoByDownloadId(id);
         if (null == info){
             return false;
         }
@@ -238,18 +200,16 @@ public class ImplDownload extends AbstractImpl{
         query.setFilterById(id);
         Cursor c = dm.query(query);
         String localUri = null;
-        int status = DownloadManager.STATUS_FAILED;;
         try{
             if(null != c && c.moveToFirst()) {
-                status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
-                if (status == DownloadManager.STATUS_SUCCESSFUL){
-                    localUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-                }
-                info.setLocalPath(localUri);
-                info.setStatus(status);
-                info.setCurrentBytes(c.getLong(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)));
-                info.setTotalBytes(c.getLong(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)));
+                info.setLocalPath(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)))
+                        .setStatus(c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)))
+                        .setReason(c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON)))
+                        .setCurrentBytes(c.getLong(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)))
+                        .setTotalBytes(c.getLong(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)))
+                        .setMimeType(c.getString(c.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE)));
                 update(info);
+                refreshTask.addCache(info);
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -258,43 +218,35 @@ public class ImplDownload extends AbstractImpl{
                 c.close();
             }
         }
-        ImplAgent.notify(true,
-                new ImplAgent.DownloadCompleteRsp(cmd.context,info.getKey(),status,localUri,info.getPackageName()));
         return true;
     }
-    
+
     private boolean handleDownloadDelete(ImplAgent.ImplRequest cmd){
         ImplAgent.DeleteDownloadReq implCmd = (ImplAgent.DeleteDownloadReq)cmd;
         long id = 0;
-        ImplInfo info = ImplConfig.findInfoByKey(databaseHelper,implCmd.key);
-        if (null != info){
-            id = info.getDownloadId();
-        }
-        if (id == 0){
+        ImplInfo info = findInfoByKey(implCmd.key);
+        if (null == info){
             return false;
         }
         ImplLog.d(TAG,"handleDownloadDelete,"+id+","+info.getKey()+","+info.getTitle());
         try{
-            dm.remove(id);
+            if (info.getDownloadId()>0) {
+                dm.remove(id);
+            }
         }catch(Exception e){}
-        mDlRunnable.remove(implCmd.key.hashCode());
+        refreshTask.removeCache(implCmd.key.hashCode());
         remove(implCmd.key);
-        ImplAgent.notify(true,
-                new ImplAgent.DeleteDownloadRsp(cmd.context,info.getKey(),true));
+        ImplAgent.notify(true,info);
         return true;
     }
 
     private boolean handleDownloadToggle(ImplAgent.ImplRequest cmd){
         ImplAgent.ToggleDownloadReq implCmd = (ImplAgent.ToggleDownloadReq)cmd;
-        long id = 0;
-        ImplInfo info = ImplConfig.findInfoByKey(databaseHelper,implCmd.key);
-        if (null != info){
+        ImplInfo info = findInfoByKey(implCmd.key);
+        if (null != info /*&& existInDownloadDb(info.getDownloadId())*/){
             ImplLog.d(TAG,"handleDownloadToggle,"+info.getKey()+","+info.getTitle());
-            id = info.getDownloadId();
-            if (existInDownloadDb(id)){
-                mDlRunnable.add(cmd.context,info);
-                toggleDownload(cmd.context,info);
-            }
+            refreshTask.addCache(info);
+            toggleDownload(cmd.context,info);
         }
         return true;
     }
@@ -334,13 +286,18 @@ public class ImplDownload extends AbstractImpl{
                         String localUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
                         String localPath = Uri.parse(localUri).getPath();
                         int status = DownloadManager.STATUS_SUCCESSFUL;
-                        int progress = 100;
                         if (!new File(localPath).exists()){
                             dm.restartDownload(id);
                             status = DownloadManager.STATUS_FAILED;
-                            progress = 0;
                         }
-                        ImplAgent.notify(true,new ImplAgent.DownloadUpdateRsp(context,info.getKey(),status,progress));
+                        info.setLocalPath(localUri)
+                                .setStatus(status)
+                                .setReason(c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON)))
+                                .setCurrentBytes(c.getLong(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)))
+                                .setTotalBytes(c.getLong(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)))
+                                .setMimeType(c.getString(c.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE)));
+                        save(info);
+                        refreshTask.addCache(info);
                         break;
                 }
             }
@@ -352,82 +309,65 @@ public class ImplDownload extends AbstractImpl{
             }
         }
     }
-    
-    class RealRunnable implements Runnable{
-        private SparseArray<Pair<Context,ImplInfo>> mDownloadList ;
 
-        public RealRunnable() {
-            super();
-            // TODO Auto-generated constructor stub
-            mDownloadList = new SparseArray<Pair<Context,ImplInfo>>();
+    class RefreshTask implements Runnable{
+        private SparseArray<ImplInfo> mRefreshCache;
+
+        public RefreshTask() {
+            mRefreshCache = new SparseArray<ImplInfo>();
         }
-        
-        public synchronized void add(Context context,ImplInfo info){
+
+        public synchronized void addCache(ImplInfo info){
             if (null == info || info.getDownloadId() <=0){
                 return;
             }
 
-            Pair<Context,ImplInfo> pair = mDownloadList.get(info.getKey().hashCode());
-            if (null == pair){
-                mDownloadList.put(info.getKey().hashCode(),new Pair<Context,ImplInfo>(context,info));
+            ImplInfo cacheInfo = mRefreshCache.get(info.getKey().hashCode());
+            if (null == cacheInfo){
+                mRefreshCache.put(info.getKey().hashCode(), info);
                 ImplAgent.mWorkHandler.removeCallbacks(this);
                 ImplAgent.mWorkHandler.postDelayed(this, 50);
             }else{
-                if (pair.second.getDownloadId() != info.getDownloadId() ){
-                    mDownloadList.put(info.getKey().hashCode(),new Pair<Context,ImplInfo>(context,info));
+                if (cacheInfo.getDownloadId() != info.getDownloadId() ){
+                    mRefreshCache.put(info.getKey().hashCode(), info);
                     ImplAgent.mWorkHandler.removeCallbacks(this);
                     ImplAgent.mWorkHandler.postDelayed(this, 50);
                 }
             }
         }
-        
-        public synchronized void remove(int key){
-            mDownloadList.remove(key);
+
+        public synchronized void removeCache(int key){
+            mRefreshCache.remove(key);
         }
-        
+
         @Override
         public synchronized void run() {
-            // TODO Auto-generated method stub
             ImplAgent.mWorkHandler.removeCallbacks(this);
-
-            int size = mDownloadList.size();
-            if (size<=0){
+            if (mRefreshCache.size()<=0){
                 return;
             }
-            long[] ids = new long[size];
+            ImplInfo cachedInfo = null;
+            long[] ids = new long[mRefreshCache.size()];
             Set<Long> removedIds = new HashSet<Long>();
-            for (int i =0;i<size;i++){
-                ids[i] = mDownloadList.valueAt(i).second.getDownloadId();
+            for (int i =0;i<mRefreshCache.size();i++){
+                ids[i] = mRefreshCache.valueAt(i).getDownloadId();
                 removedIds.add(ids[i]);
             }
             DownloadManager.Query query = new DownloadManager.Query().setFilterById(ids);
             Cursor c = dm.query(query);
             try {
-                Pair<Context,ImplInfo> pair = null;
                 if (null != c && c.moveToFirst()){
                     do{
                         long id = c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID));
                         removedIds.remove(id);
-                        pair = findPairByDownloadId(id);
-                        if (null == pair){
+                        cachedInfo = findInfoByDownloadId(id);
+                        if (null == cachedInfo){
                             continue;
-                        }
-                        String title = c.getString(c.getColumnIndex(DownloadManager.COLUMN_TITLE));
-                        int downloadSize = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                        int totalSize = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-                        int progress = 0;
-                        if (totalSize <= 0){
-                            progress = 0;
-                        }else {
-                            progress = (downloadSize * 100 / totalSize);
-                            progress = Math.min(100,Math.max(0, progress));
                         }
                         int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
                         switch(status){
                             case DownloadManager.STATUS_PENDING:
                             case DownloadManager.STATUS_RUNNING:
-                                ImplAgent.notify(true,
-                                        new ImplAgent.DownloadUpdateRsp(pair.first,pair.second.getKey(),status,progress));
                                 break;
                             case DownloadManager.STATUS_PAUSED:
                                 int reason = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON));
@@ -437,54 +377,24 @@ public class ImplDownload extends AbstractImpl{
                                 }else{
                                     status = DownloadManager.STATUS_PAUSED;
                                 }
-                                ImplAgent.notify(true,
-                                        new ImplAgent.DownloadUpdateRsp(pair.first,pair.second.getKey(),status,progress));
-                                pair.second.setReason(reason);
                                 break;
                             case DownloadManager.STATUS_SUCCESSFUL:
-                                String localUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-                                String mediaType = c.getString(c.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE));
-                                pair.second.setLocalPath(localUri);
-                                pair.second.setMimeType(mediaType);
-//                                if (new File(localPath).exists()){
-                                ImplAgent.notify(true,
-                                        new ImplAgent.DownloadUpdateRsp(pair.first,pair.second.getKey(),status,progress));
-//                                }
-                                mDownloadList.remove(pair.second.getKey().hashCode());
-                                break;
                             case DownloadManager.STATUS_FAILED:
-                                reason = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON));
-                                ImplAgent.notify(true,
-                                        new ImplAgent.DownloadUpdateRsp(pair.first,pair.second.getKey(),status,progress));
-                                mDownloadList.remove(pair.second.getKey().hashCode());
-                                pair.second.setReason(reason);
+                                mRefreshCache.remove(cachedInfo.getKey().hashCode());
                                 break;
                         }
-                        if (pair.second.getStatus()<=DownloadManager.STATUS_FAILED) {
-                            pair.second.setStatus(status);
+                        if (cachedInfo.getStatus()<=DownloadManager.STATUS_FAILED) {
+                            cachedInfo.setStatus(status);
                         }
-                        pair.second.setProgress(progress);
-                        pair.second.setTotalBytes(totalSize);
-                        pair.second.setCurrentBytes(downloadSize);
-                        update(pair.second);
+                        cachedInfo.setLocalPath(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)))
+                                .setTotalBytes(c.getInt(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)))
+                                .setCurrentBytes(c.getInt(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)))
+                                .setReason(c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON)))
+                                .setMimeType(c.getString(c.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE)));
+                        update(cachedInfo);
+                        ImplAgent.notify(true,cachedInfo);
                     }while(c.moveToNext());
-                }else{
-                    for (int i =0;i<size;i++){
-                        pair = mDownloadList.get(i);
-                        ImplAgent.notify(false,
-                                new ImplAgent.DownloadUpdateRsp(pair.first,pair.second.getKey(),pair.second.getStatus(),pair.second.getProgress()));
-                        mDownloadList.remove(pair.second.getKey().hashCode());
-                    }
                 }
-                for (long id : removedIds){
-                    pair = findPairByDownloadId(id);
-                    if (null != pair){
-                        mDownloadList.remove(pair.second.getKey().hashCode());
-                        ImplAgent.notify(false,
-                                new ImplAgent.DownloadUpdateRsp(pair.first,pair.second.getKey(),pair.second.getStatus(),pair.second.getProgress()));
-                    }
-                }
-                removedIds.clear();
             }catch(Exception e){
                 e.printStackTrace();
             } finally {
@@ -492,19 +402,28 @@ public class ImplDownload extends AbstractImpl{
                     c.close();
                 }
             }
-            if (mDownloadList.size()>0){
+
+            for (long id : removedIds){
+                cachedInfo = findInfoByDownloadId(id);
+                if (null != cachedInfo){
+                    mRefreshCache.remove(cachedInfo.getKey().hashCode());
+                }
+            }
+            removedIds.clear();
+
+            if (mRefreshCache.size()>0){
                 ImplAgent.mWorkHandler.postDelayed(this, 500);
             }
         }
 
 
-        private Pair findPairByDownloadId(long downloadId){
-            int size = mDownloadList.size();
-            Pair<Context,ImplInfo> pair = null;
+        private ImplInfo findInfoByDownloadId(long downloadId){
+            int size = mRefreshCache.size();
+            ImplInfo info = null;
             for (int i =0; i < size; i++){
-                pair = mDownloadList.valueAt(i);
-                if (downloadId == pair.second.getDownloadId()){
-                    return pair;
+                info = mRefreshCache.valueAt(i);
+                if (downloadId == info.getDownloadId()){
+                    return info;
                 }
             }
             return null;

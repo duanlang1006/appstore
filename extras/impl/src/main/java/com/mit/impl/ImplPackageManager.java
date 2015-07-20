@@ -13,6 +13,7 @@ import com.applite.common.Constant;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class ImplPackageManager extends AbstractImpl {
     private SparseArray<Method> mCmdList = new SparseArray<Method>();
@@ -35,6 +36,8 @@ public class ImplPackageManager extends AbstractImpl {
     private ImplPackageManager() {
         try {
             Class<?> cls = this.getClass();
+            mCmdList.append(IMPL_ACTION_QUERY.hashCode(),
+                    cls.getDeclaredMethod("handleQueryReq",ImplAgent.ImplRequest.class));
             mCmdList.append(IMPL_ACTION_INSTALL_PACKAGE.hashCode(),
                     cls.getDeclaredMethod("handlePackageInstallReq", ImplAgent.ImplRequest.class));
             mCmdList.append(IMPL_ACTION_DELETE_PACKAGE.hashCode(),
@@ -53,12 +56,6 @@ public class ImplPackageManager extends AbstractImpl {
             e.printStackTrace();
         }
     }
-
-//    @Override
-//    public void init(Context context) {
-//        super.init(context);
-//
-//    }
 
     @Override
     public boolean request(ImplAgent.ImplRequest cmd) {
@@ -86,98 +83,99 @@ public class ImplPackageManager extends AbstractImpl {
 
     }
 
+    private boolean handleQueryReq(ImplAgent.ImplRequest cmd){
+        ImplAgent.DownloadQueryReq implCmd = (ImplAgent.DownloadQueryReq)cmd;
+        ImplLog.d(TAG,"handleQueryReq,"+implCmd.keys);
+        List<ImplInfo> infoList = findInfoByKeyBatch(implCmd.keys);
+        for (ImplInfo info:infoList){
+            if (info.getStatus() >= Constant.STATUS_PACKAGE_INVALID) {
+                ImplAgent.notify(true,info);
+            }
+        }
+        return true;
+    }
+
     public boolean handlePackageInstallReq(ImplAgent.ImplRequest cmd) {
         // TODO Auto-generated method stub
         boolean success = true;
         ImplAgent.InstallPackageReq implCmd = (ImplAgent.InstallPackageReq)cmd;
-        ImplInfo implInfo = ImplConfig.findInfoByPackageName(databaseHelper,implCmd.packageName);
+        ImplInfo implInfo = findInfoByPackageName(implCmd.packageName);
         if (null == implInfo){
-            implInfo = new ImplInfo(implCmd.key,"",0,implCmd.packageName,"","","","");
+            implInfo = ImplInfo.create(implCmd.context,implCmd.key,"",implCmd.packageName);
             implInfo.setLocalPath(implCmd.localPath);
-            save(implInfo);
         }
 
         ImplLog.d(TAG,"handlePackageInstallReq,"+implInfo.getKey()+","+implInfo.getTitle());
-        boolean silent = implCmd.silent;
-        try{
-            PackageInfo info = pm.getPackageArchiveInfo(implCmd.localPath, PackageManager.GET_ACTIVITIES);
-            if (null != info&& info.packageName.equals(implCmd.packageName)){
-                if (!implCmd.silent){
-                    silent = false;
-                    installImplNormal(implCmd.context,implCmd.localPath);
-                }else{
-                    try {
-                        pm.getPackageInfo("com.android.installer", 0);
-                        installImplPrivate(implCmd.context,implCmd.localPath);
-                        silent = true;
-                    } catch (NameNotFoundException e) {
-                        try{
-                            pm.getPackageInfo("com.android.dbservices", 0);
-                            installImplPrivate(implCmd.context,implCmd.localPath);
-                            silent = true;
-                        }catch(Exception e1){
-                            e1.printStackTrace();
-                            installImplNormal(implCmd.context,implCmd.localPath);
-                            silent = false;
-                        }
-                    }
+        PackageInfo info = pm.getPackageArchiveInfo(implCmd.localPath, PackageManager.GET_ACTIVITIES);
+        if (null != info && info.packageName.equals(implCmd.packageName)){
+            try {
+                pm.getPackageInfo("com.android.installer", 0);
+                installImpl(implCmd.context, implInfo, implCmd.localPath, implCmd.silent);
+            } catch (NameNotFoundException e) {
+                try{
+                    pm.getPackageInfo("com.android.dbservices", 0);
+                    installImpl(implCmd.context,implInfo,implCmd.localPath,implCmd.silent);
+                }catch(Exception e1){
+                    e1.printStackTrace();
+                    installImpl(implCmd.context, implInfo, implCmd.localPath, false);
                 }
             }
-        }catch(Exception e){
-            success = false;
-            e.printStackTrace();
+        }else{
+            //希望安装的apk和下载的apk包名不一致,或者下载的apk不合法
+            implInfo.setStatus(Constant.STATUS_PACKAGE_INVALID);
         }
-        ImplAgent.notify(success, new ImplAgent.InstallPackageRsp(implCmd.context,implCmd.key, silent));
+        save(implInfo);
+        ImplAgent.notify(success,implInfo);
         return true;
     }
         
-    private void installImplPrivate(final Context context ,final String filename){
-        Intent intent = new Intent();
-        intent.setAction("com.installer.system");
-        intent.putExtra("name", filename);
-        intent.putExtra("nameTag", "APK_PATH_NAME.tag");
-        context.sendBroadcast(intent);
-    }
-    
-    private void installImplNormal(final Context context ,final String filename) {
-        Uri path = Uri.parse(filename);
-        if (path.getScheme() == null) {
-            path = Uri.fromFile(new File(filename));
-        }
-        Intent activityIntent = new Intent(Intent.ACTION_VIEW);
-        activityIntent.setDataAndType(path, "application/vnd.android.package-archive");
-        activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        try {
-            context.startActivity(activityIntent);
-        } catch (ActivityNotFoundException ex) {
-        
+    private void installImpl(final Context context,final ImplInfo implInfo, final String filename, boolean silent) {
+        if(silent){
+            Intent intent = new Intent();
+            intent.setAction("com.installer.system");
+            intent.putExtra("name", filename);
+            intent.putExtra("nameTag", "APK_PATH_NAME.tag");
+            context.sendBroadcast(intent);
+            implInfo.setStatus(Constant.STATUS_PRIVATE_INSTALLING);
+        }else {
+            Uri path = Uri.parse(filename);
+            if (path.getScheme() == null) {
+                path = Uri.fromFile(new File(filename));
+            }
+            Intent activityIntent = new Intent(Intent.ACTION_VIEW);
+            activityIntent.setDataAndType(path, "application/vnd.android.package-archive");
+            activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try {
+                context.startActivity(activityIntent);
+            } catch (ActivityNotFoundException ex) {
+
+            }
+            implInfo.setStatus(Constant.STATUS_NORMAL_INSTALLING);
         }
     }
     
     boolean handlePackageDeleteReq(ImplAgent.ImplRequest cmd) {
         // TODO Auto-generated method stub
         ImplAgent.DeletePackageReq implCmd = (ImplAgent.DeletePackageReq)cmd;
-        ImplInfo implInfo = ImplConfig.findInfoByPackageName(databaseHelper,implCmd.packageName);
+        ImplInfo implInfo = findInfoByPackageName(implCmd.packageName);
         if (null == implInfo){
-            implInfo = new ImplInfo(implCmd.key,"",0,implCmd.packageName,"","","","");
+            implInfo = ImplInfo.create(implCmd.context,implCmd.key,"",implCmd.packageName);
         }
         ImplLog.d(TAG,"handlePackageDeleteReq,"+implInfo.getKey()+","+implInfo.getTitle());
-        if (implCmd.silent){
+        try{
+            pm.getPackageInfo("com.android.dbservices", 0);
             Intent intent = new Intent("com.installer.action.delete");
             intent.putExtra("name", implCmd.packageName);
             intent.putExtra("nameTag", "APK_PATH_NAME.tag");
-            intent.putExtra("silent", true);
+            intent.putExtra("silent", implCmd.silent);
             cmd.context.sendBroadcast(intent);
-            ImplAgent.notify(true,new ImplAgent.DeletePackageRsp(implCmd.context,implCmd.key,true));
-            implInfo.setStatus(Constant.STATUS_PRIVATE_INSTALLING);
-        }else {
+        }catch(Exception e1){
+            e1.printStackTrace();
             Intent intent = new Intent(Intent.ACTION_DELETE, Uri.parse("package:" + implCmd.packageName));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             cmd.context.startActivity(intent);
-            ImplAgent.notify(true, new ImplAgent.DeletePackageRsp(implCmd.context, implCmd.key, false));
-//            implInfo.setStatus(Constant.STATUS_NORMAL_INSTALLING);
         }
-        save(implInfo);
+//        ImplAgent.notify(true,implInfo);
         return true;
     }
     
@@ -185,13 +183,13 @@ public class ImplPackageManager extends AbstractImpl {
         // TODO Auto-generated method stub
         ImplAgent.PackageAddedReq implCmd = (ImplAgent.PackageAddedReq)cmd;
         String packageName = implCmd.intent.getData().getSchemeSpecificPart();
-        ImplInfo implInfo = ImplConfig.findInfoByPackageName(databaseHelper,packageName);
+        ImplInfo implInfo = findInfoByPackageName(packageName);
         if (null == implInfo){
             return false;
         }
         implInfo.setStatus(Constant.STATUS_INSTALLED);
         save(implInfo);
-        ImplAgent.notify(true, new ImplAgent.PackageAddedRsp(cmd.context,implInfo.getKey()));
+        ImplAgent.notify(true,implInfo);
         return true;
     }
 
@@ -199,13 +197,13 @@ public class ImplPackageManager extends AbstractImpl {
         // TODO Auto-generated method stub
         ImplAgent.PackageChangedReq implCmd = (ImplAgent.PackageChangedReq)cmd;
         String packageName = implCmd.intent.getData().getSchemeSpecificPart();
-        ImplInfo implInfo = ImplConfig.findInfoByPackageName(databaseHelper,packageName);
+        ImplInfo implInfo = findInfoByPackageName(packageName);
         if (null == implInfo){
             return false;
         }
         implInfo.setStatus(Constant.STATUS_INSTALLED);
         save(implInfo);
-        ImplAgent.notify(true,new ImplAgent.PackageChangedRsp(cmd.context,implInfo.getKey()));
+        ImplAgent.notify(true,implInfo);
         return true;
     }
     
@@ -213,12 +211,14 @@ public class ImplPackageManager extends AbstractImpl {
         // TODO Auto-generated method stub
         ImplAgent.PackageRemovedReq implCmd = (ImplAgent.PackageRemovedReq)cmd;
         String packageName = implCmd.intent.getData().getSchemeSpecificPart();
-        ImplInfo implInfo = ImplConfig.findInfoByPackageName(databaseHelper,packageName);
+        ImplInfo implInfo = findInfoByPackageName(packageName);
         if (null == implInfo){
             return false;
         }
+        implInfo.setStatus(Constant.STATUS_INIT);
+        save(implInfo);
 //        remove(implInfo.getKey());
-        ImplAgent.notify(true,new ImplAgent.PackageRemovedRsp(cmd.context,implInfo.getKey()));
+        ImplAgent.notify(true,implInfo);
         return true;
     }
 
@@ -227,7 +227,7 @@ public class ImplPackageManager extends AbstractImpl {
         ImplAgent.SystemInstallResultReq implCmd = (ImplAgent.SystemInstallResultReq)cmd;
         String packageName = implCmd.intent.getStringExtra("name");
         int result = implCmd.intent.getIntExtra("result",0);
-        ImplInfo implInfo = ImplConfig.findInfoByPackageName(databaseHelper,packageName);
+        ImplInfo implInfo = findInfoByPackageName(packageName);
         if (null == implInfo){
             return false;
         }
@@ -238,7 +238,7 @@ public class ImplPackageManager extends AbstractImpl {
             implInfo.setReason(result);
         }
         save(implInfo);
-        ImplAgent.notify(true,new ImplAgent.SystemInstallResultRsp(cmd.context,implInfo.getKey(),result));
+        ImplAgent.notify(true,implInfo);
         return true;
     }
     
@@ -247,15 +247,14 @@ public class ImplPackageManager extends AbstractImpl {
         ImplAgent.SystemDeleteResultReq implCmd = (ImplAgent.SystemDeleteResultReq)cmd;
         String packageName = implCmd.intent.getStringExtra("name");
         int result = implCmd.intent.getIntExtra("result",0);
-        ImplInfo implInfo = ImplConfig.findInfoByPackageName(databaseHelper,packageName);
+        ImplInfo implInfo = findInfoByPackageName(packageName);
         if (null == implInfo){
             return false;
         }
         if (result == Constant.DELETE_SUCCEEDED){
-            remove(implInfo.getKey());
-        }else{
+            implInfo.setStatus(Constant.STATUS_INIT);
         }
-        ImplAgent.notify(true,new ImplAgent.SystemDeleteResultRsp(cmd.context,implInfo.getKey(),result));
+        ImplAgent.notify(true,implInfo);
         return true;
     }
 }

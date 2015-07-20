@@ -1,5 +1,7 @@
 package com.mit.applite.search.bean;
 
+import com.mit.impl.ImplInfo;
+
 /**
  * Created by LSY on 15-5-27.
  */
@@ -15,15 +17,16 @@ public class SearchBean {
     private String mApkSize;
     private String mXing;
 
-    private String mShowButtonText;
+//    private String mShowButtonText;
+    private ImplInfo mImplInfo;
 
-    public String getmShowButtonText() {
-        return mShowButtonText;
-    }
-
-    public void setmShowButtonText(String mShowButtonText) {
-        this.mShowButtonText = mShowButtonText;
-    }
+//    public String getmShowButtonText() {
+//        return mShowButtonText;
+//    }
+//
+//    public void setmShowButtonText(String mShowButtonText) {
+//        this.mShowButtonText = mShowButtonText;
+//    }
 
     @Override
     public String toString() {
@@ -119,5 +122,14 @@ public class SearchBean {
 
     public void setmApkSize(String mApkSize) {
         this.mApkSize = mApkSize;
+    }
+
+    public void setImplInfo(ImplInfo mImplInfo) {
+        this.mImplInfo = mImplInfo;
+    }
+
+    public ImplInfo getImplInfo() {
+
+        return mImplInfo;
     }
 }
