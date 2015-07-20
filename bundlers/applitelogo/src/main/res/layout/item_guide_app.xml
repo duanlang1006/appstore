@@ -6,26 +6,26 @@
     <LinearLayout
         android:id="@+id/guide_app_item"
         android:layout_width="wrap_content"
-        android:orientation="vertical"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <ImageView
-            android:layout_gravity="center"
             android:id="@+id/guide_app_iv"
             android:layout_width="50dp"
-            android:background="@drawable/apk_default_bg"
-            android:layout_height="50dp" />
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:src="@drawable/apk_default_bg" />
 
         <TextView
-            android:gravity="center"
-            android:layout_marginTop="5dp"
-            android:layout_gravity="center"
             android:id="@+id/guidw_app_tv"
-            android:ellipsize="end"
-            android:maxLines="1"
             android:layout_width="100dp"
-            android:textColor="@color/black"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="@color/black" />
 
     </LinearLayout>
 </LinearLayout>
