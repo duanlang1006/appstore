@@ -64,6 +64,7 @@
         android:layout_height="30dp"
         android:background="@drawable/apkbtn_background"
         android:text="install"
+        android:layout_marginRight="5dp"
         style="@style/apkListBottom"/>
     </LinearLayout>
 </LinearLayout>

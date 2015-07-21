@@ -127,13 +127,17 @@ class ImplDownload extends AbstractImpl{
 
     private boolean handleQueryReq(ImplAgent.ImplRequest cmd){
         ImplAgent.DownloadQueryReq implCmd = (ImplAgent.DownloadQueryReq)cmd;
-        ImplLog.d(TAG,"handleQueryReq,"+implCmd.keys);
-        List<ImplInfo> infoList = findInfoByKeyBatch(implCmd.keys);
-        for (ImplInfo info:infoList){
-            if (info.getStatus()<= Constant.STATUS_FAILED) {
-                refreshTask.addCache(info);
+        ImplLog.d(TAG,"handleQueryReq,"+implCmd.keys[0]);
+        ImplInfo info = null;
+        for (String key : implCmd.keys) {
+            info = refreshTask.getCache(key.hashCode());
+            if (null == info){
+                info = findInfoByKey(key);
+                if (null != info && info.getStatus() < Constant.STATUS_PACKAGE_INVALID) {
+                    refreshTask.addCache(info);
+                    ImplAgent.notify(true, info);
+                }
             }
-            ImplAgent.notify(true,info);
         }
         return false;
     }
@@ -168,7 +172,7 @@ class ImplDownload extends AbstractImpl{
                 request.setDescription(implCmd.desc);
                 long id = dm.enqueue(request);
 
-                info = ImplInfo.create(implCmd.context,implCmd.key,implCmd.url,implCmd.packageName);
+                info = ImplInfo.create(implCmd.context,implCmd.key,implCmd.url,implCmd.packageName,implCmd.versionCode);
                 info.setDownloadId(id)
                         .setIconUrl(implCmd.iconUrl)
                         .setIconPath(implCmd.iconDir)
@@ -233,6 +237,7 @@ class ImplDownload extends AbstractImpl{
             if (info.getDownloadId()>0) {
                 dm.remove(id);
             }
+            new File(Uri.parse(info.getLocalPath()).getPath()).delete();
         }catch(Exception e){}
         refreshTask.removeCache(implCmd.key.hashCode());
         remove(implCmd.key);
@@ -338,6 +343,10 @@ class ImplDownload extends AbstractImpl{
 
         public synchronized void removeCache(int key){
             mRefreshCache.remove(key);
+        }
+
+        public synchronized ImplInfo getCache(int key){
+            return mRefreshCache.get(key);
         }
 
         @Override

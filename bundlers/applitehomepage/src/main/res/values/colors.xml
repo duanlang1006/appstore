@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="actionbar_background">#FFFFFFFF</color>
     <color name="background_tab_pressed">#6633B5E5</color>
     <color name="background">#fff7ffef</color>
     <color name="textcolor">#eebbe122</color>
@@ -17,4 +18,7 @@
     <color name="apkList_category_color">#9a999a</color>
     <color name="apkList_size_color">#9a999a</color>
     <color name="apkList_bottom_color">#05db69</color>
+    <color name="button_normal">#05db69</color>
+    <color name="button_pressed">#03db57</color>
+    <color name="personal_text_color">#9a999a</color>
 </resources>

@@ -63,8 +63,9 @@ public abstract class AbstractImpl implements ImplInterface{
                     ImplConfig.COLUMN_DOWNLOADID + " = ?",
                     new String[]{String.valueOf(id)},
                     null,null,null);
-            c.moveToFirst();
-            info = ImplInfo.from(c);
+            if (null != c && c.getCount() > 0 && c.moveToFirst()) {
+                info = ImplInfo.from(c);
+            }
         }catch(Exception e){
             e.printStackTrace();
         }finally {
@@ -85,8 +86,9 @@ public abstract class AbstractImpl implements ImplInterface{
                     ImplConfig.COLUMN_PACKAGENAME + " = ?",
                     new String[]{pkgName},
                     null,null,null);
-            c.moveToFirst();
-            info = ImplInfo.from(c);
+            if (null != c && c.getCount() > 0 && c.moveToFirst()) {
+                info = ImplInfo.from(c);
+            }
         }catch(Exception e){
             e.printStackTrace();
         }finally {
@@ -107,7 +109,7 @@ public abstract class AbstractImpl implements ImplInterface{
                     ImplConfig.COLUMN_KEY + " = ?",
                     new String[]{key},
                     null, null, null);
-            if (null != c && c.moveToFirst()) {
+            if (null != c && c.getCount() > 0 && c.moveToFirst()) {
                 info = ImplInfo.from(c);
             }
         }catch(Exception e){
@@ -128,13 +130,14 @@ public abstract class AbstractImpl implements ImplInterface{
         Cursor c = null;
         try{
             c = db.query(ImplConfig.TABLE_IMPL, null, clause, args, null, null, null);
-            c.moveToFirst();
-            do {
-                ImplInfo info = ImplInfo.from(c);
-                if (null != info){
-                    infoList.add(info);
-                }
-            }while(c.moveToNext());
+            if (null != c && c.getCount() > 0 && c.moveToFirst()) {
+                do {
+                    ImplInfo info = ImplInfo.from(c);
+                    if (null != info) {
+                        infoList.add(info);
+                    }
+                } while (c.moveToNext());
+            }
         }catch(Exception e){
             e.printStackTrace();
         }finally {

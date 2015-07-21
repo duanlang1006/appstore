@@ -109,7 +109,8 @@ public class SearchApkAdapter extends BaseAdapter {
         ImplInfo info = data.getImplInfo();
         if (null == info){
             ImplAgent.queryDownload(mActivity,data.getmPackageName());
-            info = ImplInfo.create(mActivity,data.getmPackageName(),data.getmDownloadUrl(),data.getmPackageName());
+            info = ImplInfo.create(mActivity,data.getmPackageName(),data.getmDownloadUrl(),
+                    data.getmPackageName(),data.getmVersionCode());
         }
         viewholder.mProgressButton.setText(info.getActionText(mActivity));
         viewholder.mProgressButton.setTag(info);
@@ -131,7 +132,8 @@ public class SearchApkAdapter extends BaseAdapter {
                                 true,
                                 data.getmImgUrl(),
                                 "",
-                                data.getmPackageName());
+                                data.getmPackageName(),
+                                data.getmVersionCode());
                         break;
                     default:
                         try{

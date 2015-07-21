@@ -161,7 +161,7 @@ class ImplDownloadExt extends AbstractImpl{
                 request.setDescription(implCmd.desc);
                 long id = dm.enqueue(request);
 
-                info = ImplInfo.create(implCmd.context,implCmd.key,implCmd.url,implCmd.packageName);
+                info = ImplInfo.create(implCmd.context,implCmd.key,implCmd.url,implCmd.packageName, implCmd.versionCode);
                 info.setDownloadId(id)
                         .setIconUrl(implCmd.iconUrl)
                         .setIconPath(implCmd.iconDir)

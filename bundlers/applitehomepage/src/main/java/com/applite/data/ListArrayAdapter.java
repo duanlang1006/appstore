@@ -1,6 +1,7 @@
 package com.applite.data;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import com.applite.bean.HomePageApkData;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.applite.homepage.BundleContextFactory;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
@@ -28,6 +30,7 @@ import java.util.List;
 public class ListArrayAdapter extends BaseAdapter implements View.OnClickListener {
     private static final String TAG = "homepage_ListArrayAdapter";
     private LayoutInflater mInflater = null;
+    private Resources mResource = null;
     private Context mContext = null;
     private SubjectData mData = null;
     private FinalBitmap mFinalBitmap;
@@ -38,12 +41,14 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         this.mData = data;
         mFinalBitmap = FinalBitmap.create(context);
 
+        mResource = context.getResources();
         mInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         try {
             Context mcontext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             mInflater = LayoutInflater.from(mcontext);
             mInflater = mInflater.cloneInContext(mcontext);
+            mResource = mcontext.getResources();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -89,9 +94,11 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
         if (null != mData && null != mData.getData()) {
             HomePageApkData itemData = mData.getData().get(position);
+            LogUtils.d(TAG, this+",name:"+itemData.getName()+","+itemData.getImplInfo());
             if (null == itemData.getImplInfo()){
                 ImplAgent.queryDownload(mContext,itemData.getPackageName());
-                ImplInfo info = ImplInfo.create(mContext, itemData.getPackageName(), itemData.getrDownloadUrl(), itemData.getPackageName());
+                ImplInfo info = ImplInfo.create(mContext, itemData.getPackageName(), itemData.getrDownloadUrl(),
+                        itemData.getPackageName(),itemData.getVersionCode());
                 itemData.setImplInfo(info);
             }
 
@@ -135,7 +142,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                                 true,
                                 bean.getIconUrl(),
                                 "",
-                                bean.getPackageName());
+                                bean.getPackageName(),
+                                bean.getVersionCode());
                         break;
 
                     default:
@@ -208,7 +216,24 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         public void setmProgressButton(HomePageApkData itemData) {
             if (null != mProgressButton ){
                 mProgressButton.setTag(itemData);
-                mProgressButton.setText(itemData.getImplInfo().getActionText(mContext));
+                switch (itemData.getImplInfo().getStatus()){
+                    case Constant.STATUS_PENDING:
+                        mProgressButton.setBackground(null);
+                        mProgressButton.setEnabled(false);
+                        mProgressButton.setText(itemData.getImplInfo().getActionText(mContext));
+                        break;
+                    case Constant.STATUS_RUNNING:
+                    case Constant.STATUS_PAUSED:
+                        mProgressButton.setBackground(null);
+                        mProgressButton.setEnabled(false);
+                        mProgressButton.setText(itemData.getImplInfo().getProgress()+"%");
+                        break;
+                    default:
+                        mProgressButton.setBackground(mResource.getDrawable(R.drawable.item_button_bg));
+                        mProgressButton.setEnabled(true);
+                        mProgressButton.setText(itemData.getImplInfo().getActionText(mContext));
+                        break;
+                }
                 mProgressButton.setOnClickListener(ListArrayAdapter.this);
             }
         }

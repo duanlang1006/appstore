@@ -20,6 +20,8 @@ import org.apkplug.Bundle.OSGIServiceAgent;
 import org.osgi.framework.BundleContext;
 
 public class PersonalFragment extends Fragment implements View.OnClickListener{
+    LayoutInflater mInflater;
+
     public PersonalFragment() {
         // Required empty public constructor
     }
@@ -88,10 +90,11 @@ public class PersonalFragment extends Fragment implements View.OnClickListener{
     private void initActionBar(){
         try {
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-            actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setDisplayShowCustomEnabled(false);
-            actionBar.setTitle("个人中心");
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowCustomEnabled(false);
+            ViewGroup customView = (ViewGroup)mInflater.inflate(R.layout.actionbar_personal,null);
+            actionBar.setCustomView(customView);
             actionBar.show();
         }catch (Exception e){
             e.printStackTrace();

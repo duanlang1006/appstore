@@ -427,7 +427,8 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                 true,
                 bean.getImgurl(),
                 "",
-                bean.getPackagename());
+                bean.getPackagename(),
+                bean.getmVersionCode());
     }
 
     /**

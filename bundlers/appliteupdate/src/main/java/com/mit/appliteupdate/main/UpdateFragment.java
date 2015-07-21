@@ -181,7 +181,8 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                                 true,
                                 data.getmImgUrl(),
                                 "",
-                                data.getmPackageName());
+                                data.getmPackageName(),
+                                data.getmVersionCode());
                     }
                 } else {
                     Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.no_update), Toast.LENGTH_SHORT).show();

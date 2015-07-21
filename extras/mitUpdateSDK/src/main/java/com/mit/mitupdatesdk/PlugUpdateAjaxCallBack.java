@@ -79,6 +79,7 @@ public class PlugUpdateAjaxCallBack<T> extends AjaxCallBack<Object> {
             queryModel = new ApkplugQueryModel<ApkplugModel>();
             List<ApkplugModel> list = new ArrayList<ApkplugModel>();
 
+            LogUtils.d(TAG,bundles);
             JSONObject obj = new JSONObject(bundles);
             String data = obj.getString("data");
             if (!TextUtils.isEmpty(data)) {

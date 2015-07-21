@@ -9,13 +9,16 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.util.SparseArray;
 
+import com.android.dsc.downloads.DownloadManager;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.List;
 
 public class ImplPackageManager extends AbstractImpl {
+    private static final String TAG = "impl_package";
     private SparseArray<Method> mCmdList = new SparseArray<Method>();
     private PackageManager pm ;
 
@@ -101,7 +104,7 @@ public class ImplPackageManager extends AbstractImpl {
         ImplAgent.InstallPackageReq implCmd = (ImplAgent.InstallPackageReq)cmd;
         ImplInfo implInfo = findInfoByPackageName(implCmd.packageName);
         if (null == implInfo){
-            implInfo = ImplInfo.create(implCmd.context,implCmd.key,"",implCmd.packageName);
+            implInfo = ImplInfo.create(implCmd.context,implCmd.key,"",implCmd.packageName,0);
             implInfo.setLocalPath(implCmd.localPath);
         }
 
@@ -159,7 +162,7 @@ public class ImplPackageManager extends AbstractImpl {
         ImplAgent.DeletePackageReq implCmd = (ImplAgent.DeletePackageReq)cmd;
         ImplInfo implInfo = findInfoByPackageName(implCmd.packageName);
         if (null == implInfo){
-            implInfo = ImplInfo.create(implCmd.context,implCmd.key,"",implCmd.packageName);
+            implInfo = ImplInfo.create(implCmd.context,implCmd.key,"",implCmd.packageName,0);
         }
         ImplLog.d(TAG,"handlePackageDeleteReq,"+implInfo.getKey()+","+implInfo.getTitle());
         try{
@@ -187,7 +190,14 @@ public class ImplPackageManager extends AbstractImpl {
         if (null == implInfo){
             return false;
         }
+        try {
+//            DownloadManager.getInstance(cmd.context).remove(implInfo.getDownloadId());
+            new File(Uri.parse(implInfo.getLocalPath()).getPath()).delete();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         implInfo.setStatus(Constant.STATUS_INSTALLED);
+        implInfo.setLocalPath(null);
         save(implInfo);
         ImplAgent.notify(true,implInfo);
         return true;

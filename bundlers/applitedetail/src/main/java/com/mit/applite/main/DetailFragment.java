@@ -307,7 +307,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
             ImplAgent.queryDownload(mActivity, mPackageName);
             if (null == mImplInfo){
-                mImplInfo = ImplInfo.create(mActivity,mPackageName,mDownloadUrl,mPackageName);
+                mImplInfo = ImplInfo.create(mActivity,mPackageName,mDownloadUrl,mPackageName,mVersionCode);
             }
             mProgressButton.setText(mImplInfo.getActionText(mActivity));
             mProgressButton.setProgress(mImplInfo.getProgress());
@@ -349,7 +349,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 true,
                 mImgUrl,
                 "",
-                mPackageName);
+                mPackageName,
+                mVersionCode);
     }
 
 }

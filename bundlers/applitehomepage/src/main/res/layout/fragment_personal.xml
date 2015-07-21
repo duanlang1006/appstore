@@ -3,24 +3,47 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#ff777777"
+    android:background="#ffFFFFFF"
     tools:context=".PersonalFragment">
 
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:id="@+id/action_upgrade"
-        android:gravity="center_vertical"
-        android:layout_margin="5dp"
-        android:background="#ffaaaaaa"
-        android:text="更新管理"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:id="@+id/action_dm"
-        android:layout_margin="5dp"
-        android:gravity="center_vertical"
-        android:background="#ffaaaaaa"
-        android:text="下载管理"/>
+        android:layout_height="wrap_content"
+        android:id="@+id/action_upgrade">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:background="#ffFFFFFF"
+            android:text="@string/upgrade_manager"
+            style="@style/personalListText"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:background="@drawable/back"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            style="@style/personalListText" />
+    </RelativeLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/action_dm">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:text="@string/download_manager"
+            style="@style/personalListText"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:background="@drawable/back"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            style="@style/personalListText" />
+    </RelativeLayout>
 </LinearLayout>
