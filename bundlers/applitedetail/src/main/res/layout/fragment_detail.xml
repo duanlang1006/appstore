@@ -8,181 +8,211 @@
     tools:context="com.mit.detail.DetailFragment">
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:visibility="gone">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <ImageButton
-            android:id="@+id/detail_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/back_bg" />
+        <LinearLayout
+            android:id="@+id/no_network"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <TextView
-            android:id="@+id/detail_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:singleLine="true"
-            android:text="英雄联盟"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
+            <ImageView
 
-        <ImageButton
-            android:id="@+id/detail_search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/more"
-            android:visibility="invisible" />
-    </LinearLayout>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:src="@drawable/no_notwork" />
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp">
-
-        <ImageView
-            android:id="@+id/detail_apkimg"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_margin="10dp"
-            android:src="@drawable/apk_default_bg" />
+            <Button
+                android:id="@+id/refresh_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="50dp"
+                android:text="@string/refresh" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="100dp"
-            android:layout_toRightOf="@id/detail_apkimg"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageButton
+                android:id="@+id/detail_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/back_bg" />
 
             <TextView
-                android:id="@+id/detail_name1"
-                android:layout_width="fill_parent"
+                android:id="@+id/detail_name"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
                 android:ellipsize="end"
+                android:gravity="center_vertical"
                 android:singleLine="true"
                 android:text="英雄联盟"
                 android:textColor="@color/black"
-                android:textSize="15sp" />
+                android:textSize="20sp" />
 
-            <RatingBar
-                android:id="@+id/detail_xing"
-                style="?android:attr/ratingBarStyleSmall"
+            <ImageButton
+                android:id="@+id/detail_search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
-                android:layout_marginTop="3dp"
-                android:numStars="5" />
-
-            <TextView
-                android:id="@+id/detail_apksize_and_company"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="12sp" />
+                android:background="@drawable/more"
+                android:visibility="invisible" />
         </LinearLayout>
-    </RelativeLayout>
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="@color/dividing_line" />
-
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
-        <ScrollView
+        <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginBottom="50dp">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp">
+
+            <ImageView
+                android:id="@+id/detail_apkimg"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_margin="10dp"
+                android:src="@drawable/apk_default_bg" />
 
             <LinearLayout
-                android:id="@+id/detail_vp_container"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:clipChildren="false"
-                android:layerType="software"
+                android:layout_height="100dp"
+                android:layout_toRightOf="@id/detail_apkimg"
+                android:gravity="center_vertical"
                 android:orientation="vertical">
 
-                <HorizontalScrollView
+                <TextView
+                    android:id="@+id/detail_name1"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:scrollbars="none">
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="英雄联盟"
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
 
-                    <LinearLayout
-                        android:id="@+id/detail_viewpager_img_ll"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                    </LinearLayout>
-                </HorizontalScrollView>
-
-                <TextView
+                <RatingBar
+                    android:id="@+id/detail_xing"
+                    style="?android:attr/ratingBarStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="@string/app_detail"
-                    android:textColor="@color/black" />
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginTop="3dp"
+                    android:numStars="5" />
 
                 <TextView
-                    android:id="@+id/detail_content"
+                    android:id="@+id/detail_apksize_and_company"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:ellipsize="end"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:textSize="12sp" />
             </LinearLayout>
+        </RelativeLayout>
 
-
-        </ScrollView>
-
-        <LinearLayout
+        <ImageView
             android:layout_width="fill_parent"
-            android:layout_height="60dp"
-            android:layout_alignParentBottom="true"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_height="1dp"
+            android:background="@color/dividing_line" />
 
-            <ProgressBar
-                android:id="@+id/detail_progress"
-                style="?android:attr/progressBarStyleHorizontal"
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <ScrollView
                 android:layout_width="fill_parent"
-                android:layout_height="5dp"
-                android:max="100"
-                android:visibility="invisible" />
-
-            <Button
-                android:id="@+id/detail_download"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:background="@drawable/download"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:text="@string/install"
-                android:visibility="gone" />
-
-            <com.mit.applite.view.ProgressButton
-                android:id="@+id/detail_progress_button"
-                android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                app:background="@color/dividing_line"
-                app:foreground="@color/progress_foreground"
-                app:max="100"
-                app:progress="0"
-                app:text="@string/install"
-                app:textSize="15sp"
-                app:textcolor="@color/black" />
-        </LinearLayout>
-    </RelativeLayout>
+                android:layout_marginBottom="50dp">
+
+                <LinearLayout
+                    android:id="@+id/detail_vp_container"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:clipChildren="false"
+                    android:layerType="software"
+                    android:orientation="vertical">
+
+                    <HorizontalScrollView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:id="@+id/detail_viewpager_img_ll"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                        </LinearLayout>
+                    </HorizontalScrollView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:text="@string/app_detail"
+                        android:textColor="@color/black" />
+
+                    <TextView
+                        android:id="@+id/detail_content"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:ellipsize="end"
+                        android:textColor="@color/black" />
+                </LinearLayout>
+
+
+            </ScrollView>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="60dp"
+                android:layout_alignParentBottom="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ProgressBar
+                    android:id="@+id/detail_progress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="5dp"
+                    android:max="100"
+                    android:visibility="invisible" />
+
+                <Button
+                    android:id="@+id/detail_download"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/download"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    android:text="@string/install"
+                    android:visibility="gone" />
+
+                <com.mit.applite.view.ProgressButton
+                    android:id="@+id/detail_progress_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    app:background="@color/dividing_line"
+                    app:foreground="@color/progress_foreground"
+                    app:max="100"
+                    app:progress="0"
+                    app:text="@string/install"
+                    app:textSize="15sp"
+                    app:textcolor="@color/black" />
+            </LinearLayout>
+        </RelativeLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

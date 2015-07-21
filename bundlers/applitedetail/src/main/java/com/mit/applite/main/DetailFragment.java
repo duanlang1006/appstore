@@ -1,6 +1,7 @@
 package com.mit.applite.main;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -67,6 +68,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private ProgressButton mProgressButton;
     private int mVersionCode;
     private Context mContext;
+    private LinearLayout no_network;
+    private Button refreshButton;
     private ImplInfo mImplInfo = null;
     private ImplListener mImplListener = new ImplListener() {
         @Override
@@ -183,6 +186,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mXingView = (RatingBar) rootView.findViewById(R.id.detail_xing);
         mProgressBar = (ProgressBar) rootView.findViewById(R.id.detail_progress);
         mImgLl = (LinearLayout) rootView.findViewById(R.id.detail_viewpager_img_ll);
+        no_network = (LinearLayout) rootView.findViewById(R.id.no_network);
+        refreshButton = (Button) rootView.findViewById(R.id.refresh_btn);
 
         mNameView.setText(mApkName);
         mName1View.setText(mApkName);
@@ -260,7 +265,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
+                // 这里设置没有网络时的图片
+                String result = strMsg;
                 LogUtils.e(TAG, "应用详情网络请求失败，strMsg:" + strMsg);
+                setDate1(result);
             }
         });
     }
@@ -316,6 +324,21 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             LogUtils.e(TAG, "应用详情JSON解析失败");
         }
 
+    }
+
+    /**
+     * 设置无网络状态时的内容，以及点击刷新进行网络链接判断
+     * @param date1
+     */
+    private void setDate1(String date1){
+        no_network.setVisibility(View.VISIBLE);
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                no_network.setVisibility(View.GONE);
+                post(mPackageName);
+            }
+        });
     }
 
     /**
