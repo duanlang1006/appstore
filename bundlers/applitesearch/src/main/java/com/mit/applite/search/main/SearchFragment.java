@@ -41,7 +41,6 @@ import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
 import com.umeng.analytics.MobclickAgent;
 
-import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
@@ -68,7 +67,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     private Activity mActivity;
     private View rootView;
     private List<HotWordBean> mHotWordBeans = new ArrayList<HotWordBean>();
-    private FinalBitmap mFinalBitmap;
     private int mChangeNumbew = 0;//在线热词换一换点击的次数
     private GridView mGridView;
     private HotWordAdapter mGvAdapter;
@@ -168,7 +166,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         super.onAttach(activity);
         mActivity = activity;
         mFinalHttp = new FinalHttp();
-        mFinalBitmap = FinalBitmap.create(activity);
     }
 
     @Override
@@ -289,12 +286,8 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
 
         mHotWordLL = (LinearLayout) rootView.findViewById(R.id.hot_word_ll);
         mNoNetworkIV = (ImageView) rootView.findViewById(R.id.hot_word_no_network);
-//        mBackView = (ImageButton) rootView.findViewById(R.id.search_back);
-//        mEtView = (EditText) rootView.findViewById(R.id.search_et);
-//        mSearchView = (ImageButton) rootView.findViewById(R.id.search_search);
         mListView = (ListView) rootView.findViewById(R.id.search_listview);
         mGridView = (GridView) rootView.findViewById(R.id.search_gv);
-//        mDeleteView = (ImageView) rootView.findViewById(R.id.search_delete);
         mHotChangeView = (TextView) rootView.findViewById(R.id.hot_word_change);
         mPreloadListView = (ListView) rootView.findViewById(R.id.search_preload_listview);
         mPreloadListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -316,9 +309,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         mEtView.addTextChangedListener(mTextWatcher);
 
         mHotChangeView.setOnClickListener(this);
-//        mDeleteView.setOnClickListener(this);
-//        mBackView.setOnClickListener(this);
-//        mSearchView.setOnClickListener(this);
     }
 
     private TextWatcher mTextWatcher = new TextWatcher() {

@@ -26,6 +26,7 @@ import java.util.List;
  */
 public class UpdateAdapter extends BaseAdapter {
 
+    private Context mActivity;
     private FinalBitmap mFinalBitmap;
     private Context mContext;
     private List<DataBean> mDatas;
@@ -34,6 +35,7 @@ public class UpdateAdapter extends BaseAdapter {
     public UpdateAdapter(Context context, List<DataBean> mDatas) {
         this.mDatas = mDatas;
         mFinalBitmap = FinalBitmap.create(context);
+        mActivity = context;
         try {
             Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             this.mContext = mContext;
@@ -85,7 +87,7 @@ public class UpdateAdapter extends BaseAdapter {
             ImplAgent.queryDownload(mContext,data.getmPackageName());
             implInfo = ImplInfo.create(mContext,data.getmPackageName(),data.getmUrl(),data.getmPackageName());
         }
-        viewholder.mBt.setText(implInfo.getActionText(mContext));
+        viewholder.mBt.setText(implInfo.getActionText(mActivity));
         viewholder.mBt.setTag(implInfo);
         viewholder.mBt.setOnClickListener(new View.OnClickListener() {
             @Override
