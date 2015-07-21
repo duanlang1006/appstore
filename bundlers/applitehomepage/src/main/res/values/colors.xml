@@ -16,5 +16,5 @@
     <color name="apkList_apkName_color">#414141</color>
     <color name="apkList_category_color">#9a999a</color>
     <color name="apkList_size_color">#9a999a</color>
-    <color name="apkList_bottom_color">#9a999a</color>
+    <color name="apkList_bottom_color">#05db69</color>
 </resources>
