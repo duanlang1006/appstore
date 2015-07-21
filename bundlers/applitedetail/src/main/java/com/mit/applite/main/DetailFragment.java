@@ -326,6 +326,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    /**
+     * 设置无网络状态时的内容，以及点击刷新进行网络链接判断
+     * @param date1
+     */
     private void setDate1(String date1){
         no_network.setVisibility(View.VISIBLE);
         refreshButton.setOnClickListener(new View.OnClickListener() {
