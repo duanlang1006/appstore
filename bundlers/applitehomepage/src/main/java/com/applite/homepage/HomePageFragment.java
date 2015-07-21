@@ -109,14 +109,16 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         @Override
         public void run() {
             LogUtils.i(TAG, "mRefreshRunnable run");
-            if (null == mPageData){
-                mViewPager.setVisibility(View.GONE);
-            }else{
-                mViewPager.setVisibility(View.VISIBLE);
-                mSectionsPagerAdapter.notifyDataSetChanged();
-            }
+            if(mViewPager != null) {
+                if (null == mPageData) {
+                    mViewPager.setVisibility(View.GONE);
+                } else {
+                    mViewPager.setVisibility(View.VISIBLE);
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                }
             mPagerSlidingTabStrip.setViewPager(mViewPager);
 //            mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
+            }
         }
     };
     private ViewGroup rootView;
