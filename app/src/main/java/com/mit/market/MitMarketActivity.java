@@ -55,6 +55,7 @@ public class MitMarketActivity extends ApkPluginActivity {
     };
     private ServiceRegistration mOptReg;
     private ImplListener mImplListener= new ImplListener() {
+        private static final String TAG = "impl_mitactivity";
         @Override
         public void onUpdate(boolean success, ImplInfo info) {
             switch(info.getStatus()){
@@ -68,12 +69,13 @@ public class MitMarketActivity extends ApkPluginActivity {
                         ImplAgent.requestPackageInstall(MitMarketActivity.this, info.getKey(), localPath, info.getPackageName(), true);
                     }
                     ImplLog.d(TAG, "onDownloadComplete,STATUS_SUCCESSFUL," + info.getKey() + "," + localPath);
-
                     break;
                 case Constant.STATUS_FAILED:
+                    ImplLog.d(TAG, "onDownloadComplete,STATUS_FAILED," + info.getKey() + "," + info.getLocalPath());
                     Toast.makeText(MitMarketActivity.this,info.getTitle()+" 下载失败",Toast.LENGTH_SHORT).show();
                     break;
                 case Constant.STATUS_PACKAGE_INVALID:
+                    ImplLog.d(TAG, "onDownloadComplete,STATUS_PACKAGE_INVALID," + info.getKey()+","+info.getLocalPath());
                     Toast.makeText(MitMarketActivity.this,info.getTitle()+" 下载apk不合法",Toast.LENGTH_SHORT).show();
                     break;
             }

@@ -36,11 +36,11 @@ public class HomePageOSGIServiceImpl implements ApkplugOSGIService {
             FragmentManager fgm = (FragmentManager)objs[0];
             FragmentTransaction ft = fgm.beginTransaction();
             if (null == b) {
-                ft.replace(node, fg, Constant.OSGI_SERVICE_MAIN_FRAGMENT).commit();
+                ft.replace(node, fg, Constant.OSGI_SERVICE_MAIN_FRAGMENT).commitAllowingStateLoss();
             }else{
                 ft.replace(node, fg, Constant.OSGI_SERVICE_MAIN_FRAGMENT);
                 ft.addToBackStack(null);
-                ft.commit();
+                ft.commitAllowingStateLoss();
             }
         }else if (Constant.OSGI_SERVICE_TOPIC_FRAGMENT.equals(servicename)){
             SubjectData data = new SubjectData();
@@ -64,7 +64,7 @@ public class HomePageOSGIServiceImpl implements ApkplugOSGIService {
                 ft.replace(node, fg,Constant.OSGI_SERVICE_TOPIC_FRAGMENT);
             }
             ft.addToBackStack(null);
-            ft.commit();
+            ft.commitAllowingStateLoss();
         }
 		return null;
 	}

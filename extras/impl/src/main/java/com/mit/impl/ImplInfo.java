@@ -59,7 +59,7 @@ public class ImplInfo {
                 info.setStatus(Constant.STATUS_UPGRADE);
             }
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return info;
     }

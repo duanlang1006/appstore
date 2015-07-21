@@ -3,6 +3,7 @@ package com.applite.homepage;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -150,7 +151,6 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //ImplAgent.unregisterImplListener(mImplListener);
         LogUtils.i(TAG, "onDestroy");
     }
 
@@ -317,6 +317,7 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
 
     class HomePageImplListener implements ImplListener{
         private final String TAG = "impl_homepage";
+        private Handler mHandler= new Handler();
         private Runnable mRefreshListRunnable = new Runnable(){
             @Override
             public void run() {
@@ -328,9 +329,10 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         public void onUpdate(boolean success, ImplInfo implInfo) {
             HomePageApkData bean = findBeanByKey(implInfo.getKey());
             if (null != bean){
-                LogUtils.i(TAG,  HomePageListFragment.this+",onUpdate name="+bean.getName()+",status="+implInfo.getStatus());
+                LogUtils.i(TAG,  HomePageImplListener.this+",onUpdate key:"+bean.getPackageName()+",name="+bean.getName()+",status="+implInfo.getStatus()+","+implInfo);
                 bean.setImplInfo(implInfo);
-                mActivity.runOnUiThread(mRefreshListRunnable);
+                mHandler.removeCallbacks(mRefreshListRunnable);
+                mHandler.postDelayed(mRefreshListRunnable,50);
             }
         }
     }

@@ -29,10 +29,12 @@ public class ImplAgent {
     }
 
     public static void registerImplListener(ImplListener listener){
+        Log.d(TAG,"registerImplListener,"+listener);
         mListenerSet.add(listener);
     }
 
     public static void unregisterImplListener(ImplListener listener){
+        Log.d(TAG,"unregisterImplListener,"+listener);
         mListenerSet.remove(listener);
     }
 
@@ -138,6 +140,7 @@ public class ImplAgent {
     }
 
     static void notify(boolean success,ImplInfo info){
+//        ImplLog.d(TAG,"mListenerSet.size="+mListenerSet.size());
         for (ImplListener listener:mListenerSet){
 //            ImplLog.d(TAG,"notify statusTag,listener="+listener);
             listener.onUpdate(success, info);
