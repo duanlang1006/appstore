@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -88,6 +89,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     private boolean isSearchPost = true;//上拉加载是否可以请求服务器
     private int mShowHotWordNumber = 9;
 
+    private Button refresh;
+    private LinearLayout no_network;
+
     private Runnable mNotifyRunnable = new Runnable() {
         @Override
         public void run() {
@@ -95,7 +99,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         }
     };
     private ImplListener mImplListener = new ImplListener() {
-        private SearchBean findBean(String key){
+        private SearchBean findBean(String key) {
             SearchBean bean = null;
             for (int i = 0; i < mSearchApkContents.size(); i++) {
                 if (mSearchApkContents.get(i).getmPackageName().equals(key)) {
@@ -109,7 +113,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         @Override
         public void onUpdate(boolean b, ImplInfo implInfo) {
             SearchBean bean = findBean(implInfo.getKey());
-            if (null != bean ){
+            if (null != bean) {
                 bean.setImplInfo(implInfo);
                 mActivity.runOnUiThread(mNotifyRunnable);
             }
@@ -208,7 +212,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
             mEtViewText = mEtView.getText().toString();
             closeKeybord();
         } else {
-            if (mListView.getVisibility() == View.GONE){
+            if (mListView.getVisibility() == View.GONE) {
                 mEtView.setFocusable(true);
                 mEtView.setFocusableInTouchMode(true);
                 mEtView.requestFocus();
@@ -290,6 +294,10 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         mGridView = (GridView) rootView.findViewById(R.id.search_gv);
         mHotChangeView = (TextView) rootView.findViewById(R.id.hot_word_change);
         mPreloadListView = (ListView) rootView.findViewById(R.id.search_preload_listview);
+
+        refresh = (Button) rootView.findViewById(R.id.refresh);
+        no_network = (LinearLayout) rootView.findViewById(R.id.no_network);
+
         mPreloadListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -416,6 +424,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         params.put("type", "search");
         params.put("key", name);
         params.put("page", mSearchPostPage + "");
+        no_network.setVisibility(View.GONE);
         mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
@@ -437,6 +446,14 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.post_failure),
                         Toast.LENGTH_SHORT).show();
                 LogUtils.e(TAG, "搜索网络请求失败，strMsg:" + strMsg);
+                no_network.setVisibility(View.VISIBLE);
+//                refresh.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        postSearch(name);
+//                    }
+//                });
+                refresh.setVisibility(View.GONE);
             }
         });
     }
@@ -584,6 +601,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
         params.put("type", "hot_word");
+        no_network.setVisibility(View.GONE);
         mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
@@ -598,6 +616,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 super.onFailure(t, errorNo, strMsg);
                 Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.post_failure),
                         Toast.LENGTH_SHORT).show();
+                no_network.setVisibility(View.VISIBLE);
+                refresh.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        postHotWord();
+                    }
+                });
                 LogUtils.e(TAG, "在线热词请求失败，strMsg:" + strMsg);
             }
         });
