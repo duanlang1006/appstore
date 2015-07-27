@@ -63,32 +63,12 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
             mAdapter.notifyDataSetChanged();
         }
     };
-    private ImplListener mImplListener = new ImplListener() {
-        private DataBean findBean(String key){
-            DataBean bean = null;
-            for (int i = 0; i < mDataContents.size(); i++) {
-                if (mDataContents.get(i).getmPackageName().equals(key)) {
-                    bean = mDataContents.get(i);
-                    break;
-                }
-            }
-            return bean;
-        }
-
-        @Override
-        public void onUpdate(boolean b, ImplInfo implInfo) {
-            DataBean bean = findBean(implInfo.getKey());
-            if (null == bean){
-                bean.setImplInfo(implInfo);
-                mActivity.runOnUiThread(mNotifyRunnable);
-            }
-        }
-    };
     private Context mContext;
     private LinearLayout mStatsLayout;
     private ImageView mStatsImgView;
     private Button mStatsButton;
     private boolean mPostStats = true;
+    private ImplAgent implAgent;
 
     public UpdateFragment() {
     }
@@ -98,13 +78,13 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
         super.onAttach(activity);
         mActivity = activity;
         initActionBar();
+        implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mFinalHttp = new FinalHttp();
-        ImplAgent.registerImplListener(mImplListener);
     }
 
     @Override
@@ -148,7 +128,6 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDetach() {
         super.onDetach();
-        ImplAgent.unregisterImplListener(mImplListener);
     }
 
     @Override
@@ -169,20 +148,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                     DataBean data = null;
                     for (int i = 0; i < mDataContents.size(); i++) {
                         data = mDataContents.get(i);
-                        ImplAgent.downloadPackage(mActivity,
-                                data.getmPackageName(),
-                                data.getmUrl(),
-                                Constant.extenStorageDirPath,
-                                data.getmName() + ".apk",
-                                3,
-                                false,
-                                data.getmName(),
-                                "",
-                                true,
-                                data.getmImgUrl(),
-                                "",
-                                data.getmPackageName(),
-                                data.getmVersionCode());
+                        download(data);
                     }
                 } else {
                     Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.no_update), Toast.LENGTH_SHORT).show();
@@ -330,6 +296,34 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
         } catch (Exception e) {
             // TODO 自动生成的 catch 块
             e.printStackTrace();
+        }
+    }
+
+    private void download(DataBean bean){
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(),bean.getmPackageName(),bean.getmVersionCode());
+        implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());
+        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
+            switch (implInfo.getStatus()) {
+                case Constant.STATUS_PENDING:
+                case Constant.STATUS_RUNNING:
+                    break;
+                case Constant.STATUS_PAUSED:
+                    implAgent.resumeDownload(implInfo, null);
+                    break;
+                case Constant.STATUS_INSTALLED:
+                case Constant.STATUS_NORMAL_INSTALLING:
+                case Constant.STATUS_PRIVATE_INSTALLING:
+                    //正在安装或已安装
+//                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    implAgent.newDownload(implInfo,
+                            Constant.extenStorageDirPath,
+                            bean.getmName() + ".apk",
+                            true,
+                            null);
+                    break;
+            }
         }
     }
 

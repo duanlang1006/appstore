@@ -142,7 +142,8 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
                     b.putInt("statusFilter",Constant.STATUS_SUCCESSFUL
                             | Constant.STATUS_INSTALLED
                             | Constant.STATUS_INSTALL_FAILED
-                            | Constant.STATUS_PRIVATE_INSTALLING);
+                            | Constant.STATUS_PRIVATE_INSTALLING
+                            | Constant.STATUS_UPGRADE);
                     break;
                 case R.string.dm_downloading:
                     b.putInt("statusFilter",Constant.STATUS_PENDING

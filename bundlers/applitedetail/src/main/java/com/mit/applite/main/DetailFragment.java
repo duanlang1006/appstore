@@ -19,8 +19,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
@@ -38,6 +36,8 @@ import net.tsz.afinal.http.AjaxParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
 
 public class DetailFragment extends Fragment implements View.OnClickListener {
 
@@ -70,17 +70,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private Context mContext;
     private LinearLayout no_network;
     private Button refreshButton;
-    private ImplInfo mImplInfo = null;
-    private ImplListener mImplListener = new ImplListener() {
-        @Override
-        public void onUpdate(boolean b, ImplInfo implInfo) {
-            if (implInfo.getKey().equals(mPackageName)) {
-                mImplInfo = implInfo;
-                mProgressButton.setText(implInfo.getActionText(mActivity));
-                mProgressButton.setProgress(implInfo.getProgress());
-            }
-        }
-    };
+    private ImplAgent implAgent;
+    private ImplListener implCallback;
 
     public DetailFragment() {
     }
@@ -93,6 +84,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mPackageName = bundle.getString("packageName");
         mApkName = bundle.getString("name");
         mImgUrl = bundle.getString("imgUrl");
+        implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
+        implCallback = new DetailImplCallback();
         LogUtils.i(TAG, "mApkName:" + mApkName + "------mPackageName:" + mPackageName + "------mImgUrl:" + mImgUrl);
         initActionBar();
     }
@@ -100,7 +93,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ImplAgent.registerImplListener(mImplListener);
     }
 
     @Override
@@ -144,7 +136,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDetach() {
         super.onDetach();
-        ImplAgent.unregisterImplListener(mImplListener);
     }
 
     @Override
@@ -197,18 +188,31 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onClickListener() {
                 if (!TextUtils.isEmpty(mPackageName)) {
-                    if (null != mImplInfo){
-                        switch(mImplInfo.getAction(mActivity)){
-                            case ImplInfo.ACTION_DOWNLOAD:
-                                requestDownload();
-                                break;
-                            default:
-                                try{
-                                    mActivity.startActivity(mImplInfo.getActionIntent(mActivity));
-                                }catch(Exception e){
-                                    e.printStackTrace();
-                                }
-                                break;
+                    ImplInfo implinfo = (ImplInfo)mProgressButton.getTag();
+                    if (null != implinfo){
+                        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implinfo)) {
+                            switch (implinfo.getStatus()) {
+                                case Constant.STATUS_PENDING:
+                                case Constant.STATUS_RUNNING:
+                                    implAgent.pauseDownload(implinfo);
+                                    break;
+                                case Constant.STATUS_PAUSED:
+                                    implAgent.resumeDownload(implinfo, implCallback);
+                                    break;
+                                default:
+                                    implAgent.newDownload(implinfo,
+                                            Constant.extenStorageDirPath,
+                                            mApkName + ".apk",
+                                            true,
+                                            implCallback);
+                                    break;
+                            }
+                        } else {
+                            try {
+                                mContext.startActivity(implAgent.getActionIntent(implinfo));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -227,15 +231,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 getFragmentManager().popBackStack();
                 break;
             case R.id.detail_download:
-//                if (!TextUtils.isEmpty(mPackageName)) {
-//                    if (mApkType == Utils.INSTALLED) {
-//                        Utils.startApp(mActivity, mPackageName);
-//                    } else {
-//                        mProgressBar.setVisibility(View.VISIBLE);
-//                        Utils.setDownloadViewText(mActivity, mDownloadView);
-//                        requestDownload();
-//                    }
-//                }
                 break;
         }
     }
@@ -313,12 +308,11 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 setPreViewImg();
             }
 
-            ImplAgent.queryDownload(mActivity, mPackageName);
-            if (null == mImplInfo){
-                mImplInfo = ImplInfo.create(mActivity,mPackageName,mDownloadUrl,mPackageName,mVersionCode);
-            }
-            mProgressButton.setText(mImplInfo.getActionText(mActivity));
-            mProgressButton.setProgress(mImplInfo.getProgress());
+            ImplInfo implinfo = implAgent.getImplInfo(mPackageName,mPackageName,mVersionCode);
+            implAgent.setImplCallback(implCallback,implinfo);
+            mProgressButton.setText(implAgent.getActionText(implinfo));
+            mProgressButton.setProgress(implAgent.getProgress(implinfo));
+            mProgressButton.setTag(implinfo);
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.e(TAG, "应用详情JSON解析失败");
@@ -356,24 +350,79 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 //        fb.configLoadingImage(null);
     }
 
-    /**
-     * 下载APK
-     */
-    private void requestDownload() {
-        ImplAgent.downloadPackage(mActivity,
-                mPackageName,
-                mDownloadUrl,
-                Constant.extenStorageDirPath,
-                mName + ".apk",
-                3,
-                false,
-                mName,
-                "",
-                true,
-                mImgUrl,
-                "",
-                mPackageName,
-                mVersionCode);
+    class DetailImplCallback extends ImplListener {
+        DetailImplCallback() {}
+
+        @Override
+        public void onStart(ImplInfo info) {
+            super.onStart(info);
+            refresh(info);
+        }
+
+        @Override
+        public void onCancelled(ImplInfo info) {
+            super.onCancelled(info);
+            refresh(info);
+        }
+
+        @Override
+        public void onLoading(ImplInfo info, long total, long current, boolean isUploading) {
+            super.onLoading(info, total, current, isUploading);
+            refresh(info);
+        }
+
+        @Override
+        public void onSuccess(ImplInfo info, File file) {
+            super.onSuccess(info, file);
+            refresh(info);
+        }
+
+        @Override
+        public void onFailure(ImplInfo info, Throwable t, String msg) {
+            super.onFailure(info, t, msg);
+            refresh(info);
+        }
+
+        @Override
+        public void onInstallSuccess(ImplInfo info) {
+            super.onInstallSuccess(info);
+            refresh(info);
+        }
+
+        @Override
+        public void onInstalling(ImplInfo info) {
+            super.onInstalling(info);
+            refresh(info);
+        }
+
+        @Override
+        public void onInstallFailure(ImplInfo info, int errorCode) {
+            super.onInstallFailure(info, errorCode);
+            refresh(info);
+        }
+
+        @Override
+        public void onUninstallSuccess(ImplInfo info) {
+            super.onUninstallSuccess(info);
+            refresh(info);
+        }
+
+        @Override
+        public void onUninstalling(ImplInfo info) {
+            super.onUninstalling(info);
+            refresh(info);
+        }
+
+        @Override
+        public void onUninstallFailure(ImplInfo info, int errorCode) {
+            super.onUninstallFailure(info, errorCode);
+            refresh(info);
+        }
+
+        private void refresh(ImplInfo info){
+            mProgressButton.setText(implAgent.getActionText(info));
+            mProgressButton.setProgress(implAgent.getProgress(info));
+        }
     }
 
 }

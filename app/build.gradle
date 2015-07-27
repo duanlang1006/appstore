@@ -8,8 +8,8 @@ android {
         applicationId "com.applite.android"
         minSdkVersion 10
         targetSdkVersion 21
-        versionCode 20
-        versionName "2.0.020"
+        versionCode 25
+        versionName "2.0.025"
         multiDexEnabled true
         manifestPlaceholders = [UMENG_CHANNEL_VALUE: "leadexceed_buildin"]
     }
@@ -115,4 +115,5 @@ dependencies {
     compile project(':extras:impl')
     compile project(':extras:applitecommon')
     compile project(':extras:dscdownloader')
+    compile 'com.jiechic.library:xUtils:2.6.14'
 }

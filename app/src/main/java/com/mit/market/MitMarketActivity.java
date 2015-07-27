@@ -54,33 +54,6 @@ public class MitMarketActivity extends ApkPluginActivity {
         }
     };
     private ServiceRegistration mOptReg;
-    private ImplListener mImplListener= new ImplListener() {
-        private static final String TAG = "impl_mitactivity";
-        @Override
-        public void onUpdate(boolean success, ImplInfo info) {
-            switch(info.getStatus()){
-                case Constant.STATUS_SUCCESSFUL:
-                    String localPath = null;
-                    try {
-                        localPath = Uri.parse(info.getLocalPath()).getPath();
-                    }catch(Exception e){
-                    }
-                    if (null != localPath) {
-                        ImplAgent.requestPackageInstall(MitMarketActivity.this, info.getKey(), localPath, info.getPackageName(), true);
-                    }
-                    ImplLog.d(TAG, "onDownloadComplete,STATUS_SUCCESSFUL," + info.getKey() + "," + localPath);
-                    break;
-                case Constant.STATUS_FAILED:
-                    ImplLog.d(TAG, "onDownloadComplete,STATUS_FAILED," + info.getKey() + "," + info.getLocalPath());
-                    Toast.makeText(MitMarketActivity.this,info.getTitle()+" 下载失败",Toast.LENGTH_SHORT).show();
-                    break;
-                case Constant.STATUS_PACKAGE_INVALID:
-                    ImplLog.d(TAG, "onDownloadComplete,STATUS_PACKAGE_INVALID," + info.getKey()+","+info.getLocalPath());
-                    Toast.makeText(MitMarketActivity.this,info.getTitle()+" 下载apk不合法",Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +61,6 @@ public class MitMarketActivity extends ApkPluginActivity {
         setContentView(R.layout.activity_mit_market);
         setOverflowShowingAlways();
         mOptReg = registerOSGIService(Constant.OSGI_SERVICE_HOST_OPT, mOptService);
-        ImplAgent.registerImplListener(mImplListener);
 
         MobclickAgent.openActivityDurationTrack(false);//禁止默认的页面统计方式
         MobclickAgent.updateOnlineConfig(this);
@@ -188,7 +160,6 @@ public class MitMarketActivity extends ApkPluginActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterOSGIService(mOptReg);
-        ImplAgent.unregisterImplListener(mImplListener);
     }
 
     private void setOverflowShowingAlways() {
