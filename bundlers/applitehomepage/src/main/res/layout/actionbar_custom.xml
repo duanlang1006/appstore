@@ -31,12 +31,14 @@
 
     <LinearLayout
         android:id="@+id/action_title"
-        android:layout_toRightOf="@+id/action_personal"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
-        android:layout_weight="0.55">
+        android:layout_weight="0.55"
+        android:layout_toLeftOf="@+id/action_search"
+        android:layout_toRightOf="@+id/action_personal"
+        android:layout_toEndOf="@+id/action_personal">
     </LinearLayout>
 
     <ImageView

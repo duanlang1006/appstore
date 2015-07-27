@@ -61,7 +61,7 @@
             <RelativeLayout
                 android:id="@+id/guide_rl"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></RelativeLayout>
+                android:layout_height="1350dp"></RelativeLayout>
         </FrameLayout>
     </ScrollView>
 

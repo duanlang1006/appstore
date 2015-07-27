@@ -463,7 +463,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setTitle(mTitle);
                 personal.setVisibility(View.GONE);
-                title.setVisibility(View.GONE);
+                title.setVisibility(View.VISIBLE);
                 actionBar.setDisplayHomeAsUpEnabled(true);
             }
             actionBar.setCustomView(customView);

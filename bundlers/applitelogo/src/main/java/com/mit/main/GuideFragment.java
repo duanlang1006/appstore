@@ -139,7 +139,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
             initView();
             getResolution();
             post(1, 10, POST_ALL_APK);
-            GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
+            //GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
         } else {
             rootView = mInflater.inflate(R.layout.fragment_logo, container, false);
             logoInitView();
@@ -214,10 +214,10 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void setAppViewXY(int w) {
         mX = new int[10];
-        mX[0] = (mFLayoutWidth * 6 / 10) * w / mFLayoutWidth;
-        mX[1] = (mFLayoutWidth * 7 / 10) * w / mFLayoutWidth;
+        mX[0] = (mFLayoutWidth * 6 / 10 - 10) * w / mFLayoutWidth;
+        mX[1] = (mFLayoutWidth * 7 / 10 - 10) * w / mFLayoutWidth;
         mX[2] = (mFLayoutWidth * 3 / 10 - 20) * w / mFLayoutWidth;
-        mX[3] = (mFLayoutWidth * 2 / 10 - 20) * w / mFLayoutWidth;
+        mX[3] = (mFLayoutWidth * 2 / 10 - 30) * w / mFLayoutWidth;
         mX[4] = (mFLayoutWidth * 6 / 10) * w / mFLayoutWidth;
         mX[5] = (mFLayoutWidth * 7 / 10) * w / mFLayoutWidth;
         mX[6] = (mFLayoutWidth * 2 / 10) * w / mFLayoutWidth;
@@ -225,8 +225,8 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         mX[8] = (mFLayoutWidth * 6 / 10) * w / mFLayoutWidth;
         mX[9] = (mFLayoutWidth * 5 / 10 + 40) * w / mFLayoutWidth;
         mY = new int[10];
-        mY[0] = (mFLayoutHeight * 2 / 20 - 20) * w / mFLayoutWidth;
-        mY[1] = (mFLayoutHeight * 3 / 20 + 40) * w / mFLayoutWidth;
+        mY[0] = (mFLayoutHeight * 2 / 20 + 20) * w / mFLayoutWidth;
+        mY[1] = (mFLayoutHeight * 3 / 20 + 50) * w / mFLayoutWidth;
         mY[2] = (mFLayoutHeight * 5 / 20 + 40) * w / mFLayoutWidth;
         mY[3] = (mFLayoutHeight * 7 / 20) * w / mFLayoutWidth;
         mY[4] = (mFLayoutHeight * 9 / 20 + 40) * w / mFLayoutWidth;
@@ -388,6 +388,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
 
         mRLayout.addView(child);
         AppliteUtils.setLayout(child, mX[apkPsition], mY[apkPsition]);
+        LogUtils.i("lang", "mX[apkPsition]: " +mX[apkPsition]+" mY[apkPsition]: "+mY[apkPsition]);
         appearAnimator(child);
 
         int i = (child.getRight() - child.getLeft()) / 2;
@@ -403,6 +404,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void toHome() {
         try {
+            GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
             BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
             OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
                     bundleContext, ApkplugOSGIService.class,
