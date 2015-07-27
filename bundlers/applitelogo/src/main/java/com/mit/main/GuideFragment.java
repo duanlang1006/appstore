@@ -36,6 +36,7 @@ import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.mit.bean.GuideBean;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 import com.mit.utils.GuideUtils;
 import com.mit.utils.GuideSPUtils;
 import com.umeng.analytics.MobclickAgent;
@@ -95,6 +96,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
             toHome();
         }
     };
+    private ImplAgent implAgent;
 
     public GuideFragment() {
     }
@@ -103,6 +105,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
+        implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
 
     @Override
@@ -379,21 +382,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                 paowuxianAnimator(child, mApkMovePath[apkPsition]);
 
                 post((int) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 1, 1, apkPsition);
-
-                int mApkType = AppliteUtils.isAppInstalled(mActivity, bean.getPackagename(), bean.getmVersionCode());
-                LogUtils.i(TAG, "mApkType:" + mApkType);
-                switch (mApkType) {
-                    case Constant.UNINSTALLED:
-                        requestDownload(bean);
-                        break;
-                    case Constant.INSTALLED:
-                        Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
-                        break;
-                    case Constant.INSTALLED_UPDATE:
-                        Toast.makeText(mActivity, "版本更新", Toast.LENGTH_SHORT).show();
-                        requestDownload(bean);
-                        break;
-                }
+                download(bean);
             }
         });
 
@@ -408,28 +397,6 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         } else {
             mApkMovePath[apkPsition] = false;
         }
-    }
-
-    /**
-     * 下载APK
-     *
-     * @param bean
-     */
-    private void requestDownload(GuideBean bean) {
-        ImplAgent.downloadPackage(mActivity,
-                bean.getPackagename(),
-                bean.getUrl(),
-                Constant.extenStorageDirPath,
-                bean.getName() + ".apk",
-                3,
-                false,
-                bean.getName(),
-                "",
-                true,
-                bean.getImgurl(),
-                "",
-                bean.getPackagename(),
-                bean.getmVersionCode());
     }
 
     /**
@@ -475,10 +442,39 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                 paowuxianAnimator(view, mApkMovePath[(int) view.getTag()]);
 
                 GuideBean bean = mGuideContents.get(i);
-                requestDownload(bean);
+                download(bean);
             }
             mGuideContents.clear();
             mApkList.clear();
+        }
+    }
+
+
+    private void download(GuideBean bean){
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getPackagename(),bean.getPackagename(),bean.getmVersionCode());
+        implInfo.setTitle(bean.getName()).setDownloadUrl(bean.getUrl()).setIconUrl(bean.getImgurl());
+        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
+            switch (implInfo.getStatus()) {
+                case Constant.STATUS_PENDING:
+                case Constant.STATUS_RUNNING:
+                    break;
+                case Constant.STATUS_PAUSED:
+                    implAgent.resumeDownload(implInfo, null);
+                    break;
+                case Constant.STATUS_INSTALLED:
+                case Constant.STATUS_NORMAL_INSTALLING:
+                case Constant.STATUS_PRIVATE_INSTALLING:
+                    //正在安装或已安装
+//                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    implAgent.newDownload(implInfo,
+                            Constant.extenStorageDirPath,
+                            bean.getName() + ".apk",
+                            true,
+                            null);
+                    break;
+            }
         }
     }
 

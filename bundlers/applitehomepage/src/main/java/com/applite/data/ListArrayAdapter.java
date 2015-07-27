@@ -2,6 +2,8 @@ package com.applite.data;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +22,11 @@ import com.applite.homepage.BundleContextFactory;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.applite.homepage.R;
+import com.mit.impl.ImplListener;
+
 import net.tsz.afinal.FinalBitmap;
+
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -34,6 +40,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     private Context mContext = null;
     private SubjectData mData = null;
     private FinalBitmap mFinalBitmap;
+    private Bitmap defaultLoadingIcon;
+    private ImplAgent implAgent;
 
     int layoutResourceId = 0;
     public ListArrayAdapter(Context context, SubjectData data) {
@@ -58,6 +66,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }catch(Exception e){
             e.printStackTrace();
         }
+        defaultLoadingIcon = BitmapFactory.decodeResource(mResource,R.drawable.buffer);
+        implAgent = ImplAgent.getInstance(mContext.getApplicationContext());
     }
 
     @Override
@@ -94,29 +104,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
         if (null != mData && null != mData.getData()) {
             HomePageApkData itemData = mData.getData().get(position);
-            LogUtils.d(TAG, this+",name:"+itemData.getName()+","+itemData.getImplInfo());
-            if (null == itemData.getImplInfo()){
-                ImplAgent.queryDownload(mContext,itemData.getPackageName());
-                ImplInfo info = ImplInfo.create(mContext, itemData.getPackageName(), itemData.getrDownloadUrl(),
-                        itemData.getPackageName(),itemData.getVersionCode());
-                itemData.setImplInfo(info);
-            }
-
-            viewHolder.setItemData(itemData);
-//            viewHolder.setStatusTag(itemData.getImplInfo());
-            viewHolder.setLayoutStr(mData.getS_datatype());
-            float star = 0.0f;
-            try {
-                star = Float.parseFloat(itemData.getRating());
-            } catch (Exception e) {
-            }
-            viewHolder.setmRatingBar(star/2.0f);
-            viewHolder.setmProgressButton(itemData);
-            viewHolder.setmAppIcon(itemData.getIconUrl());
-            viewHolder.setCategorySub(itemData.getCategorysub());
-            viewHolder.setAppSize(itemData.getApkSize());
-            viewHolder.setmAppName(itemData.getName());
-            viewHolder.setImageListArrow();
+            viewHolder.initView(itemData,mData.getS_datatype());
         }
         return convertView;
     }
@@ -125,38 +113,37 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     public void onClick(View v) {
         if (v.getId() == R.id.list_item_progress_button){
             Object obj = v.getTag();
-            if (obj instanceof HomePageApkData){
-                HomePageApkData bean = (HomePageApkData)obj;
-                ImplInfo tag = bean.getImplInfo();
-                switch(tag.getAction(mContext)){
-                    case ImplInfo.ACTION_DOWNLOAD:
-                        ImplAgent.downloadPackage(mContext,
-                                bean.getPackageName(),
-                                bean.getrDownloadUrl(),
-                                Constant.extenStorageDirPath,
-                                bean.getName() + ".apk",
-                                3,
-                                false,
-                                bean.getName(),
-                                "",
-                                true,
-                                bean.getIconUrl(),
-                                "",
-                                bean.getPackageName(),
-                                bean.getVersionCode());
-                        break;
-
-                    default:
-                        try {
-                            mContext.startActivity(tag.getActionIntent(mContext));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        break;
+            if (obj instanceof ViewHolder) {
+                ViewHolder vh = (ViewHolder) obj;
+                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
+                    switch (vh.implInfo.getStatus()) {
+                        case Constant.STATUS_PENDING:
+                        case Constant.STATUS_RUNNING:
+                            implAgent.pauseDownload(vh.implInfo);
+                            break;
+                        case Constant.STATUS_PAUSED:
+                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
+                            break;
+                        default:
+                            implAgent.newDownload(vh.implInfo,
+                                    Constant.extenStorageDirPath,
+                                    vh.itemData.getName() + ".apk",
+                                    true,
+                                    vh.implCallback);
+                            break;
+                    }
+                } else {
+                    try {
+                        mContext.startActivity(implAgent.getActionIntent(vh.implInfo));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
     }
+
+
 
     public class ViewHolder {
         private ImageView mAppIcon;
@@ -165,10 +152,12 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private TextView mAppSize;
         private RatingBar mRatingBar;
         private Button mProgressButton;
-
-        private HomePageApkData itemData;
-        private String layoutStr;
         private ImageView mCategoryListArrow;
+        private String layoutStr;
+        private ListImplCallback implCallback;
+        ImplInfo implInfo;
+        HomePageApkData itemData;
+
         ViewHolder(View mView){
             this.mAppIcon = (ImageView) mView.findViewById(R.id.imageViewName);
             this.mAppName = (TextView) mView.findViewById(R.id.apkName);
@@ -177,86 +166,172 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             this.mRatingBar = (RatingBar) mView.findViewById(R.id.ratingbar_Indicator);
             this.mProgressButton = (Button) mView.findViewById(R.id.list_item_progress_button);
             this.mCategoryListArrow = (ImageView) mView.findViewById(R.id.categoryListArrow);
+            this.implCallback = new ListImplCallback(this);
+            if (null != mProgressButton ){
+                mProgressButton.setTag(this);
+                mProgressButton.setOnClickListener(ListArrayAdapter.this);
+            }
         }
-        public void setmAppIcon(String iconUrl) {
-            if (null != this.mAppIcon && null != iconUrl){
-                mFinalBitmap.display(this.mAppIcon, iconUrl);
+
+        public void refresh() {
+            LogUtils.d(TAG, "refresh," + implInfo.getStatus() + "," + implAgent.getActionText(implInfo));
+            initProgressButton();
+        }
+
+        public void initView(HomePageApkData itemData,String layout){
+            this.itemData = itemData;
+            this.layoutStr = layout;
+            this.implInfo = implAgent.getImplInfo(itemData.getPackageName(), itemData.getPackageName(), itemData.getVersionCode());
+            this.implInfo.setDownloadUrl(itemData.getrDownloadUrl())
+                    .setTitle(itemData.getName())
+                    .setIconUrl(itemData.getIconUrl());
+            implAgent.setImplCallback(implCallback,implInfo);
+
+            if (null != this.mAppIcon && null != itemData.getIconUrl()){
+                mFinalBitmap.display(this.mAppIcon, itemData.getIconUrl(), defaultLoadingIcon);
             }else {
-                mAppIcon.setImageResource(R.drawable.buffer);
+                mAppIcon.setImageBitmap(defaultLoadingIcon);
             }
-        }
-
-        public void setmAppName(String name) {
-            if (null != this.mAppName && null != name) {
-                this.mAppName.setText(name);
+            if (null != this.mAppName && null != itemData.getName()) {
+                this.mAppName.setText(itemData.getName());
             }
-        }
-
-        public void setCategorySub(String categorySub) {
-            if (null != this.mCategorySub && null != categorySub) {
-                this.mCategorySub.setText(categorySub);
+            if (null != this.mCategorySub && null != itemData.getCategorysub()) {
+                this.mCategorySub.setText(itemData.getCategorysub());
             }
-        }
-
-        public void setAppSize(String size){
-            if (null != this.mAppSize && null != size) {
-                String mSize = AppliteUtils.bytes2kb(Long.parseLong(size));
+            if (null != this.mAppSize && null != itemData.getApkSize()) {
+                String mSize = AppliteUtils.bytes2kb(Long.parseLong(itemData.getApkSize()));
                 if (null != mSize) {
                     this.mAppSize.setText(mSize);
                 }
             }
-        }
-
-        public void setmRatingBar(float rating) {
             if (null != mRatingBar) {
-                this.mRatingBar.setRating(rating);
+                float star = 0.0f;
+                try {
+                    star = Float.parseFloat(itemData.getRating());
+                } catch (Exception e) {
+                }
+                this.mRatingBar.setRating(star/2.0f);
             }
+            if(null != mCategoryListArrow) {
+                mCategoryListArrow.setImageResource(R.drawable.back);
+            }
+            initProgressButton();
         }
 
-        public void setmProgressButton(HomePageApkData itemData) {
+        void initProgressButton() {
             if (null != mProgressButton ){
-                mProgressButton.setTag(itemData);
-                switch (itemData.getImplInfo().getStatus()){
+                switch (implInfo.getStatus()){
                     case Constant.STATUS_PENDING:
                         mProgressButton.setBackground(null);
                         mProgressButton.setEnabled(false);
-                        mProgressButton.setText(itemData.getImplInfo().getActionText(mContext));
+                        mProgressButton.setText(implAgent.getActionText(implInfo));
                         break;
                     case Constant.STATUS_RUNNING:
                     case Constant.STATUS_PAUSED:
                         mProgressButton.setBackground(null);
                         mProgressButton.setEnabled(false);
-                        mProgressButton.setText(itemData.getImplInfo().getProgress()+"%");
+                        mProgressButton.setText(implAgent.getProgress(implInfo)+"%");
                         break;
                     default:
                         mProgressButton.setBackground(mResource.getDrawable(R.drawable.item_button_bg));
                         mProgressButton.setEnabled(true);
-                        mProgressButton.setText(itemData.getImplInfo().getActionText(mContext));
+                        mProgressButton.setText(implAgent.getActionText(implInfo));
                         break;
                 }
-                mProgressButton.setOnClickListener(ListArrayAdapter.this);
             }
+        }
+
+        public String getLayoutStr() {
+            return layoutStr;
         }
 
         public HomePageApkData getItemData() {
             return itemData;
         }
+    }
 
-        public void setItemData(HomePageApkData itemData) {
-            this.itemData = itemData;
+    class ListImplCallback extends ImplListener {
+        Object tag ;
+
+        ListImplCallback(Object tag) {
+            this.tag = tag;
         }
 
-        public void setImageListArrow(){
-            if(null != mCategoryListArrow) {
-                mCategoryListArrow.setImageResource(R.drawable.back);
-            }
-        }
-        public String getLayoutStr() {
-            return layoutStr;
+        @Override
+        public void onStart(ImplInfo info) {
+            super.onStart(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
         }
 
-        public void setLayoutStr(String layoutStr) {
-            this.layoutStr = layoutStr;
+        @Override
+        public void onCancelled(ImplInfo info) {
+            super.onCancelled(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onLoading(ImplInfo info, long total, long current, boolean isUploading) {
+            super.onLoading(info, total, current, isUploading);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onSuccess(ImplInfo info, File file) {
+            super.onSuccess(info, file);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onFailure(ImplInfo info, Throwable t, String msg) {
+            super.onFailure(info, t, msg);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onInstallSuccess(ImplInfo info) {
+            super.onInstallSuccess(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onInstalling(ImplInfo info) {
+            super.onInstalling(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onInstallFailure(ImplInfo info, int errorCode) {
+            super.onInstallFailure(info, errorCode);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onUninstallSuccess(ImplInfo info) {
+            super.onUninstallSuccess(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onUninstalling(ImplInfo info) {
+            super.onUninstalling(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onUninstallFailure(ImplInfo info, int errorCode) {
+            super.onUninstallFailure(info, errorCode);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
         }
     }
 }

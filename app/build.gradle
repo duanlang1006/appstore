@@ -115,4 +115,5 @@ dependencies {
     compile project(':extras:impl')
     compile project(':extras:applitecommon')
     compile project(':extras:dscdownloader')
+    compile 'com.jiechic.library:xUtils:2.6.14'
 }

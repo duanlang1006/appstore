@@ -1,6 +1,7 @@
 package com.mit.impl;
+import java.io.File;
 
-public interface ImplListener {
+public abstract class ImplListener {
 //    public void onDownloadComplete(boolean success,ImplAgent.DownloadCompleteRsp rsp);
 //    public void onDownloadUpdate(boolean success,ImplAgent.DownloadUpdateRsp rsp);
 //    public void onPackageAdded(boolean success,ImplAgent.PackageAddedRsp rsp);
@@ -10,5 +11,18 @@ public interface ImplListener {
 //    public void onSystemDeleteResult(boolean success,ImplAgent.SystemDeleteResultRsp rsp);
 //    public void onFinish(boolean success, ImplAgent.ImplResponse rsp);
 
-    public void onUpdate(boolean success, ImplInfo info);
+    public void onStart(ImplInfo info){};
+    public void onCancelled(ImplInfo info){};
+    public void onLoading(ImplInfo info,long total, long current, boolean isUploading){};
+    public void onSuccess(ImplInfo info,File file){};
+    public void onFailure(ImplInfo info,Throwable t,String msg){};
+
+    public void onInstallSuccess(ImplInfo info){}
+    public void onInstalling(ImplInfo info){}
+    public void onInstallFailure(ImplInfo info,int errorCode){}
+    public void onUninstallSuccess(ImplInfo info){}
+    public void onUninstalling(ImplInfo info){}
+    public void onUninstallFailure(ImplInfo info,int errorCode){}
+
+//    public void onUpdate(boolean success, ImplInfo info);
 }

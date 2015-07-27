@@ -21,7 +21,6 @@ public class HomePageApkData {
     private String apkSize;
     private String brief;
     private String mDownloadNumber;
-    private ImplInfo implInfo;
 
     @Override
     public String toString() {
@@ -100,9 +99,6 @@ public class HomePageApkData {
         return brief;
     }
 
-    public ImplInfo getImplInfo() {
-        return implInfo;
-    }
 
     public String getmDownloadNumber() {
         return mDownloadNumber;
@@ -166,9 +162,5 @@ public class HomePageApkData {
 
     public void setmDownloadNumber(String mDownloadNumber) {
         this.mDownloadNumber = mDownloadNumber;
-    }
-
-    public void setImplInfo(ImplInfo implInfo) {
-        this.implInfo = implInfo;
     }
 }

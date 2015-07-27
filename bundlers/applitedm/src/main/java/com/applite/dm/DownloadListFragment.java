@@ -3,32 +3,24 @@ package com.applite.dm;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.applite.common.Constant;
-import com.applite.common.LogUtils;
+import com.lidroid.xutils.DbUtils;
+import com.lidroid.xutils.db.sqlite.Selector;
+import com.lidroid.xutils.db.sqlite.WhereBuilder;
+import com.lidroid.xutils.db.table.Table;
+import com.lidroid.xutils.exception.DbException;
+import com.mit.impl.ImplDbHelper;
 import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplAgent;
-import com.mit.impl.ImplConfig;
-import com.mit.impl.ImplDatabaseHelper;
-import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplListener;
 import com.mit.impl.ImplLog;
 import com.umeng.analytics.MobclickAgent;
-
-import org.apkplug.Bundle.ApkplugOSGIService;
-import org.apkplug.Bundle.OSGIServiceAgent;
-import org.osgi.framework.BundleContext;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +29,7 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
     private ListView mListview;
     private DownloadAdapter mAdapter;
     private Integer mStatusFlags = null;
-    private ImplDatabaseHelper databaseHelper;
-    private ImplListener mImplListener = new DownloadImplListener();
+    private DbUtils db;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -81,8 +72,7 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        ImplAgent.registerImplListener(mImplListener);
-        databaseHelper = new ImplDatabaseHelper(mActivity);
+        db = ImplDbHelper.getDbUtils(mActivity.getApplicationContext());
         ImplLog.d(DownloadPagerFragment.TAG, "onAttach," + this);
     }
 
@@ -101,7 +91,6 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
     @Override
     public void onDetach() {
         super.onDetach();
-        ImplAgent.unregisterImplListener(mImplListener);
         ImplLog.d(DownloadPagerFragment.TAG, "onDetach," + this);
     }
 
@@ -126,61 +115,55 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//        View extra = view.findViewById(R.id.extra_line);
-//        if (null != extra) {
-//            if (extra.getVisibility() == View.GONE) {
-//                extra.setVisibility(View.VISIBLE);
-//            } else if (extra.getVisibility() == View.VISIBLE) {
-//                extra.setVisibility(View.GONE);
-//            }
-//        }
-//        LogUtils.d("applite_dm","onItemClick,"+view+","+position);
-//        mAdapter.setChecked(mListview.getCheckedItemPosition());
-//        mAdapter.notifyDataSetInvalidated();
     }
 
     private void setAdapter(){
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        List<String> selectionParts = new ArrayList<String>();
-
+        Table table = Table.get(db, ImplInfo.class);
+        WhereBuilder wb = WhereBuilder.b();
         if (mStatusFlags != null) {
             List<String> parts = new ArrayList<String>();
             if ((mStatusFlags & Constant.STATUS_PENDING) != 0) {
-                parts.add(ImplConfig.statusClause("=", Constant.STATUS_PENDING));
+                wb.or("status", "=", Constant.STATUS_PENDING);
             }
             if ((mStatusFlags & Constant.STATUS_RUNNING) != 0) {
-                parts.add(ImplConfig.statusClause("=", Constant.STATUS_RUNNING));
+                wb.or("status", "=", Constant.STATUS_RUNNING);
             }
             if ((mStatusFlags & Constant.STATUS_PAUSED) != 0) {
-                parts.add(ImplConfig.statusClause("=", Constant.STATUS_PAUSED));
+                wb.or("status", "=", Constant.STATUS_PAUSED);
             }
             if ((mStatusFlags & Constant.STATUS_SUCCESSFUL) != 0) {
-                parts.add(ImplConfig.statusClause("=", Constant.STATUS_SUCCESSFUL));
+                wb.or("status", "=", Constant.STATUS_SUCCESSFUL);
             }
             if ((mStatusFlags & Constant.STATUS_FAILED) != 0) {
-                parts.add(ImplConfig.statusClause("=", Constant.STATUS_FAILED));
+                wb.or("status", "=", Constant.STATUS_FAILED);
             }
             if ((mStatusFlags & Constant.STATUS_PACKAGE_INVALID) != 0) {
-                parts.add(ImplConfig.statusClause("=", Constant.STATUS_PACKAGE_INVALID));
+                wb.or("status", "=", Constant.STATUS_PACKAGE_INVALID);
             }
             if ((mStatusFlags & Constant.STATUS_PRIVATE_INSTALLING) != 0) {
-                parts.add(ImplConfig.statusClause("=", Constant.STATUS_PRIVATE_INSTALLING));
+                wb.or("status", "=", Constant.STATUS_PRIVATE_INSTALLING);
             }
             if ((mStatusFlags & Constant.STATUS_NORMAL_INSTALLING) != 0) {
-                parts.add(ImplConfig.statusClause("=", Constant.STATUS_NORMAL_INSTALLING));
+                wb.or("status", "=", Constant.STATUS_NORMAL_INSTALLING);
             }
             if ((mStatusFlags & Constant.STATUS_INSTALLED) != 0) {
-                parts.add(ImplConfig.statusClause("=", Constant.STATUS_INSTALLED));
+                wb.or("status", "=", Constant.STATUS_INSTALLED);
             }
             if ((mStatusFlags & Constant.STATUS_INSTALL_FAILED) != 0) {
-                parts.add(ImplConfig.statusClause("=", Constant.STATUS_INSTALL_FAILED));
+                wb.or("status", "=", Constant.STATUS_INSTALL_FAILED);
             }
-            selectionParts.add("("+ImplConfig.joinStrings(" OR ", parts)+")");
+            if ((mStatusFlags & Constant.STATUS_UPGRADE) != 0) {
+                wb.or("status", "=", Constant.STATUS_UPGRADE);
+            }
         }
-        String selection = ImplConfig.joinStrings(" AND ", selectionParts);
-        String orderBy = ImplConfig.COLUMN_LAST_MODIFIED_TIMESTAMP + " DESC";
-
-        Cursor cursor = db.query(ImplConfig.TABLE_IMPL,null,selection,null,null,null,orderBy);
+        Selector selector = Selector.from(ImplInfo.class).where(wb);
+        String sql = selector.limit(1).toString();
+        Cursor cursor = null;
+        try {
+            cursor = db.execQuery(sql);
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
         if (null == mAdapter){
             if (null != cursor) {
                 mAdapter = new DownloadAdapter(mActivity, cursor);
@@ -188,29 +171,6 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
             }
         }else{
             mAdapter.changeCursor(cursor);
-        }
-    }
-
-    private class DownloadImplListener implements ImplListener{
-        private static final String TAG = "impl_dm";
-        private Runnable mNotifyRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (null != mAdapter){
-                    Cursor c = mAdapter.getCursor();
-                    if (null != c && ! c.isClosed()){
-                        c.requery();
-                    }
-                    mAdapter.notifyDataSetChanged();
-                }else {
-                    setAdapter();
-                }
-            }
-        };
-
-        @Override
-        public void onUpdate(boolean b, ImplInfo implInfo) {
-            mActivity.runOnUiThread(mNotifyRunnable);
         }
     }
 }
