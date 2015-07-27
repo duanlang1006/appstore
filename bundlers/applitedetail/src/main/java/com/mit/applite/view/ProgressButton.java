@@ -25,7 +25,7 @@ public class ProgressButton extends View {
     private int backgroundColor;
     private String text;
     private int max = 100;
-    private int corner = 5;// 圆角的弧度
+    private int corner = 15;// 圆角的弧度
     private OnProgressButtonClickListener buttonClickListener;
 
     public ProgressButton(Context context, AttributeSet attrs) {
