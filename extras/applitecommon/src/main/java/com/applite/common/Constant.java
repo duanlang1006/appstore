@@ -3,7 +3,7 @@ package com.applite.common;
 import android.app.DownloadManager;
 
 public class Constant {
-    public static final String URL = "http://192.168.1.104/app_interface/app_main_interface.php";
+    public static final String URL = "http://www.fuli365.net/app_interface/app_main_interface.php";
 
     public static final String OSGI_SERVICE_LOGO_FRAGMENT = "osgi.service.logo.fragment";
     public static final String OSGI_SERVICE_MAIN_FRAGMENT = "osgi.service.main.fragment";

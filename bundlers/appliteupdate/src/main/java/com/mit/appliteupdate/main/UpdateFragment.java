@@ -150,6 +150,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                         data = mDataContents.get(i);
                         download(data);
                     }
+                    mAdapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.no_update), Toast.LENGTH_SHORT).show();
                 }
