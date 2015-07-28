@@ -24,6 +24,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+
+import com.applite.bean.HomePageApkData;
 import com.applite.bean.ScreenBean;
 import com.applite.bean.HomePageDataBean;
 import com.applite.bean.SubjectData;
@@ -52,6 +54,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 import java.util.List;
+
+import javax.security.auth.SubjectDomainCombiner;
 
 /**
  * Created by yuzhimin on 6/17/15.
@@ -529,7 +533,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
             public void onSuccess(Object o) {
                 super.onSuccess(o);
                 //LogUtils.d(TAG, "首页数据：");
-                LogUtils.i(TAG, "获取首页数据");
+                LogUtils.i(TAG, "获取首页数据:");
                 try {
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
                     if (1 == data.getAppKey()){

@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
 
@@ -74,9 +75,19 @@ public class ImplAgent {
         }
         mImplCallback = new ImplAgentCallback();
         mWeakCallbackMap = new WeakHashMap<>();
+
+        //重新载始下载
+        for (ImplInfo implInfo : mImplList){
+            if (ImplDownload.getInstance(mContext).needKick(implInfo)){
+                ImplDownload.getInstance(mContext).resume(implInfo, mImplCallback);
+            }
+        }
     }
 
     public ImplInfo getImplInfo(String key,String packageName,int versionCode){
+        if (null == key || null == packageName || TextUtils.isEmpty(key) || TextUtils.isEmpty(packageName)){
+             return null;
+        }
         ImplInfo implInfo = null;
         for (int i =0;i < mImplList.size();i++){
             if (mImplList.get(i).getKey().equals(key)){
@@ -218,6 +229,10 @@ public class ImplAgent {
 
     public int getAction(ImplInfo implInfo) {
         int action = ImplInfo.ACTION_DOWNLOAD;
+        if (null == implInfo){
+            return action;
+        }
+
         switch (implInfo.getStatus()) {
             case Constant.STATUS_INIT:
             case Constant.STATUS_PENDING:
@@ -272,6 +287,10 @@ public class ImplAgent {
     public String getActionText(ImplInfo implInfo) {
         Resources mResources = mContext.getResources();
         String actionText = "" ;
+        if (null == implInfo){
+            return actionText;
+        }
+
         switch (implInfo.getStatus()) {
             case Constant.STATUS_INIT:
                 actionText = mResources.getString(R.string.action_install);
@@ -286,7 +305,7 @@ public class ImplAgent {
                 break;
 
             case Constant.STATUS_PAUSED:
-                actionText = mResources.getString(R.string.action_pause);
+                actionText = mResources.getString(R.string.action_resume);
                 break;
 
             case Constant.STATUS_FAILED:
@@ -341,6 +360,9 @@ public class ImplAgent {
     public String getStatusText(ImplInfo implInfo) {
         Resources mResources = mContext.getResources();
         String statusText = "" ;
+        if (null == implInfo){
+            return statusText;
+        }
         switch (implInfo.getStatus()) {
             case Constant.STATUS_INIT:
                 statusText = "";
@@ -408,6 +430,9 @@ public class ImplAgent {
     public String getDescText(ImplInfo implInfo) {
         Resources mResources = mContext.getResources();
         String descText = "" ;
+        if (null == implInfo){
+            return descText;
+        }
         ImplDownload implDownload = ImplDownload.getInstance(mContext);
         switch (implInfo.getStatus()) {
             case Constant.STATUS_INIT:
@@ -458,6 +483,9 @@ public class ImplAgent {
 
     public Intent getActionIntent(ImplInfo implInfo) {
         Intent actionIntent = null;
+        if (null == implInfo){
+            return actionIntent;
+        }
         switch (implInfo.getStatus()) {
             case Constant.STATUS_INIT:
             case Constant.STATUS_PENDING:
@@ -524,56 +552,80 @@ public class ImplAgent {
 
 
     private class ImplAgentCallback extends ImplListener{
+        private Handler mHandler = new Handler();
+
+        private ImplAgentCallback() {
+            super();
+        }
+
         @Override
-        public void onStart(ImplInfo info) {
+        public void onStart(final ImplInfo info) {
             super.onStart(info);
             try {
                 db.saveOrUpdate(info);
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            for (ImplListener callback: mWeakCallbackMap.keySet()){
-                ImplInfo i = mWeakCallbackMap.get(callback);
-                if (i == info){
-                    callback.onStart(info);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImplListener callback: mWeakCallbackMap.keySet()){
+                        ImplInfo i = mWeakCallbackMap.get(callback);
+                        if (i == info){
+                            callback.onStart(info);
+                        }
+                    }
                 }
-            }
+            });
+            com.applite.common.LogUtils.d(TAG, info.getTitle() + ",onStart");
         }
 
         @Override
-        public void onCancelled(ImplInfo info) {
+        public void onCancelled(final ImplInfo info) {
             super.onCancelled(info);
             try {
                 db.saveOrUpdate(info);
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            for (ImplListener callback: mWeakCallbackMap.keySet()) {
-                ImplInfo i = mWeakCallbackMap.get(callback);
-                if (i == info){
-                    callback.onCancelled(info);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                        ImplInfo i = mWeakCallbackMap.get(callback);
+                        if (i == info){
+                            callback.onCancelled(info);
+                        }
+                    }
                 }
-            }
+            });
+            com.applite.common.LogUtils.d(TAG, info.getTitle() + ",onCancelled");
         }
 
         @Override
-        public void onLoading(ImplInfo info, long total, long current, boolean isUploading) {
+        public void onLoading(final ImplInfo info, final long total, final long current, final boolean isUploading) {
             super.onLoading(info, total, current, isUploading);
             try {
                 db.saveOrUpdate(info);
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            for (ImplListener callback: mWeakCallbackMap.keySet()) {
-                ImplInfo i = mWeakCallbackMap.get(callback);
-                if (i == info){
-                    callback.onLoading(info, total, current, isUploading);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                        ImplInfo i = mWeakCallbackMap.get(callback);
+                        if (i == info){
+                            callback.onLoading(info, total, current, isUploading);
+                        }
+                    }
                 }
-            }
+            });
+            com.applite.common.LogUtils.d(TAG, info.getTitle() + ",onLoading," + total + "," + current);
         }
 
         @Override
-        public void onSuccess(ImplInfo info, File file) {
+        public void onSuccess(final ImplInfo info, final File file) {
             super.onSuccess(info, file);
             try {
                 db.saveOrUpdate(info);
@@ -585,125 +637,171 @@ public class ImplAgent {
                 //安装
                 ImplPackageManager.getInstance(mContext).install(info, true, this);
             }
-
-            for (ImplListener callback: mWeakCallbackMap.keySet()) {
-                ImplInfo i = mWeakCallbackMap.get(callback);
-                if (i == info){
-                    callback.onSuccess(info, file);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                        ImplInfo i = mWeakCallbackMap.get(callback);
+                        if (i == info){
+                            callback.onSuccess(info, file);
+                        }
+                    }
                 }
-            }
+            });
+            com.applite.common.LogUtils.d(TAG, info.getTitle() + ",onCancelled");
         }
 
         @Override
-        public void onFailure(ImplInfo info, Throwable t, String msg) {
+        public void onFailure(final ImplInfo info, final Throwable t, final String msg) {
             super.onFailure(info, t, msg);
             try {
                 db.saveOrUpdate(info);
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            for (ImplListener callback: mWeakCallbackMap.keySet()) {
-                ImplInfo i = mWeakCallbackMap.get(callback);
-                if (i == info){
-                    callback.onFailure(info, t, msg);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                        ImplInfo i = mWeakCallbackMap.get(callback);
+                        if (i == info){
+                            callback.onFailure(info, t, msg);
+                        }
+                    }
                 }
-            }
+            });
+            com.applite.common.LogUtils.d(TAG, info.getTitle() + ",onFailure," + msg);
         }
 
         @Override
-        public void onInstallSuccess(ImplInfo info) {
+        public void onInstallSuccess(final ImplInfo info) {
             super.onInstallSuccess(info);
             try {
                 db.saveOrUpdate(info);
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            for (ImplListener callback: mWeakCallbackMap.keySet()) {
-                ImplInfo i = mWeakCallbackMap.get(callback);
-                if (i == info){
-                    callback.onInstallSuccess(info);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                        ImplInfo i = mWeakCallbackMap.get(callback);
+                        if (i == info){
+                            callback.onInstallSuccess(info);
+                        }
+                    }
                 }
-            }
+            });
+
         }
 
         @Override
-        public void onInstalling(ImplInfo info) {
+        public void onInstalling(final ImplInfo info) {
             super.onInstalling(info);
             try {
                 db.saveOrUpdate(info);
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            for (ImplListener callback: mWeakCallbackMap.keySet()) {
-                ImplInfo i = mWeakCallbackMap.get(callback);
-                if (i == info){
-                    callback.onInstalling(info);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                        ImplInfo i = mWeakCallbackMap.get(callback);
+                        if (i == info){
+                            callback.onInstalling(info);
+                        }
+                    }
                 }
-            }
+            });
+
         }
 
         @Override
-        public void onInstallFailure(ImplInfo info, int errorCode) {
+        public void onInstallFailure(final ImplInfo info, final int errorCode) {
             super.onInstallFailure(info, errorCode);
             try {
                 db.saveOrUpdate(info);
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            for (ImplListener callback: mWeakCallbackMap.keySet()) {
-                ImplInfo i = mWeakCallbackMap.get(callback);
-                if (i == info){
-                    callback.onInstallFailure(info,errorCode);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                        ImplInfo i = mWeakCallbackMap.get(callback);
+                        if (i == info){
+                            callback.onInstallFailure(info,errorCode);
+                        }
+                    }
                 }
-            }
+            });
+
         }
 
         @Override
-        public void onUninstallSuccess(ImplInfo info) {
+        public void onUninstallSuccess(final ImplInfo info) {
             super.onUninstallSuccess(info);
             try {
                 db.saveOrUpdate(info);
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            for (ImplListener callback: mWeakCallbackMap.keySet()) {
-                ImplInfo i = mWeakCallbackMap.get(callback);
-                if (i == info){
-                    callback.onUninstallSuccess(info);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                        ImplInfo i = mWeakCallbackMap.get(callback);
+                        if (i == info){
+                            callback.onUninstallSuccess(info);
+                        }
+                    }
                 }
-            }
+            });
+
         }
 
         @Override
-        public void onUninstalling(ImplInfo info) {
+        public void onUninstalling(final ImplInfo info) {
             super.onUninstalling(info);
             try {
                 db.saveOrUpdate(info);
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            for (ImplListener callback: mWeakCallbackMap.keySet()) {
-                ImplInfo i = mWeakCallbackMap.get(callback);
-                if (i == info){
-                    callback.onUninstalling(info);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                        ImplInfo i = mWeakCallbackMap.get(callback);
+                        if (i == info){
+                            callback.onUninstalling(info);
+                        }
+                    }
                 }
-            }
+            });
         }
 
         @Override
-        public void onUninstallFailure(ImplInfo info, int errorCode) {
+        public void onUninstallFailure(final ImplInfo info, final int errorCode) {
             super.onUninstallFailure(info, errorCode);
             try {
                 db.saveOrUpdate(info);
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            for (ImplListener callback: mWeakCallbackMap.keySet()) {
-                ImplInfo i = mWeakCallbackMap.get(callback);
-                if (i == info){
-                    callback.onUninstallFailure(info,errorCode);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                        ImplInfo i = mWeakCallbackMap.get(callback);
+                        if (i == info){
+                            callback.onUninstallFailure(info,errorCode);
+                        }
+                    }
                 }
-            }
+            });
+
         }
     }
 

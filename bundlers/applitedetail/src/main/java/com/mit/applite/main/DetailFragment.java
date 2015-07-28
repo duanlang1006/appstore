@@ -318,10 +318,12 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             }
 
             ImplInfo implinfo = implAgent.getImplInfo(mPackageName,mPackageName,mVersionCode);
-            implAgent.setImplCallback(implCallback,implinfo);
-            mProgressButton.setText(implAgent.getActionText(implinfo));
-            mProgressButton.setProgress(implAgent.getProgress(implinfo));
-            mProgressButton.setTag(implinfo);
+            if (null != implinfo) {
+                implAgent.setImplCallback(implCallback, implinfo);
+                mProgressButton.setText(implAgent.getActionText(implinfo));
+                mProgressButton.setProgress(implAgent.getProgress(implinfo));
+                mProgressButton.setTag(implinfo);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.e(TAG, "应用详情JSON解析失败");
@@ -365,7 +367,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     }
 
     class DetailImplCallback extends ImplListener {
-        DetailImplCallback() {}
+        DetailImplCallback() {
+            super();
+        }
 
         @Override
         public void onStart(ImplInfo info) {
@@ -434,6 +438,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         }
 
         private void refresh(ImplInfo info){
+            LogUtils.d(TAG,"refresh"+implAgent.getActionText(info)+","+info.getStatus());
             mProgressButton.setText(implAgent.getActionText(info));
             mProgressButton.setProgress(implAgent.getProgress(info));
         }

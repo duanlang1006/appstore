@@ -93,10 +93,7 @@ public class SearchApkAdapter extends BaseAdapter {
         }
         final SearchBean data = mSearchBeans.get(position);
         mFinalBitmap.display(viewholder.mImg, data.getmImgUrl());
-
-        ImplInfo info = implAgent.getImplInfo(data.getmPackageName(),data.getmPackageName(),data.getmVersionCode());
-        info.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
-        viewholder.initView(data, info);
+        viewholder.initView(data);
 
         viewholder.mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
@@ -157,9 +154,12 @@ public class SearchApkAdapter extends BaseAdapter {
             this.mProgressButton = (ProgressButton) v.findViewById(R.id.list_item_progress_button);
         }
 
-        public void initView(SearchBean data,ImplInfo info){
+        public void initView(SearchBean data){
             this.bean = data;
-            this.implInfo = info;
+            this.implInfo = implAgent.getImplInfo(data.getmPackageName(),data.getmPackageName(),data.getmVersionCode());;
+            if (null != this.implInfo){
+                this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
+            }
             mProgressButton.setTag(this);
             refresh();
         }
@@ -178,11 +178,9 @@ public class SearchApkAdapter extends BaseAdapter {
                     SearchUtils.toDetailFragment(bean.getmPackageName(), bean.getmName(), bean.getmImgUrl());
                 }
             });
-            mProgressButton.setText(implAgent.getActionText(implInfo));
-        }
-
-        public ImplInfo getImplInfo() {
-            return implInfo;
+            if (null != this.implInfo) {
+                mProgressButton.setText(implAgent.getActionText(implInfo));
+            }
         }
     }
 
@@ -190,6 +188,7 @@ public class SearchApkAdapter extends BaseAdapter {
         Object tag ;
 
         ListImplCallback(Object tag) {
+            super();
             this.tag = tag;
         }
 

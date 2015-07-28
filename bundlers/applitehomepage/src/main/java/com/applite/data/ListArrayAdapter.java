@@ -17,7 +17,6 @@ import com.applite.bean.HomePageApkData;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
-import com.applite.common.LogUtils;
 import com.applite.homepage.BundleContextFactory;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
@@ -103,6 +102,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             viewHolder = (ViewHolder) convertView.getTag();
         }
         if (null != mData && null != mData.getData()) {
+
             HomePageApkData itemData = mData.getData().get(position);
             viewHolder.initView(itemData,mData.getS_datatype());
         }
@@ -174,7 +174,6 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
 
         public void refresh() {
-            LogUtils.d(TAG, "refresh," + implInfo.getStatus() + "," + implAgent.getActionText(implInfo));
             initProgressButton();
         }
 
@@ -182,10 +181,12 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             this.itemData = itemData;
             this.layoutStr = layout;
             this.implInfo = implAgent.getImplInfo(itemData.getPackageName(), itemData.getPackageName(), itemData.getVersionCode());
-            this.implInfo.setDownloadUrl(itemData.getrDownloadUrl())
-                    .setTitle(itemData.getName())
-                    .setIconUrl(itemData.getIconUrl());
-            implAgent.setImplCallback(implCallback,implInfo);
+            if (null != this.implInfo) {
+                this.implInfo.setDownloadUrl(itemData.getrDownloadUrl())
+                        .setTitle(itemData.getName())
+                        .setIconUrl(itemData.getIconUrl());
+                implAgent.setImplCallback(implCallback, implInfo);
+            }
 
             if (null != this.mAppIcon && null != itemData.getIconUrl()){
                 mFinalBitmap.display(this.mAppIcon, itemData.getIconUrl(), defaultLoadingIcon);
@@ -219,18 +220,19 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
 
         void initProgressButton() {
-            if (null != mProgressButton ){
+            if (null != mProgressButton && null != this.implInfo){
                 switch (implInfo.getStatus()){
                     case Constant.STATUS_PENDING:
-                        mProgressButton.setBackground(null);
                         mProgressButton.setEnabled(false);
                         mProgressButton.setText(implAgent.getActionText(implInfo));
                         break;
                     case Constant.STATUS_RUNNING:
-                    case Constant.STATUS_PAUSED:
-                        mProgressButton.setBackground(null);
                         mProgressButton.setEnabled(false);
                         mProgressButton.setText(implAgent.getProgress(implInfo)+"%");
+                        break;
+                    case Constant.STATUS_PAUSED:
+                        mProgressButton.setEnabled(false);
+                        mProgressButton.setText(implAgent.getStatusText(implInfo));
                         break;
                     default:
                         mProgressButton.setBackground(mResource.getDrawable(R.drawable.item_button_bg));
@@ -254,6 +256,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         Object tag ;
 
         ListImplCallback(Object tag) {
+            super();
             this.tag = tag;
         }
 

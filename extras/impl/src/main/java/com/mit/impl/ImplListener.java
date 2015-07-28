@@ -11,6 +11,27 @@ public abstract class ImplListener {
 //    public void onSystemDeleteResult(boolean success,ImplAgent.SystemDeleteResultRsp rsp);
 //    public void onFinish(boolean success, ImplAgent.ImplResponse rsp);
 
+    private int rate;
+
+    protected ImplListener() {
+        rate = 500;
+    }
+
+    protected ImplListener(int rate) {
+        if (rate < 250){
+            rate = 250;
+        }
+        this.rate = rate;
+    }
+
+    public int getRate() {
+        return rate;
+    }
+
+    public void setRate(int rate) {
+        this.rate = rate;
+    }
+
     public void onStart(ImplInfo info){};
     public void onCancelled(ImplInfo info){};
     public void onLoading(ImplInfo info,long total, long current, boolean isUploading){};
