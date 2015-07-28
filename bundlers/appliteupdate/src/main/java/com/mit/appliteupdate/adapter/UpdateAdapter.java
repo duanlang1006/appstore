@@ -136,16 +136,33 @@ public class UpdateAdapter extends BaseAdapter {
             this.bean = bean;
             this.implInfo = implAgent.getImplInfo(bean.getmPackageName(),bean.getmPackageName(),bean.getmVersionCode());
             this.implInfo.setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl()).setTitle(bean.getmName());
-            implAgent.setImplCallback(implCallback,implInfo);
+            implAgent.setImplCallback(implCallback, implInfo);
             refresh();
         }
 
         public void refresh(){
             mName.setText(bean.getmName());
             mFinalBitmap.display(mImg, bean.getmImgUrl());
-            mVersionName.setText("V "+bean.getmVersionName());
+            mVersionName.setText("V " + bean.getmVersionName());
             mApkSize.setText(AppliteUtils.bytes2kb(bean.getmSize()));
-            mBt.setText(implAgent.getActionText(implInfo));
+            initProgressButton();
+        }
+
+        void initProgressButton() {
+            if (null != mBt ){
+                switch (implInfo.getStatus()){
+                    case Constant.STATUS_PENDING:
+                        mBt.setText(implAgent.getActionText(implInfo));
+                        break;
+                    case Constant.STATUS_RUNNING:
+                    case Constant.STATUS_PAUSED:
+                        mBt.setText(implAgent.getProgress(implInfo)+"%");
+                        break;
+                    default:
+                        mBt.setText(implAgent.getActionText(implInfo));
+                        break;
+                }
+            }
         }
     }
 

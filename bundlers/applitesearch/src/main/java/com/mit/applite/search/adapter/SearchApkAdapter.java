@@ -178,7 +178,25 @@ public class SearchApkAdapter extends BaseAdapter {
                     SearchUtils.toDetailFragment(bean.getmPackageName(), bean.getmName(), bean.getmImgUrl());
                 }
             });
-            mProgressButton.setText(implAgent.getActionText(implInfo));
+//            mProgressButton.setText(implAgent.getProgress(implInfo) + "");
+            initProgressButton();
+        }
+
+        void initProgressButton() {
+            if (null != mProgressButton ){
+                switch (implInfo.getStatus()){
+                    case Constant.STATUS_PENDING:
+                        mProgressButton.setText(implAgent.getActionText(implInfo));
+                        break;
+                    case Constant.STATUS_RUNNING:
+                    case Constant.STATUS_PAUSED:
+                        mProgressButton.setText(implAgent.getProgress(implInfo)+"%");
+                        break;
+                    default:
+                        mProgressButton.setText(implAgent.getActionText(implInfo));
+                        break;
+                }
+            }
         }
 
         public ImplInfo getImplInfo() {
