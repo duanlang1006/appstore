@@ -44,11 +44,12 @@ public class SearchApkAdapter extends BaseAdapter {
     public List<SearchBean> mSearchBeans;
     private Context mActivity;
     private ImplAgent implAgent;
-    public interface UpdateInatsllButtonText{
+
+    public interface UpdateInatsllButtonText {
         void updateText();
     }
 
-    public SearchApkAdapter(Context context, List<SearchBean> mSearchBeans ,UpdateInatsllButtonText listener) {
+    public SearchApkAdapter(Context context, List<SearchBean> mSearchBeans, UpdateInatsllButtonText listener) {
         mListener = listener;
         this.mSearchBeans = mSearchBeans;
         mFinalBitmap = FinalBitmap.create(context);
@@ -93,15 +94,12 @@ public class SearchApkAdapter extends BaseAdapter {
         }
         final SearchBean data = mSearchBeans.get(position);
         mFinalBitmap.display(viewholder.mImg, data.getmImgUrl());
-
-        ImplInfo info = implAgent.getImplInfo(data.getmPackageName(),data.getmPackageName(),data.getmVersionCode());
-        info.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
-        viewholder.initView(data, info);
+        viewholder.initView(data);
 
         viewholder.mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
             public void onClickListener(View view) {
-                ViewHolder vh = (ViewHolder)view.getTag();
+                ViewHolder vh = (ViewHolder) view.getTag();
                 if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
                     switch (vh.implInfo.getStatus()) {
                         case Constant.STATUS_PENDING:
@@ -157,14 +155,18 @@ public class SearchApkAdapter extends BaseAdapter {
             this.mProgressButton = (ProgressButton) v.findViewById(R.id.list_item_progress_button);
         }
 
-        public void initView(SearchBean data,ImplInfo info){
+        public void initView(SearchBean data) {
             this.bean = data;
-            this.implInfo = info;
+            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName(), data.getmVersionCode());
+            ;
+            if (null != this.implInfo) {
+                this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
+            }
             mProgressButton.setTag(this);
             refresh();
         }
 
-        public void refresh(){
+        public void refresh() {
             mName.setText(bean.getmName());
             mApkSize.setText(AppliteUtils.bytes2kb(Long.parseLong(bean.getmApkSize())));
             mDownloadNumber.setText(
@@ -183,14 +185,16 @@ public class SearchApkAdapter extends BaseAdapter {
         }
 
         void initProgressButton() {
-            if (null != mProgressButton ){
-                switch (implInfo.getStatus()){
+            if (null != mProgressButton && null != this.implInfo) {
+                switch (implInfo.getStatus()) {
                     case Constant.STATUS_PENDING:
                         mProgressButton.setText(implAgent.getActionText(implInfo));
                         break;
                     case Constant.STATUS_RUNNING:
+                        mProgressButton.setText(implAgent.getProgress(implInfo) + "%");
+                        break;
                     case Constant.STATUS_PAUSED:
-                        mProgressButton.setText(implAgent.getProgress(implInfo)+"%");
+                        mProgressButton.setText(implAgent.getStatusText(implInfo));
                         break;
                     default:
                         mProgressButton.setText(implAgent.getActionText(implInfo));
@@ -205,86 +209,87 @@ public class SearchApkAdapter extends BaseAdapter {
     }
 
     class ListImplCallback extends ImplListener {
-        Object tag ;
+        Object tag;
 
         ListImplCallback(Object tag) {
+            super();
             this.tag = tag;
         }
 
         @Override
         public void onStart(ImplInfo info) {
             super.onStart(info);
-            ViewHolder vh = (ViewHolder)tag;
+            ViewHolder vh = (ViewHolder) tag;
             vh.refresh();
         }
 
         @Override
         public void onCancelled(ImplInfo info) {
             super.onCancelled(info);
-            ViewHolder vh = (ViewHolder)tag;
+            ViewHolder vh = (ViewHolder) tag;
             vh.refresh();
         }
 
         @Override
         public void onLoading(ImplInfo info, long total, long current, boolean isUploading) {
             super.onLoading(info, total, current, isUploading);
-            ViewHolder vh = (ViewHolder)tag;
+            ViewHolder vh = (ViewHolder) tag;
             vh.refresh();
         }
 
         @Override
         public void onSuccess(ImplInfo info, File file) {
             super.onSuccess(info, file);
-            ViewHolder vh = (ViewHolder)tag;
+            ViewHolder vh = (ViewHolder) tag;
             vh.refresh();
         }
 
         @Override
         public void onFailure(ImplInfo info, Throwable t, String msg) {
             super.onFailure(info, t, msg);
-            ViewHolder vh = (ViewHolder)tag;
+            ViewHolder vh = (ViewHolder) tag;
             vh.refresh();
         }
 
         @Override
         public void onInstallSuccess(ImplInfo info) {
             super.onInstallSuccess(info);
-            ViewHolder vh = (ViewHolder)tag;
+            ViewHolder vh = (ViewHolder) tag;
             vh.refresh();
         }
 
         @Override
         public void onInstalling(ImplInfo info) {
             super.onInstalling(info);
-            ViewHolder vh = (ViewHolder)tag;
+            ViewHolder vh = (ViewHolder) tag;
             vh.refresh();
         }
 
         @Override
         public void onInstallFailure(ImplInfo info, int errorCode) {
             super.onInstallFailure(info, errorCode);
-            ViewHolder vh = (ViewHolder)tag;
+            ViewHolder vh = (ViewHolder) tag;
             vh.refresh();
         }
 
         @Override
         public void onUninstallSuccess(ImplInfo info) {
             super.onUninstallSuccess(info);
-            ViewHolder vh = (ViewHolder)tag;
+            ViewHolder vh = (ViewHolder) tag;
             vh.refresh();
         }
 
         @Override
         public void onUninstalling(ImplInfo info) {
             super.onUninstalling(info);
-            ViewHolder vh = (ViewHolder)tag;
+            ViewHolder vh = (ViewHolder) tag;
             vh.refresh();
         }
 
         @Override
         public void onUninstallFailure(ImplInfo info, int errorCode) {
             super.onUninstallFailure(info, errorCode);
-            ViewHolder vh = (ViewHolder)tag;
+            ViewHolder vh = (ViewHolder) tag;
             vh.refresh();
         }
     }

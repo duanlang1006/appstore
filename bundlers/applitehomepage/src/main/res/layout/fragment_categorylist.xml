@@ -27,7 +27,6 @@
             <TextView
                 android:layout_width="@dimen/categoryList_name_width"
                 android:layout_height="wrap_content"
-                android:text="ApkName"
                 android:id="@+id/apkName"
                 android:visibility="visible"
                 style="@style/categoryListName"/>

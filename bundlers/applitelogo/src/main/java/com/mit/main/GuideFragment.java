@@ -452,6 +452,9 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
 
     private void download(GuideBean bean){
         ImplInfo implInfo = implAgent.getImplInfo(bean.getPackagename(),bean.getPackagename(),bean.getmVersionCode());
+        if (null == implInfo){
+            return;
+        }
         implInfo.setTitle(bean.getName()).setDownloadUrl(bean.getUrl()).setIconUrl(bean.getImgurl());
         if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
             switch (implInfo.getStatus()) {

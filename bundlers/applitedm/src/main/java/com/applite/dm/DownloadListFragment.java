@@ -157,7 +157,7 @@ public class DownloadListFragment extends ListFragment implements ListView.OnIte
             }
         }
         Selector selector = Selector.from(ImplInfo.class).where(wb);
-        String sql = selector.limit(1).toString();
+        String sql = selector.toString();
         Cursor cursor = null;
         try {
             cursor = db.execQuery(sql);

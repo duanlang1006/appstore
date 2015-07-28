@@ -10,61 +10,60 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-    <ImageView
-        android:layout_margin="@dimen/apkList_iconMargin"
-        android:layout_width="@dimen/apkList_icon_width"
-        android:layout_height="@dimen/apkList_icon_height"
-        android:id="@+id/imageViewName"
-        style="@style/apkListIcon"/>
-    <LinearLayout
-        android:layout_gravity="center_vertical"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <TextView
-            android:layout_width="@dimen/apkList_iconMinWidth"
-            android:layout_height="wrap_content"
-            android:minWidth="@dimen/apkList_iconMinWidth"
-            android:text="ApkName"
-            android:id="@+id/apkName"
-            style="@style/apkListName"/>
-        <RatingBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/ratingbar_Indicator"
-            style="?android:attr/ratingBarStyleSmall"
-            android:numStars ="5"
-            android:focusable = "false"
-            android:focusableInTouchMode = "false"/>
+        <ImageView
+            android:layout_margin="@dimen/apkList_iconMargin"
+            android:layout_width="@dimen/apkList_icon_width"
+            android:layout_height="@dimen/apkList_icon_height"
+            android:id="@+id/imageViewName"
+            style="@style/apkListIcon"/>
         <LinearLayout
-            android:layout_margin="2dp"
-            android:gravity="center_vertical"
-            android:layout_width="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="categorySub"
-            android:id="@+id/categorySub"
-            style="@style/apkListCategorySub"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0.0M"
-            android:id="@+id/apkSize"
-            style="@style/apkListSize"/>
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="@dimen/apkList_iconMinWidth"
+                android:layout_height="wrap_content"
+                android:minWidth="@dimen/apkList_iconMinWidth"
+                android:text="ApkName"
+                android:id="@+id/apkName"
+                style="@style/apkListName"/>
+            <RatingBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ratingbar_Indicator"
+                style="?android:attr/ratingBarStyleSmall"
+                android:numStars ="5"
+                android:focusable = "false"
+                android:focusableInTouchMode = "false"/>
+            <LinearLayout
+                android:layout_margin="2dp"
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="categorySub"
+                    android:id="@+id/categorySub"
+                    style="@style/apkListCategorySub"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0.0M"
+                    android:id="@+id/apkSize"
+                    style="@style/apkListSize"/>
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
 
-    <Button
-        android:id="@+id/list_item_progress_button"
-        android:layout_width="70dp"
-        android:layout_height="30dp"
-        android:background="@drawable/apkbtn_background"
-        android:text="install"
-        android:layout_marginRight="5dp"
-        style="@style/apkListBottom"/>
+        <Button
+            android:id="@+id/list_item_progress_button"
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:text="install"
+            android:layout_marginRight="5dp"
+            style="@style/apkListButton"/>
     </LinearLayout>
 </LinearLayout>
