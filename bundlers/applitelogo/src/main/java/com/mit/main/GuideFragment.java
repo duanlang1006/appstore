@@ -36,6 +36,7 @@ import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.mit.bean.GuideBean;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 import com.mit.utils.GuideUtils;
 import com.mit.utils.GuideSPUtils;
 import com.umeng.analytics.MobclickAgent;
@@ -95,6 +96,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
             toHome();
         }
     };
+    private ImplAgent implAgent;
 
     public GuideFragment() {
     }
@@ -103,6 +105,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
+        implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
 
     @Override
@@ -136,7 +139,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
             initView();
             getResolution();
             post(1, 10, POST_ALL_APK);
-            GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
+            //GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
         } else {
             rootView = mInflater.inflate(R.layout.fragment_logo, container, false);
             logoInitView();
@@ -211,10 +214,10 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void setAppViewXY(int w) {
         mX = new int[10];
-        mX[0] = (mFLayoutWidth * 6 / 10) * w / mFLayoutWidth;
-        mX[1] = (mFLayoutWidth * 7 / 10) * w / mFLayoutWidth;
+        mX[0] = (mFLayoutWidth * 6 / 10 - 10) * w / mFLayoutWidth;
+        mX[1] = (mFLayoutWidth * 7 / 10 - 10) * w / mFLayoutWidth;
         mX[2] = (mFLayoutWidth * 3 / 10 - 20) * w / mFLayoutWidth;
-        mX[3] = (mFLayoutWidth * 2 / 10 - 20) * w / mFLayoutWidth;
+        mX[3] = (mFLayoutWidth * 2 / 10 - 30) * w / mFLayoutWidth;
         mX[4] = (mFLayoutWidth * 6 / 10) * w / mFLayoutWidth;
         mX[5] = (mFLayoutWidth * 7 / 10) * w / mFLayoutWidth;
         mX[6] = (mFLayoutWidth * 2 / 10) * w / mFLayoutWidth;
@@ -222,8 +225,8 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         mX[8] = (mFLayoutWidth * 6 / 10) * w / mFLayoutWidth;
         mX[9] = (mFLayoutWidth * 5 / 10 + 40) * w / mFLayoutWidth;
         mY = new int[10];
-        mY[0] = (mFLayoutHeight * 2 / 20 - 20) * w / mFLayoutWidth;
-        mY[1] = (mFLayoutHeight * 3 / 20 + 40) * w / mFLayoutWidth;
+        mY[0] = (mFLayoutHeight * 2 / 20 + 20) * w / mFLayoutWidth;
+        mY[1] = (mFLayoutHeight * 3 / 20 + 50) * w / mFLayoutWidth;
         mY[2] = (mFLayoutHeight * 5 / 20 + 40) * w / mFLayoutWidth;
         mY[3] = (mFLayoutHeight * 7 / 20) * w / mFLayoutWidth;
         mY[4] = (mFLayoutHeight * 9 / 20 + 40) * w / mFLayoutWidth;
@@ -379,26 +382,13 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                 paowuxianAnimator(child, mApkMovePath[apkPsition]);
 
                 post((int) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 1, 1, apkPsition);
-
-                int mApkType = AppliteUtils.isAppInstalled(mActivity, bean.getPackagename(), bean.getmVersionCode());
-                LogUtils.i(TAG, "mApkType:" + mApkType);
-                switch (mApkType) {
-                    case Constant.UNINSTALLED:
-                        requestDownload(bean);
-                        break;
-                    case Constant.INSTALLED:
-                        Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
-                        break;
-                    case Constant.INSTALLED_UPDATE:
-                        Toast.makeText(mActivity, "版本更新", Toast.LENGTH_SHORT).show();
-                        requestDownload(bean);
-                        break;
-                }
+                download(bean);
             }
         });
 
         mRLayout.addView(child);
         AppliteUtils.setLayout(child, mX[apkPsition], mY[apkPsition]);
+        LogUtils.i("lang", "mX[apkPsition]: " +mX[apkPsition]+" mY[apkPsition]: "+mY[apkPsition]);
         appearAnimator(child);
 
         int i = (child.getRight() - child.getLeft()) / 2;
@@ -410,32 +400,11 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * 下载APK
-     *
-     * @param bean
-     */
-    private void requestDownload(GuideBean bean) {
-        ImplAgent.downloadPackage(mActivity,
-                bean.getPackagename(),
-                bean.getUrl(),
-                Constant.extenStorageDirPath,
-                bean.getName() + ".apk",
-                3,
-                false,
-                bean.getName(),
-                "",
-                true,
-                bean.getImgurl(),
-                "",
-                bean.getPackagename(),
-                bean.getmVersionCode());
-    }
-
-    /**
      * 去首页
      */
     private void toHome() {
         try {
+            GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
             BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
             OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
                     bundleContext, ApkplugOSGIService.class,
@@ -473,10 +442,39 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                 paowuxianAnimator(view, mApkMovePath[(int) view.getTag()]);
 
                 GuideBean bean = mGuideContents.get(i);
-                requestDownload(bean);
+                download(bean);
             }
             mGuideContents.clear();
             mApkList.clear();
+        }
+    }
+
+
+    private void download(GuideBean bean){
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getPackagename(),bean.getPackagename(),bean.getmVersionCode());
+        implInfo.setTitle(bean.getName()).setDownloadUrl(bean.getUrl()).setIconUrl(bean.getImgurl());
+        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
+            switch (implInfo.getStatus()) {
+                case Constant.STATUS_PENDING:
+                case Constant.STATUS_RUNNING:
+                    break;
+                case Constant.STATUS_PAUSED:
+                    implAgent.resumeDownload(implInfo, null);
+                    break;
+                case Constant.STATUS_INSTALLED:
+                case Constant.STATUS_NORMAL_INSTALLING:
+                case Constant.STATUS_PRIVATE_INSTALLING:
+                    //正在安装或已安装
+//                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    implAgent.newDownload(implInfo,
+                            Constant.extenStorageDirPath,
+                            bean.getName() + ".apk",
+                            true,
+                            null);
+                    break;
+            }
         }
     }
 

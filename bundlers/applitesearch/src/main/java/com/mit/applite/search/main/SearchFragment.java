@@ -37,7 +37,6 @@ import com.mit.applite.search.adapter.SearchApkAdapter;
 import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.KeyBoardUtils;
-import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
 import com.umeng.analytics.MobclickAgent;
@@ -103,27 +102,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
             mAdapter.notifyDataSetChanged();
         }
     };
-    private ImplListener mImplListener = new ImplListener() {
-        private SearchBean findBean(String key) {
-            SearchBean bean = null;
-            for (int i = 0; i < mSearchApkContents.size(); i++) {
-                if (mSearchApkContents.get(i).getmPackageName().equals(key)) {
-                    bean = mSearchApkContents.get(i);
-                    break;
-                }
-            }
-            return bean;
-        }
-
-        @Override
-        public void onUpdate(boolean b, ImplInfo implInfo) {
-            SearchBean bean = findBean(implInfo.getKey());
-            if (null != bean) {
-                bean.setImplInfo(implInfo);
-                mActivity.runOnUiThread(mNotifyRunnable);
-            }
-        }
-    };
 
     private AbsListView.OnScrollListener mOnScrollListener = new AbsListView.OnScrollListener() {
         @Override
@@ -180,7 +158,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ImplAgent.registerImplListener(mImplListener);
     }
 
     @Override
@@ -247,7 +224,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     @Override
     public void onDetach() {
         super.onDetach();
-        ImplAgent.unregisterImplListener(mImplListener);
     }
 
     @Override
@@ -494,7 +470,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                     bean.setmDownloadUrl(obj.getString("rDownloadUrl"));
 
                     mSearchApkContents.add(bean);
-                    ImplAgent.queryDownload(mActivity, bean.getmPackageName());
                 }
 
                 mPreloadListView.setVisibility(View.GONE);

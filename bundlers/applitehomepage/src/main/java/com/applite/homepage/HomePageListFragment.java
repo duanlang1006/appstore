@@ -24,17 +24,12 @@ import com.applite.common.LogUtils;
 import com.applite.data.ListArrayAdapter;
 import com.applite.utils.HomepageUtils;
 import com.google.gson.Gson;
-import com.mit.impl.ImplAgent;
-import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplListener;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
 import org.osgi.framework.BundleContext;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,7 +51,6 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     private ListArrayAdapter mListAdapter = null;
     private int mCurCheckPosition = 0;
     private boolean showHome = false;
-    private ImplListener mImplListener = new HomePageImplListener();
     private MySlideViewListener mSlideViewListener = new MySlideViewListener();
     private MyScrollListener mOnScrollListener = new MyScrollListener();
 
@@ -82,7 +76,6 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         super.onAttach(activity);
         setHasOptionsMenu(true);
         mActivity = activity;
-        ImplAgent.registerImplListener(mImplListener);
     }
 
     @Override
@@ -145,7 +138,6 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     public void onDetach(){
         super.onDetach();
         LogUtils.i(TAG, "onDetach ");
-        ImplAgent.unregisterImplListener(mImplListener);
     }
 
     @Override
@@ -313,28 +305,6 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
             }
         }
         return bean;
-    }
-
-    class HomePageImplListener implements ImplListener{
-        private final String TAG = "impl_homepage";
-        private Handler mHandler= new Handler();
-        private Runnable mRefreshListRunnable = new Runnable(){
-            @Override
-            public void run() {
-                mListAdapter.notifyDataSetChanged();
-            }
-        };
-
-        @Override
-        public void onUpdate(boolean success, ImplInfo implInfo) {
-            HomePageApkData bean = findBeanByKey(implInfo.getKey());
-            if (null != bean){
-                LogUtils.i(TAG,  HomePageImplListener.this+",onUpdate key:"+bean.getPackageName()+",name="+bean.getName()+",status="+implInfo.getStatus()+","+implInfo);
-                bean.setImplInfo(implInfo);
-                mHandler.removeCallbacks(mRefreshListRunnable);
-                mHandler.postDelayed(mRefreshListRunnable,50);
-            }
-        }
     }
 
     class MyScrollListener implements AbsListView.OnScrollListener{
