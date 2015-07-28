@@ -107,14 +107,14 @@ public class SearchApkAdapter extends BaseAdapter {
                             implAgent.pauseDownload(vh.implInfo);
                             break;
                         case Constant.STATUS_PAUSED:
-                            implAgent.resumeDownload(vh.implInfo, new ListImplCallback(vh));
+                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
                             break;
                         default:
                             implAgent.newDownload(vh.implInfo,
                                     Constant.extenStorageDirPath,
                                     vh.bean.getmName() + ".apk",
                                     true,
-                                    new ListImplCallback(vh));
+                                    vh.implCallback);
                             break;
                     }
                 } else {
@@ -138,10 +138,11 @@ public class SearchApkAdapter extends BaseAdapter {
         public TextView mDownloadNumber;
         public TextView mApkSize;
         public TextView mVersionName;
-        public Button mBt;
+//        public Button mBt;
         public ProgressButton mProgressButton;
         private ImplInfo implInfo;
         private SearchBean bean;
+        private ListImplCallback implCallback;
 
         public ViewHolder(View v) {
             this.mToDetail = (LinearLayout) v.findViewById(R.id.list_item_to_detail);
@@ -151,8 +152,9 @@ public class SearchApkAdapter extends BaseAdapter {
             this.mDownloadNumber = (TextView) v.findViewById(R.id.list_item_number);
             this.mApkSize = (TextView) v.findViewById(R.id.list_item_size);
             this.mVersionName = (TextView) v.findViewById(R.id.list_item_versionname);
-            this.mBt = (Button) v.findViewById(R.id.list_item_bt);
+//            this.mBt = (Button) v.findViewById(R.id.list_item_bt);
             this.mProgressButton = (ProgressButton) v.findViewById(R.id.list_item_progress_button);
+            this.implCallback = new ListImplCallback(this);
         }
 
         public void initView(SearchBean data) {
@@ -161,6 +163,7 @@ public class SearchApkAdapter extends BaseAdapter {
             ;
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
+                implAgent.setImplCallback(implCallback, implInfo);
             }
             mProgressButton.setTag(this);
             refresh();
