@@ -1,6 +1,5 @@
 package com.mit.market;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.android.applite.plugin.AppLiteApplication;
 import com.applite.android.R;
 import com.applite.common.LogUtils;
 import com.mit.bean.ApkplugDownloadCallback;

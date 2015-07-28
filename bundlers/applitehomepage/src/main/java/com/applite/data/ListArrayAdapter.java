@@ -223,20 +223,15 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             if (null != mProgressButton && null != this.implInfo){
                 switch (implInfo.getStatus()){
                     case Constant.STATUS_PENDING:
-                        mProgressButton.setEnabled(false);
                         mProgressButton.setText(implAgent.getActionText(implInfo));
                         break;
                     case Constant.STATUS_RUNNING:
-                        mProgressButton.setEnabled(false);
                         mProgressButton.setText(implAgent.getProgress(implInfo)+"%");
                         break;
                     case Constant.STATUS_PAUSED:
-                        mProgressButton.setEnabled(false);
                         mProgressButton.setText(implAgent.getStatusText(implInfo));
                         break;
                     default:
-                        mProgressButton.setBackground(mResource.getDrawable(R.drawable.item_button_bg));
-                        mProgressButton.setEnabled(true);
                         mProgressButton.setText(implAgent.getActionText(implInfo));
                         break;
                 }

@@ -25,74 +25,10 @@
     <uses-permission android:name="com.android.dsc.permission.READ_SETTINGS"/>
 
     <application
-        android:name="com.android.applite.plugin.AppLiteApplication"
+        android:name="com.mit.market.AppLiteApplication"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" 
         android:hardwareAccelerated="true">
-        <!--<activity-->
-            <!--android:name="com.android.applite.plugin.AppLiteEnter"-->
-            <!--android:configChanges="keyboardHidden|orientation"-->
-            <!--android:icon="@drawable/ylzx"-->
-            <!--android:label="@string/app_name_enter"-->
-            <!--android:launchMode="singleTask"-->
-            <!--android:screenOrientation="portrait"-->
-            <!--android:theme="@style/AppTheme" >-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-                <!--<category android:name="android.intent.category.APP_MARKET" />-->
-                <!--<category android:name="android.intent.category.default" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
-        <!--<activity-->
-            <!--android:name="com.android.applite.plugin.AppLiteHotapps"-->
-            <!--android:configChanges="keyboardHidden|orientation"-->
-            <!--android:icon="@drawable/zjbb"-->
-            <!--android:label="@string/app_name_hotapp"-->
-            <!--android:launchMode="singleTask"-->
-            <!--android:screenOrientation="portrait"-->
-            <!--android:theme="@style/AppTheme" >-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                 <!--<category android:name="android.intent.category.APP_MARKET" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-                <!--<category android:name="android.intent.category.default" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
-        <!--<activity-->
-            <!--android:name="com.android.applite.plugin.AppLitePlugin"-->
-            <!--android:configChanges="keyboardHidden|orientation"-->
-            <!--android:label="@string/app_name"-->
-            <!--android:launchMode="singleTask"-->
-            <!--android:screenOrientation="portrait"-->
-            <!--android:theme="@style/AppTheme" >-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.default" />-->
-            <!--</intent-filter>-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.VIEW" />-->
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-                <!--<category android:name="android.intent.category.BROWSABLE" />-->
-                <!--<data android:scheme="market" android:host="details" android:path="" />-->
-                <!--<data android:scheme="market" android:host="search" android:path="" />-->
-                 <!--<data android:scheme="http" android:host="market.android.com" android:path="/details" />-->
-                <!--<data android:scheme="http" android:host="market.android.com" android:path="/search" />-->
-                <!--<data android:scheme="https" android:host="market.android.com" android:path="/details" />-->
-                <!--<data android:scheme="https" android:host="market.android.com" android:path="/search" />-->
-                <!--<data android:scheme="http" android:host="play.google.com" android:path="/store/apps/details" />-->
-                <!--<data android:scheme="http" android:host="play.google.com" android:path="/store/search" />-->
-                <!--<data android:scheme="https" android:host="play.google.com" android:path="/store/apps/details" />-->
-                <!--<data android:scheme="https" android:host="play.google.com" android:path="/store/search" />-->
-                <!--<data android:scheme="http" android:host="apptest.baidu.com" android:pathPrefix="/appsearch/highdownload" />-->
-                <!--<data android:scheme="http" android:host="mo.baidu.com" android:pathPrefix="/appsearch/highdownload" />-->
-                <!--<data android:scheme="https" android:host="mo.baidu.com" android:pathPrefix="/appsearch/highdownload" />-->
-                <!--<data android:scheme="appclient" android:host="apptest.baidu.com" android:pathPrefix="/appsearch/highdownload" />-->
-                <!--<data android:scheme="appclient" android:host="mo.baidu.com" android:pathPrefix="/appsearch/highdownload" />-->
-                <!--<data android:scheme="http" android:host="dbl-chunlei-rd06.vm.baidu.com" android:pathPrefix="/appsearch/highdownload" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
-
         <activity
             android:name="com.mit.market.MitMarketActivity"
             android:configChanges="keyboardHidden|orientation"
@@ -119,7 +55,7 @@
         </activity>
 
         <receiver
-            android:name="com.android.applite.model.AppLiteReceiver"
+            android:name="com.mit.market.AppLiteReceiver"
             android:exported="true"
             android:process=":remote">
             <intent-filter>
@@ -138,13 +74,6 @@
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
-
-        <provider
-            android:name="com.android.applite.model.AppLiteProvider"
-            android:authorities="com.android.applite.settings"
-            android:exported="true"
-            android:readPermission="com.android.applite.permission.READ_SETTINGS"
-            android:writePermission="com.android.applite.permission.WRITE_SETTINGS" />
 
         <!--==================apkplug=======================================-->
         <activity
@@ -167,9 +96,9 @@
         <meta-data android:name="UMENG_CHANNEL" android:value="${UMENG_CHANNEL_VALUE}" />
         <meta-data android:name="UMENG_APPKEY" android:value="53c77d9c56240b2447001087" />
         <meta-data android:name="APPLITE_DATA" android:value="folder.data"/>
-        <meta-data  android:name="apkplug-appid" android:value="c6fb0702a4c5f81e" ></meta-data>
-        <meta-data  android:name="apkplug-theme-auth" android:value="c3c1CqGa8Akd0KXK3r7/ejczH+u+M+4RRwuf3/0RIHgZkWFIMy5svg9aWL/jzKUcdBL45p4smWCVlGWTfFgMZFDXqSr9hVo80zfuhpzQdHLq3oJvf23vfbONqz0Phib63d/Ckm9vLSDU+DV9Bop/jb03dB6dX84n4Hlg/6Pshiw=" ></meta-data>
-        <meta-data  android:name="apkplug-auth" android:value="L/AHLAOZzGcVCbEugHLsFSX5sXAJbV3K16f0bYITvHzVTezNu+xs19aP/uZhH8IV5INUl4p6fEI+rxs+asecB19gzClRj3iPmcB2F6yZgCKShXD2C/QRbt58ZhKrRZkMsa1alz8W9G85sxD3T0ignP+ijS8A1jluARxRP7ikgYM=" ></meta-data>
+        <meta-data  android:name="apkplug-appid" android:value="e595b25764689c08" ></meta-data>
+        <meta-data  android:name="apkplug-theme-auth" android:value="mDgCmjcTa25zYSl3g6kXXuGB4178EsIpVpssWV93dqkm66kR3rUd8EfrcS3HTrmbLAYT9613SyXUn4K9FXfn3AkLiitKxWLXynSRI/eU67uU+OZ2QoqH/sqFgntPCEv+3xvGtRwO8OtDssr/0DlFy3Khgdl9ut6k3Ubh5lN8YWE=" ></meta-data>
+        <meta-data  android:name="apkplug-auth" android:value="r0NI/rx5tj+EyS9i/2fU+aTYnweKyXP5JPwcX2S5d55DpKHFLsathgRi3xBwE3UQg5NRKKBnNGukjaswYuV4TrX0F6/B4dAldTpusHhivPzC2nzBDK0WqBklPLWiTtu5mnXIBsOsbBd21mw2nVcANtRnobRXQAozX0wBEo9UNoU=" ></meta-data>
     </application>
 
 </manifest>
