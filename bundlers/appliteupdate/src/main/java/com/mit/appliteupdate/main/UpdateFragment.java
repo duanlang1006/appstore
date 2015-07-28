@@ -301,6 +301,9 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
 
     private void download(DataBean bean){
         ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(),bean.getmPackageName(),bean.getmVersionCode());
+        if (null == implInfo){
+            return;
+        }
         implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());
         if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
             switch (implInfo.getStatus()) {

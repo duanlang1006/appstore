@@ -135,8 +135,10 @@ public class UpdateAdapter extends BaseAdapter {
         public void initView(DataBean bean){
             this.bean = bean;
             this.implInfo = implAgent.getImplInfo(bean.getmPackageName(),bean.getmPackageName(),bean.getmVersionCode());
-            this.implInfo.setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl()).setTitle(bean.getmName());
-            implAgent.setImplCallback(implCallback,implInfo);
+            if (null != this.implInfo) {
+                this.implInfo.setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl()).setTitle(bean.getmName());
+                implAgent.setImplCallback(implCallback,implInfo);
+            }
             refresh();
         }
 
@@ -145,7 +147,9 @@ public class UpdateAdapter extends BaseAdapter {
             mFinalBitmap.display(mImg, bean.getmImgUrl());
             mVersionName.setText("V "+bean.getmVersionName());
             mApkSize.setText(AppliteUtils.bytes2kb(bean.getmSize()));
-            mBt.setText(implAgent.getActionText(implInfo));
+            if (null != this.implInfo) {
+                mBt.setText(implAgent.getActionText(implInfo));
+            }
         }
     }
 
@@ -153,6 +157,7 @@ public class UpdateAdapter extends BaseAdapter {
         Object tag ;
 
         ListImplCallback(Object tag) {
+            super();
             this.tag = tag;
         }
 

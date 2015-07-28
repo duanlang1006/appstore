@@ -30,7 +30,7 @@ class ImplDownload  {
         }
     }
 
-    public static ImplDownload getInstance(Context context){
+    static ImplDownload getInstance(Context context){
         if (null == mInstance){
             initInstance(context);
         }
@@ -101,6 +101,7 @@ class ImplDownload  {
                     true,
                     new DownloadCallback<File>(implInfo,callback));
             implInfo.setDownloadId(downloadInfo.getId());
+            downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
         } catch (DbException e) {
             e.printStackTrace();
         }
@@ -122,10 +123,26 @@ class ImplDownload  {
             DownloadInfo downloadInfo = dm.getDownloadInfoById(implInfo.getDownloadId());
             if (null != downloadInfo) {
                 dm.resumeDownload(downloadInfo, new DownloadCallback<File>(implInfo, callback));
+                downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
             }
         } catch (DbException e) {
             e.printStackTrace();
         }
+    }
+
+    boolean needKick(ImplInfo implInfo){
+        boolean ret = false;
+        DownloadInfo downloadInfo = dm.getDownloadInfoById(implInfo.getDownloadId());
+        if (null != downloadInfo && null == downloadInfo.getHandler()) {
+            switch (downloadInfo.getState()){
+                case WAITING:
+                case STARTED:
+                case LOADING:
+                    ret = true;
+                    break;
+            }
+        }
+        return ret;
     }
 
     void remove(ImplInfo implInfo){

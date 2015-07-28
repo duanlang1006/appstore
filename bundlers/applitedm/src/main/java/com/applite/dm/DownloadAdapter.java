@@ -34,6 +34,7 @@ import android.widget.TextView;
 
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
@@ -85,20 +86,7 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder)view.getTag();
         if (null == viewHolder) {
-            viewHolder = new ViewHolder();
-            viewHolder.actionBtn = (TextView) view.findViewById(R.id.button_op);
-            viewHolder.deleteButton = (TextView) view.findViewById(R.id.button_delete);
-            viewHolder.detailButton = (TextView) view.findViewById(R.id.button_detail);
-            viewHolder.progressBar = (ProgressBar) view.findViewById(android.R.id.progress);
-            viewHolder.descView = (TextView) view.findViewById(R.id.size_text);
-            viewHolder.titleView = (TextView) view.findViewById(R.id.download_title);
-            viewHolder.statusView = (TextView) view.findViewById(R.id.domain);
-            viewHolder.iconView = (ImageView) view.findViewById(R.id.download_icon);
-            viewHolder.extra = view.findViewById(R.id.extra_line);
-            view.setTag(viewHolder);
-            viewHolder.actionBtn.setTag(viewHolder);
-            viewHolder.deleteButton.setTag(viewHolder);
-            viewHolder.detailButton.setTag(viewHolder);
+            viewHolder = new ViewHolder(view);
         }
 
         viewHolder.position = cursor.getPosition();
@@ -187,16 +175,33 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         ImageView iconView;
         ImplInfo implInfo;
         View extra;
+        ImplListener implCallback;
         int position;
+
+        ViewHolder(View view) {
+            actionBtn = (TextView) view.findViewById(R.id.button_op);
+            deleteButton = (TextView) view.findViewById(R.id.button_delete);
+            detailButton = (TextView) view.findViewById(R.id.button_detail);
+            progressBar = (ProgressBar) view.findViewById(android.R.id.progress);
+            descView = (TextView) view.findViewById(R.id.size_text);
+            titleView = (TextView) view.findViewById(R.id.download_title);
+            statusView = (TextView) view.findViewById(R.id.domain);
+            iconView = (ImageView) view.findViewById(R.id.download_icon);
+            extra = view.findViewById(R.id.extra_line);
+            view.setTag(this);
+            actionBtn.setTag(this);
+            deleteButton.setTag(this);
+            detailButton.setTag(this);
+            implCallback = new DownloadImplCallback(this);
+        }
 
         void initView(ImplInfo info){
             this.implInfo = info;
+            if (null == this.implInfo){
+                return;
+            }
+            implAgent.setImplCallback(implCallback,implInfo);
             actionBtn.setText(implAgent.getActionText(implInfo));
-//            if (implAgent.getAction(mContext) == ImplInfo.ACTION_INSTALL){
-//                actionBtn.setEnabled(false);
-//            }else{
-//                actionBtn.setEnabled(true);
-//            }
             descView.setText(implAgent.getDescText(implInfo));
             String title = implInfo.getTitle();
             if(null == title && title.isEmpty()) {
@@ -209,6 +214,9 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         }
 
         void refresh(){
+            if (null == this.implInfo){
+                return;
+            }
             actionBtn.setText(implAgent.getActionText(implInfo));
             descView.setText(implAgent.getDescText(implInfo));
             statusView.setText(implAgent.getStatusText(implInfo));
@@ -246,6 +254,7 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         Object tag ;
 
         DownloadImplCallback(Object tag) {
+            super();
             this.tag = tag;
         }
 
@@ -275,6 +284,9 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
             super.onSuccess(info, file);
             ViewHolder vh = (ViewHolder)tag;
             vh.refresh();
+            onContentChanged();
+            notifyDataSetChanged();
+            LogUtils.d("impl_callback","onSuccess:"+implAgent.getProgress(info));
         }
 
         @Override

@@ -15,8 +15,6 @@ public class DataBean {
     private String mVersionName;
 //    private String mShowText;
 
-    private ImplInfo mImplInfo;
-
     @Override
     public String toString() {
         return "DataBean{" +
@@ -92,13 +90,5 @@ public class DataBean {
 
     public void setmVersionCode(int mVersionCode) {
         this.mVersionCode = mVersionCode;
-    }
-
-    public ImplInfo getImplInfo() {
-        return mImplInfo;
-    }
-
-    public void setImplInfo(ImplInfo mImplInfo) {
-        this.mImplInfo = mImplInfo;
     }
 }
