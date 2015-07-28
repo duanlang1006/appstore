@@ -67,10 +67,15 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     private SearchApkAdapter mAdapter;
     private Activity mActivity;
     private View rootView;
+
+    //热词相关
     private List<HotWordBean> mHotWordBeans = new ArrayList<HotWordBean>();
-    private int mChangeNumbew = 0;//在线热词换一换点击的次数
+    private int mChangeNumbew = 1;//在线热词换一换点击的次数
     private GridView mGridView;
     private HotWordAdapter mGvAdapter;
+    private int mEndPageNumber;//最后一页热词的个数
+    private int mHotWordPage;//热词的页数
+
     private ImageView mDeleteView;
     private List<HotWordBean> mShowHotData = new ArrayList<HotWordBean>();
     private TextView mHotChangeView;
@@ -398,11 +403,11 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 }
                 break;
             case R.id.hot_word_change:
-                mChangeNumbew = mChangeNumbew + 1;
-                mShowHotData.clear();
-                if (mHotWordBeans.size() / mShowHotWordNumber <= mChangeNumbew)
+                if (mChangeNumbew >= mHotWordPage)
                     mChangeNumbew = 0;
+                mShowHotData.clear();
                 setHotWordShowData(mChangeNumbew);
+                mChangeNumbew = mChangeNumbew + 1;
                 break;
         }
     }
@@ -655,6 +660,12 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 bean.setmDataType(object.getString("s_datatype"));
                 mHotWordBeans.add(bean);
             }
+            mEndPageNumber = mHotWordBeans.size() % mShowHotWordNumber;
+            if (mEndPageNumber == 0) {
+                mHotWordPage = mHotWordBeans.size() / mShowHotWordNumber;
+            } else {
+                mHotWordPage = mHotWordBeans.size() / mShowHotWordNumber + 1;
+            }
             setHotWordShowData(0);
             LogUtils.i(TAG, "在线热词返回的数量=" + mHotWordBeans.size());
         } catch (JSONException e) {
@@ -668,16 +679,26 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
      */
     private void setHotWordShowData(int position) {
         if (mHotWordBeans.size() > mShowHotWordNumber) {
-            for (int i = 0 + mShowHotWordNumber * position; i < mShowHotWordNumber + mShowHotWordNumber * position; i++) {
-                mShowHotData.add(mHotWordBeans.get(i));
+            if (position == mHotWordPage - 1 && mEndPageNumber != 0) {
+                for (int i = mHotWordBeans.size() - mShowHotWordNumber; i < mHotWordBeans.size(); i++) {
+                    mShowHotData.add(mHotWordBeans.get(i));
+                }
+            } else {
+                for (int i = 0 + mShowHotWordNumber * position; i < mShowHotWordNumber + mShowHotWordNumber * position; i++) {
+                    mShowHotData.add(mHotWordBeans.get(i));
+                }
             }
         } else {
             for (int i = 0; i < mHotWordBeans.size(); i++) {
                 mShowHotData.add(mHotWordBeans.get(i));
             }
         }
-        mGvAdapter = new HotWordAdapter(mActivity, mShowHotData);
-        mGridView.setAdapter(mGvAdapter);
+        if (null == mGvAdapter) {
+            mGvAdapter = new HotWordAdapter(mActivity, mShowHotData);
+            mGridView.setAdapter(mGvAdapter);
+        } else {
+            mGvAdapter.notifyDataSetChanged();
+        }
 
         mPreloadListView.setVisibility(View.GONE);
         mListView.setVisibility(View.GONE);

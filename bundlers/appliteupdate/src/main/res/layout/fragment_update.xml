@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:text="全部更新"
-            android:textColor="@color/qingse" />
+            android:textColor="@color/install_button_nor" />
 
     </LinearLayout>
 
