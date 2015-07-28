@@ -3,6 +3,10 @@ package com.mit.applite.main;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -72,6 +76,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private Button refreshButton;
     private ImplAgent implAgent;
     private ImplListener implCallback;
+    private LinearLayout detail_contentandpic;
 
     public DetailFragment() {
     }
@@ -179,6 +184,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mImgLl = (LinearLayout) rootView.findViewById(R.id.detail_viewpager_img_ll);
         no_network = (LinearLayout) rootView.findViewById(R.id.no_network);
         refreshButton = (Button) rootView.findViewById(R.id.refresh_btn);
+        detail_contentandpic = (LinearLayout) rootView.findViewById(R.id.detail_contentandpic);
 
         mNameView.setText(mApkName);
         mName1View.setText(mApkName);
@@ -274,6 +280,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
      * @param data
      */
     private void setData(String data) {
+//        detail_contentandpic.setVisibility(View.GONE);
         try {
             String mViewPagerUrl = null;
             JSONObject object = new JSONObject(data);
@@ -301,7 +308,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     mXingView.setRating(Float.parseFloat(xing) / 2.0f);
                     mFinalBitmap.display(mApkImgView, mImgUrl);
                     mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size));
+//                    detail_contentandpic.setBackground(mContext.getResources().getDrawable(R.id.k));
                     mApkContentView.setText(content);
+                    detail_contentandpic.setVisibility(View.VISIBLE);
                 }
                 mViewPagerUrlList = mViewPagerUrl.split(",");
                 LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrl);
@@ -345,7 +354,12 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
             final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
             mImgLl.addView(child);
-            fb.display(img, mViewPagerUrlList[i]);
+            // 下面添加参数，显示读出时内容和读取失败时的内容
+            Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.detail_default_img);
+            fb.display(img, mViewPagerUrlList[i],bmp,bmp);
+            LogUtils.i(TAG, "111   :" + fb);
+            LogUtils.i(TAG, "222   :" + bmp);
+            LogUtils.i(TAG, "333   :" + getResources());
         }
 //        fb.configLoadingImage(null);
     }

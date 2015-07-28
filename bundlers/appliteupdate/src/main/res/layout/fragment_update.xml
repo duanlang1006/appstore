@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:layout_weight="1"
+            android:textSize="15dp"
             android:text="可更新"
             android:textColor="@color/black" />
 
@@ -26,6 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:text="全部更新"
+            android:textSize="15dp"
             android:textColor="@color/qingse" />
 
     </LinearLayout>
@@ -43,10 +45,12 @@
         android:orientation="vertical"
         android:visibility="gone">
 
+        <!-- 无更新内容时，显示图片-->
         <ImageView
             android:id="@+id/update_stats_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginTop="50dp"
             android:background="@drawable/no_update" />
 
