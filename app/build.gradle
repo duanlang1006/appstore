@@ -5,11 +5,11 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "com.applite.android"
+        applicationId "com.shly.appstore"
         minSdkVersion 10
         targetSdkVersion 21
-        versionCode 25
-        versionName "2.0.025"
+        versionCode 26
+        versionName "2.0.026"
         multiDexEnabled true
         manifestPlaceholders = [UMENG_CHANNEL_VALUE: "leadexceed_buildin"]
     }
@@ -62,7 +62,7 @@ android {
                 variant.outputs.each { output ->
                     def outputFile = output.outputFile
                     if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                        // 输出apk名称为applite_v1.0_wandoujia.apk
+                        // 输出apk名称为appstore_v1.0_wandoujia.apk
                         def fileName = "applite_v${defaultConfig.versionName}_${variant.productFlavors[0].name}_${variant.buildType.name}.apk"
                         output.outputFile = new File(outputFile.parent, fileName)
                     }
