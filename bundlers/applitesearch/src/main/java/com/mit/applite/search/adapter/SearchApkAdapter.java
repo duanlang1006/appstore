@@ -21,6 +21,7 @@ import com.mit.applite.search.utils.SearchUtils;
 import com.mit.applite.search.view.ProgressButton;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
+import com.mit.impl.ImplListener;
 
 import net.tsz.afinal.FinalBitmap;
 
@@ -28,6 +29,7 @@ import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
 import org.osgi.framework.BundleContext;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -41,6 +43,7 @@ public class SearchApkAdapter extends BaseAdapter {
     private Context context;
     public List<SearchBean> mSearchBeans;
     private Context mActivity;
+    private ImplAgent implAgent;
     public interface UpdateInatsllButtonText{
         void updateText();
     }
@@ -60,6 +63,7 @@ public class SearchApkAdapter extends BaseAdapter {
             mInflater = LayoutInflater.from(context);
             this.context = context;
         }
+        implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
 
     @Override
@@ -80,66 +84,47 @@ public class SearchApkAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewholder;
-        /* 将convertView封装在ViewHodler中，减少系统内存占用 */
         if (convertView == null) {
-            /* convertView为空则初始化 */
             convertView = mInflater.inflate(R.layout.item_search_listview, parent, false);
             viewholder = new ViewHolder(convertView);
             convertView.setTag(viewholder);
         } else {
-            // 不为空则直接使用已有的封装类
             viewholder = (ViewHolder) convertView.getTag();
         }
         final SearchBean data = mSearchBeans.get(position);
         mFinalBitmap.display(viewholder.mImg, data.getmImgUrl());
-        viewholder.mName.setText(data.getmName());
-        viewholder.mApkSize.setText(AppliteUtils.bytes2kb(Long.parseLong(data.getmApkSize())));
-        viewholder.mDownloadNumber.setText(
-                SearchUtils.getDownloadNumber(context, Integer.parseInt(data.getmDownloadNumber())) +
-                        context.getResources().getString(R.string.download_number));
-        viewholder.mVersionName.setText(context.getResources().getString(R.string.version) +
-                data.getmVersionName());
-        viewholder.mToDetail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SearchUtils.toDetailFragment(data.getmPackageName(), data.getmName(), data.getmImgUrl());
-            }
-        });
 
-        ImplInfo info = data.getImplInfo();
-        if (null == info){
-            ImplAgent.queryDownload(mActivity,data.getmPackageName());
-            info = ImplInfo.create(mActivity,data.getmPackageName(),data.getmDownloadUrl(),data.getmPackageName());
-        }
-        viewholder.mProgressButton.setText(info.getActionText(mActivity));
-        viewholder.mProgressButton.setTag(info);
+        ImplInfo info = implAgent.getImplInfo(data.getmPackageName(),data.getmPackageName(),data.getmVersionCode());
+        info.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
+        viewholder.initView(data, info);
+
         viewholder.mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
             public void onClickListener(View view) {
-                ImplInfo info = (ImplInfo)view.getTag();
-                switch (info.getAction(mActivity)){
-                    case ImplInfo.ACTION_DOWNLOAD:
-                        ImplAgent.downloadPackage(context,
-                                data.getmPackageName(),
-                                data.getmDownloadUrl(),
-                                Constant.extenStorageDirPath,
-                                data.getmName() + ".apk",
-                                3,
-                                false,
-                                data.getmName(),
-                                "",
-                                true,
-                                data.getmImgUrl(),
-                                "",
-                                data.getmPackageName());
-                        break;
-                    default:
-                        try{
-                            mActivity.startActivity(info.getActionIntent(mActivity));
-                        }catch(Exception e){
-                            e.printStackTrace();
-                        }
-                        break;
+                ViewHolder vh = (ViewHolder)view.getTag();
+                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
+                    switch (vh.implInfo.getStatus()) {
+                        case Constant.STATUS_PENDING:
+                        case Constant.STATUS_RUNNING:
+                            implAgent.pauseDownload(vh.implInfo);
+                            break;
+                        case Constant.STATUS_PAUSED:
+                            implAgent.resumeDownload(vh.implInfo, new ListImplCallback(vh));
+                            break;
+                        default:
+                            implAgent.newDownload(vh.implInfo,
+                                    Constant.extenStorageDirPath,
+                                    vh.bean.getmName() + ".apk",
+                                    true,
+                                    new ListImplCallback(vh));
+                            break;
+                    }
+                } else {
+                    try {
+                        mActivity.startActivity(implAgent.getActionIntent(vh.implInfo));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -157,6 +142,8 @@ public class SearchApkAdapter extends BaseAdapter {
         public TextView mVersionName;
         public Button mBt;
         public ProgressButton mProgressButton;
+        private ImplInfo implInfo;
+        private SearchBean bean;
 
         public ViewHolder(View v) {
             this.mToDetail = (LinearLayout) v.findViewById(R.id.list_item_to_detail);
@@ -168,6 +155,119 @@ public class SearchApkAdapter extends BaseAdapter {
             this.mVersionName = (TextView) v.findViewById(R.id.list_item_versionname);
             this.mBt = (Button) v.findViewById(R.id.list_item_bt);
             this.mProgressButton = (ProgressButton) v.findViewById(R.id.list_item_progress_button);
+        }
+
+        public void initView(SearchBean data,ImplInfo info){
+            this.bean = data;
+            this.implInfo = info;
+            mProgressButton.setTag(this);
+            refresh();
+        }
+
+        public void refresh(){
+            mName.setText(bean.getmName());
+            mApkSize.setText(AppliteUtils.bytes2kb(Long.parseLong(bean.getmApkSize())));
+            mDownloadNumber.setText(
+                    SearchUtils.getDownloadNumber(context, Integer.parseInt(bean.getmDownloadNumber())) +
+                            context.getResources().getString(R.string.download_number));
+            mVersionName.setText(context.getResources().getString(R.string.version) +
+                    bean.getmVersionName());
+            mToDetail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SearchUtils.toDetailFragment(bean.getmPackageName(), bean.getmName(), bean.getmImgUrl());
+                }
+            });
+            mProgressButton.setText(implAgent.getActionText(implInfo));
+        }
+
+        public ImplInfo getImplInfo() {
+            return implInfo;
+        }
+    }
+
+    class ListImplCallback extends ImplListener {
+        Object tag ;
+
+        ListImplCallback(Object tag) {
+            this.tag = tag;
+        }
+
+        @Override
+        public void onStart(ImplInfo info) {
+            super.onStart(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onCancelled(ImplInfo info) {
+            super.onCancelled(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onLoading(ImplInfo info, long total, long current, boolean isUploading) {
+            super.onLoading(info, total, current, isUploading);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onSuccess(ImplInfo info, File file) {
+            super.onSuccess(info, file);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onFailure(ImplInfo info, Throwable t, String msg) {
+            super.onFailure(info, t, msg);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onInstallSuccess(ImplInfo info) {
+            super.onInstallSuccess(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onInstalling(ImplInfo info) {
+            super.onInstalling(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onInstallFailure(ImplInfo info, int errorCode) {
+            super.onInstallFailure(info, errorCode);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onUninstallSuccess(ImplInfo info) {
+            super.onUninstallSuccess(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onUninstalling(ImplInfo info) {
+            super.onUninstalling(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onUninstallFailure(ImplInfo info, int errorCode) {
+            super.onUninstallFailure(info, errorCode);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
         }
     }
 }

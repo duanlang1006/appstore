@@ -8,8 +8,8 @@ android {
         applicationId "com.applite.android"
         minSdkVersion 10
         targetSdkVersion 21
-        versionCode 20
-        versionName "2.0.020"
+        versionCode 25
+        versionName "2.0.025"
         multiDexEnabled true
         manifestPlaceholders = [UMENG_CHANNEL_VALUE: "leadexceed_buildin"]
     }
@@ -86,6 +86,23 @@ android {
         destinationDir file('.')
         archiveName "applite_v${defaultConfig.versionName}.zip"
     }
+
+    task setTag (type : Exec) {
+        executable "git"
+        args "tag"
+        args "-af"
+        args "applite_v${defaultConfig.versionName}"
+        args "-m"
+        args "release for applite_v${defaultConfig.versionName}"
+    }
+
+    task pushTag (type : Exec) {
+        executable "git"
+        args "push"
+        args "origin"
+        args "--tags"
+        args "-f"
+    }
 }
 
 dependencies {
@@ -98,4 +115,5 @@ dependencies {
     compile project(':extras:impl')
     compile project(':extras:applitecommon')
     compile project(':extras:dscdownloader')
+    compile 'com.jiechic.library:xUtils:2.6.14'
 }

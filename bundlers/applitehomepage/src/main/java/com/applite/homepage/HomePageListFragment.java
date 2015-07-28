@@ -3,6 +3,7 @@ package com.applite.homepage;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -23,17 +24,12 @@ import com.applite.common.LogUtils;
 import com.applite.data.ListArrayAdapter;
 import com.applite.utils.HomepageUtils;
 import com.google.gson.Gson;
-import com.mit.impl.ImplAgent;
-import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplListener;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
 import org.osgi.framework.BundleContext;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,7 +51,6 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     private ListArrayAdapter mListAdapter = null;
     private int mCurCheckPosition = 0;
     private boolean showHome = false;
-    private ImplListener mImplListener = new HomePageImplListener();
     private MySlideViewListener mSlideViewListener = new MySlideViewListener();
     private MyScrollListener mOnScrollListener = new MyScrollListener();
 
@@ -81,7 +76,6 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
         super.onAttach(activity);
         setHasOptionsMenu(true);
         mActivity = activity;
-        ImplAgent.registerImplListener(mImplListener);
     }
 
     @Override
@@ -144,13 +138,11 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     public void onDetach(){
         super.onDetach();
         LogUtils.i(TAG, "onDetach ");
-        ImplAgent.unregisterImplListener(mImplListener);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //ImplAgent.unregisterImplListener(mImplListener);
         LogUtils.i(TAG, "onDestroy");
     }
 
@@ -313,26 +305,6 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
             }
         }
         return bean;
-    }
-
-    class HomePageImplListener implements ImplListener{
-        private final String TAG = "impl_homepage";
-        private Runnable mRefreshListRunnable = new Runnable(){
-            @Override
-            public void run() {
-                mListAdapter.notifyDataSetChanged();
-            }
-        };
-
-        @Override
-        public void onUpdate(boolean success, ImplInfo implInfo) {
-            HomePageApkData bean = findBeanByKey(implInfo.getKey());
-            if (null != bean){
-                LogUtils.i(TAG,  HomePageListFragment.this+",onUpdate name="+bean.getName()+",status="+implInfo.getStatus());
-                bean.setImplInfo(implInfo);
-                mActivity.runOnUiThread(mRefreshListRunnable);
-            }
-        }
     }
 
     class MyScrollListener implements AbsListView.OnScrollListener{

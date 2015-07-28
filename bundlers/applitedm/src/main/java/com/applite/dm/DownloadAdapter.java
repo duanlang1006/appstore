@@ -32,15 +32,17 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
+import com.lidroid.xutils.BitmapUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
-import net.tsz.afinal.FinalBitmap;
-
+import com.mit.impl.ImplListener;
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
 import org.osgi.framework.BundleContext;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -51,12 +53,13 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
     private Resources mResources;
     private LayoutInflater mInflater;
     private int mCheckedItemPosition = -1;
-    private FinalBitmap mFinalBitmap;
+    private BitmapUtils mBitmapHelper;
+    private ImplAgent implAgent;
 
     public DownloadAdapter(Context context, Cursor cursor) {
         super(context, cursor,true);
         mContext = context;
-        mFinalBitmap = FinalBitmap.create(mContext);
+        mBitmapHelper = BitmapHelper.getBitmapUtils(mContext.getApplicationContext());
         mResources = mContext.getResources();
         mInflater = LayoutInflater.from(mContext);
         try {
@@ -69,6 +72,7 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         }catch (Exception e){
             e.printStackTrace();
         }
+        implAgent = ImplAgent.getInstance(context.getApplicationContext());
     }
 
     @Override
@@ -79,9 +83,9 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        DownloadItemViewHolder viewHolder = (DownloadItemViewHolder)view.getTag();
+        ViewHolder viewHolder = (ViewHolder)view.getTag();
         if (null == viewHolder) {
-            viewHolder = new DownloadItemViewHolder();
+            viewHolder = new ViewHolder();
             viewHolder.actionBtn = (TextView) view.findViewById(R.id.button_op);
             viewHolder.deleteButton = (TextView) view.findViewById(R.id.button_delete);
             viewHolder.detailButton = (TextView) view.findViewById(R.id.button_detail);
@@ -103,7 +107,10 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         viewHolder.detailButton.setOnClickListener(this);
 
         view.setOnClickListener(this);
-        viewHolder.setImplInfo(ImplInfo.from(cursor));
+        String key = cursor.getString(cursor.getColumnIndex("key"));
+        String packageName = cursor.getString(cursor.getColumnIndex("packageName"));
+        int versionCode = cursor.getInt(cursor.getColumnIndex("versionCode"));
+        viewHolder.initView(implAgent.getImplInfo(key,packageName,versionCode));
         if (mCheckedItemPosition == cursor.getPosition()){
             viewHolder.extra.setVisibility(View.VISIBLE);
         }else{
@@ -113,10 +120,10 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        DownloadAdapter.DownloadItemViewHolder viewHoler = (DownloadAdapter.DownloadItemViewHolder)v.getTag();
+        ViewHolder vh = (ViewHolder)v.getTag();
         switch(v.getId()){
             case R.id.button_delete:
-                ImplAgent.requestDownloadDelete(mContext,viewHoler.implInfo.getKey());
+                implAgent.remove(vh.implInfo);
                 break;
             case R.id.button_detail:
                 try {
@@ -128,9 +135,9 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
                     agent.getService().ApkplugOSGIService(bundleContext,
                             Constant.OSGI_SERVICE_DM_FRAGMENT,
                             0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
-                            viewHoler.implInfo.getPackageName(),
-                            viewHoler.implInfo.getTitle(),
-                            viewHoler.implInfo.getIconUrl(),
+                            vh.implInfo.getPackageName(),
+                            vh.implInfo.getTitle(),
+                            vh.implInfo.getIconUrl(),
                             Constant.OSGI_SERVICE_DM_FRAGMENT);
                 } catch (Exception e) {
                     // TODO 自动生成的 catch 块
@@ -138,58 +145,38 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
                 }
                 break;
             case R.id.button_op:
-                switch(viewHoler.implInfo.getAction(mContext)){
-                    case ImplInfo.ACTION_DOWNLOAD:
-                        if (null != viewHoler.implInfo){
-                            ImplAgent.downloadToggle(mContext, viewHoler.implInfo.getKey());
-                        }
-                        break;
-                    default:
-                        try {
-                            mContext.startActivity(viewHoler.implInfo.getActionIntent(mContext));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        break;
+                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
+                    switch (vh.implInfo.getStatus()) {
+                        case Constant.STATUS_PENDING:
+                        case Constant.STATUS_RUNNING:
+                            implAgent.pauseDownload(vh.implInfo);
+                            break;
+                        case Constant.STATUS_PAUSED:
+                            implAgent.resumeDownload(vh.implInfo, new DownloadImplCallback(vh));
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    try {
+                        mContext.startActivity(implAgent.getActionIntent(vh.implInfo));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             default:
-                if (mCheckedItemPosition == viewHoler.position){
+                if (mCheckedItemPosition == vh.position){
                     mCheckedItemPosition = -1;
                 }else{
-                    mCheckedItemPosition = viewHoler.position;
+                    mCheckedItemPosition = vh.position;
                 }
                 notifyDataSetInvalidated();
                 break;
         }
     }
 
-    private void setIcon(ImplInfo info,ImageView iconView) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromParts("file", "", null), info.getMimeType());
-        PackageManager pm = mContext.getPackageManager();
-        List<ResolveInfo> list = pm.queryIntentActivities(intent,
-                PackageManager.MATCH_DEFAULT_ONLY);
-        if (list.size() == 0) {
-            // no icon found for this mediatype. use "unknown" icon
-            iconView.setImageDrawable(mResources.getDrawable(R.drawable.ic_download_misc_file_type));
-        } else {
-            Drawable icon = list.get(0).activityInfo.loadIcon(pm);
-            iconView.setImageDrawable(icon);
-        }
-        if(null != info.getIconUrl()){
-            mFinalBitmap.display(iconView, info.getIconUrl());
-        }
-    }
-
-    private void setProgress(ProgressBar progressBar,int percent){
-        progressBar.setIndeterminate(false);
-        progressBar.setMax(100);
-        progressBar.setProgress(percent);
-        progressBar.setVisibility(View.VISIBLE);
-    }
-
-    class DownloadItemViewHolder{
+    class ViewHolder {
         ProgressBar progressBar;
         TextView titleView;
         TextView descView;
@@ -202,23 +189,141 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         View extra;
         int position;
 
-        void setImplInfo(ImplInfo info){
+        void initView(ImplInfo info){
             this.implInfo = info;
-            actionBtn.setText(implInfo.getActionText(mContext));
-//            if (implInfo.getAction(mContext) == ImplInfo.ACTION_INSTALL){
+            actionBtn.setText(implAgent.getActionText(implInfo));
+//            if (implAgent.getAction(mContext) == ImplInfo.ACTION_INSTALL){
 //                actionBtn.setEnabled(false);
 //            }else{
 //                actionBtn.setEnabled(true);
 //            }
-            descView.setText(implInfo.getDescText(mContext));
+            descView.setText(implAgent.getDescText(implInfo));
             String title = implInfo.getTitle();
             if(null == title && title.isEmpty()) {
                 title = mResources.getString(R.string.missing_title);
             }
             titleView.setText(title);
-            statusView.setText(implInfo.getStatusText(mContext));
-            setIcon(info,iconView);
-            setProgress(progressBar,implInfo.getProgress());
+            statusView.setText(implAgent.getStatusText(implInfo));
+            setIcon();
+            setProgress();
+        }
+
+        void refresh(){
+            actionBtn.setText(implAgent.getActionText(implInfo));
+            descView.setText(implAgent.getDescText(implInfo));
+            statusView.setText(implAgent.getStatusText(implInfo));
+            setProgress();
+        }
+
+        private void setIcon() {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.fromParts("file", "", null), implInfo.getMimeType());
+            PackageManager pm = mContext.getPackageManager();
+            List<ResolveInfo> list = pm.queryIntentActivities(intent,
+                    PackageManager.MATCH_DEFAULT_ONLY);
+            if (list.size() == 0) {
+                // no icon found for this mediatype. use "unknown" icon
+                iconView.setImageDrawable(mResources.getDrawable(R.drawable.ic_download_misc_file_type));
+            } else {
+                Drawable icon = list.get(0).activityInfo.loadIcon(pm);
+                iconView.setImageDrawable(icon);
+            }
+            if(null != implInfo.getIconUrl()){
+                mBitmapHelper.display(iconView, implInfo.getIconUrl());
+            }
+        }
+
+        private void setProgress(){
+            progressBar.setIndeterminate(false);
+            progressBar.setMax(100);
+            progressBar.setProgress(implAgent.getProgress(implInfo));
+            progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+    class DownloadImplCallback extends ImplListener {
+        Object tag ;
+
+        DownloadImplCallback(Object tag) {
+            this.tag = tag;
+        }
+
+        @Override
+        public void onStart(ImplInfo info) {
+            super.onStart(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onCancelled(ImplInfo info) {
+            super.onCancelled(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onLoading(ImplInfo info, long total, long current, boolean isUploading) {
+            super.onLoading(info, total, current, isUploading);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onSuccess(ImplInfo info, File file) {
+            super.onSuccess(info, file);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onFailure(ImplInfo info, Throwable t, String msg) {
+            super.onFailure(info, t, msg);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onInstallSuccess(ImplInfo info) {
+            super.onInstallSuccess(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onInstalling(ImplInfo info) {
+            super.onInstalling(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onInstallFailure(ImplInfo info, int errorCode) {
+            super.onInstallFailure(info, errorCode);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onUninstallSuccess(ImplInfo info) {
+            super.onUninstallSuccess(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onUninstalling(ImplInfo info) {
+            super.onUninstalling(info);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
+        }
+
+        @Override
+        public void onUninstallFailure(ImplInfo info, int errorCode) {
+            super.onUninstallFailure(info, errorCode);
+            ViewHolder vh = (ViewHolder)tag;
+            vh.refresh();
         }
     }
 }

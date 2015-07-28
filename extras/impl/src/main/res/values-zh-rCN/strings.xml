@@ -16,6 +16,7 @@
     <string name="action_open">打开</string>
     <string name="action_pause">暂停</string>
     <string name="action_install" >安装</string>
+    <string name="action_upgrade" >更新</string>
     <string name="action_run" >运行</string>
     <string name="action_resume" >继续</string>
     <string name="action_waiting" >等待</string>
@@ -23,4 +24,5 @@
     <string name="install_status_success" >已安装</string>
     <string name="install_status_failed" >安装失败</string>
     <string name="install_status_installing" >正在安装</string>
+    <string name="install_status_upgrade" >发现更新</string>
 </resources>

@@ -33,7 +33,7 @@ public class MyIntentService extends IntentService {
         if (intent != null) {
             Intent origionalIntent = intent.getParcelableExtra(ORIGIONAL_INTENT);
             if (null != origionalIntent){
-                ImplAgent.onReceive(this,origionalIntent);
+                ImplAgent.getInstance(this.getApplicationContext()).onReceive(this,origionalIntent);
             }
         }
     }
