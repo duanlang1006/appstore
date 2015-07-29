@@ -359,9 +359,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             // 下面添加参数，显示读出时内容和读取失败时的内容
             Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.detail_default_img);
             fb.display(img, mViewPagerUrlList[i],bmp,bmp);
-            LogUtils.i(TAG, "111   :" + fb);
-            LogUtils.i(TAG, "222   :" + bmp);
-            LogUtils.i(TAG, "333   :" + getResources());
         }
 //        fb.configLoadingImage(null);
     }
