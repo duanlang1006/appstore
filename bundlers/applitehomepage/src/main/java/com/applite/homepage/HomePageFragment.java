@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.applite.bean.HomePageApkData;
@@ -81,6 +82,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     private String mCategory;   //null：首页   非null:分类
     private String mTitle;
 
+    private RelativeLayout mLoadingarea;
     private View mLoadingView;
     private TextView loadingText;
     private View mOffnetView;
@@ -143,8 +145,6 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         }catch (Exception e){
             e.printStackTrace();
         }
-
-//        initActionBar();
     }
 
     @Override
@@ -171,6 +171,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 
         Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
 
+        mLoadingarea = (RelativeLayout)rootView.findViewById(R.id.top_parent);
         //加载中显示动画资源及文字
         mLoadingView = rootView.findViewById(R.id.loading_img);
         LoadingAnimation = AnimationUtils.loadAnimation(context, R.anim.tip);
@@ -186,11 +187,13 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         offnetImg = (ImageView)rootView.findViewById(R.id.off_img);
         mRetrybtn = (Button)rootView.findViewById(R.id.retry_btn);
 
-        //mLoadingView.setVisibility(View.GONE);
-        //loadingText.setVisibility(View.GONE);
         mOffnetView.setVisibility(View.GONE);
 
         if(!networkState){
+             mLoadingarea.setVisibility(View.GONE);
+             //mLoadingView.setVisibility(View.GONE);
+             //loadingText.setVisibility(View.GONE);
+             mLoadingView.clearAnimation();
              mOffnetView.setVisibility(View.VISIBLE);
 
              mRetrybtn.setOnClickListener(new View.OnClickListener(){
@@ -346,6 +349,7 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
         public void onClick(View v) {
             SPUtils.put(mActivity,SPUtils.POP_IMGURL_ISCLICK,mPopIsClick);
             popupWindow.dismiss();
+            LogUtils.i("lang", "v.getId() = "+v.getId());
             switch (v.getId()){
                 case R.id.pop_img_exit:
                     break;
@@ -515,14 +519,15 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
             params.put("categorytype", mCategory);
         }
         mOffnetView.setVisibility(View.GONE);
-        //mLoadingView.setVisibility(View.VISIBLE);
-        //LoadingAnimation.start();
+        mLoadingarea.setVisibility(View.VISIBLE);
+        if (LoadingAnimation != null) {
+            mLoadingView.startAnimation(LoadingAnimation);
+        }
 
         mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
-                //LogUtils.d(TAG, "首页数据：");
                 LogUtils.i(TAG, "获取首页数据:");
                 try {
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
@@ -532,15 +537,17 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-                //mOffnetView.setVisibility(View.GONE);
-                //mLoadingView.setVisibility(View.GONE);
+                if (LoadingAnimation != null) {
+                    mLoadingView.startAnimation(LoadingAnimation);
+                }
                 mActivity.runOnUiThread(mRefreshRunnable);
             }
 
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
-                //mLoadingView.setVisibility(View.GONE);
+                mLoadingView.clearAnimation();
+                mLoadingarea.setVisibility(View.GONE);
                 mOffnetView.setVisibility(View.VISIBLE);
                 LogUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
             }
