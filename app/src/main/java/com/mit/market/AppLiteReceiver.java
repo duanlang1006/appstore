@@ -1,4 +1,5 @@
-package com.android.applite.model;
+package com.mit.market;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,12 +8,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import com.applite.util.AppliteConfig;
-import com.mit.market.MyIntentService;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.applite.android.R;
-import com.mit.market.MitMarketActivity;
 
 public class AppLiteReceiver extends BroadcastReceiver {
     private static final String TAG = "AppLiteReceiver";
@@ -20,13 +18,11 @@ public class AppLiteReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 	    if(Intent.ACTION_TIME_CHANGED.equals(intent.getAction())){
-	        AppLiteModel.getInstance(context).onReceive(context, intent);
-	    }
-	    if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
+
+	    }else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
 	        AppliteConfig.initNetwork(context);
         }else if ("com.dataservice.broadcast".equals(intent.getAction())){
             setRemind(context,intent);
-            //AppLiteModel.getInstance(context).onReceive(context,intent);
         }else{
             MyIntentService.startByOriginIntent(context,intent);
         }
@@ -76,7 +72,7 @@ public class AppLiteReceiver extends BroadcastReceiver {
                 + " ; mIconUrl: " + mIconUrl
                 + " ; mIntent: " + mIntent);
         if(context.getPackageName().equals(mPackageName)) {
-            manager = (NotificationManager) context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+            manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             ComponentName cn =null;
             if(null ==mIntent || null == mAction || null == mPackageName){
                 mPlayIntent = new Intent(context, MitMarketActivity.class);

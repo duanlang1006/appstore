@@ -1,14 +1,9 @@
 package com.mit.market;
 
 import android.content.Context;
-import android.util.Log;
-
-import com.android.applite.plugin.AppLiteApplication;
-
 import org.apkplug.Bundle.BundleControl;
 import org.apkplug.Bundle.OSGIServiceAgent;
 import org.apkplug.Bundle.installCallback;
-import org.apkplug.app.FrameworkInstance;
 import org.osgi.framework.BundleContext;
 
 import java.io.BufferedOutputStream;

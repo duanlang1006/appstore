@@ -175,7 +175,7 @@ public class ImplAgent {
         if (null == implInfo){
             return;
         }
-        mWeakCallbackMap.put(appCallback,implInfo);
+        setImplCallback(appCallback, implInfo);
         implInfo.setMimeType(MimeTypeUtils.getMimeType(filename));
         implInfo.setAutoLaunch(autoLauncher);
         ImplDownload.getInstance(mContext).addDownload(implInfo,publicDir,filename,mImplCallback);
@@ -192,7 +192,7 @@ public class ImplAgent {
         if (null == implInfo){
             return;
         }
-        mWeakCallbackMap.put(appCallback,implInfo);
+        setImplCallback(appCallback,implInfo);
         ImplDownload.getInstance(mContext).resume(implInfo, mImplCallback);
     }
 
@@ -210,12 +210,12 @@ public class ImplAgent {
     }
 
     public void install(ImplInfo implInfo,boolean silent,ImplListener appCallback){
-        mWeakCallbackMap.put(appCallback,implInfo);
+        setImplCallback(appCallback,implInfo);
         ImplPackageManager.getInstance(mContext).install(implInfo,silent,mImplCallback);
     }
 
     public void uninstall(ImplInfo implInfo,boolean silent,ImplListener appCallback){
-        mWeakCallbackMap.put(appCallback,implInfo);
+        setImplCallback(appCallback,implInfo);
         ImplPackageManager.getInstance(mContext).uninstall(implInfo, silent, mImplCallback);
     }
 
@@ -224,7 +224,9 @@ public class ImplAgent {
     }
 
     public void setImplCallback(ImplListener appCallback,ImplInfo implInfo){
-        mWeakCallbackMap.put(appCallback,implInfo);
+        if (null != appCallback && null != implInfo) {
+            mWeakCallbackMap.put(appCallback, implInfo);
+        }
     }
 
     public int getAction(ImplInfo implInfo) {

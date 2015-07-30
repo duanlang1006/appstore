@@ -1,4 +1,4 @@
-package com.android.applite.plugin;
+package com.mit.market;
 /*
  * Copyright (C) 2008 The Android Open Source Project
  *
@@ -23,14 +23,8 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.util.Log;
 
-import com.android.applite.model.AppLiteModel;
-import com.applite.util.AppliteConfig;
-import com.mit.market.InstallBundle;
-
-import org.apkplug.Bundle.installCallback;
 import org.apkplug.app.FrameworkFactory;
 import org.apkplug.app.FrameworkInstance;
-import org.osgi.framework.BundleContext;
 
 import java.util.List;
 
@@ -52,18 +46,10 @@ public class AppLiteApplication extends Application {
         sScreenDensity = getResources().getDisplayMetrics().density;
 
         AppliteConfig.initNetwork(this);
-        AppLiteModel.getInstance(this);
 
-//        // Register intent receivers
-//        IntentFilter filter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
-//        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-//        filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
-//        filter.addDataScheme("package");
-//        registerReceiver(mModel, filter);
-//
         String processName = getProcessName(this, android.os.Process.myPid());
         if (processName != null) {
-            boolean defaultProcess = processName.equals("com.applite.android");
+            boolean defaultProcess = processName.equals(getPackageName());
             if (defaultProcess) {
                 Log.d(TAG,"defaultProcess is true");
                 initAppForMainProcess();
@@ -81,7 +67,6 @@ public class AppLiteApplication extends Application {
     @Override
     public void onTerminate() {
         super.onTerminate();
-        AppLiteModel.getInstance(this).destory();
 
         if (null != sframe){
             sframe.shutdown();
