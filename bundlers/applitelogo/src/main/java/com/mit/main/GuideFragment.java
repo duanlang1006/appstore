@@ -9,6 +9,8 @@ import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import android.os.Build;
 import android.os.Bundle;
@@ -97,6 +99,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         }
     };
     private ImplAgent implAgent;
+    private Resources mResources;
 
     public GuideFragment() {
     }
@@ -122,6 +125,9 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             mInflater = LayoutInflater.from(context);
             mInflater = mInflater.cloneInContext(context);
+
+            mResources = context.getResources();
+
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.hide();
         } catch (Exception e) {
@@ -369,7 +375,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         mAppTV.setText(bean.getName());
 //        }
 
-        mFinalBitmap.display(mAppIV, bean.getImgurl());
+        mFinalBitmap.display(mAppIV, bean.getImgurl(), BitmapFactory.decodeResource(mResources, R.drawable.buffer));
 
         child.setTag(apkPsition);
         mApkList.add(child);

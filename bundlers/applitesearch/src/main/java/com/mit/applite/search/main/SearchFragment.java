@@ -88,9 +88,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     private int mSearchPostPage = 0;
     private boolean isLastRow = false;
     private View moreView;//搜索ListView尾部布局
-    private boolean isToEnd = false;//服务器数据是否到底
+    private boolean ISTOEND = false;//服务器数据是否到底
     private String mSearchText = "";//当前搜索的关键字
-    private boolean isSearchPost = true;//上拉加载是否可以请求服务器
+    private boolean ISPOSTSEARCH = true;//上拉加载是否可以请求服务器
     private int mShowHotWordNumber = 9;
 
     private Button refresh;
@@ -112,16 +112,16 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 mMoreText.setText(AppliteUtils.getString(mContext, R.string.loading));
                 moreView.setVisibility(View.VISIBLE);
 
-                if (isToEnd) {
+                if (ISTOEND) {
                     mMoreProgressBar.setVisibility(View.GONE);
                     mMoreText.setText(AppliteUtils.getString(mContext, R.string.no_data));
 //                    Toast.makeText(mActivity, "木有更多数据！", Toast.LENGTH_SHORT).show();
 //                    mListView.removeFooterView(moreView); //移除底部视图
                 } else {
                     //加载更多数据，这里可以使用异步加载
-                    if (isSearchPost) {
+                    if (ISPOSTSEARCH) {
                         postSearch(mEtView.getText().toString());
-                        isSearchPost = false;
+                        ISPOSTSEARCH = false;
                     }
                 }
                 LogUtils.i(TAG, "加载更多数据");
@@ -198,6 +198,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 mEtView.setFocusable(true);
                 mEtView.setFocusableInTouchMode(true);
                 mEtView.requestFocus();
+                mEtView.findFocus();
                 KeyBoardUtils.openKeybord(mEtView, mActivity);
             }
             initActionBar();
@@ -298,6 +299,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         mEtView.addTextChangedListener(mTextWatcher);
 
         mHotChangeView.setOnClickListener(this);
+        refresh.setOnClickListener(this);
     }
 
     private TextWatcher mTextWatcher = new TextWatcher() {
@@ -314,9 +316,11 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         @Override
         public void afterTextChanged(Editable s) {
             LogUtils.i(TAG, "输入文字后的状态");
+            ISPOSTSEARCH = true;
             if (TextUtils.isEmpty(mEtView.getText().toString())) {
                 isHotWordLayoutVisibility(View.VISIBLE);
             } else {
+                no_network.setVisibility(View.GONE);
                 isHotWordLayoutVisibility(View.GONE);
                 mListView.setVisibility(View.GONE);
                 if (!isClickPreloadItem) {//点击预加载Item，改变mEtView的文字不会postPreload请求
@@ -360,6 +364,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 isHotWordLayoutVisibility(View.VISIBLE);
                 break;
             case R.id.search_search:
+                no_network.setVisibility(View.GONE);
                 mPreloadListView.setVisibility(View.GONE);
                 if (TextUtils.isEmpty(mEtView.getText().toString())) {
                     Toast.makeText(mActivity, AppliteUtils.getString(mContext, R.string.srarch_content_no_null),
@@ -371,10 +376,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                         mListView.setVisibility(View.VISIBLE);
                         break;
                     } else {
-                        isToEnd = false;
-                        mSearchPostPage = 0;
-                        postSearch(mEtView.getText().toString());
-                        isHotWordLayoutVisibility(View.GONE);
+                        if (ISPOSTSEARCH) {
+                            ISTOEND = false;
+                            ISPOSTSEARCH = false;
+                            mSearchPostPage = 0;
+                            postSearch(mEtView.getText().toString());
+                            isHotWordLayoutVisibility(View.GONE);
+                        }
                     }
                 }
                 break;
@@ -384,6 +392,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 mShowHotData.clear();
                 setHotWordShowData(mChangeNumbew);
                 mChangeNumbew = mChangeNumbew + 1;
+                break;
+            case R.id.refresh:
+                if (TextUtils.isEmpty(mEtView.getText().toString())) {
+                    postHotWord();
+                } else {
+                    postSearch(mEtView.getText().toString());
+                }
                 break;
         }
     }
@@ -405,36 +420,29 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         params.put("type", "search");
         params.put("key", name);
         params.put("page", mSearchPostPage + "");
-        no_network.setVisibility(View.GONE);
         mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
                 String result = (String) o;
-                setSearchData(result);
                 LogUtils.i(TAG, "搜索网络请求成功，result:" + result);
+                setSearchData(result);
 
                 mSearchText = name;
-                isSearchPost = true;//请求成功后，才可以继续请求
+                ISPOSTSEARCH = true;//请求成功后，才可以继续请求
                 mSearchPostPage = mSearchPostPage + 1;//请求成功后，请求的页数加1
             }
 
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
-                isSearchPost = true;
+                ISPOSTSEARCH = true;
                 moreView.setVisibility(View.GONE);
+                mActivity.runOnUiThread(mNotifyRunnable);
+
                 Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.post_failure),
                         Toast.LENGTH_SHORT).show();
                 LogUtils.e(TAG, "搜索网络请求失败，strMsg:" + strMsg);
-                no_network.setVisibility(View.VISIBLE);
-//                refresh.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        postSearch(name);
-//                    }
-//                });
-                refresh.setVisibility(View.GONE);
             }
         });
     }
@@ -452,7 +460,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
             JSONObject object = new JSONObject(data);
             int app_key = object.getInt("app_key");
             String json = object.getString("search_info");
-            isToEnd = object.getBoolean("istoend");
+            ISTOEND = object.getBoolean("istoend");
             if (!TextUtils.isEmpty(json)) {
                 JSONArray array = new JSONArray(json);
                 for (int i = 0; i < array.length(); i++) {
@@ -524,8 +532,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
-                Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.post_failure),
-                        Toast.LENGTH_SHORT).show();
                 LogUtils.e(TAG, "预加载网络请求失败，strMsg:" + strMsg);
             }
         });
@@ -594,15 +600,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
-                Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.post_failure),
-                        Toast.LENGTH_SHORT).show();
                 no_network.setVisibility(View.VISIBLE);
-                refresh.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        postHotWord();
-                    }
-                });
                 LogUtils.e(TAG, "在线热词请求失败，strMsg:" + strMsg);
             }
         });

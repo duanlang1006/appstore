@@ -1,12 +1,9 @@
 package com.mit.applite.main;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -23,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
@@ -170,7 +168,11 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
      * 初始化控件
      */
     private void initView() {
-        mProgressButton = (ProgressButton) rootView.findViewById(R.id.detail_progress_button);
+//        mProgressButton = (ProgressButton) rootView.findViewById(R.id.detail_progress_button);
+        LinearLayout mDownloadLayout = (LinearLayout) rootView.findViewById(R.id.detail_download_layout);
+        mProgressButton = ProgressButton.inflate(mContext, container, false, mInflater);
+        mDownloadLayout.addView(mProgressButton);
+
         mApkImgView = (ImageView) rootView.findViewById(R.id.detail_apkimg);
         mNameView = (TextView) rootView.findViewById(R.id.detail_name);
         mName1View = (TextView) rootView.findViewById(R.id.detail_name1);
@@ -194,8 +196,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onClickListener() {
                 if (!TextUtils.isEmpty(mPackageName)) {
-                    ImplInfo implinfo = (ImplInfo)mProgressButton.getTag();
-                    if (null != implinfo){
+                    ImplInfo implinfo = (ImplInfo) mProgressButton.getTag();
+                    if (null != implinfo) {
                         if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implinfo)) {
                             switch (implinfo.getStatus()) {
                                 case Constant.STATUS_PENDING:
@@ -227,7 +229,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mBackView.setOnClickListener(this);
         mSearchView.setOnClickListener(this);
         mDownloadView.setOnClickListener(this);
-
+        refreshButton.setOnClickListener(this);
     }
 
     @Override
@@ -237,6 +239,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 getFragmentManager().popBackStack();
                 break;
             case R.id.detail_download:
+                break;
+            case R.id.refresh_btn:
+                no_network.setVisibility(View.GONE);
+                post(mPackageName);
                 break;
         }
     }
@@ -266,10 +272,9 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onFailure(Throwable t, int errorNo, String strMsg) {
                 super.onFailure(t, errorNo, strMsg);
-                // 这里设置没有网络时的图片
-                String result = strMsg;
                 LogUtils.e(TAG, "应用详情网络请求失败，strMsg:" + strMsg);
-                setDate1(result);
+                // 这里设置没有网络时的图片
+                no_network.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -317,7 +322,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 setPreViewImg();
             }
 
-            ImplInfo implinfo = implAgent.getImplInfo(mPackageName,mPackageName,mVersionCode);
+            ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName, mVersionCode);
             if (null != implinfo) {
                 implAgent.setImplCallback(implCallback, implinfo);
                 mProgressButton.setText(implAgent.getActionText(implinfo));
@@ -332,21 +337,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * 设置无网络状态时的内容，以及点击刷新进行网络链接判断
-     * @param date1
-     */
-    private void setDate1(String date1){
-        no_network.setVisibility(View.VISIBLE);
-        refreshButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                no_network.setVisibility(View.GONE);
-                post(mPackageName);
-            }
-        });
-    }
-
-    /**
      * 设置应用介绍的图片
      */
     private void setPreViewImg() {
@@ -357,8 +347,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
             mImgLl.addView(child);
             // 下面添加参数，显示读出时内容和读取失败时的内容
-            Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.detail_default_img);
-            fb.display(img, mViewPagerUrlList[i],bmp,bmp);
+            Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.detail_default_img);
+            fb.display(img, mViewPagerUrlList[i], bmp, bmp);
             LogUtils.i(TAG, "111   :" + fb);
             LogUtils.i(TAG, "222   :" + bmp);
             LogUtils.i(TAG, "333   :" + getResources());
@@ -437,8 +427,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             refresh(info);
         }
 
-        private void refresh(ImplInfo info){
-            LogUtils.d(TAG,"refresh"+implAgent.getActionText(info)+","+info.getStatus());
+        private void refresh(ImplInfo info) {
+            LogUtils.d(TAG, "refresh" + implAgent.getActionText(info) + "," + info.getStatus());
             mProgressButton.setText(implAgent.getActionText(info));
             mProgressButton.setProgress(implAgent.getProgress(info));
         }

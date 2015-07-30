@@ -25,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
-                android:src="@drawable/no_notwork" />
+                android:src="@drawable/post_failure" />
 
             <Button
                 android:id="@+id/refresh_btn"
@@ -33,7 +33,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="50dp"
-                android:text="@string/refresh" />
+                android:background="@drawable/refresh_but_bg"
+                android:padding="10dp"
+                android:text="@string/refresh"
+                android:textColor="@color/black" />
         </LinearLayout>
 
         <!-- 详情页顶部的应用名称，返回-->
@@ -192,6 +195,7 @@
             </ScrollView>
 
             <LinearLayout
+                android:id="@+id/detail_download_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="50dp"
                 android:layout_alignParentBottom="true"
@@ -217,7 +221,7 @@
                     android:text="@string/install"
                     android:visibility="gone" />
 
-                <com.mit.applite.view.ProgressButton
+                <!--<com.mit.applite.view.ProgressButton
                     android:id="@+id/detail_progress_button"
                     android:layout_width="300dp"
                     android:layout_height="fill_parent"
@@ -227,7 +231,8 @@
                     app:progress="0"
                     app:text="@string/install"
                     app:textSize="20sp"
-                    app:textcolor="@color/black" />
+                    app:textcolor="@color/black"
+                    android:visibility="gone"/>-->
             </LinearLayout>
         </RelativeLayout>
 

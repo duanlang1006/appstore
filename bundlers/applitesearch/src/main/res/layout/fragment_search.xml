@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:src="@drawable/no_notwork" />
+            android:src="@drawable/post_failure" />
 
         <Button
             android:id="@+id/refresh"
@@ -25,7 +25,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
-            android:text="@string/refresh" />
+            android:background="@drawable/hot_word_change_bg"
+            android:padding="15dp"
+            android:text="@string/refresh"
+            android:textColor="@color/black" />
 
     </LinearLayout>
 

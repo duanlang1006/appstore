@@ -1,6 +1,7 @@
 package com.mit.appliteupdate.adapter;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -144,7 +145,7 @@ public class UpdateAdapter extends BaseAdapter {
 
         public void refresh() {
             mName.setText(bean.getmName());
-            mFinalBitmap.display(mImg, bean.getmImgUrl());
+            mFinalBitmap.display(mImg, bean.getmImgUrl(), BitmapFactory.decodeResource(mContext.getResources(), R.drawable.buffer));
             mVersionName.setText("V " + bean.getmVersionName());
             mApkSize.setText(AppliteUtils.bytes2kb(bean.getmSize()));
             initProgressButton();
