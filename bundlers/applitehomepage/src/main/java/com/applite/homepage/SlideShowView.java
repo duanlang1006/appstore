@@ -203,7 +203,11 @@ public class SlideShowView extends FrameLayout implements View.OnClickListener{
                 position = imageViewsList.size()+position;
             }
             ImageView imageView = imageViewsList.get(position);
-            mFinalBitmap.display(imageView,imageUrls[position%imageUrls.length]);
+            mFinalBitmap.display(imageView, imageUrls[position % imageUrls.length]);
+            ViewGroup p = (ViewGroup) imageView.getParent();
+            if(p != null){
+                p.removeAllViewsInLayout();
+            }
             container.addView(imageView);
             return imageView;
         }
