@@ -33,6 +33,16 @@ android {
         config
     }
     buildTypes {
+        debug {
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
         release {
             buildConfigField "boolean", "LOG_DEBUG", "false"
 

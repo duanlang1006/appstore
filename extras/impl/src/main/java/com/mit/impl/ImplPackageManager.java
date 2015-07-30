@@ -135,7 +135,7 @@ public class ImplPackageManager{
             e.printStackTrace();
         }
         implInfo.setStatus(Constant.STATUS_INSTALLED);
-        implInfo.setLocalPath(null);
+//        implInfo.setLocalPath(null);
         callback.onInstallSuccess(implInfo);
     }
 

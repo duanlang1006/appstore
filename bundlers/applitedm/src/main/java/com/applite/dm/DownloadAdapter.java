@@ -22,11 +22,15 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -34,21 +38,23 @@ import android.widget.TextView;
 
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
+import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
 import com.lidroid.xutils.BitmapUtils;
+import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
+import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
+import com.lidroid.xutils.bitmap.callback.BitmapLoadFrom;
+import com.lidroid.xutils.util.MimeTypeUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplListener;
+import com.mit.impl.ImplChangeCallback;
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
 import org.osgi.framework.BundleContext;
 
-import java.io.File;
+import java.lang.reflect.Method;
 import java.util.List;
 
-/**
- * List adapter for Cursors returned by {@link com.android.dsc.downloads.DownloadManager}.
- */
 public class DownloadAdapter extends CursorAdapter implements View.OnClickListener{
     private Context mContext;
     private Resources mResources;
@@ -175,7 +181,7 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         ImageView iconView;
         ImplInfo implInfo;
         View extra;
-        ImplListener implCallback;
+        ImplChangeCallback implCallback;
         int position;
 
         ViewHolder(View view) {
@@ -204,7 +210,7 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
             actionBtn.setText(implAgent.getActionText(implInfo));
             descView.setText(implAgent.getDescText(implInfo));
             String title = implInfo.getTitle();
-            if(null == title && title.isEmpty()) {
+            if(null == title || title.isEmpty()) {
                 title = mResources.getString(R.string.missing_title);
             }
             titleView.setText(title);
@@ -224,20 +230,36 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         }
 
         private void setIcon() {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(Uri.fromParts("file", "", null), implInfo.getMimeType());
-            PackageManager pm = mContext.getPackageManager();
-            List<ResolveInfo> list = pm.queryIntentActivities(intent,
-                    PackageManager.MATCH_DEFAULT_ONLY);
-            if (list.size() == 0) {
-                // no icon found for this mediatype. use "unknown" icon
-                iconView.setImageDrawable(mResources.getDrawable(R.drawable.ic_download_misc_file_type));
-            } else {
-                Drawable icon = list.get(0).activityInfo.loadIcon(pm);
-                iconView.setImageDrawable(icon);
-            }
+            Drawable drawable = mResources.getDrawable(R.drawable.ic_download_misc_file_type);
+            iconView.setImageDrawable(drawable);
             if(null != implInfo.getIconUrl()){
-                mBitmapHelper.display(iconView, implInfo.getIconUrl());
+                mBitmapHelper.configDefaultLoadFailedImage(drawable);
+                mBitmapHelper.configDefaultLoadingImage(drawable);
+                mBitmapHelper.display(iconView, implInfo.getIconUrl(),new BitmapLoadCallBack<ImageView>() {
+                    @Override
+                    public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
+                        this.setBitmap(imageView,IconCache.getInstance(mContext).getIcon(implInfo.getPackageName(),bitmap));
+                        Animation animation = bitmapDisplayConfig.getAnimation();
+                        if (animation != null) {
+                            animationDisplay(imageView, animation);
+                        }
+                    }
+
+                    @Override
+                    public void onLoadFailed(ImageView imageView, String s, Drawable drawable) {
+                        this.setDrawable(imageView, drawable);
+                    }
+
+                    private void animationDisplay(ImageView container, Animation animation) {
+                        try {
+                            Method cloneMethod = Animation.class.getDeclaredMethod("clone");
+                            cloneMethod.setAccessible(true);
+                            container.startAnimation((Animation) cloneMethod.invoke(animation));
+                        } catch (Throwable e) {
+                            container.startAnimation(animation);
+                        }
+                    }
+                });
             }
         }
 
@@ -250,90 +272,15 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
     }
 
 
-    class DownloadImplCallback extends ImplListener {
+    class DownloadImplCallback implements ImplChangeCallback {
         Object tag ;
 
         DownloadImplCallback(Object tag) {
-            super();
             this.tag = tag;
         }
 
         @Override
-        public void onStart(ImplInfo info) {
-            super.onStart(info);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onCancelled(ImplInfo info) {
-            super.onCancelled(info);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onLoading(ImplInfo info, long total, long current, boolean isUploading) {
-            super.onLoading(info, total, current, isUploading);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onSuccess(ImplInfo info, File file) {
-            super.onSuccess(info, file);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-            onContentChanged();
-            notifyDataSetChanged();
-            LogUtils.d("impl_callback","onSuccess:"+implAgent.getProgress(info));
-        }
-
-        @Override
-        public void onFailure(ImplInfo info, Throwable t, String msg) {
-            super.onFailure(info, t, msg);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onInstallSuccess(ImplInfo info) {
-            super.onInstallSuccess(info);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onInstalling(ImplInfo info) {
-            super.onInstalling(info);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onInstallFailure(ImplInfo info, int errorCode) {
-            super.onInstallFailure(info, errorCode);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onUninstallSuccess(ImplInfo info) {
-            super.onUninstallSuccess(info);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onUninstalling(ImplInfo info) {
-            super.onUninstalling(info);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onUninstallFailure(ImplInfo info, int errorCode) {
-            super.onUninstallFailure(info, errorCode);
+        public void onChange(ImplInfo info) {
             ViewHolder vh = (ViewHolder)tag;
             vh.refresh();
         }
