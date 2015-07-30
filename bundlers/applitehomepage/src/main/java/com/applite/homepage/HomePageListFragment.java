@@ -29,6 +29,8 @@ import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import java.util.List;
 
@@ -337,29 +339,14 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
 
     class MySlideViewListener implements SlideShowView.OnSlideViewClickListener{
         @Override
-        public void onClick(View v, int position) {
+        public void onClick(View v, int position){
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
-            HomepageUtils.toTopicFragment(topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype());
-//            SubjectData data = new SubjectData();
-//            data.setS_key(topicData.t_key);
-//            data.setS_name(topicData.t_info);
-//            data.setStep(mData.getStep());
-//            data.setS_datatype(mData.getS_datatype());
-//            data.setData(new ArrayList<HomePageApkData>());
-//            data.setSpecialtopic_data(null);
-//            try {
-//                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-//                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-//                        bundleContext, ApkplugOSGIService.class,
-//                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-//                        OSGIServiceAgent.real_time);   //每次都重新查询
-//                agent.getService().ApkplugOSGIService(bundleContext,
-//                        Constant.OSGI_SERVICE_DM_FRAGMENT,
-//                        0, Constant.OSGI_SERVICE_TOPIC_FRAGMENT,data);
-//            } catch (Exception e) {
-//                // T
-//                e.printStackTrace();
-//            }
+            LogUtils.i(TAG, "topicData = " + topicData);
+            if(topicData.getT_skiptype() == 1){
+                HomepageUtils.toDetialFragment(topicData.getT_packagename(),topicData.getT_name(),topicData.getT_iconurl());
+            }else{
+                HomepageUtils.toTopicFragment(topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype());
+            }
         }
     }
 }
