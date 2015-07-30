@@ -56,6 +56,10 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
 
     private boolean isend;
     private boolean sendhttpreq = true;
+    public HomePageListFragment(){
+        this(null);
+    }
+
     public HomePageListFragment(SubjectData data) {
         this.mData = data;
     }

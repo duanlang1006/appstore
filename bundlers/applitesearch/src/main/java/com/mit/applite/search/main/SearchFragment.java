@@ -38,7 +38,6 @@ import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.KeyBoardUtils;
 import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplListener;
 import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalHttp;
