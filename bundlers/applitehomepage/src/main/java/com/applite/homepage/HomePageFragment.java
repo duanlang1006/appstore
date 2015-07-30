@@ -20,10 +20,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.applite.bean.HomePageApkData;
 import com.applite.bean.ScreenBean;
@@ -52,14 +55,8 @@ import org.json.JSONObject;
 import org.osgi.framework.BundleContext;
 import java.io.File;
 import java.util.ArrayList;
-
 import java.util.List;
 
-import javax.security.auth.SubjectDomainCombiner;
-
-/**
- * Created by yuzhimin on 6/17/15.
- */
 public class HomePageFragment extends Fragment implements View.OnClickListener{
     private final String TAG = "homepage_PagerFragment";
     private Activity mActivity;
@@ -84,30 +81,15 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
     private String mCategory;   //null：首页   非null:分类
     private String mTitle;
 
-    //private View mLoadingView;
+    private View mLoadingView;
+    private TextView loadingText;
     private View mOffnetView;
 
     private ImageView loadingView;
-    AnimationDrawable LoadingAnimation;
+    Animation LoadingAnimation;
 
     private Button mRetrybtn;
     private View offnetImg;
-    private boolean refreshflag;
-
-    private final ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
-        @Override
-        public void onPageScrolled(int i, float v, int i2) {
-        }
-
-        @Override
-        public void onPageSelected(int i) {
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int i) {
-        }
-    };
-
 
     Runnable mRefreshRunnable = new Runnable() {
         @Override
@@ -121,7 +103,6 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
                     mSectionsPagerAdapter.notifyDataSetChanged();
                 }
             mPagerSlidingTabStrip.setViewPager(mViewPager);
-//            mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
             }
         }
     };
@@ -188,16 +169,25 @@ public class HomePageFragment extends Fragment implements View.OnClickListener{
 
         rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_homepage_main, container, false);
 
-        //mLoadingView = rootView.findViewById(R.id.top_parent);
-        //loadingView = (ImageView)rootView.findViewById(R.id.loading_img);
-        //loadingView.setBackgroundResource(R.drawable.loading_animation);
-        //LoadingAnimation = (AnimationDrawable) loadingView.getBackground();
+        Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
 
+        //加载中显示动画资源及文字
+        mLoadingView = rootView.findViewById(R.id.loading_img);
+        LoadingAnimation = AnimationUtils.loadAnimation(context, R.anim.tip);
+        LinearInterpolator lin = new LinearInterpolator();
+        LoadingAnimation.setInterpolator(lin);
+        if (LoadingAnimation != null) {
+            mLoadingView.startAnimation(LoadingAnimation);
+        }
+        loadingText = (TextView) rootView.findViewById(R.id.loading_text);
+
+        //无网络连接时显示图片资源
         mOffnetView = rootView.findViewById(R.id.middle_parent);
         offnetImg = (ImageView)rootView.findViewById(R.id.off_img);
         mRetrybtn = (Button)rootView.findViewById(R.id.retry_btn);
 
         //mLoadingView.setVisibility(View.GONE);
+        //loadingText.setVisibility(View.GONE);
         mOffnetView.setVisibility(View.GONE);
 
         if(!networkState){
