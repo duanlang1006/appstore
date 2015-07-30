@@ -33,7 +33,7 @@ import com.applite.common.LogUtils;
 import com.mit.applite.view.ProgressButton;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplListener;
+import com.mit.impl.ImplChangeCallback;
 import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
@@ -79,7 +79,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private LinearLayout no_network;
     private Button refreshButton;
     private ImplAgent implAgent;
-    private ImplListener implCallback;
+    private ImplChangeCallback implCallback;
     private LinearLayout detail_contentandpic;
 
     private RelativeLayout mLoadingarea;
@@ -391,75 +391,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 //        fb.configLoadingImage(null);
     }
 
-    class DetailImplCallback extends ImplListener {
-        DetailImplCallback() {
-            super();
-        }
-
+    class DetailImplCallback implements ImplChangeCallback {
         @Override
-        public void onStart(ImplInfo info) {
-            super.onStart(info);
-            refresh(info);
-        }
-
-        @Override
-        public void onCancelled(ImplInfo info) {
-            super.onCancelled(info);
-            refresh(info);
-        }
-
-        @Override
-        public void onLoading(ImplInfo info, long total, long current, boolean isUploading) {
-            super.onLoading(info, total, current, isUploading);
-            refresh(info);
-        }
-
-        @Override
-        public void onSuccess(ImplInfo info, File file) {
-            super.onSuccess(info, file);
-            refresh(info);
-        }
-
-        @Override
-        public void onFailure(ImplInfo info, Throwable t, String msg) {
-            super.onFailure(info, t, msg);
-            refresh(info);
-        }
-
-        @Override
-        public void onInstallSuccess(ImplInfo info) {
-            super.onInstallSuccess(info);
-            refresh(info);
-        }
-
-        @Override
-        public void onInstalling(ImplInfo info) {
-            super.onInstalling(info);
-            refresh(info);
-        }
-
-        @Override
-        public void onInstallFailure(ImplInfo info, int errorCode) {
-            super.onInstallFailure(info, errorCode);
-            refresh(info);
-        }
-
-        @Override
-        public void onUninstallSuccess(ImplInfo info) {
-            super.onUninstallSuccess(info);
-            refresh(info);
-        }
-
-        @Override
-        public void onUninstalling(ImplInfo info) {
-            super.onUninstalling(info);
-            refresh(info);
-        }
-
-        @Override
-        public void onUninstallFailure(ImplInfo info, int errorCode) {
-            super.onUninstallFailure(info, errorCode);
-            refresh(info);
+        public void onChange(ImplInfo implInfo) {
+            refresh(implInfo);
         }
 
         private void refresh(ImplInfo info){

@@ -1,5 +1,6 @@
 package com.mit.impl;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -11,8 +12,6 @@ import android.os.HandlerThread;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
-
-import com.android.dsc.downloads.DownloadManager;
 import com.applite.common.Constant;
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
@@ -60,7 +59,7 @@ public class ImplAgent {
     private List<ImplInfo> mImplList;
     private DbUtils db;
     private ImplAgentCallback mImplCallback;
-    private WeakHashMap<ImplListener,ImplInfo> mWeakCallbackMap;
+    private WeakHashMap<ImplChangeCallback,ImplInfo> mWeakCallbackMap;
 
     private ImplAgent(Context context) {
         mContext = context;
@@ -104,13 +103,13 @@ public class ImplAgent {
                 .setVersionCode(versionCode);
         ImplDownload.getInstance(mContext).fillImplInfo(implInfo);
         ImplPackageManager.getInstance(mContext).fillImplInfo(implInfo);
-        if (implInfo.getDownloadId()>0){
-            try {
-                db.saveOrUpdate(implInfo);
-            } catch (DbException e) {
-                e.printStackTrace();
-            }
-        }
+//        if (implInfo.getDownloadId()>0){
+//            try {
+//                db.saveOrUpdate(implInfo);
+//            } catch (DbException e) {
+//                e.printStackTrace();
+//            }
+//        }
         return implInfo;
     }
 
@@ -171,12 +170,12 @@ public class ImplAgent {
                                String publicDir,
                                String filename,
                                boolean autoLauncher,
-                               ImplListener appCallback){
+                               ImplChangeCallback appCallback){
         if (null == implInfo){
             return;
         }
         setImplCallback(appCallback, implInfo);
-        implInfo.setMimeType(MimeTypeUtils.getMimeType(filename));
+//        implInfo.setMimeType(MimeTypeUtils.getMimeType(filename));
         implInfo.setAutoLaunch(autoLauncher);
         ImplDownload.getInstance(mContext).addDownload(implInfo,publicDir,filename,mImplCallback);
     }
@@ -188,7 +187,7 @@ public class ImplAgent {
         ImplDownload.getInstance(mContext).pause(implInfo);
     }
 
-    public void resumeDownload(ImplInfo implInfo,ImplListener appCallback){
+    public void resumeDownload(ImplInfo implInfo,ImplChangeCallback appCallback){
         if (null == implInfo){
             return;
         }
@@ -209,12 +208,12 @@ public class ImplAgent {
         ImplDownload.getInstance(mContext).remove(implInfo);
     }
 
-    public void install(ImplInfo implInfo,boolean silent,ImplListener appCallback){
+    public void install(ImplInfo implInfo,boolean silent,ImplChangeCallback appCallback){
         setImplCallback(appCallback,implInfo);
         ImplPackageManager.getInstance(mContext).install(implInfo,silent,mImplCallback);
     }
 
-    public void uninstall(ImplInfo implInfo,boolean silent,ImplListener appCallback){
+    public void uninstall(ImplInfo implInfo,boolean silent,ImplChangeCallback appCallback){
         setImplCallback(appCallback,implInfo);
         ImplPackageManager.getInstance(mContext).uninstall(implInfo, silent, mImplCallback);
     }
@@ -223,7 +222,7 @@ public class ImplAgent {
         return ImplDownload.getInstance(mContext).getProgress(implInfo);
     }
 
-    public void setImplCallback(ImplListener appCallback,ImplInfo implInfo){
+    public void setImplCallback(ImplChangeCallback appCallback,ImplInfo implInfo){
         if (null != appCallback && null != implInfo) {
             mWeakCallbackMap.put(appCallback, implInfo);
         }
@@ -245,10 +244,13 @@ public class ImplAgent {
 
             case Constant.STATUS_SUCCESSFUL:
                 String localPath = implInfo.getLocalPath();
-                String mimeType = implInfo.getMimeType();
+                if (null == localPath || TextUtils.isEmpty(localPath)){
+                    localPath = ImplDownload.getInstance(mContext).getLocalPath(implInfo);
+                }
+                String mimeType = MimeTypeUtils.getMimeType(localPath);
                 action = ImplInfo.ACTION_OPEN;
                 //下载的是apk
-                if ("application/vnd.android.package-archive".equals(mimeType)) {
+                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
                     PackageInfo archivePkg = mContext.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
                     if (null != archivePkg){
@@ -316,10 +318,13 @@ public class ImplAgent {
 
             case Constant.STATUS_SUCCESSFUL:
                 String localPath = implInfo.getLocalPath();
-                String mimeType = implInfo.getMimeType();
+                if (null == localPath || TextUtils.isEmpty(localPath)){
+                    localPath = ImplDownload.getInstance(mContext).getLocalPath(implInfo);
+                }
+                String mimeType = MimeTypeUtils.getMimeType(localPath);
                 actionText = mResources.getString(R.string.action_open);
                 //下载的是apk
-                if ("application/vnd.android.package-archive".equals(mimeType)) {
+                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
                     PackageInfo archivePkg = mContext.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
                     if (null != archivePkg){
@@ -388,10 +393,13 @@ public class ImplAgent {
 
             case Constant.STATUS_SUCCESSFUL:
                 String localPath = implInfo.getLocalPath();
-                String mimeType = implInfo.getMimeType();
+                if (null == localPath || TextUtils.isEmpty(localPath)){
+                    localPath = ImplDownload.getInstance(mContext).getLocalPath(implInfo);
+                }
+                String mimeType = MimeTypeUtils.getMimeType(localPath);
                 statusText = mResources.getString(R.string.download_status_success);
                 //下载的是apk
-                if ("application/vnd.android.package-archive".equals(mimeType)) {
+                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
                     PackageInfo archivePkg = mContext.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
                     if (null == archivePkg){
@@ -447,10 +455,13 @@ public class ImplAgent {
 
             case Constant.STATUS_SUCCESSFUL:
                 String localPath = implInfo.getLocalPath();
-                String mimeType = implInfo.getMimeType();
+                if (null == localPath || TextUtils.isEmpty(localPath)){
+                    localPath = ImplDownload.getInstance(mContext).getLocalPath(implInfo);
+                }
+                String mimeType = MimeTypeUtils.getMimeType(localPath);
                 descText = Formatter.formatFileSize(mContext, implDownload.getTotalBytes(implInfo));
                 //下载的是apk
-                if ("application/vnd.android.package-archive".equals(mimeType)) {
+                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
                     PackageInfo archivePkg = mContext.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
                     if (null != archivePkg){
@@ -501,9 +512,12 @@ public class ImplAgent {
             case Constant.STATUS_NORMAL_INSTALLING:
             case Constant.STATUS_SUCCESSFUL:
                 String localPath = implInfo.getLocalPath();
-                String mimeType = implInfo.getMimeType();
+                if (null == localPath || TextUtils.isEmpty(localPath)){
+                    localPath = ImplDownload.getInstance(mContext).getLocalPath(implInfo);
+                }
+                String mimeType = MimeTypeUtils.getMimeType(localPath);
                 //下载的是apk
-                if ("application/vnd.android.package-archive".equals(mimeType)) {
+                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
                     PackageInfo archivePkg = mContext.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
                     if (null != archivePkg){
@@ -561,6 +575,28 @@ public class ImplAgent {
         }
 
         @Override
+        public void onPending(final ImplInfo info) {
+            super.onPending(info);
+            try {
+                db.saveOrUpdate(info);
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()){
+                        ImplInfo i = mWeakCallbackMap.get(callback);
+                        if (i == info){
+                            callback.onChange(info);
+                        }
+                    }
+                }
+            });
+            com.applite.common.LogUtils.d(TAG, info.getTitle() + ",onStart");
+        }
+
+        @Override
         public void onStart(final ImplInfo info) {
             super.onStart(info);
             try {
@@ -571,10 +607,10 @@ public class ImplAgent {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    for (ImplListener callback: mWeakCallbackMap.keySet()){
+                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()){
                         ImplInfo i = mWeakCallbackMap.get(callback);
                         if (i == info){
-                            callback.onStart(info);
+                            callback.onChange(info);
                         }
                     }
                 }
@@ -593,10 +629,10 @@ public class ImplAgent {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
                         ImplInfo i = mWeakCallbackMap.get(callback);
                         if (i == info){
-                            callback.onCancelled(info);
+                            callback.onChange(info);
                         }
                     }
                 }
@@ -615,10 +651,10 @@ public class ImplAgent {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
                         ImplInfo i = mWeakCallbackMap.get(callback);
                         if (i == info){
-                            callback.onLoading(info, total, current, isUploading);
+                            callback.onChange(info);
                         }
                     }
                 }
@@ -642,10 +678,10 @@ public class ImplAgent {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
                         ImplInfo i = mWeakCallbackMap.get(callback);
                         if (i == info){
-                            callback.onSuccess(info, file);
+                            callback.onChange(info);
                         }
                     }
                 }
@@ -664,10 +700,10 @@ public class ImplAgent {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
                         ImplInfo i = mWeakCallbackMap.get(callback);
                         if (i == info){
-                            callback.onFailure(info, t, msg);
+                            callback.onChange(info);
                         }
                     }
                 }
@@ -686,10 +722,10 @@ public class ImplAgent {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
                         ImplInfo i = mWeakCallbackMap.get(callback);
                         if (i == info){
-                            callback.onInstallSuccess(info);
+                            callback.onChange(info);
                         }
                     }
                 }
@@ -708,10 +744,10 @@ public class ImplAgent {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
                         ImplInfo i = mWeakCallbackMap.get(callback);
                         if (i == info){
-                            callback.onInstalling(info);
+                            callback.onChange(info);
                         }
                     }
                 }
@@ -730,10 +766,10 @@ public class ImplAgent {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
                         ImplInfo i = mWeakCallbackMap.get(callback);
                         if (i == info){
-                            callback.onInstallFailure(info,errorCode);
+                            callback.onChange(info);
                         }
                     }
                 }
@@ -752,10 +788,10 @@ public class ImplAgent {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
                         ImplInfo i = mWeakCallbackMap.get(callback);
                         if (i == info){
-                            callback.onUninstallSuccess(info);
+                            callback.onChange(info);
                         }
                     }
                 }
@@ -774,10 +810,10 @@ public class ImplAgent {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
                         ImplInfo i = mWeakCallbackMap.get(callback);
                         if (i == info){
-                            callback.onUninstalling(info);
+                            callback.onChange(info);
                         }
                     }
                 }
@@ -795,10 +831,10 @@ public class ImplAgent {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    for (ImplListener callback: mWeakCallbackMap.keySet()) {
+                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
                         ImplInfo i = mWeakCallbackMap.get(callback);
                         if (i == info){
-                            callback.onUninstallFailure(info,errorCode);
+                            callback.onChange(info);
                         }
                     }
                 }
