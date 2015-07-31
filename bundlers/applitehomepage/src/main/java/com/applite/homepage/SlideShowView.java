@@ -134,8 +134,8 @@ public class SlideShowView extends FrameLayout implements View.OnClickListener{
         this.dotLayout.removeAllViews();
         // 热点个数与图片特殊相等
         int size = imageUrls.length;
-        if (size > 0 && size < 3){
-            size = 4;
+        if (size > 0 && size < 4){
+            size = 6;
         }
         for (int i = 0; i < size; i++) {
             ImageView view =  new ImageView(context);
