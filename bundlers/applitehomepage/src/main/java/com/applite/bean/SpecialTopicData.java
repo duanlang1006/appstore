@@ -10,12 +10,54 @@ public class SpecialTopicData implements Parcelable{
     public String t_iconurl;
     public String t_key;
     public String t_info;
+    public int t_skiptype;
+    public String tt_packageName;
+    public String tt_name;
+    public String tt_iconUrl;
+
+    public int getT_skiptype(){
+        return t_skiptype;
+    }
+
+    public String getTt_packageName() {
+        return tt_packageName;
+    }
+
+    public String getTt_name() {
+        return tt_name;
+    }
+
+    public String getTt_iconUrl() {
+        return tt_iconUrl;
+    }
+
+    public void setT_skiptype(int t_skiptype) {
+        this.t_skiptype = t_skiptype;
+    }
+
+    public void setTt_packageName(String tt_packageName) {
+        this.tt_packageName = tt_packageName;
+    }
+
+    public void setTt_name(String tt_name) {
+        this.tt_name = tt_name;
+    }
+
+    public void setTt_iconUrl(String tt_iconUrl) {
+        this.tt_iconUrl = tt_iconUrl;
+    }
+
     @Override
     public String toString(){
         return "SpecialTopicData {" + '\'' +
                 ", t_iconurl=" +t_iconurl + '\'' +
                 ", t_key=" + t_key + '\'' +
                 ", t_info=" + t_info + '\'' +
+                ", t_skiptype=" + t_skiptype + '\'' +
+                ", tt_packageName=" + tt_packageName + '\'' +
+                ", tt_name=" + tt_name + '\'' +
+                ", tt_iconUrl=" + tt_iconUrl + '\'' +
+
                 "}";
     }
 
