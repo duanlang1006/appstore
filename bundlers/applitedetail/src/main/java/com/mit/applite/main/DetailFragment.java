@@ -13,12 +13,16 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.applite.common.AppliteUtils;
@@ -165,7 +169,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
      * 初始化控件
      */
     private void initView() {
-//        mProgressButton = (ProgressButton) rootView.findViewById(R.id.detail_progress_button);
         LinearLayout mDownloadLayout = (LinearLayout) rootView.findViewById(R.id.detail_download_layout);
         mProgressButton = ProgressButton.inflate(mContext, container, false, mInflater);
         mDownloadLayout.addView(mProgressButton);
@@ -185,6 +188,17 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
         mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
         mBitmapUtil.display(mApkImgView, mImgUrl);
+
+//        mLoadingarea = (RelativeLayout)rootView.findViewById(R.id.top_parent);
+//        //加载中显示动画资源及文字
+//        mLoadingView = rootView.findViewById(R.id.loading_img);
+//        LoadingAnimation = AnimationUtils.loadAnimation(mContext, R.anim.tip);
+//        LinearInterpolator lin = new LinearInterpolator();
+//        LoadingAnimation.setInterpolator(lin);
+//        if (LoadingAnimation != null) {
+//            mLoadingView.startAnimation(LoadingAnimation);
+//        }
+//        loadingText = (TextView) rootView.findViewById(R.id.loading_text);
 
         mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override

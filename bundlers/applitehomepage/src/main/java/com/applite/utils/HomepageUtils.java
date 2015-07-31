@@ -30,4 +30,28 @@ public class HomepageUtils {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 去详情页面
+     */
+    public static void toDetialFragment(String t_packagename, String t_name, String t_iconurl) {
+        try {
+            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
+                    bundleContext, ApkplugOSGIService.class,
+                    "(serviceName=" + Constant.OSGI_SERVICE_HOST_OPT + ")", //服务查询条件
+                    OSGIServiceAgent.real_time);   //每次都重新查询
+            agent.getService().ApkplugOSGIService(bundleContext,
+                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,
+                    0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
+                    t_packagename,
+                    t_name,
+                    t_iconurl,
+                    Constant.OSGI_SERVICE_MAIN_FRAGMENT);
+        } catch (Exception e) {
+            // T
+            e.printStackTrace();
+        }
+
+    }
 }
