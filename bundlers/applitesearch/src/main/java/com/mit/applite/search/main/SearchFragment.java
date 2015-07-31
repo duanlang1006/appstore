@@ -59,7 +59,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     private EditText mEtView;
     private ImageButton mSearchView;
     private LinearLayout mHotWordLL;
-    private ImageView mNoNetworkIV;
     private ListView mListView;
     private List<SearchBean> mSearchApkContents = new ArrayList<SearchBean>();
     private SearchApkAdapter mAdapter;
@@ -271,7 +270,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         mMoreProgressBar = (ProgressBar) moreView.findViewById(R.id.load_progressbar);
 
         mHotWordLL = (LinearLayout) rootView.findViewById(R.id.hot_word_ll);
-        mNoNetworkIV = (ImageView) rootView.findViewById(R.id.hot_word_no_network);
         mListView = (ListView) rootView.findViewById(R.id.search_listview);
         mGridView = (GridView) rootView.findViewById(R.id.search_gv);
         mHotChangeView = (TextView) rootView.findViewById(R.id.hot_word_change);
@@ -425,7 +423,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 LogUtils.i(TAG, "搜索网络请求成功，result:" + responseInfo.result);
                 setSearchData(responseInfo.result);
 
-                no_network.setVisibility(View.GONE);
                 mSearchText = name;
                 ISPOSTSEARCH = true;//请求结束后，才可以继续请求
                 mSearchPostPage = mSearchPostPage + 1;//请求成功后，请求的页数加1
@@ -433,6 +430,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
 
             @Override
             public void onFailure(HttpException e, String s) {
+                no_network.setVisibility(View.VISIBLE);
                 ISPOSTSEARCH = true;
                 moreView.setVisibility(View.GONE);
                 if (null != mAdapter)
@@ -520,7 +518,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 LogUtils.i(TAG, "预加载网络请求成功，result:" + responseInfo.result);
-                no_network.setVisibility(View.GONE);
                 if (number == mPostPreloadNumber)
                     setPreloadData(responseInfo.result);
             }
@@ -581,18 +578,15 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "hot_word");
-        no_network.setVisibility(View.GONE);
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 LogUtils.i(TAG, "在线热词请求成功，reuslt:" + responseInfo.result);
-                no_network.setVisibility(View.GONE);
                 resolve(responseInfo.result);
             }
 
             @Override
             public void onFailure(HttpException e, String s) {
-                no_network.setVisibility(View.VISIBLE);
                 LogUtils.e(TAG, "在线热词请求失败:" + s);
             }
         });

@@ -12,6 +12,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -72,6 +75,9 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     private boolean mPostStats = true;
     private ImplAgent implAgent;
     private HttpUtils mHttpUtils;
+    private LinearLayout mLoadLayout;
+    private ImageView mLoadView;
+    private Animation LoadingAnimation;
 
     public UpdateFragment() {
     }
@@ -185,11 +191,39 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
         mStatsImgView = (ImageView) rootView.findViewById(R.id.update_stats_img);
         mStatsButton = (Button) rootView.findViewById(R.id.update_post_button);
 
+        //加载中控件
+        mLoadLayout = (LinearLayout) rootView.findViewById(R.id.update_loading_layout);
+        mLoadView = (ImageView) rootView.findViewById(R.id.update_loading_img);
+        //旋转动画
+        LoadingAnimation = AnimationUtils.loadAnimation(mContext, R.anim.loading);
+        LinearInterpolator lin = new LinearInterpolator();
+        LoadingAnimation.setInterpolator(lin);
+        mLoadView.startAnimation(LoadingAnimation);
+
         mStatsButton.setOnClickListener(this);
         mAllUpdateView.setOnClickListener(this);
     }
 
+    /**
+     * 设置加载中控件的显示和隐藏
+     *
+     * @param Visibility
+     */
+    private void setLoadLayoutVisibility(int Visibility) {
+        switch (Visibility) {
+            case View.VISIBLE:
+                mLoadLayout.setVisibility(View.VISIBLE);
+                mLoadView.startAnimation(LoadingAnimation);
+                break;
+            case View.GONE:
+                mLoadLayout.setVisibility(View.GONE);
+                mLoadView.clearAnimation();
+                break;
+        }
+    }
+
     private void post() {
+        setLoadLayoutVisibility(View.VISIBLE);
         mPostStats = false;
         RequestParams params = new RequestParams();
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
@@ -199,6 +233,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
+                setLoadLayoutVisibility(View.GONE);
                 LogUtils.i(TAG, "更新请求成功，resulit：" + responseInfo.result);
                 resolve(responseInfo.result);
                 mPostStats = true;
@@ -206,6 +241,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onFailure(HttpException e, String s) {
+                setLoadLayoutVisibility(View.GONE);
                 LogUtils.i(TAG, "更新请求失败：" + s);
                 setStatsLayoutVisibility(View.VISIBLE, mContext.getResources().getDrawable(R.drawable.post_failure));
                 mStatsButton.setVisibility(View.VISIBLE);
@@ -257,6 +293,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
                 }
                 mAdapter = new UpdateAdapter(mActivity, mDataContents);
                 mListView.setAdapter(mAdapter);
+                mListView.setVisibility(View.VISIBLE);
             }
         } catch (JSONException e) {
             e.printStackTrace();

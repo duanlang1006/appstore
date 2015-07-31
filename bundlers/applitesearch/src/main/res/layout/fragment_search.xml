@@ -62,11 +62,6 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/hot_word_no_network"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:visibility="gone" />
 
     <!--搜索显示数据的ListView-->
     <ListView
