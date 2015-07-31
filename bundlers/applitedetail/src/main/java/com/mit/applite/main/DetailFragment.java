@@ -16,12 +16,16 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
@@ -77,6 +81,11 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private ImplAgent implAgent;
     private ImplChangeCallback implCallback;
     private LinearLayout detail_contentandpic;
+
+    private RelativeLayout mLoadingarea;
+    private View mLoadingView;
+    private TextView loadingText;
+    Animation LoadingAnimation;
 
     public DetailFragment() {
     }
@@ -190,6 +199,17 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mName1View.setText(mApkName);
         mFinalBitmap.display(mApkImgView, mImgUrl);
 
+        mLoadingarea = (RelativeLayout)rootView.findViewById(R.id.top_parent);
+        //加载中显示动画资源及文字
+        mLoadingView = rootView.findViewById(R.id.loading_img);
+        LoadingAnimation = AnimationUtils.loadAnimation(mContext, R.anim.tip);
+        LinearInterpolator lin = new LinearInterpolator();
+        LoadingAnimation.setInterpolator(lin);
+        if (LoadingAnimation != null) {
+            mLoadingView.startAnimation(LoadingAnimation);
+        }
+        loadingText = (TextView) rootView.findViewById(R.id.loading_text);
+
         mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
             public void onClickListener() {
@@ -260,6 +280,8 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 super.onSuccess(o);
                 String result = (String) o;
                 LogUtils.i(TAG, "应用详情网络请求成功，result:" + result);
+                mLoadingarea.setVisibility(View.GONE);
+                mLoadingView.clearAnimation();
                 setData(result);
             }
 
@@ -336,10 +358,16 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
      * @param date1
      */
     private void setDate1(String date1){
+        mLoadingarea.setVisibility(View.GONE);
+        mLoadingView.clearAnimation();
         no_network.setVisibility(View.VISIBLE);
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mLoadingarea.setVisibility(View.VISIBLE);
+                if (LoadingAnimation != null) {
+                    mLoadingView.startAnimation(LoadingAnimation);
+                }
                 no_network.setVisibility(View.GONE);
                 post(mPackageName);
             }
@@ -359,9 +387,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
             // 下面添加参数，显示读出时内容和读取失败时的内容
             Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.detail_default_img);
             fb.display(img, mViewPagerUrlList[i],bmp,bmp);
-            LogUtils.i(TAG, "111   :" + fb);
-            LogUtils.i(TAG, "222   :" + bmp);
-            LogUtils.i(TAG, "333   :" + getResources());
         }
 //        fb.configLoadingImage(null);
     }
