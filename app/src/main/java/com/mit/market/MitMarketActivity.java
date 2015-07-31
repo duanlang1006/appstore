@@ -18,7 +18,6 @@ import com.mit.bean.ApkplugModel;
 import com.mit.bean.ApkplugQueryModel;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplListener;
 import com.mit.impl.ImplLog;
 import com.mit.mitupdatesdk.MitApkplugCloudAgent;
 import com.mit.mitupdatesdk.MitMobclickAgent;

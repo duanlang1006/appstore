@@ -1,6 +1,7 @@
 package com.mit.applite.search.adapter;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,22 +13,16 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.applite.common.AppliteUtils;
+import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
-import com.applite.common.LogUtils;
+import com.lidroid.xutils.BitmapUtils;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.main.BundleContextFactory;
 import com.mit.applite.search.utils.SearchUtils;
-import com.mit.applite.search.view.ProgressButton;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
-
-import net.tsz.afinal.FinalBitmap;
-
-import org.apkplug.Bundle.ApkplugOSGIService;
-import org.apkplug.Bundle.OSGIServiceAgent;
-import org.osgi.framework.BundleContext;
 
 import java.io.File;
 import java.util.List;
@@ -37,11 +32,11 @@ import java.util.List;
  */
 public class SearchApkAdapter extends BaseAdapter {
 
-    private final FinalBitmap mFinalBitmap;
     private final UpdateInatsllButtonText mListener;
+    private BitmapUtils mBitmapUtil;
     private LayoutInflater mInflater;
-    private Context context;
-    public List<SearchBean> mSearchBeans;
+    private Context mContext;
+    private List<SearchBean> mSearchBeans;
     private Context mActivity;
     private ImplAgent implAgent;
 
@@ -52,17 +47,15 @@ public class SearchApkAdapter extends BaseAdapter {
     public SearchApkAdapter(Context context, List<SearchBean> mSearchBeans, UpdateInatsllButtonText listener) {
         mListener = listener;
         this.mSearchBeans = mSearchBeans;
-        mFinalBitmap = FinalBitmap.create(context);
         mActivity = context;
+        mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
         try {
             Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            this.context = mContext;
+            this.mContext = mContext;
             mInflater = LayoutInflater.from(mContext);
             mInflater = mInflater.cloneInContext(mContext);
         } catch (Exception e) {
             e.printStackTrace();
-            mInflater = LayoutInflater.from(context);
-            this.context = context;
         }
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
@@ -93,13 +86,17 @@ public class SearchApkAdapter extends BaseAdapter {
             viewholder = (ViewHolder) convertView.getTag();
         }
         final SearchBean data = mSearchBeans.get(position);
-        mFinalBitmap.display(viewholder.mImg, data.getmImgUrl());
+
+        mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
         viewholder.initView(data);
 
-        viewholder.mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
+        viewholder.mBt.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onClickListener(View view) {
-                ViewHolder vh = (ViewHolder) view.getTag();
+            public void onClick(View v) {
+                ViewHolder vh = (ViewHolder) v.getTag();
                 if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
                     switch (vh.implInfo.getStatus()) {
                         case Constant.STATUS_PENDING:
@@ -138,8 +135,7 @@ public class SearchApkAdapter extends BaseAdapter {
         public TextView mDownloadNumber;
         public TextView mApkSize;
         public TextView mVersionName;
-//        public Button mBt;
-        public ProgressButton mProgressButton;
+        public Button mBt;
         private ImplInfo implInfo;
         private SearchBean bean;
         private ListImplCallback implCallback;
@@ -152,8 +148,7 @@ public class SearchApkAdapter extends BaseAdapter {
             this.mDownloadNumber = (TextView) v.findViewById(R.id.list_item_number);
             this.mApkSize = (TextView) v.findViewById(R.id.list_item_size);
             this.mVersionName = (TextView) v.findViewById(R.id.list_item_versionname);
-//            this.mBt = (Button) v.findViewById(R.id.list_item_bt);
-            this.mProgressButton = (ProgressButton) v.findViewById(R.id.list_item_progress_button);
+            this.mBt = (Button) v.findViewById(R.id.list_item_bt);
             this.implCallback = new ListImplCallback(this);
         }
 
@@ -165,7 +160,7 @@ public class SearchApkAdapter extends BaseAdapter {
                 this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
                 implAgent.setImplCallback(implCallback, implInfo);
             }
-            mProgressButton.setTag(this);
+            mBt.setTag(this);
             refresh();
         }
 
@@ -173,9 +168,9 @@ public class SearchApkAdapter extends BaseAdapter {
             mName.setText(bean.getmName());
             mApkSize.setText(AppliteUtils.bytes2kb(Long.parseLong(bean.getmApkSize())));
             mDownloadNumber.setText(
-                    SearchUtils.getDownloadNumber(context, Integer.parseInt(bean.getmDownloadNumber())) +
-                            context.getResources().getString(R.string.download_number));
-            mVersionName.setText(context.getResources().getString(R.string.version) +
+                    SearchUtils.getDownloadNumber(mContext, Integer.parseInt(bean.getmDownloadNumber())) +
+                            mContext.getResources().getString(R.string.download_number));
+            mVersionName.setText(mContext.getResources().getString(R.string.version) +
                     bean.getmVersionName());
             mToDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -188,19 +183,19 @@ public class SearchApkAdapter extends BaseAdapter {
         }
 
         void initProgressButton() {
-            if (null != mProgressButton && null != this.implInfo) {
+            if (null != mBt && null != this.implInfo) {
                 switch (implInfo.getStatus()) {
                     case Constant.STATUS_PENDING:
-                        mProgressButton.setText(implAgent.getActionText(implInfo));
+                        mBt.setText(implAgent.getActionText(implInfo));
                         break;
                     case Constant.STATUS_RUNNING:
-                        mProgressButton.setText(implAgent.getProgress(implInfo) + "%");
+                        mBt.setText(implAgent.getProgress(implInfo) + "%");
                         break;
                     case Constant.STATUS_PAUSED:
-                        mProgressButton.setText(implAgent.getStatusText(implInfo));
+                        mBt.setText(implAgent.getStatusText(implInfo));
                         break;
                     default:
-                        mProgressButton.setText(implAgent.getActionText(implInfo));
+                        mBt.setText(implAgent.getActionText(implInfo));
                         break;
                 }
             }

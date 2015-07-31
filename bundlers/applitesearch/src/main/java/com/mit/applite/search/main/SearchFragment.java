@@ -30,6 +30,12 @@ import android.widget.Toast;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.applite.search.adapter.HotWordAdapter;
 import com.mit.applite.search.R;
 import com.mit.applite.search.adapter.PreloadAdapter;
@@ -37,12 +43,7 @@ import com.mit.applite.search.adapter.SearchApkAdapter;
 import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.KeyBoardUtils;
-import com.mit.impl.ImplInfo;
 import com.umeng.analytics.MobclickAgent;
-
-import net.tsz.afinal.FinalHttp;
-import net.tsz.afinal.http.AjaxCallBack;
-import net.tsz.afinal.http.AjaxParams;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,9 +58,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     private ImageButton mBackView;
     private EditText mEtView;
     private ImageButton mSearchView;
-    private FinalHttp mFinalHttp;
     private LinearLayout mHotWordLL;
-    private ImageView mNoNetworkIV;
     private ListView mListView;
     private List<SearchBean> mSearchApkContents = new ArrayList<SearchBean>();
     private SearchApkAdapter mAdapter;
@@ -87,9 +86,9 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     private int mSearchPostPage = 0;
     private boolean isLastRow = false;
     private View moreView;//搜索ListView尾部布局
-    private boolean isToEnd = false;//服务器数据是否到底
+    private boolean ISTOEND = false;//服务器数据是否到底
     private String mSearchText = "";//当前搜索的关键字
-    private boolean isSearchPost = true;//上拉加载是否可以请求服务器
+    private boolean ISPOSTSEARCH = true;//上拉加载是否可以请求服务器
     private int mShowHotWordNumber = 9;
 
     private Button refresh;
@@ -111,16 +110,16 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 mMoreText.setText(AppliteUtils.getString(mContext, R.string.loading));
                 moreView.setVisibility(View.VISIBLE);
 
-                if (isToEnd) {
+                if (ISTOEND) {
                     mMoreProgressBar.setVisibility(View.GONE);
                     mMoreText.setText(AppliteUtils.getString(mContext, R.string.no_data));
 //                    Toast.makeText(mActivity, "木有更多数据！", Toast.LENGTH_SHORT).show();
 //                    mListView.removeFooterView(moreView); //移除底部视图
                 } else {
                     //加载更多数据，这里可以使用异步加载
-                    if (isSearchPost) {
+                    if (ISPOSTSEARCH) {
                         postSearch(mEtView.getText().toString());
-                        isSearchPost = false;
+                        ISPOSTSEARCH = false;
                     }
                 }
                 LogUtils.i(TAG, "加载更多数据");
@@ -143,6 +142,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     private ProgressBar mMoreProgressBar;
     private LayoutInflater mInflater;
     private String mEtViewText;//页面隐藏时mEtView里面的字
+    private HttpUtils mHttpUtils;
 
     public SearchFragment() {
     }
@@ -151,7 +151,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        mFinalHttp = new FinalHttp();
+        mHttpUtils = new HttpUtils();
     }
 
     @Override
@@ -197,6 +197,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 mEtView.setFocusable(true);
                 mEtView.setFocusableInTouchMode(true);
                 mEtView.requestFocus();
+                mEtView.findFocus();
                 KeyBoardUtils.openKeybord(mEtView, mActivity);
             }
             initActionBar();
@@ -269,7 +270,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         mMoreProgressBar = (ProgressBar) moreView.findViewById(R.id.load_progressbar);
 
         mHotWordLL = (LinearLayout) rootView.findViewById(R.id.hot_word_ll);
-        mNoNetworkIV = (ImageView) rootView.findViewById(R.id.hot_word_no_network);
         mListView = (ListView) rootView.findViewById(R.id.search_listview);
         mGridView = (GridView) rootView.findViewById(R.id.search_gv);
         mHotChangeView = (TextView) rootView.findViewById(R.id.hot_word_change);
@@ -297,6 +297,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         mEtView.addTextChangedListener(mTextWatcher);
 
         mHotChangeView.setOnClickListener(this);
+        refresh.setOnClickListener(this);
     }
 
     private TextWatcher mTextWatcher = new TextWatcher() {
@@ -313,9 +314,11 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         @Override
         public void afterTextChanged(Editable s) {
             LogUtils.i(TAG, "输入文字后的状态");
+            ISPOSTSEARCH = true;
             if (TextUtils.isEmpty(mEtView.getText().toString())) {
                 isHotWordLayoutVisibility(View.VISIBLE);
             } else {
+                no_network.setVisibility(View.GONE);
                 isHotWordLayoutVisibility(View.GONE);
                 mListView.setVisibility(View.GONE);
                 if (!isClickPreloadItem) {//点击预加载Item，改变mEtView的文字不会postPreload请求
@@ -359,6 +362,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 isHotWordLayoutVisibility(View.VISIBLE);
                 break;
             case R.id.search_search:
+                no_network.setVisibility(View.GONE);
                 mPreloadListView.setVisibility(View.GONE);
                 if (TextUtils.isEmpty(mEtView.getText().toString())) {
                     Toast.makeText(mActivity, AppliteUtils.getString(mContext, R.string.srarch_content_no_null),
@@ -370,10 +374,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                         mListView.setVisibility(View.VISIBLE);
                         break;
                     } else {
-                        isToEnd = false;
-                        mSearchPostPage = 0;
-                        postSearch(mEtView.getText().toString());
-                        isHotWordLayoutVisibility(View.GONE);
+                        if (ISPOSTSEARCH) {
+                            ISTOEND = false;
+                            ISPOSTSEARCH = false;
+                            mSearchPostPage = 0;
+                            postSearch(mEtView.getText().toString());
+                            isHotWordLayoutVisibility(View.GONE);
+                        }
                     }
                 }
                 break;
@@ -383,6 +390,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
                 mShowHotData.clear();
                 setHotWordShowData(mChangeNumbew);
                 mChangeNumbew = mChangeNumbew + 1;
+                break;
+            case R.id.refresh:
+                if (TextUtils.isEmpty(mEtView.getText().toString())) {
+                    postHotWord();
+                } else {
+                    postSearch(mEtView.getText().toString());
+                }
                 break;
         }
     }
@@ -397,43 +411,34 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
      * @param name
      */
     public void postSearch(final String name) {
-        AjaxParams params = new AjaxParams();
-        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.put("packagename", mActivity.getPackageName());
-        params.put("app", "applite");
-        params.put("type", "search");
-        params.put("key", name);
-        params.put("page", mSearchPostPage + "");
-        no_network.setVisibility(View.GONE);
-        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "search");
+        params.addBodyParameter("key", name);
+        params.addBodyParameter("page", mSearchPostPage + "");
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
-                String result = (String) o;
-                setSearchData(result);
-                LogUtils.i(TAG, "搜索网络请求成功，result:" + result);
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                LogUtils.i(TAG, "搜索网络请求成功，result:" + responseInfo.result);
+                setSearchData(responseInfo.result);
 
                 mSearchText = name;
-                isSearchPost = true;//请求成功后，才可以继续请求
+                ISPOSTSEARCH = true;//请求结束后，才可以继续请求
                 mSearchPostPage = mSearchPostPage + 1;//请求成功后，请求的页数加1
             }
 
             @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
-                isSearchPost = true;
+            public void onFailure(HttpException e, String s) {
+                no_network.setVisibility(View.VISIBLE);
+                ISPOSTSEARCH = true;
                 moreView.setVisibility(View.GONE);
+                if (null != mAdapter)
+                    mActivity.runOnUiThread(mNotifyRunnable);
+
                 Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.post_failure),
                         Toast.LENGTH_SHORT).show();
-                LogUtils.e(TAG, "搜索网络请求失败，strMsg:" + strMsg);
-                no_network.setVisibility(View.VISIBLE);
-//                refresh.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        postSearch(name);
-//                    }
-//                });
-                refresh.setVisibility(View.GONE);
+                LogUtils.e(TAG, "搜索网络请求失败:" + s);
             }
         });
     }
@@ -451,7 +456,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
             JSONObject object = new JSONObject(data);
             int app_key = object.getInt("app_key");
             String json = object.getString("search_info");
-            isToEnd = object.getBoolean("istoend");
+            ISTOEND = object.getBoolean("istoend");
             if (!TextUtils.isEmpty(json)) {
                 JSONArray array = new JSONArray(json);
                 for (int i = 0; i < array.length(); i++) {
@@ -504,28 +509,22 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
      * @param number 点击搜索随便填
      */
     public void postPreload(final String name, final int number) {
-        AjaxParams params = new AjaxParams();
-        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.put("packagename", mActivity.getPackageName());
-        params.put("app", "applite");
-        params.put("type", "search");
-        params.put("key", name);
-        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "search");
+        params.addBodyParameter("key", name);
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
-                String result = (String) o;
-                LogUtils.i(TAG, "预加载网络请求成功，result:" + result);
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                LogUtils.i(TAG, "预加载网络请求成功，result:" + responseInfo.result);
                 if (number == mPostPreloadNumber)
-                    setPreloadData(result);
+                    setPreloadData(responseInfo.result);
             }
 
             @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
-                Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.post_failure),
-                        Toast.LENGTH_SHORT).show();
-                LogUtils.e(TAG, "预加载网络请求失败，strMsg:" + strMsg);
+            public void onFailure(HttpException e, String s) {
+                LogUtils.e(TAG, "预加载网络请求失败:" + s);
             }
         });
     }
@@ -575,34 +574,20 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
      * 在线热词网络请求
      */
     private void postHotWord() {
-        AjaxParams params = new AjaxParams();
-        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.put("packagename", mActivity.getPackageName());
-        params.put("app", "applite");
-        params.put("type", "hot_word");
-        no_network.setVisibility(View.GONE);
-        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "hot_word");
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
-                String reuslt = (String) o;
-                LogUtils.i(TAG, "在线热词请求成功，reuslt:" + reuslt);
-                resolve(reuslt);
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                LogUtils.i(TAG, "在线热词请求成功，reuslt:" + responseInfo.result);
+                resolve(responseInfo.result);
             }
 
             @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
-                Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.post_failure),
-                        Toast.LENGTH_SHORT).show();
-                no_network.setVisibility(View.VISIBLE);
-                refresh.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        postHotWord();
-                    }
-                });
-                LogUtils.e(TAG, "在线热词请求失败，strMsg:" + strMsg);
+            public void onFailure(HttpException e, String s) {
+                LogUtils.e(TAG, "在线热词请求失败:" + s);
             }
         });
     }

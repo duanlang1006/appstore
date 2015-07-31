@@ -9,6 +9,8 @@ import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,20 +34,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.applite.common.AppliteUtils;
+import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.lidroid.xutils.BitmapUtils;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.HttpHandler;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.bean.GuideBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
-import com.mit.utils.GuideUtils;
 import com.mit.utils.GuideSPUtils;
 import com.umeng.analytics.MobclickAgent;
 
-import net.tsz.afinal.FinalBitmap;
-import net.tsz.afinal.FinalHttp;
-import net.tsz.afinal.http.AjaxCallBack;
-import net.tsz.afinal.http.AjaxParams;
-import net.tsz.afinal.http.HttpHandler;
 
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
@@ -69,8 +74,6 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     private Button mInstallView;
     private Button mToHomeView;
     private List<GuideBean> mGuideContents = new ArrayList<GuideBean>();
-    private FinalBitmap mFinalBitmap;
-    private FinalHttp mFinalHttp;
     private ImageView mLogoIV;
 
     private Activity mActivity;
@@ -97,6 +100,9 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         }
     };
     private ImplAgent implAgent;
+    private BitmapUtils mBitmapUtil;
+    private HttpUtils mHttpUtils;
+    private Context mContext;
 
     public GuideFragment() {
     }
@@ -111,6 +117,8 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
+        mHttpUtils = new HttpUtils();
     }
 
 
@@ -122,6 +130,9 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             mInflater = LayoutInflater.from(context);
             mInflater = mInflater.cloneInContext(context);
+
+            mContext = context;
+
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.hide();
         } catch (Exception e) {
@@ -132,8 +143,6 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         }
         this.container = container;
 
-        mFinalBitmap = FinalBitmap.create(mActivity);
-        mFinalHttp = new FinalHttp();
         if ((Boolean) GuideSPUtils.get(mActivity, GuideSPUtils.ISGUIDE, true)) {
             rootView = mInflater.inflate(R.layout.fragment_guide, container, false);
             initView();
@@ -246,33 +255,29 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     private void post(int position, int number, final int apkPsition) {
         annalPostApkNumber(apkPsition);
 
-        AjaxParams params = new AjaxParams();
-        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.put("packagename", mActivity.getPackageName());
-        params.put("app", "applite");
-        params.put("type", "guide");
-        params.put("sort", "gift");
-        params.put("position", position + "");
-        params.put("number", number + "");
-        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "guide");
+        params.addBodyParameter("sort", "gift");
+        params.addBodyParameter("position", position + "");
+        params.addBodyParameter("number", number + "");
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
+            public void onSuccess(ResponseInfo<String> responseInfo) {
                 if (mShuttingdown) {
                     return;
                 }
-                String reuslt = (String) o;
-                LogUtils.i(TAG, "首页指导网络请求成功，reuslt:" + reuslt);
-                setData(reuslt, apkPsition);
+                LogUtils.i(TAG, "首页指导网络请求成功，reuslt:" + responseInfo.result);
+                setData(responseInfo.result, apkPsition);
             }
 
             @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
+            public void onFailure(HttpException e, String s) {
                 if (mShuttingdown) {
                     return;
                 }
-                LogUtils.e(TAG, "首页指导网络请求失败:" + strMsg);
+                LogUtils.e(TAG, "首页指导网络请求失败:" + s);
                 deleteNoReturn(apkPsition, 0);
             }
         });
@@ -360,16 +365,11 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         final ImageView mAppIV = (ImageView) child.findViewById(R.id.guide_app_iv);
         final TextView mAppTV = (TextView) child.findViewById(R.id.guidw_app_tv);
 
-        //判断应用名有没有括号，有的话去掉
-//        int subscript = bean.getName().lastIndexOf("(");
-//        if (subscript != -1) {
-//            String result = bean.getName().substring(0, bean.getName().lastIndexOf("("));
-//            mAppTV.setText(result);
-//        } else {
         mAppTV.setText(bean.getName());
-//        }
 
-        mFinalBitmap.display(mAppIV, bean.getImgurl());
+        mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.display(mAppIV, bean.getImgurl());
 
         child.setTag(apkPsition);
         mApkList.add(child);
@@ -388,7 +388,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
 
         mRLayout.addView(child);
         AppliteUtils.setLayout(child, mX[apkPsition], mY[apkPsition]);
-        LogUtils.i("lang", "mX[apkPsition]: " +mX[apkPsition]+" mY[apkPsition]: "+mY[apkPsition]);
+        LogUtils.i("lang", "mX[apkPsition]: " + mX[apkPsition] + " mY[apkPsition]: " + mY[apkPsition]);
         appearAnimator(child);
 
         int i = (child.getRight() - child.getLeft()) / 2;
@@ -450,9 +450,9 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    private void download(GuideBean bean){
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getPackagename(),bean.getPackagename(),bean.getmVersionCode());
-        if (null == implInfo){
+    private void download(GuideBean bean) {
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getPackagename(), bean.getPackagename(), bean.getmVersionCode());
+        if (null == implInfo) {
             return;
         }
         implInfo.setTitle(bean.getName()).setDownloadUrl(bean.getUrl()).setIconUrl(bean.getImgurl());
@@ -569,28 +569,28 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      * 下载文件
      */
     private void download(final String name, String url) {
-        HttpHandler mHttpHandler = mFinalHttp.download(url, //这里是下载的路径
+        HttpHandler mHttpHandler = mHttpUtils.download(url, //这里是下载的路径
                 AppliteUtils.getAppDir(name), //这是保存到本地的路径
                 true,//true:断点续传 false:不断点续传（全新下载）
-                new AjaxCallBack<File>() {
+                new RequestCallBack<File>() {
 
                     @Override
-                    public void onLoading(long count, long current) {
-                        LogUtils.i(TAG, "下载进度：" + current + "/" + count);
+                    public void onLoading(long total, long current, boolean isUploading) {
+                        LogUtils.i(TAG, "下载进度：" + current + "/" + total);
                     }
 
                     @Override
-                    public void onSuccess(File t) {
+                    public void onSuccess(ResponseInfo<File> responseInfo) {
                         LogUtils.i(TAG, name + "下载成功");
                         LogUtils.i(TAG, "Utils.getAppDir(name):" + AppliteUtils.getAppDir(name));
                         GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_IMG_URL, AppliteUtils.getAppDir(name));
                     }
 
                     @Override
-                    public void onFailure(Throwable t, int errorNo, String strMsg) {
-                        super.onFailure(t, errorNo, strMsg);
-                        LogUtils.e(TAG, name + "下载失败，strMsg：" + strMsg);
+                    public void onFailure(HttpException e, String s) {
+                        LogUtils.e(TAG, name + "下载LOGO失败：" + s);
                     }
+
                 });
     }
 
@@ -612,22 +612,19 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      * LOGO页面的网络请求
      */
     private void logoPost() {
-        AjaxParams params = new AjaxParams();
-        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.put("packagename", mActivity.getPackageName());
-        params.put("app", "applite");
-        params.put("type", "logo");
-        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "logo");
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
+            public void onSuccess(ResponseInfo<String> responseInfo) {
                 if (mShuttingdown) {
                     return;
                 }
-                String reuslt = (String) o;
-                LogUtils.i(TAG, "LOGO网络请求成功，reuslt：" + reuslt);
+                LogUtils.i(TAG, "LOGO网络请求成功，reuslt：" + responseInfo.result);
                 try {
-                    JSONObject obj = new JSONObject(reuslt);
+                    JSONObject obj = new JSONObject(responseInfo.result);
                     int app_key = obj.getInt("app_key");
                     long NextTime = obj.getLong("nexttime");
                     long ShowTime = obj.getInt("i_staytime") * 1000;
@@ -649,12 +646,11 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
             }
 
             @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
+            public void onFailure(HttpException e, String s) {
                 if (mShuttingdown) {
                     return;
                 }
-                LogUtils.e(TAG, "LOGO网络请求失败：" + strMsg);
+                LogUtils.e(TAG, "LOGO网络请求失败：" + s);
             }
         });
     }

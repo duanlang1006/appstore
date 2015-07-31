@@ -1,6 +1,7 @@
 package com.applite.common;
 
 import android.content.Context;
+
 import com.lidroid.xutils.BitmapUtils;
 
 /**

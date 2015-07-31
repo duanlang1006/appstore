@@ -18,7 +18,7 @@
             android:layout_height="30dp"
             android:layout_margin="5dp"
             android:layout_marginRight="5dp"
-            android:src="@drawable/apk_default_bg"
+            android:src="@drawable/apk_icon_defailt_img"
             android:visibility="gone" />
 
         <TextView

@@ -9,12 +9,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.applite.common.BitmapHelper;
+import com.lidroid.xutils.BitmapUtils;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.main.BundleContextFactory;
 import com.mit.applite.search.utils.SearchUtils;
-
-import net.tsz.afinal.FinalBitmap;
 
 import java.util.List;
 
@@ -23,23 +23,23 @@ import java.util.List;
  */
 public class HotWordAdapter extends BaseAdapter {
 
-    private final FinalBitmap mFinalBitmap;
-    private Context context;
+    private BitmapUtils mBitmapUtil;
+    private Context mActivity;
+    private Context mContext;
     private List<HotWordBean> mHotWordBeans;
     private LayoutInflater mInflater;
 
     public HotWordAdapter(Context context, List<HotWordBean> mHotWordBeans) {
         this.mHotWordBeans = mHotWordBeans;
-        mFinalBitmap = FinalBitmap.create(context);
+        mActivity = context;
+        mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
         try {
             Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            this.context = mContext;
+            this.mContext = mContext;
             mInflater = LayoutInflater.from(mContext);
             mInflater = mInflater.cloneInContext(mContext);
         } catch (Exception e) {
             e.printStackTrace();
-            mInflater = LayoutInflater.from(context);
-            this.context = context;
         }
     }
 
@@ -72,8 +72,10 @@ public class HotWordAdapter extends BaseAdapter {
             viewholder = (ViewHolder) convertView.getTag();
         }
         final HotWordBean data = mHotWordBeans.get(position);
-//        if (Integer.parseInt(data.getmType()) == 0) {
-//            mFinalBitmap.display(viewholder.mImg, data.getmImgUrl());
+//        if (data.getmType() == 0) {
+//            mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+//            mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+//            mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
 //            viewholder.mImg.setVisibility(View.VISIBLE);
 //        }
         viewholder.mTv.setText(data.getmName());
