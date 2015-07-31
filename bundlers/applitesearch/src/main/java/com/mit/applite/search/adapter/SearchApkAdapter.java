@@ -13,7 +13,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.applite.common.AppliteUtils;
+import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
+import com.lidroid.xutils.BitmapUtils;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.main.BundleContextFactory;
@@ -21,8 +23,6 @@ import com.mit.applite.search.utils.SearchUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
-
-import net.tsz.afinal.FinalBitmap;
 
 import java.io.File;
 import java.util.List;
@@ -32,11 +32,11 @@ import java.util.List;
  */
 public class SearchApkAdapter extends BaseAdapter {
 
-    private final FinalBitmap mFinalBitmap;
     private final UpdateInatsllButtonText mListener;
+    private BitmapUtils mBitmapUtil;
     private LayoutInflater mInflater;
-    private Context context;
-    public List<SearchBean> mSearchBeans;
+    private Context mContext;
+    private List<SearchBean> mSearchBeans;
     private Context mActivity;
     private ImplAgent implAgent;
 
@@ -47,17 +47,15 @@ public class SearchApkAdapter extends BaseAdapter {
     public SearchApkAdapter(Context context, List<SearchBean> mSearchBeans, UpdateInatsllButtonText listener) {
         mListener = listener;
         this.mSearchBeans = mSearchBeans;
-        mFinalBitmap = FinalBitmap.create(context);
         mActivity = context;
+        mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
         try {
             Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            this.context = mContext;
+            this.mContext = mContext;
             mInflater = LayoutInflater.from(mContext);
             mInflater = mInflater.cloneInContext(mContext);
         } catch (Exception e) {
             e.printStackTrace();
-            mInflater = LayoutInflater.from(context);
-            this.context = context;
         }
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
@@ -88,7 +86,10 @@ public class SearchApkAdapter extends BaseAdapter {
             viewholder = (ViewHolder) convertView.getTag();
         }
         final SearchBean data = mSearchBeans.get(position);
-        mFinalBitmap.display(viewholder.mImg, data.getmImgUrl(), BitmapFactory.decodeResource(context.getResources(), R.drawable.buffer));
+
+        mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
         viewholder.initView(data);
 
         viewholder.mBt.setOnClickListener(new View.OnClickListener() {
@@ -167,9 +168,9 @@ public class SearchApkAdapter extends BaseAdapter {
             mName.setText(bean.getmName());
             mApkSize.setText(AppliteUtils.bytes2kb(Long.parseLong(bean.getmApkSize())));
             mDownloadNumber.setText(
-                    SearchUtils.getDownloadNumber(context, Integer.parseInt(bean.getmDownloadNumber())) +
-                            context.getResources().getString(R.string.download_number));
-            mVersionName.setText(context.getResources().getString(R.string.version) +
+                    SearchUtils.getDownloadNumber(mContext, Integer.parseInt(bean.getmDownloadNumber())) +
+                            mContext.getResources().getString(R.string.download_number));
+            mVersionName.setText(mContext.getResources().getString(R.string.version) +
                     bean.getmVersionName());
             mToDetail.setOnClickListener(new View.OnClickListener() {
                 @Override

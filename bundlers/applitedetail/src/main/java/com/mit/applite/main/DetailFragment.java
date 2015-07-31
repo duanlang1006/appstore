@@ -22,18 +22,21 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.applite.common.AppliteUtils;
+import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.lidroid.xutils.BitmapUtils;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.applite.view.ProgressButton;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
 import com.umeng.analytics.MobclickAgent;
-
-import net.tsz.afinal.FinalBitmap;
-import net.tsz.afinal.FinalHttp;
-import net.tsz.afinal.http.AjaxCallBack;
-import net.tsz.afinal.http.AjaxParams;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,7 +59,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private Button mDownloadView;
     private RatingBar mXingView;
     private String mDownloadUrl;
-    private FinalBitmap mFinalBitmap;
     private ImageView mApkImgView;
     private String mViewPagerUrlList[] = null;
     private ProgressBar mProgressBar;
@@ -75,6 +77,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private ImplAgent implAgent;
     private ImplListener implCallback;
     private LinearLayout detail_contentandpic;
+    private BitmapUtils mBitmapUtil;
 
     public DetailFragment() {
     }
@@ -96,6 +99,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
     }
 
     @Override
@@ -117,7 +121,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         this.container = container;
 
         rootView = mInflater.inflate(R.layout.fragment_detail, container, false);
-        mFinalBitmap = FinalBitmap.create(mActivity);
         initView();
         if (!TextUtils.isEmpty(mPackageName))
             post(mPackageName);
@@ -190,7 +193,10 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
         mNameView.setText(mApkName);
         mName1View.setText(mApkName);
-        mFinalBitmap.display(mApkImgView, mImgUrl);
+
+        mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.display(mApkImgView, mImgUrl);
 
         mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
@@ -253,26 +259,22 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
      * @param mPackageName
      */
     private void post(String mPackageName) {
-        FinalHttp mFinalHttp = new FinalHttp();
-        AjaxParams params = new AjaxParams();
-        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.put("packagename", mActivity.getPackageName());
-        params.put("app", "applite");
-        params.put("type", "detail");
-        params.put("name", mPackageName);
-        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "detail");
+        params.addBodyParameter("name", mPackageName);
+        HttpUtils mHttpUtils = new HttpUtils();
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
-                String result = (String) o;
-                LogUtils.i(TAG, "应用详情网络请求成功，result:" + result);
-                setData(result);
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                LogUtils.i(TAG, "应用详情网络请求成功，result:" + responseInfo.result);
+                setData(responseInfo.result);
             }
 
             @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
-                LogUtils.e(TAG, "应用详情网络请求失败，strMsg:" + strMsg);
+            public void onFailure(HttpException e, String s) {
+                LogUtils.e(TAG, "应用详情网络请求失败:" + s);
                 // 这里设置没有网络时的图片
                 no_network.setVisibility(View.VISIBLE);
             }
@@ -311,7 +313,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     mNameView.setText(mName);
                     mName1View.setText(mName);
                     mXingView.setRating(Float.parseFloat(xing) / 2.0f);
-                    mFinalBitmap.display(mApkImgView, mImgUrl);
+                    mBitmapUtil.display(mApkImgView, mImgUrl);
                     mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size));
 //                    detail_contentandpic.setBackground(mContext.getResources().getDrawable(R.id.k));
                     mApkContentView.setText(content);
@@ -340,20 +342,15 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
      * 设置应用介绍的图片
      */
     private void setPreViewImg() {
-        FinalBitmap fb = FinalBitmap.create(mActivity);
-//        fb.configLoadingImage(R.drawable.detail_default_img);
         for (int i = 0; i < mViewPagerUrlList.length; i++) {
             final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
             final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
             mImgLl.addView(child);
             // 下面添加参数，显示读出时内容和读取失败时的内容
-            Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.detail_default_img);
-            fb.display(img, mViewPagerUrlList[i], bmp, bmp);
-            LogUtils.i(TAG, "111   :" + fb);
-            LogUtils.i(TAG, "222   :" + bmp);
-            LogUtils.i(TAG, "333   :" + getResources());
+            mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.detail_default_img));
+            mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.detail_default_img));
+            mBitmapUtil.display(img, mViewPagerUrlList[i]);
         }
-//        fb.configLoadingImage(null);
     }
 
     class DetailImplCallback extends ImplListener {

@@ -22,6 +22,12 @@ import android.widget.Toast;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.adapter.UpdateAdapter;
 import com.mit.appliteupdate.bean.DataBean;
@@ -32,9 +38,6 @@ import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplListener;
 import com.umeng.analytics.MobclickAgent;
 
-import net.tsz.afinal.FinalHttp;
-import net.tsz.afinal.http.AjaxCallBack;
-import net.tsz.afinal.http.AjaxParams;
 
 import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
@@ -52,7 +55,6 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     private LayoutInflater mInflater;
     private View rootView;
     private Activity mActivity;
-    private FinalHttp mFinalHttp;
     private TextView mAllUpdateView;
     private ListView mListView;
     private List<DataBean> mDataContents = new ArrayList<DataBean>();
@@ -69,6 +71,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     private Button mStatsButton;
     private boolean mPostStats = true;
     private ImplAgent implAgent;
+    private HttpUtils mHttpUtils;
 
     public UpdateFragment() {
     }
@@ -84,7 +87,7 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFinalHttp = new FinalHttp();
+        mHttpUtils = new HttpUtils();
     }
 
     @Override
@@ -188,30 +191,27 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
 
     private void post() {
         mPostStats = false;
-        AjaxParams params = new AjaxParams();
-        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.put("packagename", mActivity.getPackageName());
-        params.put("app", "applite");
-        params.put("type", "update_management");
-        params.put("update_info", UpdateUtils.getAllApkData(mActivity));
-        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "update_management");
+        params.addBodyParameter("update_info", UpdateUtils.getAllApkData(mActivity));
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
-                String resulit = (String) o;
-                LogUtils.i(TAG, "更新请求成功，resulit：" + resulit);
-                resolve(resulit);
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                LogUtils.i(TAG, "更新请求成功，resulit：" + responseInfo.result);
+                resolve(responseInfo.result);
                 mPostStats = true;
             }
 
             @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
-                LogUtils.i(TAG, "更新请求失败，strMsg：" + strMsg);
+            public void onFailure(HttpException e, String s) {
+                LogUtils.i(TAG, "更新请求失败：" + s);
                 setStatsLayoutVisibility(View.VISIBLE, mContext.getResources().getDrawable(R.drawable.post_failure));
                 mStatsButton.setVisibility(View.VISIBLE);
                 mPostStats = true;
             }
+
         });
     }
 
@@ -300,9 +300,9 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void download(DataBean bean){
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(),bean.getmPackageName(),bean.getmVersionCode());
-        if (null == implInfo){
+    private void download(DataBean bean) {
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
+        if (null == implInfo) {
             return;
         }
         implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());

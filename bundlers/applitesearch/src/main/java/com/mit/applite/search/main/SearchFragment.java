@@ -30,6 +30,12 @@ import android.widget.Toast;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.applite.search.adapter.HotWordAdapter;
 import com.mit.applite.search.R;
 import com.mit.applite.search.adapter.PreloadAdapter;
@@ -37,13 +43,7 @@ import com.mit.applite.search.adapter.SearchApkAdapter;
 import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.KeyBoardUtils;
-import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplListener;
 import com.umeng.analytics.MobclickAgent;
-
-import net.tsz.afinal.FinalHttp;
-import net.tsz.afinal.http.AjaxCallBack;
-import net.tsz.afinal.http.AjaxParams;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,7 +58,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     private ImageButton mBackView;
     private EditText mEtView;
     private ImageButton mSearchView;
-    private FinalHttp mFinalHttp;
     private LinearLayout mHotWordLL;
     private ImageView mNoNetworkIV;
     private ListView mListView;
@@ -144,6 +143,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     private ProgressBar mMoreProgressBar;
     private LayoutInflater mInflater;
     private String mEtViewText;//页面隐藏时mEtView里面的字
+    private HttpUtils mHttpUtils;
 
     public SearchFragment() {
     }
@@ -152,7 +152,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        mFinalHttp = new FinalHttp();
+        mHttpUtils = new HttpUtils();
     }
 
     @Override
@@ -413,36 +413,34 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
      * @param name
      */
     public void postSearch(final String name) {
-        AjaxParams params = new AjaxParams();
-        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.put("packagename", mActivity.getPackageName());
-        params.put("app", "applite");
-        params.put("type", "search");
-        params.put("key", name);
-        params.put("page", mSearchPostPage + "");
-        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "search");
+        params.addBodyParameter("key", name);
+        params.addBodyParameter("page", mSearchPostPage + "");
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
-                String result = (String) o;
-                LogUtils.i(TAG, "搜索网络请求成功，result:" + result);
-                setSearchData(result);
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                LogUtils.i(TAG, "搜索网络请求成功，result:" + responseInfo.result);
+                setSearchData(responseInfo.result);
 
+                no_network.setVisibility(View.GONE);
                 mSearchText = name;
-                ISPOSTSEARCH = true;//请求成功后，才可以继续请求
+                ISPOSTSEARCH = true;//请求结束后，才可以继续请求
                 mSearchPostPage = mSearchPostPage + 1;//请求成功后，请求的页数加1
             }
 
             @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
+            public void onFailure(HttpException e, String s) {
                 ISPOSTSEARCH = true;
                 moreView.setVisibility(View.GONE);
-                mActivity.runOnUiThread(mNotifyRunnable);
+                if (null != mAdapter)
+                    mActivity.runOnUiThread(mNotifyRunnable);
 
                 Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.post_failure),
                         Toast.LENGTH_SHORT).show();
-                LogUtils.e(TAG, "搜索网络请求失败，strMsg:" + strMsg);
+                LogUtils.e(TAG, "搜索网络请求失败:" + s);
             }
         });
     }
@@ -513,26 +511,23 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
      * @param number 点击搜索随便填
      */
     public void postPreload(final String name, final int number) {
-        AjaxParams params = new AjaxParams();
-        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.put("packagename", mActivity.getPackageName());
-        params.put("app", "applite");
-        params.put("type", "search");
-        params.put("key", name);
-        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "search");
+        params.addBodyParameter("key", name);
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
-                String result = (String) o;
-                LogUtils.i(TAG, "预加载网络请求成功，result:" + result);
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                LogUtils.i(TAG, "预加载网络请求成功，result:" + responseInfo.result);
+                no_network.setVisibility(View.GONE);
                 if (number == mPostPreloadNumber)
-                    setPreloadData(result);
+                    setPreloadData(responseInfo.result);
             }
 
             @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
-                LogUtils.e(TAG, "预加载网络请求失败，strMsg:" + strMsg);
+            public void onFailure(HttpException e, String s) {
+                LogUtils.e(TAG, "预加载网络请求失败:" + s);
             }
         });
     }
@@ -582,26 +577,23 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
      * 在线热词网络请求
      */
     private void postHotWord() {
-        AjaxParams params = new AjaxParams();
-        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.put("packagename", mActivity.getPackageName());
-        params.put("app", "applite");
-        params.put("type", "hot_word");
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "hot_word");
         no_network.setVisibility(View.GONE);
-        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
-                String reuslt = (String) o;
-                LogUtils.i(TAG, "在线热词请求成功，reuslt:" + reuslt);
-                resolve(reuslt);
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                LogUtils.i(TAG, "在线热词请求成功，reuslt:" + responseInfo.result);
+                no_network.setVisibility(View.GONE);
+                resolve(responseInfo.result);
             }
 
             @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
+            public void onFailure(HttpException e, String s) {
                 no_network.setVisibility(View.VISIBLE);
-                LogUtils.e(TAG, "在线热词请求失败，strMsg:" + strMsg);
+                LogUtils.e(TAG, "在线热词请求失败:" + s);
             }
         });
     }
