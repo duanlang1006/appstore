@@ -22,14 +22,7 @@ import com.mit.applite.search.view.ProgressButton;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
-
 import net.tsz.afinal.FinalBitmap;
-
-import org.apkplug.Bundle.ApkplugOSGIService;
-import org.apkplug.Bundle.OSGIServiceAgent;
-import org.osgi.framework.BundleContext;
-
-import java.io.File;
 import java.util.List;
 
 /**

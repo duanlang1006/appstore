@@ -11,6 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.osgi.extra.OSGIServiceHost;
+import com.osgi.extra.OSGIServiceClient;
+
+import org.apkplug.Bundle.OSGIServiceAgent;
+import org.osgi.framework.BundleContext;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -212,4 +218,31 @@ public class AppliteUtils {
         }
     }
 
+    public static OSGIServiceHost getHostOSGIService(BundleContext bundleContext){
+        OSGIServiceHost host = null;
+        try {
+            host = new OSGIServiceAgent<OSGIServiceHost>(
+                    bundleContext, OSGIServiceHost.class,
+                    "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
+                    OSGIServiceAgent.real_time).getService();   //每次都重新查询
+        } catch (Exception e) {
+            // TODO 自动生成的 catch 块
+            e.printStackTrace();
+        }
+        return host;
+    }
+
+    public static OSGIServiceClient getPluginOSGIService(BundleContext bundleContext,String serviceName){
+        OSGIServiceClient service = null;
+        try {
+            service = new OSGIServiceAgent<OSGIServiceClient>(
+                    bundleContext, OSGIServiceClient.class,
+                    "(serviceName="+ serviceName+")", //服务查询条件
+                    OSGIServiceAgent.real_time).getService();   //每次都重新查询
+        } catch (Exception e) {
+            // TODO 自动生成的 catch 块
+            e.printStackTrace();
+        }
+        return service;
+    }
 }

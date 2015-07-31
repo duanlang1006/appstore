@@ -16,11 +16,9 @@
             <option value="$PROJECT_DIR$/bundlers/applitehomepage" />
             <option value="$PROJECT_DIR$/bundlers/applitelogo" />
             <option value="$PROJECT_DIR$/bundlers/applitesearch" />
-            <option value="$PROJECT_DIR$/bundlers/sHMClient" />
+            <option value="$PROJECT_DIR$/bundlers/appliteupdate" />
             <option value="$PROJECT_DIR$/extras" />
-            <option value="$PROJECT_DIR$/extras/androidpnclient" />
             <option value="$PROJECT_DIR$/extras/applitecommon" />
-            <option value="$PROJECT_DIR$/extras/dscdownloader" />
             <option value="$PROJECT_DIR$/extras/impl" />
             <option value="$PROJECT_DIR$/extras/mitUpdateSDK" />
           </set>

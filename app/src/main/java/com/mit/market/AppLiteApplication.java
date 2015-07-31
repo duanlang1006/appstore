@@ -91,8 +91,6 @@ public class AppLiteApplication extends Application {
             Log.e(TAG,"Could not create : " + ex);
             ex.printStackTrace();
         }
-
-
     }
 
     public static boolean isScreenLarge() {
@@ -126,7 +124,7 @@ public class AppLiteApplication extends Application {
         return null;
     }
 
-    public static FrameworkInstance getFrame(){
+    public FrameworkInstance getFrame(){
         Log.d(TAG,"getFrame("+sframe+")");
         return sframe;
     }

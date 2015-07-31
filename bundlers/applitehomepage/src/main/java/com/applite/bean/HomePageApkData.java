@@ -1,11 +1,12 @@
 package com.applite.bean;
 
-import com.mit.impl.ImplInfo;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by yuzhimin on 6/30/15.
  */
-public class HomePageApkData {
+public class HomePageApkData implements Parcelable{
     private String key;
     private String packageName;
     private String name;
@@ -21,6 +22,63 @@ public class HomePageApkData {
     private String apkSize;
     private String brief;
     private String mDownloadNumber;
+
+    public HomePageApkData() {
+    }
+
+    public HomePageApkData(Parcel in) {
+        key = in.readString();
+        packageName = in.readString();
+        name = in.readString();
+        categorymain = in.readString();
+        categorysub = in.readString();
+        iconUrl = in.readString();
+        rating = in.readString();
+        versionName = in.readString();
+        versionCode = in.readInt();
+        boxLabel = in.readString();
+        downloadTimes = in.readString();
+        rDownloadUrl = in.readString();
+        apkSize = in.readString();
+        brief = in.readString();
+        mDownloadNumber = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(key);
+        dest.writeString(packageName);
+        dest.writeString(name);
+        dest.writeString(categorymain);
+        dest.writeString(categorysub);
+        dest.writeString(iconUrl);
+        dest.writeString(rating);
+        dest.writeString(versionName);
+        dest.writeInt(versionCode);
+        dest.writeString(boxLabel);
+        dest.writeString(downloadTimes);
+        dest.writeString(rDownloadUrl);
+        dest.writeString(apkSize);
+        dest.writeString(brief);
+        dest.writeString(mDownloadNumber);
+    }
+
+    public static final Parcelable.Creator<HomePageApkData> CREATOR = new Parcelable.Creator<HomePageApkData>() {
+        @Override
+        public HomePageApkData createFromParcel(Parcel in) {
+            return new HomePageApkData(in);
+        }
+
+        @Override
+        public HomePageApkData[] newArray(int size) {
+            return new HomePageApkData[size];
+        }
+    };
 
     @Override
     public String toString() {

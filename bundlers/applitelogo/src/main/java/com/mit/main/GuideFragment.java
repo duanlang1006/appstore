@@ -39,6 +39,8 @@ import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.utils.GuideUtils;
 import com.mit.utils.GuideSPUtils;
+import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
@@ -47,7 +49,6 @@ import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
 import net.tsz.afinal.http.HttpHandler;
 
-import org.apkplug.Bundle.ApkplugOSGIService;
 import org.apkplug.Bundle.OSGIServiceAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,7 +60,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class GuideFragment extends Fragment implements View.OnClickListener {
+public class GuideFragment extends OSGIBaseFragment implements View.OnClickListener {
 
     private static final String TAG = "GuideFragment";
     private FrameLayout mFLayout;
@@ -98,7 +99,18 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     };
     private ImplAgent implAgent;
 
-    public GuideFragment() {
+    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
+        Fragment fg = null;
+        if (null != host){
+            fg = host.newFragment(
+                    BundleContextFactory.getInstance().getBundleContext(),
+                    Constant.OSGI_SERVICE_LOGO_FRAGMENT,GuideFragment.class.getName(),params);
+        }
+        return fg;
+    }
+
+    private GuideFragment(Fragment mFragment, Bundle params) {
+        super(mFragment, params);
     }
 
     @Override
@@ -403,17 +415,11 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      * 去首页
      */
     private void toHome() {
-        try {
-            GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
-            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName=osgi.service.host.opt)", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            agent.getService().ApkplugOSGIService(bundleContext, SimpleBundle.OSGI_SERVICE_LOGO_FRAGMENT, 0, Constant.OSGI_SERVICE_MAIN_FRAGMENT);
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
+        GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
+        BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+        OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
+        if (null != host){
+            host.jumpto(bundleContext, Constant.OSGI_SERVICE_MAIN_FRAGMENT, null);
         }
     }
 

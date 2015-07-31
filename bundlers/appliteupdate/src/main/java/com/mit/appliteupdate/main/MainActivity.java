@@ -25,11 +25,11 @@ public class MainActivity extends FragmentActivity {
      * 设置默认的Fragment
      */
     private void setDefaultFragment() {
-        fm = getSupportFragmentManager();
-        transaction = fm.beginTransaction();
-        mUpdateFragment = new UpdateFragment();
-        transaction.replace(R.id.update_content, mUpdateFragment);
-        transaction.commit();
+//        fm = getSupportFragmentManager();
+//        transaction = fm.beginTransaction();
+//        mUpdateFragment = new UpdateFragment();
+//        transaction.replace(R.id.update_content, mUpdateFragment);
+//        transaction.commit();
     }
 
 }

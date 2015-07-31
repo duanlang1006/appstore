@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,30 +21,52 @@ import com.lidroid.xutils.exception.DbException;
 import com.mit.impl.ImplDbHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
+import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DownloadListFragment extends ListFragment implements ListView.OnItemClickListener{
+public class DownloadListFragment extends OSGIBaseFragment implements ListView.OnItemClickListener{
     private Activity mActivity;
     private ListView mListview;
     private DownloadAdapter mAdapter;
     private Integer mStatusFlags = null;
     private DbUtils db;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public DownloadListFragment() {
+    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
+        Fragment fg = null;
+        if (null != host){
+            fg = host.newFragment(
+                    BundleContextFactory.getInstance().getBundleContext(),
+                    Constant.OSGI_SERVICE_DM_FRAGMENT,DownloadListFragment.class.getName(),params);
+        }
+        return fg;
+    }
+
+    public static Fragment newInstance(OSGIServiceHost host,int flag){
+        Fragment fg = null;
+        if (null != host){
+            Bundle b = new Bundle();
+            b.putInt("statusFilter", flag);
+            fg = host.newFragment(
+                    BundleContextFactory.getInstance().getBundleContext(),
+                    Constant.OSGI_SERVICE_DM_FRAGMENT,DownloadListFragment.class.getName(),b);
+        }
+        return fg;
+    }
+
+    private DownloadListFragment(Fragment mFragment, Bundle params) {
+        super(mFragment, params);
+        if (null != params) {
+            mStatusFlags = params.getInt("statusFilter");
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         ImplLog.d(DownloadPagerFragment.TAG, "onCreate," + this);
         super.onCreate(savedInstanceState);
-        Bundle b = getArguments();
-        mStatusFlags = b.getInt("statusFilter");
     }
 
     @Override

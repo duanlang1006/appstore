@@ -29,14 +29,13 @@ import com.mit.appliteupdate.utils.UpdateSPUtils;
 import com.mit.appliteupdate.utils.UpdateUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
+import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
-
-import org.apkplug.Bundle.ApkplugOSGIService;
-import org.apkplug.Bundle.OSGIServiceAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,7 +44,7 @@ import org.osgi.framework.BundleContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UpdateFragment extends Fragment implements View.OnClickListener {
+public class UpdateFragment extends OSGIBaseFragment implements View.OnClickListener {
 
     private static final String TAG = "UpdateFragment";
     private LayoutInflater mInflater;
@@ -69,7 +68,19 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
     private boolean mPostStats = true;
     private ImplAgent implAgent;
 
-    public UpdateFragment() {
+    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
+        Fragment fg = null;
+        if (null != host){
+            fg = host.newFragment(
+                    BundleContextFactory.getInstance().getBundleContext(),
+                    Constant.OSGI_SERVICE_UPDATE_FRAGMENT,UpdateFragment.class.getName(),params);
+        }
+        return fg;
+    }
+
+
+    private UpdateFragment(Fragment mFragment, Bundle params) {
+        super(mFragment, params);
     }
 
     @Override
@@ -108,7 +119,6 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
         initView();
         post();
 
-        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -129,15 +139,6 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
         super.onDetach();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getFragmentManager().popBackStack();
-                return super.onOptionsItemSelected(item);
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onClick(View v) {
@@ -284,18 +285,12 @@ public class UpdateFragment extends Fragment implements View.OnClickListener {
      * 发送更新通知
      */
     private void showUpdateNotification(int number) {
-        try {
-            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName=" + Constant.OSGI_SERVICE_HOST_OPT + ")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            agent.getService().ApkplugOSGIService(bundleContext,
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,
-                    2, number);
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
+        BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+        OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
+        if (null != host){
+            Bundle b = new Bundle();
+            b.putInt("number",number);
+            host.notify(bundleContext, b);
         }
     }
 

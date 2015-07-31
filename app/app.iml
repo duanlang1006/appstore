@@ -109,6 +109,7 @@
     <orderEntry type="library" exported="" name="gson-2.2.4" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="umeng-update-v2.6.0.1" level="project" />
+    <orderEntry type="library" exported="" name="xUtils-2.6.14" level="project" />
     <orderEntry type="library" exported="" name="multidex-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
@@ -118,7 +119,6 @@
     <orderEntry type="module" module-name="mitUpdateSDK" exported="" />
     <orderEntry type="module" module-name="applitecommon" exported="" />
     <orderEntry type="module" module-name="impl" exported="" />
-    <orderEntry type="module" module-name="dscdownloader" exported="" />
   </component>
 </module>
 
