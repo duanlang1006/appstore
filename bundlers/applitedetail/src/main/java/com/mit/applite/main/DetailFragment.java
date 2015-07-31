@@ -50,19 +50,12 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private Activity mActivity;
     private View rootView;
     private String mApkName;
-    private TextView mNameView;
     private TextView mName1View;
     private TextView mApkSizeAndCompanyView;
     private TextView mApkContentView;
-    private ImageButton mBackView;
-    private ImageButton mSearchView;
-    private Button mDownloadView;
     private RatingBar mXingView;
-    private String mDownloadUrl;
     private ImageView mApkImgView;
     private String mViewPagerUrlList[] = null;
-    private ProgressBar mProgressBar;
-    private static final int APK_LOADING = 1;
     private LayoutInflater mInflater;
     private ViewGroup container;
     private LinearLayout mImgLl;
@@ -78,6 +71,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private ImplChangeCallback implCallback;
     private LinearLayout detail_contentandpic;
     private BitmapUtils mBitmapUtil;
+    private String mDownloadUrl;
 
     public DetailFragment() {
     }
@@ -177,21 +171,15 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mDownloadLayout.addView(mProgressButton);
 
         mApkImgView = (ImageView) rootView.findViewById(R.id.detail_apkimg);
-        mNameView = (TextView) rootView.findViewById(R.id.detail_name);
         mName1View = (TextView) rootView.findViewById(R.id.detail_name1);
         mApkSizeAndCompanyView = (TextView) rootView.findViewById(R.id.detail_apksize_and_company);
         mApkContentView = (TextView) rootView.findViewById(R.id.detail_content);
-        mBackView = (ImageButton) rootView.findViewById(R.id.detail_back);
-        mSearchView = (ImageButton) rootView.findViewById(R.id.detail_search);
-        mDownloadView = (Button) rootView.findViewById(R.id.detail_download);
         mXingView = (RatingBar) rootView.findViewById(R.id.detail_xing);
-        mProgressBar = (ProgressBar) rootView.findViewById(R.id.detail_progress);
         mImgLl = (LinearLayout) rootView.findViewById(R.id.detail_viewpager_img_ll);
         no_network = (LinearLayout) rootView.findViewById(R.id.no_network);
         refreshButton = (Button) rootView.findViewById(R.id.refresh_btn);
         detail_contentandpic = (LinearLayout) rootView.findViewById(R.id.detail_contentandpic);
 
-        mNameView.setText(mApkName);
         mName1View.setText(mApkName);
 
         mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
@@ -232,20 +220,12 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
-        mBackView.setOnClickListener(this);
-        mSearchView.setOnClickListener(this);
-        mDownloadView.setOnClickListener(this);
         refreshButton.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.detail_back:
-                getFragmentManager().popBackStack();
-                break;
-            case R.id.detail_download:
-                break;
             case R.id.refresh_btn:
                 no_network.setVisibility(View.GONE);
                 post(mPackageName);
@@ -287,7 +267,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
      * @param data
      */
     private void setData(String data) {
-//        detail_contentandpic.setVisibility(View.GONE);
         try {
             String mViewPagerUrl = null;
             JSONObject object = new JSONObject(data);
@@ -310,17 +289,14 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     String content = obj.getString("description");
                     mViewPagerUrl = obj.getString("screenshotsUrl");
 
-                    mNameView.setText(mName);
                     mName1View.setText(mName);
                     mXingView.setRating(Float.parseFloat(xing) / 2.0f);
                     mBitmapUtil.display(mApkImgView, mImgUrl);
                     mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size));
-//                    detail_contentandpic.setBackground(mContext.getResources().getDrawable(R.id.k));
                     mApkContentView.setText(content);
                     detail_contentandpic.setVisibility(View.VISIBLE);
                 }
                 mViewPagerUrlList = mViewPagerUrl.split(",");
-                LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrl);
                 setPreViewImg();
             }
 
@@ -343,6 +319,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
      */
     private void setPreViewImg() {
         for (int i = 0; i < mViewPagerUrlList.length; i++) {
+            LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
             final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
             final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
             mImgLl.addView(child);
