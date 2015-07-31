@@ -7,8 +7,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.mit.applite.main.R;
 
@@ -25,7 +27,7 @@ public class ProgressButton extends View {
     private int backgroundColor;
     private String text;
     private int max = 100;
-    private int corner = 15;// 圆角的弧度
+    private int corner = 5;// 圆角的弧度
     private OnProgressButtonClickListener buttonClickListener;
 
     public ProgressButton(Context context, AttributeSet attrs) {
@@ -48,6 +50,12 @@ public class ProgressButton extends View {
         this.text = typedArray.getString(R.styleable.ProgressButton_text);
         this.textSize = typedArray.getDimension(R.styleable.ProgressButton_textSize, 20);
         typedArray.recycle();
+    }
+
+    public static ProgressButton inflate(Context context, ViewGroup root, boolean attach, LayoutInflater inflater) {
+        LayoutInflater mInflater = LayoutInflater.from(context);
+        mInflater = mInflater.cloneInContext(context);
+        return (ProgressButton) inflater.inflate(R.layout.progress_button_layout, root, attach);
     }
 
     @Override

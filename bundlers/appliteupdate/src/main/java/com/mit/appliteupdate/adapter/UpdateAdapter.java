@@ -10,15 +10,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.applite.common.AppliteUtils;
+import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
+import com.lidroid.xutils.BitmapUtils;
 import com.mit.appliteupdate.main.BundleContextFactory;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.bean.DataBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
-
-import net.tsz.afinal.FinalBitmap;
 
 import java.io.File;
 import java.util.List;
@@ -28,8 +28,8 @@ import java.util.List;
  */
 public class UpdateAdapter extends BaseAdapter {
 
+    private final BitmapUtils mBitmapUtil;
     private Context mActivity;
-    private FinalBitmap mFinalBitmap;
     private Context mContext;
     private List<DataBean> mDatas;
     private LayoutInflater mInflater;
@@ -37,8 +37,8 @@ public class UpdateAdapter extends BaseAdapter {
 
     public UpdateAdapter(Context context, List<DataBean> mDatas) {
         this.mDatas = mDatas;
-        mFinalBitmap = FinalBitmap.create(context);
         mActivity = context;
+        mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
         try {
             Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             this.mContext = mContext;
@@ -144,7 +144,11 @@ public class UpdateAdapter extends BaseAdapter {
 
         public void refresh() {
             mName.setText(bean.getmName());
-            mFinalBitmap.display(mImg, bean.getmImgUrl());
+
+            mBitmapUtil.configDefaultLoadingImage(mContext.getDrawable(R.drawable.apk_icon_defailt_img));
+            mBitmapUtil.configDefaultLoadFailedImage(mContext.getDrawable(R.drawable.apk_icon_defailt_img));
+            mBitmapUtil.display(mImg, bean.getmImgUrl());
+
             mVersionName.setText("V " + bean.getmVersionName());
             mApkSize.setText(AppliteUtils.bytes2kb(bean.getmSize()));
             initProgressButton();

@@ -9,9 +9,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,6 +24,12 @@ import android.widget.Toast;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.adapter.UpdateAdapter;
 import com.mit.appliteupdate.bean.DataBean;
@@ -32,10 +40,6 @@ import com.mit.impl.ImplInfo;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
-
-import net.tsz.afinal.FinalHttp;
-import net.tsz.afinal.http.AjaxCallBack;
-import net.tsz.afinal.http.AjaxParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,7 +54,6 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private LayoutInflater mInflater;
     private View rootView;
     private Activity mActivity;
-    private FinalHttp mFinalHttp;
     private TextView mAllUpdateView;
     private ListView mListView;
     private List<DataBean> mDataContents = new ArrayList<DataBean>();
@@ -67,6 +70,10 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private Button mStatsButton;
     private boolean mPostStats = true;
     private ImplAgent implAgent;
+    private HttpUtils mHttpUtils;
+    private LinearLayout mLoadLayout;
+    private ImageView mLoadView;
+    private Animation LoadingAnimation;
 
     public static Fragment newInstance(OSGIServiceHost host,Bundle params){
         Fragment fg = null;
@@ -94,7 +101,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFinalHttp = new FinalHttp();
+        mHttpUtils = new HttpUtils();
     }
 
     @Override
@@ -182,36 +189,63 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         mStatsImgView = (ImageView) rootView.findViewById(R.id.update_stats_img);
         mStatsButton = (Button) rootView.findViewById(R.id.update_post_button);
 
+        //加载中控件
+        mLoadLayout = (LinearLayout) rootView.findViewById(R.id.update_loading_layout);
+        mLoadView = (ImageView) rootView.findViewById(R.id.update_loading_img);
+        //旋转动画
+        LoadingAnimation = AnimationUtils.loadAnimation(mContext, R.anim.loading);
+        LinearInterpolator lin = new LinearInterpolator();
+        LoadingAnimation.setInterpolator(lin);
+        mLoadView.startAnimation(LoadingAnimation);
+
         mStatsButton.setOnClickListener(this);
         mAllUpdateView.setOnClickListener(this);
     }
 
+    /**
+     * 设置加载中控件的显示和隐藏
+     *
+     * @param Visibility
+     */
+    private void setLoadLayoutVisibility(int Visibility) {
+        switch (Visibility) {
+            case View.VISIBLE:
+                mLoadLayout.setVisibility(View.VISIBLE);
+                mLoadView.startAnimation(LoadingAnimation);
+                break;
+            case View.GONE:
+                mLoadLayout.setVisibility(View.GONE);
+                mLoadView.clearAnimation();
+                break;
+        }
+    }
+
     private void post() {
+        setLoadLayoutVisibility(View.VISIBLE);
         mPostStats = false;
-        AjaxParams params = new AjaxParams();
-        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.put("packagename", mActivity.getPackageName());
-        params.put("app", "applite");
-        params.put("type", "update_management");
-        params.put("update_info", UpdateUtils.getAllApkData(mActivity));
-        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "update_management");
+        params.addBodyParameter("update_info", UpdateUtils.getAllApkData(mActivity));
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
-            public void onSuccess(Object o) {
-                super.onSuccess(o);
-                String resulit = (String) o;
-                LogUtils.i(TAG, "更新请求成功，resulit：" + resulit);
-                resolve(resulit);
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                setLoadLayoutVisibility(View.GONE);
+                LogUtils.i(TAG, "更新请求成功，resulit：" + responseInfo.result);
+                resolve(responseInfo.result);
                 mPostStats = true;
             }
 
             @Override
-            public void onFailure(Throwable t, int errorNo, String strMsg) {
-                super.onFailure(t, errorNo, strMsg);
-                LogUtils.i(TAG, "更新请求失败，strMsg：" + strMsg);
+            public void onFailure(HttpException e, String s) {
+                setLoadLayoutVisibility(View.GONE);
+                LogUtils.i(TAG, "更新请求失败：" + s);
                 setStatsLayoutVisibility(View.VISIBLE, mContext.getResources().getDrawable(R.drawable.post_failure));
                 mStatsButton.setVisibility(View.VISIBLE);
                 mPostStats = true;
             }
+
         });
     }
 
@@ -257,6 +291,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 }
                 mAdapter = new UpdateAdapter(mActivity, mDataContents);
                 mListView.setAdapter(mAdapter);
+                mListView.setVisibility(View.VISIBLE);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -294,9 +329,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
     }
 
-    private void download(DataBean bean){
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(),bean.getmPackageName(),bean.getmVersionCode());
-        if (null == implInfo){
+    private void download(DataBean bean) {
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
+        if (null == implInfo) {
             return;
         }
         implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());

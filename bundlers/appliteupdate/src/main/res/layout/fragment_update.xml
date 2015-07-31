@@ -17,9 +17,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:textSize="15dp"
             android:text="可更新"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:textSize="15dp" />
 
         <TextView
             android:id="@+id/update_all_update"
@@ -27,14 +27,38 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:text="全部更新"
-            android:textColor="@color/install_button_nor" />
+            android:textColor="@drawable/all_update_button_bg" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/update_loading_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/update_loading_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="180dp"
+            android:src="@drawable/loading_img" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/loading"
+            android:textColor="@color/black" />
     </LinearLayout>
 
     <ListView
         android:id="@+id/update_listview"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"></ListView>
+        android:layout_height="wrap_content"
+        android:visibility="gone"></ListView>
 
 
     <LinearLayout
@@ -58,6 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:background="@drawable/install_button_bg"
             android:padding="5dp"
             android:text="点击重新请求"
             android:textColor="@color/black" />

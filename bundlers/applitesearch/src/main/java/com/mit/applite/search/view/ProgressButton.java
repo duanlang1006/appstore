@@ -7,15 +7,18 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.mit.applite.search.R;
 
 /**
  * Created by LSY on 15-6-16.
  */
-public class ProgressButton extends View {
+public class ProgressButton extends LinearLayout {
+    private LayoutInflater mInflater;
     private Paint.FontMetrics fm;
     private int progress = 0;
     private int textColor = Color.WHITE;
@@ -28,13 +31,19 @@ public class ProgressButton extends View {
     private int corner = 5;// 圆角的弧度
     private OnProgressButtonClickListener buttonClickListener;
 
+    public ProgressButton(Context context) {
+        this(context,null);
+    }
+
     public ProgressButton(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs);
+        this(context, attrs, 0);
     }
 
     public ProgressButton(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        mInflater = LayoutInflater.from(context);
+        mInflater = mInflater.cloneInContext(context);
+
         init(context, attrs);
     }
 
