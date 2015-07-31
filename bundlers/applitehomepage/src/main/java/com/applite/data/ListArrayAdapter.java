@@ -17,15 +17,14 @@ import com.applite.bean.HomePageApkData;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.applite.homepage.BundleContextFactory;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplInfo;
 import com.applite.homepage.R;
-import com.mit.impl.ImplListener;
 
 import net.tsz.afinal.FinalBitmap;
-
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -118,6 +117,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
                     switch (vh.implInfo.getStatus()) {
                         case Constant.STATUS_PENDING:
+                            break;
                         case Constant.STATUS_RUNNING:
                             implAgent.pauseDownload(vh.implInfo);
                             break;
@@ -154,7 +154,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private Button mProgressButton;
         private ImageView mCategoryListArrow;
         private String layoutStr;
-        private ListImplCallback implCallback;
+        private ImplChangeCallback implCallback;
         ImplInfo implInfo;
         HomePageApkData itemData;
 
@@ -221,6 +221,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
         void initProgressButton() {
             if (null != mProgressButton && null != this.implInfo){
+                LogUtils.d(TAG,implInfo.getTitle()+","+implInfo.getStatus()+","+implAgent.getActionText(implInfo));
                 switch (implInfo.getStatus()){
                     case Constant.STATUS_PENDING:
                         mProgressButton.setText(implAgent.getActionText(implInfo));
@@ -247,7 +248,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
     }
 
-    class ListImplCallback extends ImplListener {
+    class ListImplCallback implements ImplChangeCallback {
         Object tag ;
 
         ListImplCallback(Object tag) {
@@ -256,78 +257,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
 
         @Override
-        public void onStart(ImplInfo info) {
-            super.onStart(info);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onCancelled(ImplInfo info) {
-            super.onCancelled(info);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onLoading(ImplInfo info, long total, long current, boolean isUploading) {
-            super.onLoading(info, total, current, isUploading);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onSuccess(ImplInfo info, File file) {
-            super.onSuccess(info, file);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onFailure(ImplInfo info, Throwable t, String msg) {
-            super.onFailure(info, t, msg);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onInstallSuccess(ImplInfo info) {
-            super.onInstallSuccess(info);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onInstalling(ImplInfo info) {
-            super.onInstalling(info);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onInstallFailure(ImplInfo info, int errorCode) {
-            super.onInstallFailure(info, errorCode);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onUninstallSuccess(ImplInfo info) {
-            super.onUninstallSuccess(info);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onUninstalling(ImplInfo info) {
-            super.onUninstalling(info);
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onUninstallFailure(ImplInfo info, int errorCode) {
-            super.onUninstallFailure(info, errorCode);
+        public void onChange(ImplInfo info) {
             ViewHolder vh = (ViewHolder)tag;
             vh.refresh();
         }

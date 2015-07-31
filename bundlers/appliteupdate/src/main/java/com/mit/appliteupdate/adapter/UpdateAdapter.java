@@ -18,7 +18,7 @@ import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.bean.DataBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplListener;
+import com.mit.impl.ImplChangeCallback;
 
 import java.io.File;
 import java.util.List;
@@ -174,87 +174,15 @@ public class UpdateAdapter extends BaseAdapter {
         }
     }
 
-    class ListImplCallback extends ImplListener {
+    class ListImplCallback implements ImplChangeCallback {
         Object tag;
 
         ListImplCallback(Object tag) {
-            super();
             this.tag = tag;
         }
 
         @Override
-        public void onStart(ImplInfo info) {
-            super.onStart(info);
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onCancelled(ImplInfo info) {
-            super.onCancelled(info);
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onLoading(ImplInfo info, long total, long current, boolean isUploading) {
-            super.onLoading(info, total, current, isUploading);
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onSuccess(ImplInfo info, File file) {
-            super.onSuccess(info, file);
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onFailure(ImplInfo info, Throwable t, String msg) {
-            super.onFailure(info, t, msg);
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onInstallSuccess(ImplInfo info) {
-            super.onInstallSuccess(info);
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onInstalling(ImplInfo info) {
-            super.onInstalling(info);
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onInstallFailure(ImplInfo info, int errorCode) {
-            super.onInstallFailure(info, errorCode);
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onUninstallSuccess(ImplInfo info) {
-            super.onUninstallSuccess(info);
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onUninstalling(ImplInfo info) {
-            super.onUninstalling(info);
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
-        }
-
-        @Override
-        public void onUninstallFailure(ImplInfo info, int errorCode) {
-            super.onUninstallFailure(info, errorCode);
+        public void onChange(ImplInfo info) {
             ViewHolder vh = (ViewHolder) tag;
             vh.refresh();
         }

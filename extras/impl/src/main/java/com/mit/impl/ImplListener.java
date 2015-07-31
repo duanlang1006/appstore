@@ -1,16 +1,7 @@
 package com.mit.impl;
 import java.io.File;
 
-public abstract class ImplListener {
-//    public void onDownloadComplete(boolean success,ImplAgent.DownloadCompleteRsp rsp);
-//    public void onDownloadUpdate(boolean success,ImplAgent.DownloadUpdateRsp rsp);
-//    public void onPackageAdded(boolean success,ImplAgent.PackageAddedRsp rsp);
-//    public void onPackageRemoved(boolean success,ImplAgent.PackageRemovedRsp rsp);
-//    public void onPackageChanged(boolean success,ImplAgent.PackageChangedRsp rsp);
-//    public void onSystemInstallResult(boolean success,ImplAgent.SystemInstallResultRsp rsp);
-//    public void onSystemDeleteResult(boolean success,ImplAgent.SystemDeleteResultRsp rsp);
-//    public void onFinish(boolean success, ImplAgent.ImplResponse rsp);
-
+abstract class ImplListener {
     private int rate;
 
     protected ImplListener() {
@@ -32,6 +23,7 @@ public abstract class ImplListener {
         this.rate = rate;
     }
 
+    public void onPending(ImplInfo info){};
     public void onStart(ImplInfo info){};
     public void onCancelled(ImplInfo info){};
     public void onLoading(ImplInfo info,long total, long current, boolean isUploading){};

@@ -63,7 +63,7 @@ android {
                     def outputFile = output.outputFile
                     if (outputFile != null && outputFile.name.endsWith('.apk')) {
                         // 输出apk名称为appstore_v1.0_wandoujia.apk
-                        def fileName = "applite_v${defaultConfig.versionName}_${variant.productFlavors[0].name}_${variant.buildType.name}.apk"
+                        def fileName = "appstore_v${defaultConfig.versionName}_${variant.productFlavors[0].name}_${variant.buildType.name}.apk"
                         output.outputFile = new File(outputFile.parent, fileName)
                     }
                 }
@@ -82,18 +82,18 @@ android {
     task apkZip(type: Zip) {
         classifier = 'build'
         from projectDir
-        include 'build/outputs/apk/applite_*.apk'
+        include 'build/outputs/apk/appstore_*.apk'
         destinationDir file('.')
-        archiveName "applite_v${defaultConfig.versionName}.zip"
+        archiveName "appstore_v${defaultConfig.versionName}.zip"
     }
 
     task setTag (type : Exec) {
         executable "git"
         args "tag"
         args "-af"
-        args "applite_v${defaultConfig.versionName}"
+        args "appstore_v${defaultConfig.versionName}"
         args "-m"
-        args "release for applite_v${defaultConfig.versionName}"
+        args "release for appstore_v${defaultConfig.versionName}"
     }
 
     task pushTag (type : Exec) {
@@ -114,6 +114,6 @@ dependencies {
     compile project(':extras:mitUpdateSDK')
     compile project(':extras:impl')
     compile project(':extras:applitecommon')
-    compile project(':extras:dscdownloader')
+//    compile project(':extras:dscdownloader')
     compile 'com.jiechic.library:xUtils:2.6.14'
 }

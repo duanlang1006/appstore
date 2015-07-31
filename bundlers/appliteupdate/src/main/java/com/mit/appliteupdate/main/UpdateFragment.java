@@ -38,7 +38,6 @@ import com.mit.appliteupdate.utils.UpdateSPUtils;
 import com.mit.appliteupdate.utils.UpdateUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplListener;
 import com.umeng.analytics.MobclickAgent;
 
 

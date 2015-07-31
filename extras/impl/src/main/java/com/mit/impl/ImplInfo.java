@@ -1,18 +1,6 @@
 package com.mit.impl;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.database.Cursor;
-import android.net.Uri;
-import android.text.format.Formatter;
-
-import com.android.dsc.downloads.DownloadManager;
 import com.applite.common.Constant;
-import com.lidroid.xutils.db.annotation.Id;
 
 /**
  * Created by hxd on 15-6-11.
@@ -102,9 +90,9 @@ public class ImplInfo {
         return localPath;
     }
 
-    public String getMimeType() {
-        return mimeType;
-    }
+//    public String getMimeType() {
+//        return mimeType;
+//    }
 
     public boolean isAutoLaunch() {
         return autoLaunch;
@@ -169,10 +157,10 @@ public class ImplInfo {
         return this;
     }
 
-    public ImplInfo setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-        return this;
-    }
+//    public ImplInfo setMimeType(String mimeType) {
+//        this.mimeType = mimeType;
+//        return this;
+//    }
 
     public ImplInfo setAutoLaunch(boolean autoLaunch) {
         this.autoLaunch = autoLaunch;

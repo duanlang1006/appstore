@@ -101,7 +101,9 @@ class ImplDownload  {
                     true,
                     new DownloadCallback<File>(implInfo,callback));
             implInfo.setDownloadId(downloadInfo.getId());
+            implInfo.setStatus(Constant.STATUS_PENDING);
             downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
+            callback.onPending(implInfo);
         } catch (DbException e) {
             e.printStackTrace();
         }
@@ -183,6 +185,14 @@ class ImplDownload  {
         return ret;
     }
 
+    String getLocalPath(ImplInfo implInfo){
+        String ret = null;
+        DownloadInfo downloadInfo = dm.getDownloadInfoById(implInfo.getDownloadId());
+        if (null != downloadInfo ){
+            ret = downloadInfo.getFileSavePath();
+        }
+        return ret;
+    }
 
     class DownloadCallback<File> extends RequestCallBack<File> {
         private ImplInfo implInfo;
@@ -229,9 +239,12 @@ class ImplDownload  {
         @Override
         public void onSuccess(ResponseInfo<File> fileResponseInfo) {
             java.io.File file = (java.io.File)fileResponseInfo.result;
-            implInfo.setStatus(Constant.STATUS_SUCCESSFUL);
-            if (null != file) {
-                implInfo.setLocalPath(file.getPath());
+            if (null != file && file.exists()) {
+                implInfo.setLocalPath(file.getAbsolutePath());
+                implInfo.setStatus(Constant.STATUS_SUCCESSFUL);
+            }else{
+                implInfo.setLocalPath(null);
+                implInfo.setStatus(Constant.STATUS_FAILED);
             }
 
             if (null != baseCallback){
