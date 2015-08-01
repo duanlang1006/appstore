@@ -91,7 +91,6 @@
     <orderEntry type="library" exported="" name="applite-impl-v1.1" level="project" />
     <orderEntry type="library" exported="" name="applite-common-v1.0" level="project" />
     <orderEntry type="library" exported="" name="android-support-v7-appcompat" level="project" />
-    <orderEntry type="library" exported="" name="afinal_0.5.1_bin" level="project" />
     <orderEntry type="library" exported="" name="analytics-5.5.3" level="project" />
   </component>
 </module>

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.applite.common.AppliteUtils;
@@ -47,32 +48,40 @@ public class SimpleBundle implements BundleActivator {
 
     public class SearchOSGIServiceImpl extends OSGIServiceClient {
         @Override
-        public void launchOSGIFragment(String servicename, Bundle bundle) {
+        public void launchOSGIFragment(String servicename, Fragment fragment, Bundle bundle) {
             OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
             if (Constant.OSGI_SERVICE_SEARCH_FRAGMENT.equals(servicename) && null != host) {
-                Fragment fg = SearchFragment.newInstance(host,bundle);
                 FragmentManager fgm = host.getFragmentManager();
                 FragmentTransaction ft = fgm.beginTransaction();
                 ft.hide(fgm.findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT));//得到首页Fragment，然后隐藏
-                ft.add(host.getNode(), fg, Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
+                ft.add(host.getNode(), fragment, Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
                 ft.addToBackStack(null);
                 ft.commit();
             }
         }
 
         @Override
-        public OSGIBaseFragment newOSGIFragment(Fragment container, String whichFragment, Bundle params) {
-            OSGIBaseFragment fg = null;
-            try {
-                Class<?> cls = Class.forName(whichFragment);
-                Constructor ct = cls.getDeclaredConstructor(Fragment.class,Bundle.class);
-                ct.setAccessible(true);
-                fg = (OSGIBaseFragment)ct.newInstance(container,params);
-            } catch (Exception e) {
-                e.printStackTrace();
+        public OSGIBaseFragment newOSGIFragment(Fragment container, String whichService,String whichFragment, Bundle params) {
+            OSGIBaseFragment baseFragment = null;
+            if (null != whichFragment && !TextUtils.isEmpty(whichFragment)){
+                try {
+                    Class<?> cls = Class.forName(whichFragment);
+                    Constructor ct = cls.getDeclaredConstructor(Fragment.class,Bundle.class);
+                    ct.setAccessible(true);
+                    baseFragment = (OSGIBaseFragment)ct.newInstance(container,params);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            return fg;
+
+            if (null == baseFragment) {
+                if (Constant.OSGI_SERVICE_SEARCH_FRAGMENT.equals(whichService)) {
+                    baseFragment = SearchFragment.newInstance(container, params);
+                }
+            }
+            return baseFragment;
         }
+
 //        @Override
 //        public Object ApkplugOSGIService(BundleContext bundleContext, String servicename, int node, Object... objs) {
 //            Log.d(SimpleBundle.TAG, "ApkplugOSGIService,recv service:" + servicename + ",node=" + node);

@@ -47,34 +47,37 @@ public class SimpleBundle implements BundleActivator {
 
     public class UpdateOSGIServiceImpl extends OSGIServiceClient {
         @Override
-        public void launchOSGIFragment(String servicename, Bundle bundle) {
-            if (Constant.OSGI_SERVICE_UPDATE_FRAGMENT.equals(servicename)) {
-                OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
-                if (null != host){
-                    Fragment fg = UpdateFragment.newInstance(host,null);
-                    FragmentManager fgm = host.getFragmentManager();
-                    FragmentTransaction ft = fgm.beginTransaction();
-                    if (null == fgm.findFragmentByTag(Constant.OSGI_SERVICE_UPDATE_FRAGMENT)) {
-                        ft.replace(host.getNode(), fg, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
-                        ft.addToBackStack(null);
-                        ft.commit();
-                    }
+        public void launchOSGIFragment(String servicename, Fragment fragment, Bundle bundle) {
+            OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
+            if (null != host && Constant.OSGI_SERVICE_UPDATE_FRAGMENT.equals(servicename)) {
+                FragmentManager fgm = host.getFragmentManager();
+                FragmentTransaction ft = fgm.beginTransaction();
+                if (null == fgm.findFragmentByTag(Constant.OSGI_SERVICE_UPDATE_FRAGMENT)) {
+                    ft.replace(host.getNode(), fragment, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
+                    ft.addToBackStack(null);
+                    ft.commit();
                 }
             }
         }
 
         @Override
-        public OSGIBaseFragment newOSGIFragment(Fragment container, String whichFragment, Bundle params) {
-            OSGIBaseFragment fg = null;
+        public OSGIBaseFragment newOSGIFragment(Fragment container, String whichService, String whichFragment, Bundle params) {
+            OSGIBaseFragment baseFragment = null;
             try {
                 Class<?> cls = Class.forName(whichFragment);
                 Constructor ct = cls.getDeclaredConstructor(Fragment.class,Bundle.class);
                 ct.setAccessible(true);
-                fg = (OSGIBaseFragment)ct.newInstance(container,params);
+                baseFragment = (OSGIBaseFragment)ct.newInstance(container,params);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return fg;
+            if (null == baseFragment){
+                if (Constant.OSGI_SERVICE_UPDATE_FRAGMENT.equals(whichService)){
+                    baseFragment = UpdateFragment.newInstance(container,params);
+                }
+            }
+
+            return baseFragment;
         }
 
 //        @Override

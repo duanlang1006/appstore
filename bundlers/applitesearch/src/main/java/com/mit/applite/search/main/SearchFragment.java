@@ -146,14 +146,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private String mEtViewText;//页面隐藏时mEtView里面的字
     private HttpUtils mHttpUtils;
 
-    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
-        Fragment fg = null;
-        if (null != host){
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_SEARCH_FRAGMENT,SearchFragment.class.getName(),params);
-        }
-        return fg;
+    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
+        return new SearchFragment(fg,params);
     }
 
 

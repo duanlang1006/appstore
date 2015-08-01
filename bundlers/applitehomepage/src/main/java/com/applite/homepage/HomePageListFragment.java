@@ -55,29 +55,16 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     private boolean isend;
     private boolean sendhttpreq = true;
 
-    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
-        Fragment fg = null;
-        if (null != host){
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,HomePageListFragment.class.getName(),params);
-        }
-        return fg;
+    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
+        return new HomePageListFragment(fg,params);
     }
 
-    public static Fragment newInstance(OSGIServiceHost host,SubjectData data,boolean showHome){
-        Fragment fg = null;
-        if (null != host){
-            Bundle b = new Bundle();
-            b.putParcelable("subject_data", data);
-            b.putBoolean("show_home", showHome);
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,HomePageListFragment.class.getName(),b);
-        }
-        return fg;
+    public static Bundle newBundle(SubjectData data,boolean showHome){
+        Bundle b = new Bundle();
+        b.putParcelable("subject_data", data);
+        b.putBoolean("show_home", showHome);
+        return b;
     }
-
 
     private HomePageListFragment(Fragment mFragment, Bundle params) {
         super(mFragment, params);
@@ -146,14 +133,8 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         if (null == itemData){
             return;
         }
-        OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
         if (viewHolder.getLayoutStr().equals("fragment_categorylist")) {
-            if (null != host){
-                Fragment fg = HomePageFragment.newInstance(host,itemData.getKey(),itemData.getName());
-                FragmentTransaction ft = fg.getFragmentManager().beginTransaction();
-                ft.replace(host.getNode(),fg,Constant.OSGI_SERVICE_MAIN_FRAGMENT);
-                ft.commitAllowingStateLoss();
-            }
+            HomepageUtils.toHomePageCategory(itemData.getKey(),itemData.getName());
         }else if (viewHolder.getLayoutStr().equals("fragment_apklist")){
             HomepageUtils.launchDetail(itemData.getPackageName(),itemData.getName(),itemData.getIconUrl());
         }

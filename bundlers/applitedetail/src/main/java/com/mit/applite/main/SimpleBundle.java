@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.osgi.extra.OSGIBaseFragment;
@@ -48,45 +50,45 @@ public class SimpleBundle implements BundleActivator {
 
     public class DetailOSGIServiceImpl extends OSGIServiceClient {
         @Override
-        public void launchOSGIFragment(String servicename, Bundle params) {
+        public void launchOSGIFragment(String servicename, Fragment fg, Bundle params) {
             LogUtils.d(SimpleBundle.TAG, "DetailOSGIServiceImpl,recv service:" + servicename);
             if (Constant.OSGI_SERVICE_DETAIL_FRAGMENT.equals(servicename)){
-                try {
-                    BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                    OSGIServiceHost host = new OSGIServiceAgent<OSGIServiceHost>(
-                            bundleContext,
-                            OSGIServiceHost.class,
-                            "(serviceName="+Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                            OSGIServiceAgent.real_time).getService();   //每次都重新查询
-                    Fragment fg = DetailFragment.newInstance(host,params);
+                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+                OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
+                if (null != host){
                     FragmentManager fgm = host.getFragmentManager();
                     FragmentTransaction ft = fgm.beginTransaction();
                     if (null != params){
                         String from = params.getString("from");
-                        ft.hide(fgm.findFragmentByTag(from));//得到当前Fragment，然后隐藏
+                        ft.hide(fgm.findFragmentByTag(from));
                     }
                     ft.add(host.getNode(), fg, Constant.OSGI_SERVICE_DETAIL_FRAGMENT);
                     ft.addToBackStack(null);
                     ft.commitAllowingStateLoss();
-                } catch (Exception e) {
-                    // TODO 自动生成的 catch 块
-                    e.printStackTrace();
                 }
             }
         }
 
+
         @Override
-        public OSGIBaseFragment newOSGIFragment(Fragment container, String whichFragment, Bundle params) {
-            OSGIBaseFragment fg = null;
-            try {
-                Class<?> cls = Class.forName(whichFragment);
-                Constructor ct = cls.getDeclaredConstructor(Fragment.class,Bundle.class);
-                ct.setAccessible(true);
-                fg = (OSGIBaseFragment)ct.newInstance(container,params);
-            } catch (Exception e) {
-                e.printStackTrace();
+        public OSGIBaseFragment newOSGIFragment(Fragment container, String whichService, String whichFragment,Bundle params) {
+            OSGIBaseFragment baseFragment = null;
+            if (null != whichFragment && !TextUtils.isEmpty(whichFragment)){
+                try {
+                    Class<?> cls = Class.forName(whichFragment);
+                    Constructor ct = cls.getDeclaredConstructor(Fragment.class,Bundle.class);
+                    ct.setAccessible(true);
+                    baseFragment = (OSGIBaseFragment)ct.newInstance(container,params);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            return fg;
+            if (null == baseFragment) {
+                if (Constant.OSGI_SERVICE_DETAIL_FRAGMENT.equals(whichService)) {
+                    baseFragment = DetailFragment.newInstance(container, params);
+                }
+            }
+            return baseFragment;
         }
     }
 }

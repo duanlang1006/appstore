@@ -51,13 +51,13 @@ public class MitMarketActivity extends ApkPluginActivity {
         }
 
         @Override
-        public void jumpto(BundleContext bundleContext, String target, Bundle params) {
-            launchFragment(target,params);
+        public void jumpto(BundleContext bundleContext, String whichService,String whichFragment, Bundle params) {
+            launchFragment((ApkPluginFragment) newFragment(bundleContext, whichService, whichFragment, params));
         }
 
         @Override
-        public Fragment newFragment(BundleContext bundleContext,String targetService, String whichFragment, Bundle params) {
-            return ApkPluginFragment.newInstance(targetService,whichFragment,params);
+        public Fragment newFragment(BundleContext bundleContext,String whichService,String whichFragment, Bundle params) {
+            return ApkPluginFragment.newInstance(whichService,whichFragment,params);
         }
 
         @Override
@@ -87,10 +87,10 @@ public class MitMarketActivity extends ApkPluginActivity {
 
         Intent mIntent = getIntent();
         if (Constant.UPDATE_FRAGMENT_NOT.equals(mIntent.getStringExtra("update"))) {
-            launchFragment(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null);
+            launchFragment(ApkPluginFragment.newInstance(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,null));
         } else {
             if (savedInstanceState == null) {
-                launchFragment(Constant.OSGI_SERVICE_LOGO_FRAGMENT,null);
+                launchFragment(ApkPluginFragment.newInstance(Constant.OSGI_SERVICE_LOGO_FRAGMENT,null,null));
             }
         }
     }
@@ -169,7 +169,7 @@ public class MitMarketActivity extends ApkPluginActivity {
 //        Intent mIntent = getIntent();
         setIntent(intent);
         if (Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update")))
-            launchFragment(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null);
+            launchFragment(ApkPluginFragment.newInstance(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,null));
     }
 
 

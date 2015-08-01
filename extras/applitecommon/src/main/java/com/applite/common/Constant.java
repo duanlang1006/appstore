@@ -11,6 +11,7 @@ public class Constant {
     public static final String OSGI_SERVICE_SETTING_FRAGMENT = "osgi.service.setting.fragment";
     public static final String OSGI_SERVICE_SEARCH_FRAGMENT = "osgi.service.search.fragment";
     public static final String OSGI_SERVICE_DM_FRAGMENT = "osgi.service.dm.fragment";
+    public static final String OSGI_SERVICE_DM_LIST_FRAGMENT = "osgi.service.dmlist.fragment";
     public static final String OSGI_SERVICE_UPGRADE_FRAGMENT = "osgi.service.upgrade.fragment";
     public static final String OSGI_SERVICE_HOST_OPT = "osgi.service.host.opt";
     public static final String OSGI_SERVICE_DETAIL_FRAGMENT = "osgi.service.detail.fragment";

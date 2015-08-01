@@ -232,7 +232,7 @@ public class AppliteUtils {
         return host;
     }
 
-    public static OSGIServiceClient getPluginOSGIService(BundleContext bundleContext,String serviceName){
+    public static OSGIServiceClient getClientOSGIService(BundleContext bundleContext,String serviceName){
         OSGIServiceClient service = null;
         try {
             service = new OSGIServiceAgent<OSGIServiceClient>(

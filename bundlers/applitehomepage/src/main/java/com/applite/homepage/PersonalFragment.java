@@ -18,16 +18,9 @@ import com.osgi.extra.OSGIServiceHost;
 public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener{
     LayoutInflater mInflater;
 
-    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
-        Fragment fg = null;
-        if (null != host){
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,PersonalFragment.class.getName(),params);
-        }
-        return fg;
+    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
+        return new PersonalFragment(fg,params);
     }
-
 
     private PersonalFragment(Fragment mFragment, Bundle params) {
         super(mFragment, params);

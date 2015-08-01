@@ -114,27 +114,15 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private SubjectData mPopData = new SubjectData();
 
 
-    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
-        Fragment fg = null;
-        if (null != host){
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,HomePageFragment.class.getName(),params);
-        }
-        return fg;
+    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
+        return new HomePageFragment(fg,params);
     }
 
-    public static Fragment newInstance(OSGIServiceHost host,String category,String title){
-        Fragment fg = null;
-        if (null != host){
-            Bundle bundle = new Bundle();
-            bundle.putString("category",category);
-            bundle.putString("title",title);
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,HomePageFragment.class.getName(),bundle);
-        }
-        return fg;
+    public static Bundle newBundle(String category,String title){
+        Bundle bundle = new Bundle();
+        bundle.putString("category",category);
+        bundle.putString("title",title);
+        return bundle;
     }
 
     private HomePageFragment(Fragment mFragment, Bundle params) {
@@ -442,10 +430,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.action_personal:
-                launchPersonalFragment();
+                HomepageUtils.launchPersonalFragment();
                 break;
             case R.id.action_search:
-                launchSearchFragment();
+                HomepageUtils.launchSearchFragment();
                 MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
                 break;
         }
@@ -485,42 +473,6 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         }
     }
 
-    /****
-     * 搜索
-     */
-    private void launchSearchFragment() {
-        BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
-        if (null != host){
-            host.jumpto(bundleContext,Constant.OSGI_SERVICE_SEARCH_FRAGMENT, null);
-        }
-    }
-
-    /***
-     * 进入个人中心
-     */
-    private void launchPersonalFragment() {
-        OSGIServiceHost host = null;
-        try {
-            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-            host = new OSGIServiceAgent<OSGIServiceHost>(
-                    bundleContext,
-                    OSGIServiceHost.class,
-                    "(serviceName="+Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                    OSGIServiceAgent.real_time).getService();   //每次都重新查询
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
-        if (null != host){
-            Fragment fg = PersonalFragment.newInstance(host,null);
-            FragmentManager fm = host.getFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
-            ft.replace(host.getNode(),fg,"personal");
-            ft.addToBackStack(null);
-            ft.commit();
-        }
-    }
 
     /**
      * HomePage网络请求
@@ -578,21 +530,9 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     class SectionsPagerAdapter extends FragmentStatePagerAdapter {
         private static final String TAG = "homepage_adapter";
         private int mChildCount = 0;
-        OSGIServiceHost host = null;
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
-            try {
-                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                host = new OSGIServiceAgent<OSGIServiceHost>(
-                        bundleContext,
-                        OSGIServiceHost.class,
-                        "(serviceName="+Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                        OSGIServiceAgent.real_time).getService();   //每次都重新查询
-            } catch (Exception e) {
-                // TODO 自动生成的 catch 块
-                e.printStackTrace();
-            }
         }
 
         @Override
@@ -608,8 +548,13 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         public Fragment getItem(int position) {
             LogUtils.d(TAG,"getItem,"+position);
             Fragment fg = null;
-            if (null != host){
-                fg = HomePageListFragment.newInstance(host,mPageData.get(position),false);
+            OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
+            if (null != host) {
+                fg = host.newFragment(
+                        BundleContextFactory.getInstance().getBundleContext(),
+                        Constant.OSGI_SERVICE_MAIN_FRAGMENT,
+                        HomePageListFragment.class.getName(),
+                        HomePageListFragment.newBundle(mPageData.get(position),false));
             }
             return fg;
         }

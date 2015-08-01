@@ -34,15 +34,8 @@ public class DownloadPagerFragment extends OSGIBaseFragment{
     private Activity mActivity;
     private boolean destoryView = false;
 
-
-    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
-        Fragment fg = null;
-        if (null != host){
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_DM_FRAGMENT,DownloadPagerFragment.class.getName(),params);
-        }
-        return fg;
+    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
+        return new DownloadPagerFragment(fg,params);
     }
 
     private DownloadPagerFragment(Fragment mFragment, Bundle params) {
@@ -142,26 +135,34 @@ public class DownloadPagerFragment extends OSGIBaseFragment{
 
         @Override
         public Fragment getItem(int position) {
-            Fragment fm = null;
+            Fragment fg = null;
             OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
             if (null != host) {
                 switch (tabs[position]) {
                     case R.string.dm_downloaded:
-                        fm = DownloadListFragment.newInstance(host, Constant.STATUS_SUCCESSFUL
-                                | Constant.STATUS_INSTALLED
-                                | Constant.STATUS_INSTALL_FAILED
-                                | Constant.STATUS_PRIVATE_INSTALLING
-                                | Constant.STATUS_UPGRADE);
+                        fg = host.newFragment(
+                                BundleContextFactory.getInstance().getBundleContext(),
+                                Constant.OSGI_SERVICE_DM_FRAGMENT,
+                                DownloadListFragment.class.getName(),
+                                DownloadListFragment.newBundle(Constant.STATUS_SUCCESSFUL
+                                        | Constant.STATUS_INSTALLED
+                                        | Constant.STATUS_INSTALL_FAILED
+                                        | Constant.STATUS_PRIVATE_INSTALLING
+                                        | Constant.STATUS_UPGRADE));
                         break;
                     case R.string.dm_downloading:
-                        fm = DownloadListFragment.newInstance(host, Constant.STATUS_PENDING
-                                | Constant.STATUS_RUNNING
-                                | Constant.STATUS_PAUSED
-                                | Constant.STATUS_FAILED);
+                        fg = host.newFragment(
+                                BundleContextFactory.getInstance().getBundleContext(),
+                                Constant.OSGI_SERVICE_DM_FRAGMENT,
+                                DownloadListFragment.class.getName(),
+                                DownloadListFragment.newBundle( Constant.STATUS_PENDING
+                                        | Constant.STATUS_RUNNING
+                                        | Constant.STATUS_PAUSED
+                                        | Constant.STATUS_FAILED));
                         break;
                 }
             }
-            return fm;
+            return fg;
         }
 
         @Override

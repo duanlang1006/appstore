@@ -32,7 +32,6 @@ import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 import com.osgi.extra.OSGIBaseFragment;
-import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,29 +65,23 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private BitmapUtils mBitmapUtil;
     private String mDownloadUrl;
 
-    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
-        Fragment fg = null;
-        if (null != host){
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_DETAIL_FRAGMENT, DetailFragment.class.getName(), params);
-        }
-        return fg;
+    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
+        return new DetailFragment(fg,params);
     }
 
-    public static Fragment newInstance(OSGIServiceHost host,String packageName,String name,String imgUrl){
-        Fragment fg = null;
-        if (null != host){
-            Bundle b = new Bundle();
-            b.putString("packageName",packageName);
-            b.putString("name",name);
-            b.putString("imgUrl",imgUrl);
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_DETAIL_FRAGMENT,DetailFragment.class.getName(),b);
-        }
-        return fg;
-    }
+//    public static OSGIBaseFragment newInstance(OSGIServiceHost host,String packageName,String name,String imgUrl){
+//        Fragment fg = null;
+//        if (null != host){
+//            Bundle b = new Bundle();
+//            b.putString("packageName",packageName);
+//            b.putString("name",name);
+//            b.putString("imgUrl",imgUrl);
+//            fg = host.newFragment(
+//                    BundleContextFactory.getInstance().getBundleContext(),
+//                    Constant.OSGI_SERVICE_DETAIL_FRAGMENT,DetailFragment.class.getName(),b);
+//        }
+//        return fg;
+//    }
 
     private DetailFragment(Fragment mFragment, Bundle params) {
         super(mFragment, params);
