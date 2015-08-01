@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.applite.android.R;
+import com.applite.common.AppliteUtils;
 import com.applite.common.LogUtils;
 import com.mit.bean.ApkplugDownloadCallback;
 import com.mit.bean.ApkplugModel;
@@ -157,24 +158,15 @@ public abstract class ApkPluginActivity extends ActionBarActivity {
         }
     }
 
-    protected void launchFragment(String serviceName,Bundle params){
-        boolean ret = false;
-        try {
-            //查询插件服务
-            FrameworkInstance frame= ((AppLiteApplication)getApplication()).getFrame();
-            BundleContext bundleContext = frame.getSystemBundleContext();
-            OSGIServiceClient service = new OSGIServiceAgent<OSGIServiceClient>(
-                    bundleContext,
-                    OSGIServiceClient.class,
-                    "(serviceName="+serviceName+")", //服务查询条件
-                    OSGIServiceAgent.real_time).getService();   //每次都重新查询
-            service.launchOSGIFragment(serviceName, params);
-            ret = true;
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
-        if (!ret){
+    protected void launchFragment(ApkPluginFragment fg){
+        String clientService = fg.getWhichService();
+        Bundle params = fg.getParams();
+        FrameworkInstance frame= ((AppLiteApplication)getApplication()).getFrame();
+        BundleContext bundleContext = frame.getSystemBundleContext();
+        OSGIServiceClient client = AppliteUtils.getClientOSGIService(bundleContext,clientService);
+        if (null != client){
+            client.launchOSGIFragment(clientService, fg, params);
+        }else{
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();

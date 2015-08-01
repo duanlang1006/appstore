@@ -105,14 +105,8 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private HttpUtils mHttpUtils;
     private Context mContext;
 
-    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
-        Fragment fg = null;
-        if (null != host){
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_LOGO_FRAGMENT,GuideFragment.class.getName(),params);
-        }
-        return fg;
+    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
+        return new GuideFragment(fg,params);
     }
 
     private GuideFragment(Fragment mFragment, Bundle params) {
@@ -419,7 +413,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
         OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
         if (null != host){
-            host.jumpto(bundleContext, Constant.OSGI_SERVICE_MAIN_FRAGMENT, null);
+            host.jumpto(bundleContext, Constant.OSGI_SERVICE_MAIN_FRAGMENT,null, null);
         }
     }
 

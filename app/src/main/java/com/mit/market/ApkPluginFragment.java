@@ -8,11 +8,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.applite.common.AppliteUtils;
 import com.applite.common.LogUtils;
 import com.osgi.extra.OSGIServiceClient;
 import com.osgi.extra.OSGIBaseFragment;
-
-import org.apkplug.Bundle.OSGIServiceAgent;
 import org.apkplug.app.FrameworkInstance;
 import org.osgi.framework.BundleContext;
 
@@ -22,38 +22,48 @@ import org.osgi.framework.BundleContext;
 public class ApkPluginFragment extends Fragment{
     private final String TAG = "apkplugin_Fragment";
     private Activity mActivity;
-    private String mTargetService;
+    private String mWhichService;
     private String mWhichFragment;
     private Bundle mParams;
     private OSGIServiceClient mPluginService;
     private OSGIBaseFragment mPluginFragment;
 
 
-    public static Fragment newInstance(String tag,String which,Bundle params){
-        Fragment fg = new ApkPluginFragment();
+    public static ApkPluginFragment newInstance(String whichService,String whichFragment,Bundle params){
+        ApkPluginFragment fg = new ApkPluginFragment();
         Bundle b = new Bundle();
-        b.putString("tag",tag);
-        b.putString("which",which);
-        if (null != params){
-            b.putBundle("bundle", params);
-        }
+        b.putString("service",whichService);
+        b.putString("fragment",whichFragment);
+        b.putBundle("params", params);
         fg.setArguments(b);
         return fg;
     }
 
 
     public ApkPluginFragment() {
-        mTargetService = null;
+        mWhichService = null;
         mWhichFragment = null;
         mParams = null;
         mPluginService = null;
         mPluginFragment = null;
     }
 
+    public String getWhichService(){
+        return getArguments().getString("service");
+    }
+
+    public String getWhichFragment(){
+        return getArguments().getString("fragment");
+    }
+
+    public Bundle getParams(){
+        return getArguments().getBundle("params");
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LogUtils.d(TAG, "onCreate ,mPluginService:"+mPluginService);
+        LogUtils.d(TAG, "onCreate ,this:"+this);
         setHasOptionsMenu(true);
 
         if (null != mPluginService){
@@ -65,41 +75,33 @@ public class ApkPluginFragment extends Fragment{
 
     @Override
     public void onAttach(Activity activity) {
-        super.onAttach(activity);
+       super.onAttach(activity);
 
         mActivity = activity;
         Bundle arguments = getArguments();
         if (null != arguments){
-            mTargetService = arguments.getString("tag");
-            mWhichFragment = arguments.getString("which");
-            mParams = arguments.getBundle("bundle");
+            mWhichService = arguments.getString("service");
+            mWhichFragment = arguments.getString("fragment");
+            mParams = arguments.getBundle("params");
         }
-        LogUtils.d(TAG, "onAttach ,mTargetService:"+mTargetService+",mWhichFragment="+mWhichFragment);
-        try {
-            FrameworkInstance frame= ((AppLiteApplication)mActivity.getApplication()).getFrame();
-            BundleContext bundleContext = frame.getSystemBundleContext();
-            OSGIServiceAgent<OSGIServiceClient> agent = new OSGIServiceAgent<OSGIServiceClient>(
-                    bundleContext, OSGIServiceClient.class,
-                    "(serviceName="+mTargetService+")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            mPluginService = agent.getService();
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
+        LogUtils.d(TAG, "onAttach ,this:"+this);
 
+        FrameworkInstance frame= ((AppLiteApplication)mActivity.getApplication()).getFrame();
+        BundleContext bundleContext = frame.getSystemBundleContext();
+        mPluginService = AppliteUtils.getClientOSGIService(bundleContext, mWhichService);
         if (null != mPluginService){
-            mPluginFragment = mPluginService.newOSGIFragment(this,mWhichFragment,mParams);
+            mPluginFragment = mPluginService.newOSGIFragment(this,mWhichService,mWhichFragment,mParams);
             mPluginService.onAttach(mPluginFragment,activity);
         }else{
             //wrong
+            LogUtils.e(TAG,"onAttach,client = null,"+mWhichService);
         }
-        LogUtils.d(TAG, "onAttach ,mPluginService:"+mPluginService+",mWhichFragment="+mWhichFragment);
+        LogUtils.d(TAG, "onAttach ,mPluginService:"+mPluginService);
     }
 
     @Override
     public void onStart() {
-        LogUtils.d(TAG, "onStart ,mPluginService:"+mPluginService);
+        LogUtils.d(TAG, "onStart ,this:"+this);
         super.onStart();
         if (null != mPluginService){
             mPluginService.onStart(mPluginFragment);
@@ -110,7 +112,7 @@ public class ApkPluginFragment extends Fragment{
 
     @Override
     public void onResume() {
-        LogUtils.d(TAG, "onResume ,mPluginService:"+mPluginService);
+        LogUtils.d(TAG, "onResume ,this:"+this);
         super.onResume();
         if (null != mPluginService){
             mPluginService.onResume(mPluginFragment);
@@ -121,7 +123,7 @@ public class ApkPluginFragment extends Fragment{
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        LogUtils.d(TAG, "onSaveInstanceState ,mPluginService:"+mPluginService);
+        LogUtils.d(TAG, "onSaveInstanceState ,this:"+this);
         super.onSaveInstanceState(outState);
         if (null != mPluginService){
             mPluginService.onSaveInstanceState(mPluginFragment,outState);
@@ -132,7 +134,7 @@ public class ApkPluginFragment extends Fragment{
 
     @Override
     public void onPause() {
-        LogUtils.d(TAG, "onPause ,mPluginService:"+mPluginService);
+        LogUtils.d(TAG, "onPause ,this:"+this);
         super.onPause();
         if (null != mPluginService){
             mPluginService.onPause(mPluginFragment);
@@ -143,7 +145,7 @@ public class ApkPluginFragment extends Fragment{
 
     @Override
     public void onStop() {
-        LogUtils.d(TAG, "onStop ,mPluginService:"+mPluginService);
+        LogUtils.d(TAG, "onStop ,this:"+this);
         super.onStop();
         if (null != mPluginService){
             mPluginService.onStop(mPluginFragment);
@@ -154,7 +156,7 @@ public class ApkPluginFragment extends Fragment{
 
     @Override
     public void onDestroy() {
-        LogUtils.d(TAG, "onDestroy ,mPluginService:"+mPluginService);
+        LogUtils.d(TAG, "onDestroy ,this:"+this);
         super.onDestroy();
         if (null != mPluginService){
             mPluginService.onDestroy(mPluginFragment);
@@ -165,7 +167,7 @@ public class ApkPluginFragment extends Fragment{
 
     @Override
     public void onDestroyView() {
-        LogUtils.d(TAG, "onDestroyView ,mPluginService:"+mPluginService);
+        LogUtils.d(TAG, "onDestroyView ,this:"+this);
         super.onDestroyView();
         if (null != mPluginService){
             mPluginService.onDestroyView(mPluginFragment);
@@ -176,7 +178,7 @@ public class ApkPluginFragment extends Fragment{
 
     @Override
     public void onDetach() {
-        LogUtils.d(TAG, "onDetach ,mPluginService:"+mPluginService);
+        LogUtils.d(TAG, "onDetach ,this:"+this);
         super.onDetach();
         if (null != mPluginService){
             mPluginService.onDetach(mPluginFragment);
@@ -187,7 +189,7 @@ public class ApkPluginFragment extends Fragment{
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        LogUtils.d(TAG, "onCreateView ,mPluginService:"+mPluginService);
+        LogUtils.d(TAG, "onCreateView ,this:"+this);
         if (null != mPluginService){
             return mPluginService.onCreateView(mPluginFragment,inflater, container, savedInstanceState);
         }else{
@@ -198,7 +200,7 @@ public class ApkPluginFragment extends Fragment{
 
     @Override
     public void onHiddenChanged(boolean hidden) {
-        LogUtils.d(TAG, "onHiddenChanged: "+hidden);
+        LogUtils.d(TAG, "onHiddenChanged: "+hidden+",this:"+this);
         super.onHiddenChanged(hidden);
         if (null != mPluginService){
             mPluginService.onHiddenChanged(mPluginFragment,hidden);

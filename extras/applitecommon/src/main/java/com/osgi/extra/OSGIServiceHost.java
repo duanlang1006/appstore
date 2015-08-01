@@ -10,8 +10,8 @@ import org.osgi.framework.BundleContext;
  */
 public abstract class OSGIServiceHost {
     public abstract void notify(BundleContext bundleContext, Bundle params);
-    public abstract void jumpto(BundleContext bundleContext, String target, Bundle params);
-    public abstract Fragment newFragment(BundleContext bundleContext,String targetService, String whichFragment, Bundle param);
+    public abstract void jumpto(BundleContext bundleContext, String whichService, String whichFragment, Bundle params);
+    public abstract Fragment newFragment(BundleContext bundleContext,String whichService, String whichFragment, Bundle param);
     public abstract FragmentManager getFragmentManager();
     public abstract int getNode();
 }

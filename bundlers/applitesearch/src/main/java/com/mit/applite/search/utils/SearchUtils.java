@@ -47,7 +47,7 @@ public class SearchUtils {
             b.putString("name",name);
             b.putString("imgUrl",imgUrl);
             b.putString("from",Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
-            host.jumpto(bundleContext, Constant.OSGI_SERVICE_DETAIL_FRAGMENT, b);
+            host.jumpto(bundleContext, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,null, b);
         }
     }
 
@@ -64,7 +64,7 @@ public class SearchUtils {
             b.putInt("step",step);
             b.putString("datatype",datatype);
             b.putString("from",Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
-            host.jumpto(bundleContext, Constant.OSGI_SERVICE_TOPIC_FRAGMENT, b);
+            host.jumpto(bundleContext, Constant.OSGI_SERVICE_TOPIC_FRAGMENT,null, b);
         }
     }
 

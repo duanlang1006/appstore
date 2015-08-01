@@ -63,7 +63,7 @@ public class SimpleBundle implements BundleActivator{
 
     public class HomePageOSGIServiceImpl extends OSGIServiceClient {
         @Override
-        public OSGIBaseFragment newOSGIFragment(Fragment container, String whichFragment, Bundle params) {
+        public OSGIBaseFragment newOSGIFragment(Fragment container, String whichService,String whichFragment, Bundle params) {
             OSGIBaseFragment fg = null;
             try {
                 Class<?> cls = Class.forName(whichFragment);
@@ -73,42 +73,38 @@ public class SimpleBundle implements BundleActivator{
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            if (null == fg) {
+                if (Constant.OSGI_SERVICE_MAIN_FRAGMENT.equals(whichService)) {
+                    fg = HomePageFragment.newInstance(container, params);
+                }else if (Constant.OSGI_SERVICE_TOPIC_FRAGMENT.equals(whichService)){
+                    fg = HomePageListFragment.newInstance(container,params);
+                }
+            }
             return fg;
         }
 
         @Override
-        public void launchOSGIFragment(String servicename, Bundle params) {
+        public void launchOSGIFragment(String servicename, Fragment fragment, Bundle params) {
             BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
             OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
-
             if (null != host && Constant.OSGI_SERVICE_MAIN_FRAGMENT.equals(servicename)){
-                Fragment fg = HomePageFragment.newInstance(host,params);
                 FragmentManager fgm = host.getFragmentManager();
                 FragmentTransaction ft = fgm.beginTransaction();
-                ft.replace(host.getNode(), fg, Constant.OSGI_SERVICE_MAIN_FRAGMENT);
+                ft.replace(host.getNode(), fragment, Constant.OSGI_SERVICE_MAIN_FRAGMENT);
                 if (null != params) {
                     ft.addToBackStack(null);
                 }
                 ft.commitAllowingStateLoss();
             }else if (null != host && Constant.OSGI_SERVICE_TOPIC_FRAGMENT.equals(servicename)){
-                SubjectData data = new SubjectData();
-                data.setS_key(params.getString("key"));
-                data.setS_name(params.getString("name"));
-                data.setStep(params.getInt("step"));
-                data.setS_datatype(params.getString("datatype"));
-                data.setData(new ArrayList<HomePageApkData>());
-                data.setSpecialtopic_data(null);
-
-                Fragment fg = HomePageListFragment.newInstance(host,data,true);
                 FragmentManager fgm = host.getFragmentManager();
                 FragmentTransaction ft = fgm.beginTransaction();
                 if(null != fgm.findFragmentByTag(Constant.OSGI_SERVICE_SEARCH_FRAGMENT)){
                     ft.hide(fgm.findFragmentByTag(Constant.OSGI_SERVICE_SEARCH_FRAGMENT));
-                    ft.add(host.getNode(), fg,Constant.OSGI_SERVICE_TOPIC_FRAGMENT);
+                    ft.add(host.getNode(), fragment,Constant.OSGI_SERVICE_TOPIC_FRAGMENT);
                 }else {
-                    ft.replace(host.getNode(), fg,Constant.OSGI_SERVICE_TOPIC_FRAGMENT);
+                    ft.replace(host.getNode(), fragment,Constant.OSGI_SERVICE_TOPIC_FRAGMENT);
                 }
-                ft.replace(host.getNode(), fg, Constant.OSGI_SERVICE_TOPIC_FRAGMENT);
+                ft.replace(host.getNode(), fragment, Constant.OSGI_SERVICE_TOPIC_FRAGMENT);
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
             }

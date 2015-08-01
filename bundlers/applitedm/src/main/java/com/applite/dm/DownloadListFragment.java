@@ -22,7 +22,6 @@ import com.mit.impl.ImplDbHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
-import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,26 +33,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     private Integer mStatusFlags = null;
     private DbUtils db;
 
-    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
-        Fragment fg = null;
-        if (null != host){
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_DM_FRAGMENT,DownloadListFragment.class.getName(),params);
-        }
-        return fg;
+    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
+        return new DownloadListFragment(fg,params);
     }
 
-    public static Fragment newInstance(OSGIServiceHost host,int flag){
-        Fragment fg = null;
-        if (null != host){
-            Bundle b = new Bundle();
-            b.putInt("statusFilter", flag);
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_DM_FRAGMENT,DownloadListFragment.class.getName(),b);
-        }
-        return fg;
+    public static Bundle newBundle(int flag){
+        Bundle b = new Bundle();
+        b.putInt("statusFilter",flag);
+        return b;
     }
 
     private DownloadListFragment(Fragment mFragment, Bundle params) {

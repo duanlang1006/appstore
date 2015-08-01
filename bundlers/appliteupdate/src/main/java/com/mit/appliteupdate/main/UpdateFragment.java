@@ -75,19 +75,13 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private ImageView mLoadView;
     private Animation LoadingAnimation;
 
-    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
-        Fragment fg = null;
-        if (null != host){
-            fg = host.newFragment(
-                    BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_UPDATE_FRAGMENT,UpdateFragment.class.getName(),params);
-        }
-        return fg;
+    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
+        return new UpdateFragment(fg,params);
     }
 
 
-    private UpdateFragment(Fragment mFragment, Bundle params) {
-        super(mFragment, params);
+    private UpdateFragment(Fragment fg, Bundle params) {
+        super(fg, params);
     }
 
     @Override

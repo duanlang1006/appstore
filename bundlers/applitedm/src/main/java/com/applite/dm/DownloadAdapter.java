@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
@@ -119,21 +120,15 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
                 implAgent.remove(vh.implInfo);
                 break;
             case R.id.button_detail:
-                try {
-                    BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                    OSGIServiceHost host = new OSGIServiceAgent<OSGIServiceHost>(
-                            bundleContext, OSGIServiceHost.class,
-                            "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                            OSGIServiceAgent.real_time).getService();   //每次都重新查询
+                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+                OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
+                if (null != host){
                     Bundle bundle = new Bundle();
                     bundle.putString("packageName",vh.implInfo.getPackageName());
                     bundle.putString("name",vh.implInfo.getTitle());
                     bundle.putString("iconUrl",vh.implInfo.getIconUrl());
                     bundle.putString("from",Constant.OSGI_SERVICE_DM_FRAGMENT);
-                    host.jumpto(bundleContext,Constant.OSGI_SERVICE_DETAIL_FRAGMENT,bundle);
-                } catch (Exception e) {
-                    // TODO 自动生成的 catch 块
-                    e.printStackTrace();
+                    host.jumpto(bundleContext,Constant.OSGI_SERVICE_DETAIL_FRAGMENT,null,bundle);
                 }
                 break;
             case R.id.button_op:
