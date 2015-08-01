@@ -63,7 +63,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private Button refreshButton;
     private ImplAgent implAgent;
     private ImplChangeCallback implCallback;
-    private LinearLayout detail_contentandpic;
     private BitmapUtils mBitmapUtil;
     private String mDownloadUrl;
 
@@ -187,7 +186,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         mImgLl = (LinearLayout) rootView.findViewById(R.id.detail_viewpager_img_ll);
         no_network = (LinearLayout) rootView.findViewById(R.id.no_network);
         refreshButton = (Button) rootView.findViewById(R.id.refresh_btn);
-        detail_contentandpic = (LinearLayout) rootView.findViewById(R.id.detail_contentandpic);
 
         mName1View.setText(mApkName);
 
@@ -314,7 +312,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     mBitmapUtil.display(mApkImgView, mImgUrl);
                     mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size));
                     mApkContentView.setText(content);
-                    detail_contentandpic.setVisibility(View.VISIBLE);
                 }
                 mViewPagerUrlList = mViewPagerUrl.split(",");
                 setPreViewImg();

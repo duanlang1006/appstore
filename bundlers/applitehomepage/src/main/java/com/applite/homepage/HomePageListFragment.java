@@ -299,7 +299,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
             LogUtils.i(TAG, "topicData = " + topicData);
             if(topicData.getT_skiptype() == 1){
-                HomepageUtils.toDetialFragment(topicData.getT_packagename(),topicData.getT_name(),topicData.getT_iconurl());
+                HomepageUtils.launchDetail(topicData.getTt_packageName(),topicData.getTt_name(),topicData.getTt_iconUrl());
             }else{
                 HomepageUtils.toTopicFragment(topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype());
             }

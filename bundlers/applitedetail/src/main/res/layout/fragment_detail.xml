@@ -127,17 +127,19 @@
                     android:textSize="20dp"
                     android:textStyle="bold" />
 
-                <!-- 详情文字介绍背景图-->
-                <LinearLayout
-                    android:id="@+id/detail_contentandpic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/k"
-                    android:visibility="gone">
+                <!--&lt;!&ndash; 详情文字介绍背景图&ndash;&gt;-->
+                <!--<LinearLayout-->
+                    <!--android:id="@+id/detail_contentandpic"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="@drawable/k"-->
+                    <!--android:visibility="gone">-->
 
                 <!-- 详情文字内容-->
                 <TextView
                     android:id="@+id/detail_content"
+                    android:background="@drawable/k"
+                    android:padding="2dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
@@ -146,7 +148,7 @@
                     android:layout_marginTop="15dp"
                     android:ellipsize="end"
                     android:textColor="@color/black" />
-                </LinearLayout>
+                <!--</LinearLayout>-->
             </LinearLayout>
 
 
