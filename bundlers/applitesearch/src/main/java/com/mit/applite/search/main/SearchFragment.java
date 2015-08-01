@@ -43,6 +43,8 @@ import com.mit.applite.search.adapter.SearchApkAdapter;
 import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.KeyBoardUtils;
+import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 
 import org.json.JSONArray;
@@ -52,7 +54,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchFragment extends Fragment implements View.OnClickListener, SearchApkAdapter.UpdateInatsllButtonText {
+public class SearchFragment extends OSGIBaseFragment implements View.OnClickListener, SearchApkAdapter.UpdateInatsllButtonText {
 
     private static final String TAG = "SearchFragment";
     private ImageButton mBackView;
@@ -144,7 +146,19 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     private String mEtViewText;//页面隐藏时mEtView里面的字
     private HttpUtils mHttpUtils;
 
-    public SearchFragment() {
+    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
+        Fragment fg = null;
+        if (null != host){
+            fg = host.newFragment(
+                    BundleContextFactory.getInstance().getBundleContext(),
+                    Constant.OSGI_SERVICE_SEARCH_FRAGMENT,SearchFragment.class.getName(),params);
+        }
+        return fg;
+    }
+
+
+    private SearchFragment(Fragment mFragment, Bundle params) {
+        super(mFragment, params);
     }
 
     @Override
@@ -182,7 +196,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
         if (mHotWordBeans.size() == 0)
             postHotWord();
 
-        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -224,16 +237,6 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Se
     @Override
     public void onDetach() {
         super.onDetach();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getFragmentManager().popBackStack();
-                return super.onOptionsItemSelected(item);
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void initActionBar() {

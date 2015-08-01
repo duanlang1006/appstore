@@ -1,18 +1,66 @@
 package com.applite.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 
 /**
  * Created by yuzhimin on 6/30/15.
  */
-public class SubjectData {
+public class SubjectData implements Parcelable{
     private String s_key;
     private String s_name;
-    private String s_datatype;
+    private String s_datatype;      //指定用哪个布局
     private int step;               //步长
     private List<SpecialTopicData> specialtopic_data; //专题数据
     private List<HomePageApkData> data;     //apk数据
 
+
+    public SubjectData() {
+        s_key = null;
+        s_name = null;
+        s_datatype = null;
+        step = 10;
+        specialtopic_data = null;
+        data = null;
+    }
+
+    public SubjectData(Parcel in) {
+        s_key = in.readString();
+        s_name = in.readString();
+        s_datatype = in.readString();
+        step = in.readInt();
+        in.readList(specialtopic_data,SpecialTopicData.class.getClassLoader());
+        in.readList(data,HomePageApkData.class.getClassLoader());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(s_key);
+        dest.writeString(s_name);
+        dest.writeString(s_datatype);
+        dest.writeInt(step);
+        dest.writeList(specialtopic_data);
+        dest.writeList(data);
+    }
+
+    public static final Parcelable.Creator<SubjectData> CREATOR = new Parcelable.Creator<SubjectData>() {
+        @Override
+        public SubjectData createFromParcel(Parcel in) {
+            return new SubjectData(in);
+        }
+
+        @Override
+        public SubjectData[] newArray(int size) {
+            return new SubjectData[size];
+        }
+    };
 
     public String getS_key() {
         return s_key;

@@ -1,14 +1,22 @@
 package com.applite.dm;
 
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
+import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
+import com.osgi.extra.OSGIServiceClient;
 
-import org.apkplug.Bundle.ApkplugOSGIService;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
+import java.lang.reflect.Constructor;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -22,10 +30,10 @@ public class SimpleBundle implements BundleActivator{
 
         Dictionary<String,Object> properties =new Hashtable<String,Object>();
         properties.put("serviceName", Constant.OSGI_SERVICE_DM_FRAGMENT);
-        ApkplugOSGIService service = new MyOSGIServiceImpl();
+        OSGIServiceClient service = new DmOSGIServiceImpl();
         //注册一个服务给Host调用
         mServiceReg = mcontext.registerService(
-                ApkplugOSGIService.class.getName(),
+                OSGIServiceClient.class.getName(),
                 service,
                 properties);
     }
@@ -35,5 +43,49 @@ public class SimpleBundle implements BundleActivator{
         if (null != mServiceReg){
             mServiceReg.unregister();
         }
+    }
+
+    public class DmOSGIServiceImpl extends OSGIServiceClient {
+        @Override
+        public void launchOSGIFragment(String servicename, Bundle bundle) {
+            OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
+            if (null != host && Constant.OSGI_SERVICE_DM_FRAGMENT.equals(servicename)){
+                Fragment downloadPagerFragement = DownloadPagerFragment.newInstance(host,bundle);
+                FragmentManager fgm = host.getFragmentManager();
+                FragmentTransaction ft = fgm.beginTransaction();
+                ft.replace(host.getNode(), downloadPagerFragement, Constant.OSGI_SERVICE_DM_FRAGMENT);
+                ft.addToBackStack(null);
+                ft.commit();
+            }
+        }
+
+        @Override
+        public OSGIBaseFragment newOSGIFragment(Fragment container, String whichFragment, Bundle params) {
+            OSGIBaseFragment fg = null;
+            try {
+                Class<?> cls = Class.forName(whichFragment);
+                Constructor ct = cls.getDeclaredConstructor(Fragment.class,Bundle.class);
+                ct.setAccessible(true);
+                fg = (OSGIBaseFragment)ct.newInstance(container,params);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return fg;
+        }
+
+//        @Override
+//        public Object ApkplugOSGIService(BundleContext arg0, String servicename, int node,Object... objs) {
+//            if (Constant.OSGI_SERVICE_DM_FRAGMENT.equals(servicename)){
+////            if (null == downloadPagerFragement) {
+//                Fragment downloadPagerFragement = new DownloadPagerFragment();
+////            }
+//                FragmentManager fgm = (FragmentManager)objs[0];
+//                FragmentTransaction ft = fgm.beginTransaction();
+//                ft.replace(node, downloadPagerFragement, Constant.OSGI_SERVICE_DM_FRAGMENT);
+//                ft.addToBackStack(null);
+//                ft.commit();
+//            }
+//            return null;
+//        }
     }
 }

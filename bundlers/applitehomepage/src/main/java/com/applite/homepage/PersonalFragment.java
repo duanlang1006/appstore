@@ -4,33 +4,38 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.text.Layout;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import com.applite.common.Constant;
-import com.applite.common.PagerSlidingTabStrip;
+import com.applite.utils.HomepageUtils;
+import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 
-import org.apkplug.Bundle.ApkplugOSGIService;
-import org.apkplug.Bundle.OSGIServiceAgent;
-import org.osgi.framework.BundleContext;
 
-public class PersonalFragment extends Fragment implements View.OnClickListener{
+public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener{
     LayoutInflater mInflater;
 
-    public PersonalFragment() {
-        // Required empty public constructor
+    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
+        Fragment fg = null;
+        if (null != host){
+            fg = host.newFragment(
+                    BundleContextFactory.getInstance().getBundleContext(),
+                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,PersonalFragment.class.getName(),params);
+        }
+        return fg;
+    }
+
+
+    private PersonalFragment(Fragment mFragment, Bundle params) {
+        super(mFragment, params);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-        }
     }
 
     @Override
@@ -56,7 +61,6 @@ public class PersonalFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -65,23 +69,13 @@ public class PersonalFragment extends Fragment implements View.OnClickListener{
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
-            case android.R.id.home:
-                getFragmentManager().popBackStack();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.action_dm:
-                launchDownloadManagerFragment();
+                HomepageUtils.launchDownloadManagerFragment();
                 break;
             case R.id.action_upgrade:
-                launchUpgradeFragment();
+                HomepageUtils.launchUpgradeFragment();
                 break;
         }
     }
@@ -97,44 +91,6 @@ public class PersonalFragment extends Fragment implements View.OnClickListener{
             actionBar.setCustomView(customView);
             actionBar.show();
         }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 升级
-     */
-    private void launchUpgradeFragment() {
-        try {
-            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            agent.getService().ApkplugOSGIService(bundleContext,
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,
-                    0, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
-    }
-
-    /****
-     * 下载管理
-     */
-    private void launchDownloadManagerFragment() {
-        try {
-            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            agent.getService().ApkplugOSGIService(bundleContext,
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,
-                    0, Constant.OSGI_SERVICE_DM_FRAGMENT);
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
             e.printStackTrace();
         }
     }

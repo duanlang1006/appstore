@@ -18,12 +18,16 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.PagerSlidingTabStrip;
 import com.mit.impl.ImplLog;
+import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 
 
-public class DownloadPagerFragment extends android.support.v4.app.Fragment {
+public class DownloadPagerFragment extends OSGIBaseFragment{
     final static String TAG = "applite_dm";
     private ViewPager mViewPager;
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
@@ -31,11 +35,24 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
     private boolean destoryView = false;
 
 
+    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
+        Fragment fg = null;
+        if (null != host){
+            fg = host.newFragment(
+                    BundleContextFactory.getInstance().getBundleContext(),
+                    Constant.OSGI_SERVICE_DM_FRAGMENT,DownloadPagerFragment.class.getName(),params);
+        }
+        return fg;
+    }
+
+    private DownloadPagerFragment(Fragment mFragment, Bundle params) {
+        super(mFragment, params);
+    }
+
     public void onAttach(Activity activity) {
-        ImplLog.d(TAG, "onAttach,"+this);
+        ImplLog.d(TAG, "onAttach," + this);
         super.onAttach(activity);
         mActivity = activity;
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -93,16 +110,6 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
-            case android.R.id.home:
-                getFragmentManager().popBackStack();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     private void initActionBar(View customView){
         try {
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
@@ -135,24 +142,25 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
 
         @Override
         public Fragment getItem(int position) {
-            Fragment fm = new DownloadListFragment();
-            Bundle b = new Bundle();
-            switch(tabs[position]){
-                case R.string.dm_downloaded:
-                    b.putInt("statusFilter",Constant.STATUS_SUCCESSFUL
-                            | Constant.STATUS_INSTALLED
-                            | Constant.STATUS_INSTALL_FAILED
-                            | Constant.STATUS_PRIVATE_INSTALLING
-                            | Constant.STATUS_UPGRADE);
-                    break;
-                case R.string.dm_downloading:
-                    b.putInt("statusFilter",Constant.STATUS_PENDING
-                            | Constant.STATUS_RUNNING
-                            | Constant.STATUS_PAUSED
-                            | Constant.STATUS_FAILED);
-                    break;
+            Fragment fm = null;
+            OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
+            if (null != host) {
+                switch (tabs[position]) {
+                    case R.string.dm_downloaded:
+                        fm = DownloadListFragment.newInstance(host, Constant.STATUS_SUCCESSFUL
+                                | Constant.STATUS_INSTALLED
+                                | Constant.STATUS_INSTALL_FAILED
+                                | Constant.STATUS_PRIVATE_INSTALLING
+                                | Constant.STATUS_UPGRADE);
+                        break;
+                    case R.string.dm_downloading:
+                        fm = DownloadListFragment.newInstance(host, Constant.STATUS_PENDING
+                                | Constant.STATUS_RUNNING
+                                | Constant.STATUS_PAUSED
+                                | Constant.STATUS_FAILED);
+                        break;
+                }
             }
-            fm.setArguments(b);
             return fm;
         }
 
@@ -163,7 +171,7 @@ public class DownloadPagerFragment extends android.support.v4.app.Fragment {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            Resources res = getResources();
+            Resources res = getActivity().getResources();
             try {
                 res = BundleContextFactory.getInstance().getBundleContext().getBundleContext().getResources();
             }catch (Exception e){

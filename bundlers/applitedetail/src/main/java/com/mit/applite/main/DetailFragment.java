@@ -2,27 +2,18 @@ package com.mit.applite.main;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RatingBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.applite.common.AppliteUtils;
@@ -40,15 +31,14 @@ import com.mit.applite.view.ProgressButton;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
+import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-
-public class DetailFragment extends Fragment implements View.OnClickListener {
+public class DetailFragment extends OSGIBaseFragment implements View.OnClickListener {
 
     private static final String TAG = "DetailFragment";
     private Activity mActivity;
@@ -73,21 +63,46 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private Button refreshButton;
     private ImplAgent implAgent;
     private ImplChangeCallback implCallback;
-    private LinearLayout detail_contentandpic;
     private BitmapUtils mBitmapUtil;
     private String mDownloadUrl;
 
-    public DetailFragment() {
+    public static Fragment newInstance(OSGIServiceHost host,Bundle params){
+        Fragment fg = null;
+        if (null != host){
+            fg = host.newFragment(
+                    BundleContextFactory.getInstance().getBundleContext(),
+                    Constant.OSGI_SERVICE_DETAIL_FRAGMENT, DetailFragment.class.getName(), params);
+        }
+        return fg;
+    }
+
+    public static Fragment newInstance(OSGIServiceHost host,String packageName,String name,String imgUrl){
+        Fragment fg = null;
+        if (null != host){
+            Bundle b = new Bundle();
+            b.putString("packageName",packageName);
+            b.putString("name",name);
+            b.putString("imgUrl",imgUrl);
+            fg = host.newFragment(
+                    BundleContextFactory.getInstance().getBundleContext(),
+                    Constant.OSGI_SERVICE_DETAIL_FRAGMENT,DetailFragment.class.getName(),b);
+        }
+        return fg;
+    }
+
+    private DetailFragment(Fragment mFragment, Bundle params) {
+        super(mFragment, params);
+        if (null != params) {
+            mPackageName = params.getString("packageName");
+            mApkName = params.getString("name");
+            mImgUrl = params.getString("imgUrl");
+        }
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        Bundle bundle = this.getArguments();
-        mPackageName = bundle.getString("packageName");
-        mApkName = bundle.getString("name");
-        mImgUrl = bundle.getString("imgUrl");
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
         implCallback = new DetailImplCallback();
         LogUtils.i(TAG, "mApkName:" + mApkName + "------mPackageName:" + mPackageName + "------mImgUrl:" + mImgUrl);
@@ -123,7 +138,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         if (!TextUtils.isEmpty(mPackageName))
             post(mPackageName);
 
-        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -142,15 +156,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         super.onDetach();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getFragmentManager().popBackStack();
-                return super.onOptionsItemSelected(item);
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     private void initActionBar() {
         try {
@@ -181,7 +186,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         mImgLl = (LinearLayout) rootView.findViewById(R.id.detail_viewpager_img_ll);
         no_network = (LinearLayout) rootView.findViewById(R.id.no_network);
         refreshButton = (Button) rootView.findViewById(R.id.refresh_btn);
-        detail_contentandpic = (LinearLayout) rootView.findViewById(R.id.detail_contentandpic);
 
         mName1View.setText(mApkName);
 
@@ -308,7 +312,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                     mBitmapUtil.display(mApkImgView, mImgUrl);
                     mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size));
                     mApkContentView.setText(content);
-                    detail_contentandpic.setVisibility(View.VISIBLE);
                 }
                 mViewPagerUrlList = mViewPagerUrl.split(",");
                 setPreViewImg();

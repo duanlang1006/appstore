@@ -24,11 +24,11 @@ public class MainActivity extends FragmentActivity {
      * 设置默认的Fragment
      */
     private void setDefaultFragment() {
-        fm = getSupportFragmentManager();
-        transaction = fm.beginTransaction();
-        mSearchFragment = new SearchFragment();
-        transaction.replace(R.id.search_content, mSearchFragment);
-        transaction.commit();
+//        fm = getSupportFragmentManager();
+//        transaction = fm.beginTransaction();
+//        mSearchFragment = new SearchFragment();
+//        transaction.replace(R.id.search_content, mSearchFragment);
+//        transaction.commit();
     }
 
 }

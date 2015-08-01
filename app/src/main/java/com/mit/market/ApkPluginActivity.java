@@ -18,8 +18,8 @@ import com.mit.bean.ApkplugUpdateBean;
 import com.mit.bean.ApkplugUpdateCallback;
 import com.mit.bean.ApkplugUpdateInfo;
 import com.mit.mitupdatesdk.MitApkplugCloudAgent;
-
-import org.apkplug.Bundle.ApkplugOSGIService;
+import com.osgi.extra.OSGIServiceHost;
+import com.osgi.extra.OSGIServiceClient;
 import org.apkplug.Bundle.OSGIServiceAgent;
 import org.apkplug.Bundle.installCallback;
 import org.apkplug.app.FrameworkInstance;
@@ -157,35 +157,18 @@ public abstract class ApkPluginActivity extends ActionBarActivity {
         }
     }
 
-    protected Fragment getFragment(String serviceName){
-        Fragment fg = null;
-        try {
-            FrameworkInstance frame= ((AppLiteApplication)getApplication()).getFrame();
-            BundleContext bundleContext = frame.getSystemBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName="+serviceName+")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            fg = (Fragment)agent.getService().ApkplugOSGIService(bundleContext, serviceName, 0, "host");
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
-        return fg;
-    }
-
-    protected void launchFragment(int node,Object... objects){
+    protected void launchFragment(String serviceName,Bundle params){
         boolean ret = false;
         try {
-            String serviceName = (String)objects[0];
+            //查询插件服务
             FrameworkInstance frame= ((AppLiteApplication)getApplication()).getFrame();
             BundleContext bundleContext = frame.getSystemBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
+            OSGIServiceClient service = new OSGIServiceAgent<OSGIServiceClient>(
+                    bundleContext,
+                    OSGIServiceClient.class,
                     "(serviceName="+serviceName+")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            objects[0] = getSupportFragmentManager();
-            agent.getService().ApkplugOSGIService(bundleContext, serviceName, node, objects);
+                    OSGIServiceAgent.real_time).getService();   //每次都重新查询
+            service.launchOSGIFragment(serviceName, params);
             ret = true;
         } catch (Exception e) {
             // TODO 自动生成的 catch 块
@@ -198,13 +181,14 @@ public abstract class ApkPluginActivity extends ActionBarActivity {
         }
     }
 
-    protected ServiceRegistration registerOSGIService(String serviceName,ApkplugOSGIService service){
+
+    protected ServiceRegistration registerOSGIService(String serviceName,OSGIServiceHost service){
         Dictionary<String,Object> properties =new Hashtable<String,Object>();
         properties.put("serviceName", serviceName);
         //注册一个服务给Host调用
         FrameworkInstance frame= ((AppLiteApplication)getApplication()).getFrame();
         return frame.getSystemBundleContext().registerService(
-                ApkplugOSGIService.class.getName(),
+                OSGIServiceHost.class.getName(),
                 service,
                 properties);
     }
