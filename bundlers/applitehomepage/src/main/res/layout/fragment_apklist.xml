@@ -22,13 +22,27 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="@dimen/apkList_iconMinWidth"
+            <LinearLayout
+                android:layout_margin="2dp"
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="@dimen/apkList_iconMinWidth"
-                android:text="ApkName"
-                android:id="@+id/apkName"
-                style="@style/apkListName"/>
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="@dimen/apkList_iconMinWidth"
+                    android:text="ApkName"
+                    android:id="@+id/apkName"
+                    style="@style/apkListName"/>
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="wrap_content"/>
+                <ImageView
+                    android:id="@+id/extentIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
             <RatingBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

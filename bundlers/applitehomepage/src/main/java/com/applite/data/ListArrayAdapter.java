@@ -153,8 +153,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private RatingBar mRatingBar;
         private Button mProgressButton;
         private ImageView mCategoryListArrow;
+        private ImageView mExtentIcon;
         private String layoutStr;
         private ImplChangeCallback implCallback;
+
         ImplInfo implInfo;
         HomePageApkData itemData;
 
@@ -166,6 +168,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             this.mRatingBar = (RatingBar) mView.findViewById(R.id.ratingbar_Indicator);
             this.mProgressButton = (Button) mView.findViewById(R.id.list_item_progress_button);
             this.mCategoryListArrow = (ImageView) mView.findViewById(R.id.categoryListArrow);
+            this.mExtentIcon = (ImageView) mView.findViewById(R.id.extentIcon);
             this.implCallback = new ListImplCallback(this);
             if (null != mProgressButton ){
                 mProgressButton.setTag(this);
@@ -203,6 +206,33 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 String mSize = AppliteUtils.bytes2kb(Long.parseLong(itemData.getApkSize()));
                 if (null != mSize) {
                     this.mAppSize.setText(mSize);
+                }
+            }
+            if (null != this.mExtentIcon) {
+                String s = itemData.getBoxLabel();
+                LogUtils.i("duanlang", "s = "+s);
+                switch (s){
+                    case "1":
+                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type1);
+                        break;
+                    case "2":
+                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type2);
+                        break;
+                    case "3":
+                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type3);
+                        break;
+                    case "4":
+                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type4);
+                        break;
+                    case "5":
+                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type5);
+                        break;
+                    case "6":
+                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type6);
+                        break;
+                    case "7":
+                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type7);
+                        break;
                 }
             }
             if (null != mRatingBar) {
