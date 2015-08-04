@@ -72,12 +72,14 @@ public class HotWordAdapter extends BaseAdapter {
             viewholder = (ViewHolder) convertView.getTag();
         }
         final HotWordBean data = mHotWordBeans.get(position);
-//        if (data.getmType() == 0) {
-//            mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
-//            mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
-//            mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
-//            viewholder.mImg.setVisibility(View.VISIBLE);
-//        }
+        if (data.getmType() == 0) {
+            mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+            mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+            mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
+            viewholder.mImg.setVisibility(View.VISIBLE);
+        } else if (data.getmType() == 1) {
+            viewholder.mImg.setVisibility(View.GONE);
+        }
         viewholder.mTv.setText(data.getmName());
 
         viewholder.mLl.setOnClickListener(new View.OnClickListener() {

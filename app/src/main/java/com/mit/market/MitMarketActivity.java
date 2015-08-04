@@ -1,24 +1,20 @@
 package com.mit.market;
 
-import android.app.DownloadManager;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.os.Handler;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
 import android.view.Window;
-import android.widget.Toast;
+import android.widget.ImageView;
 
+import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
-import com.applite.common.LogUtils;
+import com.applite.sharedpreferences.GuideSPUtils;
 import com.mit.bean.ApkplugModel;
 import com.mit.bean.ApkplugQueryModel;
-import com.mit.impl.ImplAgent;
-import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplLog;
 import com.mit.mitupdatesdk.MitApkplugCloudAgent;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
@@ -58,6 +54,7 @@ public class MitMarketActivity extends ApkPluginActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mit_market);
+
         setOverflowShowingAlways();
         mOptReg = registerOSGIService(Constant.OSGI_SERVICE_HOST_OPT, mOptService);
 
@@ -152,7 +149,6 @@ public class MitMarketActivity extends ApkPluginActivity {
         if (Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update")))
             launchFragment(R.id.container, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
     }
-
 
 
     @Override

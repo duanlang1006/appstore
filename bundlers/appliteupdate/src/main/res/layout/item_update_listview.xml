@@ -39,14 +39,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:text="v1.0-v1.2"
-                android:textColor="@color/dividing_line" />
+                android:textColor="@color/dividing_line"
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/item_update_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3.6MB"
-                android:textColor="@color/dividing_line" />
+                android:textColor="@color/dividing_line"
+                android:textSize="10sp" />
         </LinearLayout>
 
         <Button

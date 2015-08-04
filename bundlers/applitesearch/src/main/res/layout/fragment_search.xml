@@ -46,9 +46,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:horizontalSpacing="5dp"
+            android:horizontalSpacing="1dp"
             android:numColumns="3"
-            android:verticalSpacing="5dp"></GridView>
+            android:verticalSpacing="1dp"></GridView>
 
         <TextView
             android:id="@+id/hot_word_change"
@@ -79,6 +79,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:divider="@color/dividing_line"
+        android:dividerHeight="1dp"
         android:fadingEdge="none"
         android:visibility="gone"></ListView>
 </LinearLayout>

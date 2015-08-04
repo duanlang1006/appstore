@@ -16,4 +16,14 @@
         <attr name="pstsTextAllCaps" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="ProgressButton">
+        <attr name="progressButtonBackground" format="color" />
+        <attr name="progressButtonForeground" format="color" />
+        <attr name="progressButtonTextcolor" format="color" />
+        <attr name="progressButtonMax" format="integer" />
+        <attr name="progressButtonProgress" format="integer" />
+        <attr name="progressButtonTextSize" format="dimension" />
+        <attr name="progressButtonText" format="string" />
+    </declare-styleable>
+
 </resources>

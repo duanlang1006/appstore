@@ -1,4 +1,4 @@
-package com.mit.applite.view;
+package com.applite.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -12,7 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mit.applite.main.R;
+import com.applite.common.R;
 
 /**
  * Created by LSY on 15-6-16.
@@ -42,20 +42,20 @@ public class ProgressButton extends View {
 
     private void init(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ProgressButton);
-        this.backgroundColor = typedArray.getInteger(R.styleable.ProgressButton_background, Color.parseColor("#C6C6C6"));
-        this.foreground = typedArray.getInteger(R.styleable.ProgressButton_foreground, Color.rgb(20, 131, 214));
-        this.textColor = typedArray.getInteger(R.styleable.ProgressButton_textcolor, Color.WHITE);
-        this.max = typedArray.getInteger(R.styleable.ProgressButton_max, 100);
-        this.progress = typedArray.getInteger(R.styleable.ProgressButton_progress, 0);
-        this.text = typedArray.getString(R.styleable.ProgressButton_text);
-        this.textSize = typedArray.getDimension(R.styleable.ProgressButton_textSize, 20);
+        this.backgroundColor = typedArray.getInteger(R.styleable.ProgressButton_progressButtonBackground, Color.parseColor("#C6C6C6"));
+        this.foreground = typedArray.getInteger(R.styleable.ProgressButton_progressButtonForeground, Color.rgb(20, 131, 214));
+        this.textColor = typedArray.getInteger(R.styleable.ProgressButton_progressButtonTextcolor, Color.WHITE);
+        this.max = typedArray.getInteger(R.styleable.ProgressButton_progressButtonMax, 100);
+        this.progress = typedArray.getInteger(R.styleable.ProgressButton_progressButtonProgress, 0);
+        this.text = typedArray.getString(R.styleable.ProgressButton_progressButtonText);
+        this.textSize = typedArray.getDimension(R.styleable.ProgressButton_progressButtonTextSize, 20);
         typedArray.recycle();
     }
 
-    public static ProgressButton inflate(Context context, ViewGroup root, boolean attach, LayoutInflater inflater) {
-        LayoutInflater mInflater = LayoutInflater.from(context);
+    public static ProgressButton inflate(Context context,ViewGroup root, boolean attach) {
+        LayoutInflater mInflater=LayoutInflater.from(context);
         mInflater = mInflater.cloneInContext(context);
-        return (ProgressButton) inflater.inflate(R.layout.progress_button_layout, root, attach);
+        return (ProgressButton) mInflater.inflate(R.layout.progress_button_layout, root, attach);
     }
 
     @Override
