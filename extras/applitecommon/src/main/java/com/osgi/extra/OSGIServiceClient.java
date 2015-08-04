@@ -11,7 +11,7 @@ import android.view.ViewGroup;
  * Created by hxd on 15-7-30.
  */
 public abstract class OSGIServiceClient {
-    public abstract void launchOSGIFragment(String service,Fragment fg,Bundle params);
+//    public abstract void launchOSGIFragment(String service,Fragment fg,Bundle params);
     public abstract OSGIBaseFragment newOSGIFragment(Fragment container,String whichService,String whichFragment,Bundle params);
 
     public void onCreate(OSGIBaseFragment target,Bundle savedInstanceState){

@@ -48,19 +48,6 @@ public class SimpleBundle implements BundleActivator {
 
     public class SearchOSGIServiceImpl extends OSGIServiceClient {
         @Override
-        public void launchOSGIFragment(String servicename, Fragment fragment, Bundle bundle) {
-            OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
-            if (Constant.OSGI_SERVICE_SEARCH_FRAGMENT.equals(servicename) && null != host) {
-                FragmentManager fgm = host.getFragmentManager();
-                FragmentTransaction ft = fgm.beginTransaction();
-                ft.hide(fgm.findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT));//得到首页Fragment，然后隐藏
-                ft.add(host.getNode(), fragment, Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
-                ft.addToBackStack(null);
-                ft.commit();
-            }
-        }
-
-        @Override
         public OSGIBaseFragment newOSGIFragment(Fragment container, String whichService,String whichFragment, Bundle params) {
             OSGIBaseFragment baseFragment = null;
             if (null != whichFragment && !TextUtils.isEmpty(whichFragment)){
@@ -81,21 +68,5 @@ public class SimpleBundle implements BundleActivator {
             }
             return baseFragment;
         }
-
-//        @Override
-//        public Object ApkplugOSGIService(BundleContext bundleContext, String servicename, int node, Object... objs) {
-//            Log.d(SimpleBundle.TAG, "ApkplugOSGIService,recv service:" + servicename + ",node=" + node);
-//            if (Constant.OSGI_SERVICE_SEARCH_FRAGMENT.equals(servicename)) {
-//                Fragment fg = new SearchFragment();
-//                FragmentManager fgm = (FragmentManager) objs[0];
-//                FragmentTransaction ft = fgm.beginTransaction();
-//                ft.hide(fgm.findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT));//得到首页Fragment，然后隐藏
-//                ft.add(node, fg, Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
-////            ft.replace(node, fg, Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
-//                ft.addToBackStack(null);
-//                ft.commit();
-//            }
-//            return null;
-//        }
     }
 }

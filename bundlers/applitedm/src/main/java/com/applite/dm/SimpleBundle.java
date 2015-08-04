@@ -48,18 +48,6 @@ public class SimpleBundle implements BundleActivator{
 
     public class DmOSGIServiceImpl extends OSGIServiceClient {
         @Override
-        public void launchOSGIFragment(String servicename, Fragment fragment, Bundle bundle) {
-            OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
-            if (null != host && Constant.OSGI_SERVICE_DM_FRAGMENT.equals(servicename)){
-                FragmentManager fgm = host.getFragmentManager();
-                FragmentTransaction ft = fgm.beginTransaction();
-                ft.replace(host.getNode(), fragment, Constant.OSGI_SERVICE_DM_FRAGMENT);
-                ft.addToBackStack(null);
-                ft.commit();
-            }
-        }
-
-        @Override
         public OSGIBaseFragment newOSGIFragment(Fragment container, String whichService,String whichFragment, Bundle params) {
             OSGIBaseFragment baseFragment = null;
             if (null != whichFragment && !TextUtils.isEmpty(whichFragment)){
@@ -73,7 +61,7 @@ public class SimpleBundle implements BundleActivator{
                 }
             }
             if (null == baseFragment) {
-                if (Constant.OSGI_SERVICE_DETAIL_FRAGMENT.equals(whichService)) {
+                if (Constant.OSGI_SERVICE_DM_FRAGMENT.equals(whichService)) {
                     baseFragment = DownloadPagerFragment.newInstance(container, params);
                 }
             }

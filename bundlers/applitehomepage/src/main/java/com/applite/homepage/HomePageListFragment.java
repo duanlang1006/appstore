@@ -134,9 +134,9 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
             return;
         }
         if (viewHolder.getLayoutStr().equals("fragment_categorylist")) {
-            HomepageUtils.toHomePageCategory(itemData.getKey(),itemData.getName());
+            HomepageUtils.toHomePageCategory(((OSGIServiceHost)mActivity),itemData.getKey(),itemData.getName());
         }else if (viewHolder.getLayoutStr().equals("fragment_apklist")){
-            HomepageUtils.launchDetail(itemData.getPackageName(),itemData.getName(),itemData.getIconUrl());
+            HomepageUtils.launchDetail(((OSGIServiceHost)mActivity),itemData.getPackageName(),itemData.getName(),itemData.getIconUrl());
         }
     }
 
@@ -280,9 +280,9 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
             LogUtils.i(TAG, "topicData = " + topicData);
             if(topicData.getT_skiptype() == 1){
-                HomepageUtils.launchDetail(topicData.getTt_packageName(),topicData.getTt_name(),topicData.getTt_iconUrl());
+                HomepageUtils.launchDetail(((OSGIServiceHost)mActivity),topicData.getTt_packageName(),topicData.getTt_name(),topicData.getTt_iconUrl());
             }else{
-                HomepageUtils.toTopicFragment(topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype());
+                HomepageUtils.toTopicFragment(((OSGIServiceHost)mActivity),topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype());
             }
         }
     }

@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -218,20 +219,6 @@ public class AppliteUtils {
         }
     }
 
-    public static OSGIServiceHost getHostOSGIService(BundleContext bundleContext){
-        OSGIServiceHost host = null;
-        try {
-            host = new OSGIServiceAgent<OSGIServiceHost>(
-                    bundleContext, OSGIServiceHost.class,
-                    "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                    OSGIServiceAgent.real_time).getService();   //每次都重新查询
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
-        return host;
-    }
-
     public static OSGIServiceClient getClientOSGIService(BundleContext bundleContext,String serviceName){
         OSGIServiceClient service = null;
         try {
@@ -244,5 +231,12 @@ public class AppliteUtils {
             e.printStackTrace();
         }
         return service;
+    }
+
+    public static Bundle putFgParams(Bundle params,String fromTag,String operate,boolean addToBackStack){
+        params.putString("fromTag",fromTag);
+        params.putString("operate",operate);
+        params.putBoolean("addToBackStack",addToBackStack);
+        return params;
     }
 }

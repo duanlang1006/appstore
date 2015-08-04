@@ -50,27 +50,6 @@ public class SimpleBundle implements BundleActivator {
 
     public class DetailOSGIServiceImpl extends OSGIServiceClient {
         @Override
-        public void launchOSGIFragment(String servicename, Fragment fg, Bundle params) {
-            LogUtils.d(SimpleBundle.TAG, "DetailOSGIServiceImpl,recv service:" + servicename);
-            if (Constant.OSGI_SERVICE_DETAIL_FRAGMENT.equals(servicename)){
-                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
-                if (null != host){
-                    FragmentManager fgm = host.getFragmentManager();
-                    FragmentTransaction ft = fgm.beginTransaction();
-                    if (null != params){
-                        String from = params.getString("from");
-                        ft.hide(fgm.findFragmentByTag(from));
-                    }
-                    ft.add(host.getNode(), fg, Constant.OSGI_SERVICE_DETAIL_FRAGMENT);
-                    ft.addToBackStack(null);
-                    ft.commitAllowingStateLoss();
-                }
-            }
-        }
-
-
-        @Override
         public OSGIBaseFragment newOSGIFragment(Fragment container, String whichService, String whichFragment,Bundle params) {
             OSGIBaseFragment baseFragment = null;
             if (null != whichFragment && !TextUtils.isEmpty(whichFragment)){

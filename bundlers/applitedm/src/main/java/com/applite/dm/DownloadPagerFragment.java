@@ -136,7 +136,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment{
         @Override
         public Fragment getItem(int position) {
             Fragment fg = null;
-            OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
+            OSGIServiceHost host = (OSGIServiceHost)mActivity;
             if (null != host) {
                 switch (tabs[position]) {
                     case R.string.dm_downloaded:

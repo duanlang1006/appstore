@@ -315,7 +315,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
      */
     private void showUpdateNotification(int number) {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
+        OSGIServiceHost host = (OSGIServiceHost)mActivity;
         if (null != host){
             Bundle b = new Bundle();
             b.putInt("number",number);
