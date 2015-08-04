@@ -23,6 +23,8 @@ import com.mit.applite.search.utils.SearchUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
+import com.osgi.extra.OSGIServiceHost;
+
 import java.util.List;
 
 /**
@@ -173,7 +175,8 @@ public class SearchApkAdapter extends BaseAdapter {
             mToDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SearchUtils.toDetailFragment(bean.getmPackageName(), bean.getmName(), bean.getmImgUrl());
+                    SearchUtils.toDetailFragment((OSGIServiceHost)mActivity,
+                            bean.getmPackageName(), bean.getmName(), bean.getmImgUrl());
                 }
             });
 //            mProgressButton.setText(implAgent.getProgress(implInfo) + "");

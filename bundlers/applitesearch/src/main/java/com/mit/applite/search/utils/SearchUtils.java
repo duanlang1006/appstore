@@ -38,15 +38,14 @@ public class SearchUtils {
     /**
      * 去详情页面
      */
-    public static void toDetailFragment(String packageName, String name, String imgUrl) {
+    public static void toDetailFragment(OSGIServiceHost host,String packageName, String name, String imgUrl) {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
         if (null != host){
             Bundle b = new Bundle();
             b.putString("packageName",packageName);
             b.putString("name",name);
             b.putString("imgUrl",imgUrl);
-            b.putString("from",Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
+            AppliteUtils.putFgParams(b,Constant.OSGI_SERVICE_SEARCH_FRAGMENT,"add",true);
             host.jumpto(bundleContext, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,null, b);
         }
     }
@@ -54,16 +53,15 @@ public class SearchUtils {
     /**
      * 去主题页面
      */
-    public static void toTopicFragment(String key, String name, int step, String datatype) {
+    public static void toTopicFragment(OSGIServiceHost host,String key, String name, int step, String datatype) {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
         if (null != host){
             Bundle b = new Bundle();
             b.putString("key",key);
             b.putString("name",name);
             b.putInt("step",step);
             b.putString("datatype",datatype);
-            b.putString("from",Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
+            AppliteUtils.putFgParams(b,Constant.OSGI_SERVICE_SEARCH_FRAGMENT,"add",true);
             host.jumpto(bundleContext, Constant.OSGI_SERVICE_TOPIC_FRAGMENT,null, b);
         }
     }

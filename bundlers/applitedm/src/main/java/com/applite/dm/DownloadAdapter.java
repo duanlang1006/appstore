@@ -121,13 +121,13 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
                 break;
             case R.id.button_detail:
                 BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
+                OSGIServiceHost host = (OSGIServiceHost)mContext;
                 if (null != host){
                     Bundle bundle = new Bundle();
                     bundle.putString("packageName",vh.implInfo.getPackageName());
                     bundle.putString("name",vh.implInfo.getTitle());
                     bundle.putString("iconUrl",vh.implInfo.getIconUrl());
-                    bundle.putString("from",Constant.OSGI_SERVICE_DM_FRAGMENT);
+                    AppliteUtils.putFgParams(bundle,Constant.OSGI_SERVICE_DM_FRAGMENT,"replace",true);
                     host.jumpto(bundleContext,Constant.OSGI_SERVICE_DETAIL_FRAGMENT,null,bundle);
                 }
                 break;

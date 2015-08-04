@@ -25,16 +25,16 @@ else
     exit 0
 fi
 
-cd ../../bundlers/applitelogo
-../../gradlew clean makePlugin
-if [ $? -eq 0 ];then
-    echo applitelogo ok!!!!!!!!!!!!!!!!!!!!!!!!
-else
-    echo applitelogo error!!!!!!!!!!!!!!!!!!!!!!!!
-    exit 0
-fi
+#cd ../../bundlers/applitelogo
+#../../gradlew clean makePlugin
+#if [ $? -eq 0 ];then
+#    echo applitelogo ok!!!!!!!!!!!!!!!!!!!!!!!!
+#else
+#    echo applitelogo error!!!!!!!!!!!!!!!!!!!!!!!!
+#    exit 0
+#fi
 
-cd ../applitehomepage
+cd ../../bundlers/applitehomepage
 ../../gradlew clean makePlugin
 if [ $? -eq 0 ];then
     echo applitehomepage ok!!!!!!!!!!!!!!!!!!!!!!!!

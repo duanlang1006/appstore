@@ -34,7 +34,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        LayoutInflater mInflater = inflater;
+        mInflater = inflater;
         try {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             if (null != context) {
@@ -65,10 +65,10 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.action_dm:
-                HomepageUtils.launchDownloadManagerFragment();
+                HomepageUtils.launchDownloadManagerFragment(((OSGIServiceHost)getActivity()));
                 break;
             case R.id.action_upgrade:
-                HomepageUtils.launchUpgradeFragment();
+                HomepageUtils.launchUpgradeFragment(((OSGIServiceHost)getActivity()));
                 break;
         }
     }

@@ -25,11 +25,11 @@ import java.util.ArrayList;
  */
 public class HomepageUtils {
 
-    public static void toHomePageCategory(String category, String name) {
+    public static void toHomePageCategory(OSGIServiceHost host,String category, String name) {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
         if (null != host){
             Bundle b = HomePageFragment.newBundle(category, name);
+            AppliteUtils.putFgParams(b,Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true);
             host.jumpto(bundleContext,Constant.OSGI_SERVICE_MAIN_FRAGMENT,HomePageFragment.class.getName(),b);
         }
     }
@@ -37,9 +37,8 @@ public class HomepageUtils {
     /**
      * 去专题页面
      */
-    public static void toTopicFragment(String s_key, String s_name, int step, String s_datatype) {
+    public static void toTopicFragment(OSGIServiceHost host,String s_key, String s_name, int step, String s_datatype) {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
         if (null != host){
             SubjectData data = new SubjectData();
             data.setS_key(s_key);
@@ -49,41 +48,41 @@ public class HomepageUtils {
             data.setData(new ArrayList<HomePageApkData>());
             data.setSpecialtopic_data(null);
             Bundle params = HomePageListFragment.newBundle(data,true);
-            host.jumpto(bundleContext,Constant.OSGI_SERVICE_MAIN_FRAGMENT,HomePageListFragment.class.getName(),params);
+            AppliteUtils.putFgParams(params,Constant.OSGI_SERVICE_TOPIC_FRAGMENT,"replace",true);
+            host.jumpto(bundleContext,Constant.OSGI_SERVICE_TOPIC_FRAGMENT,HomePageListFragment.class.getName(),params);
         }
     }
 
     /**
      * 升级
      */
-    public static void launchUpgradeFragment() {
+    public static void launchUpgradeFragment(OSGIServiceHost host) {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
         if (null != host){
-            host.jumpto(bundleContext,Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,null);
+            host.jumpto(bundleContext,Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,
+                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
         }
     }
 
     /****
      * 下载管理
      */
-    public static void launchDownloadManagerFragment() {
+    public static void launchDownloadManagerFragment(OSGIServiceHost host) {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
         if (null != host){
-            host.jumpto(bundleContext,Constant.OSGI_SERVICE_DM_FRAGMENT,null,null);
+            host.jumpto(bundleContext,Constant.OSGI_SERVICE_DM_FRAGMENT,null,
+                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
         }
     }
 
-    public static void launchDetail(String packageName,String name,String imgUrl){
+    public static void launchDetail(OSGIServiceHost host,String packageName,String name,String imgUrl){
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        OSGIServiceHost host = AppliteUtils.getHostOSGIService(bundleContext);
         if (null != host){
             Bundle b = new Bundle();
             b.putString("packageName",packageName);
             b.putString("name",name);
             b.putString("imgUrl",imgUrl);
-            b.putString("from",Constant.OSGI_SERVICE_MAIN_FRAGMENT);
+            AppliteUtils.putFgParams(b,Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true);
             host.jumpto(bundleContext,Constant.OSGI_SERVICE_DETAIL_FRAGMENT,null,b);
         }
     }
@@ -91,22 +90,22 @@ public class HomepageUtils {
     /****
      * 搜索
      */
-    public static void launchSearchFragment() {
+    public static void launchSearchFragment(OSGIServiceHost host) {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
         if (null != host){
-            host.jumpto(bundleContext,Constant.OSGI_SERVICE_SEARCH_FRAGMENT,null, null);
+            host.jumpto(bundleContext,Constant.OSGI_SERVICE_SEARCH_FRAGMENT,null,
+                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
         }
     }
 
     /***
      * 进入个人中心
      */
-    public static void launchPersonalFragment() {
+    public static void launchPersonalFragment(OSGIServiceHost host) {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
         if (null != host){
-            host.jumpto(bundleContext,Constant.OSGI_SERVICE_MAIN_FRAGMENT,PersonalFragment.class.getName(), null);
+            host.jumpto(bundleContext,Constant.OSGI_SERVICE_MAIN_FRAGMENT,PersonalFragment.class.getName(),
+                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
         }
     }
 }
