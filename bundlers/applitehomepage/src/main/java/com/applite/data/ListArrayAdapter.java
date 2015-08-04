@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import com.applite.bean.HomePageApkData;
@@ -28,9 +30,6 @@ import net.tsz.afinal.FinalBitmap;
 import java.lang.reflect.Field;
 import java.util.List;
 
-/**
- * Created by yuzhimin on 6/17/15.
- */
 public class ListArrayAdapter extends BaseAdapter implements View.OnClickListener {
     private static final String TAG = "homepage_ListArrayAdapter";
     private LayoutInflater mInflater = null;
@@ -150,17 +149,20 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private TextView mAppName;
         private TextView mCategorySub;
         private TextView mAppSize;
+        private TextView mAppBrief;
         private RatingBar mRatingBar;
         private Button mProgressButton;
         private ImageView mCategoryListArrow;
         private ImageView mExtentIcon;
         private String layoutStr;
         private ImplChangeCallback implCallback;
+        private LinearLayout pullDownView;
 
         ImplInfo implInfo;
         HomePageApkData itemData;
 
         ViewHolder(View mView){
+            this.pullDownView = (LinearLayout)mView.findViewById(R.id.pullDownView);
             this.mAppIcon = (ImageView) mView.findViewById(R.id.imageViewName);
             this.mAppName = (TextView) mView.findViewById(R.id.apkName);
             this.mCategorySub = (TextView) mView.findViewById(R.id.categorySub);
@@ -169,6 +171,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             this.mProgressButton = (Button) mView.findViewById(R.id.list_item_progress_button);
             this.mCategoryListArrow = (ImageView) mView.findViewById(R.id.categoryListArrow);
             this.mExtentIcon = (ImageView) mView.findViewById(R.id.extentIcon);
+            this.mAppBrief = (TextView) mView.findViewById(R.id.apkBrief);
             this.implCallback = new ListImplCallback(this);
             if (null != mProgressButton ){
                 mProgressButton.setTag(this);
@@ -181,6 +184,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
 
         public void initView(HomePageApkData itemData,String layout){
+            LogUtils.i("duanlang", "itemData = "+itemData.toString());
             this.itemData = itemData;
             this.layoutStr = layout;
             this.implInfo = implAgent.getImplInfo(itemData.getPackageName(), itemData.getPackageName(), itemData.getVersionCode());
@@ -210,29 +214,40 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             }
             if (null != this.mExtentIcon) {
                 String s = itemData.getBoxLabel();
-                LogUtils.i("duanlang", "s = "+s);
                 switch (s){
                     case "1":
-                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type1);
+                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type1);
                         break;
                     case "2":
-                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type2);
+                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type2);
                         break;
                     case "3":
-                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type3);
+                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type3);
                         break;
                     case "4":
-                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type4);
+                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type4);
                         break;
                     case "5":
-                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type5);
+                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type5);
                         break;
                     case "6":
-                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type6);
+                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type6);
                         break;
                     case "7":
-                        mExtentIcon.setImageResource(R.drawable.iden_icon_image_type7);
+                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type7);
                         break;
+                    default:
+                        this.mExtentIcon.setVisibility(View.GONE);
+                }
+            }
+            if (null != this.mAppBrief){
+                if(!TextUtils.isEmpty(itemData.getBrief())){
+                    LogUtils.i("duanlang", "appName = "+itemData.getName());
+                    this.mAppBrief.setText(itemData.getBrief());
+                    this.mAppBrief.setVisibility(View.VISIBLE);
+                }else{
+                    LogUtils.i("duanlang", "appName = " + itemData.getName() + "itemData.getBrief() = " + itemData.getBrief());
+                    this.mAppBrief.setVisibility(View.GONE);
                 }
             }
             if (null != mRatingBar) {
