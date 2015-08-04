@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import java.math.BigDecimal;
 public class AppliteUtils {
 
     private static final String TAG = "AppliteUtils";
+    private static String sdState = Environment.getExternalStorageState();
 
     /**
      * 得到AndroidManifest.xml里面MetaData的Value值
@@ -217,6 +219,37 @@ public class AppliteUtils {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * 删除文件
+     *
+     * @param fileName
+     */
+    public static void delFile(String fileName) {
+        File file = new File(fileName);
+        if (file.isFile()) {
+            file.delete();
+        }
+        file.exists();
+    }
+
+    /**
+     * 判断文件夹下是否有这个文件名
+     *
+     * @param PathName
+     * @return
+     */
+    public static boolean fileIsExists(String PathName) {
+        boolean ret = false;
+        try {
+            File f = new File(PathName);
+            if (f.exists()) {
+                ret = true;
+            }
+        } catch (Exception e) {
+        }
+        return ret;
     }
 
     public static OSGIServiceClient getClientOSGIService(BundleContext bundleContext,String serviceName){

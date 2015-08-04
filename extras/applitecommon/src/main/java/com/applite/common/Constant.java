@@ -49,4 +49,6 @@ public class Constant {
     public static final int INSTALLED_UPDATE = 2; // 表示已经安装，版本比现在这个版本要低，可以点击按钮更新
 
     public static final String UPDATE_FRAGMENT_NOT = "show_update_fragment";
+    public static final String LOGO_IMG_NAME = "logo.jpg";
+
 }

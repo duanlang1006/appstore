@@ -9,6 +9,7 @@ import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,6 +32,7 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.applite.sharedpreferences.GuideSPUtils;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -42,7 +44,6 @@ import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.bean.GuideBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
-import com.mit.utils.GuideSPUtils;
 import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 import org.json.JSONArray;
@@ -601,10 +602,14 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         if (System.currentTimeMillis() / 1000 >= (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_START_SHOW_TIME, 0L) &&
                 System.currentTimeMillis() / 1000 <= (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_END_SHOW_TIME, 0L)) {
             if (!TextUtils.isEmpty((String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, ""))) {
-                mLogoIV.setImageBitmap(AppliteUtils.getLoacalBitmap(
-                        (String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, "")));
+                mLogoIV.setBackground(new BitmapDrawable(AppliteUtils.getLoacalBitmap(
+                        (String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, ""))));
             }
         }
+        //判断在线LOGO的是否存在和显示时间，如果当前时间大于显示时间则删除LOGO图片
+        if (AppliteUtils.fileIsExists((String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, "")) &&
+                System.currentTimeMillis() / 1000 > (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_END_SHOW_TIME, 0L))
+            AppliteUtils.delFile((String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, ""));
     }
 
     /**
@@ -636,7 +641,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                     GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_START_SHOW_TIME, StartTime);
                     GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_END_SHOW_TIME, EndTime);
                     if (!TextUtils.isEmpty(BigImgUrl)) {
-                        download("logo.jpg", BigImgUrl);
+                        download(Constant.LOGO_IMG_NAME, BigImgUrl);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

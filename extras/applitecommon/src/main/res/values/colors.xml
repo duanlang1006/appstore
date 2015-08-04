@@ -5,4 +5,8 @@
     <color name="slidetab_selected_text_color">#ff05db69</color>
     <color name="slidetab_indicator_color">#FF773E</color>
     <color name="slidetab_underline_color">#ff7700</color>
+
+    <color name="progress_background">#a0a0a0</color>
+    <color name="progress_foreground">#00CC00</color>
+    <color name="progress_textcolor">#000000</color>
 </resources>

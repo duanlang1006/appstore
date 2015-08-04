@@ -20,7 +20,7 @@
     <string name="update">更新</string>
     <string name="keep_on">继续</string>
     <string name="srarch_content_no_null">搜索内容不能为空！</string>
-    <string name="app_detail">应用详情</string>
+    <string name="app_detail">应用介绍</string>
 
     <string name="download_start">安装</string>
     <string name="download_pending">等待下载</string>
@@ -34,4 +34,6 @@
     <string name="installed">安装成功，点此启动</string>
     <string name="start_up">"启动"</string>
 
+    <string name="refresh">刷新</string>
+    <string name="loading">正在加载</string>
 </resources>

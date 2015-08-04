@@ -18,7 +18,7 @@
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:text="可更新"
-            android:textColor="@color/black"
+            android:textColor="#9a999a"
             android:textSize="15dp" />
 
         <TextView

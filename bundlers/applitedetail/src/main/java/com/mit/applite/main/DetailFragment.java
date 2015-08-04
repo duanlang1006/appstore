@@ -10,6 +10,9 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,6 +23,7 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.applite.view.ProgressButton;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -27,7 +31,6 @@ import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
-import com.mit.applite.view.ProgressButton;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
@@ -64,6 +67,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private ImplChangeCallback implCallback;
     private BitmapUtils mBitmapUtil;
     private String mDownloadUrl;
+    private LinearLayout mDataLayout;
+    private LinearLayout mLoadLayout;
+    private ImageView mLoadView;
+    private Animation LoadingAnimation;
 
     public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
         return new DetailFragment(fg,params);
@@ -147,6 +154,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onDetach() {
         super.onDetach();
+        System.gc();
     }
 
 
@@ -167,10 +175,21 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      * 初始化控件
      */
     private void initView() {
+        //加载中控件
+        mLoadLayout = (LinearLayout) rootView.findViewById(R.id.detail_loading_layout);
+        mLoadView = (ImageView) rootView.findViewById(R.id.detail_loading_img);
+        //旋转动画
+        LoadingAnimation = AnimationUtils.loadAnimation(mContext, R.anim.loading);
+        LinearInterpolator lin = new LinearInterpolator();
+        LoadingAnimation.setInterpolator(lin);
+        mLoadView.startAnimation(LoadingAnimation);
+
+        //下载按钮
         LinearLayout mDownloadLayout = (LinearLayout) rootView.findViewById(R.id.detail_download_layout);
-        mProgressButton = ProgressButton.inflate(mContext, container, false, mInflater);
+        mProgressButton = ProgressButton.inflate(mActivity, container, false);
         mDownloadLayout.addView(mProgressButton);
 
+        mDataLayout = (LinearLayout) rootView.findViewById(R.id.detail_data_layout);
         mApkImgView = (ImageView) rootView.findViewById(R.id.detail_apkimg);
         mName1View = (TextView) rootView.findViewById(R.id.detail_name1);
         mApkSizeAndCompanyView = (TextView) rootView.findViewById(R.id.detail_apksize_and_company);
@@ -185,17 +204,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
         mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
         mBitmapUtil.display(mApkImgView, mImgUrl);
-
-//        mLoadingarea = (RelativeLayout)rootView.findViewById(R.id.top_parent);
-//        //加载中显示动画资源及文字
-//        mLoadingView = rootView.findViewById(R.id.loading_img);
-//        LoadingAnimation = AnimationUtils.loadAnimation(mContext, R.anim.tip);
-//        LinearInterpolator lin = new LinearInterpolator();
-//        LoadingAnimation.setInterpolator(lin);
-//        if (LoadingAnimation != null) {
-//            mLoadingView.startAnimation(LoadingAnimation);
-//        }
-//        loadingText = (TextView) rootView.findViewById(R.id.loading_text);
 
         mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
@@ -267,6 +275,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             public void onFailure(HttpException e, String s) {
                 LogUtils.e(TAG, "应用详情网络请求失败:" + s);
                 // 这里设置没有网络时的图片
+                mLoadLayout.setVisibility(View.GONE);
+                mDataLayout.setVisibility(View.GONE);
                 no_network.setVisibility(View.VISIBLE);
             }
         });
@@ -299,12 +309,14 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     String mDownloadNumber = obj.getString("downloadTimes");
                     String content = obj.getString("description");
                     mViewPagerUrl = obj.getString("screenshotsUrl");
+                    String developer = obj.getString("developer");
 
                     mName1View.setText(mName);
                     mXingView.setRating(Float.parseFloat(xing) / 2.0f);
                     mBitmapUtil.display(mApkImgView, mImgUrl);
-                    mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size));
+                    mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size) + " | " + developer);
                     mApkContentView.setText(content);
+                    LogUtils.i(TAG, "应用介绍：" + content);
                 }
                 mViewPagerUrlList = mViewPagerUrl.split(",");
                 setPreViewImg();
@@ -328,17 +340,49 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      * 设置应用介绍的图片
      */
     private void setPreViewImg() {
+        BitmapUtils bitmapUtils = new BitmapUtils(mActivity);
+        // 下面添加参数，显示读出时内容和读取失败时的内容
+        bitmapUtils.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.detail_default_img));
+        bitmapUtils.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.detail_default_img));
         for (int i = 0; i < mViewPagerUrlList.length; i++) {
             LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
             final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
             final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
             mImgLl.addView(child);
-            // 下面添加参数，显示读出时内容和读取失败时的内容
-            mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.detail_default_img));
-            mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.detail_default_img));
-            mBitmapUtil.display(img, mViewPagerUrlList[i]);
+            bitmapUtils.display(img, mViewPagerUrlList[i]);
         }
+        mLoadLayout.setVisibility(View.GONE);
+        mDataLayout.setVisibility(View.VISIBLE);
     }
+
+//    /**
+//     * 设置应用介绍的图片
+//     */
+//    private void setPreViewImg() {
+//        Drawable mDefaultImg = mContext.getResources().getDrawable(R.drawable.detail_default_img);
+//        // 创建默认的ImageLoader配置参数
+//        ImageLoaderConfiguration configuration = ImageLoaderConfiguration
+//                .createDefault(getActivity());
+//        ImageLoader.getInstance().init(configuration);
+//        DisplayImageOptions options = new DisplayImageOptions.Builder()
+//                .cacheInMemory(true) // 设置下载的图片是否缓存在内存中
+//                .cacheOnDisk(true) // 设置下载的图片是否缓存在SD卡中
+//                .showImageOnLoading(mDefaultImg) //设置图片在下载期间显示的图片
+//                .showImageForEmptyUri(mDefaultImg)//设置图片Uri为空或是错误的时候显示的图片
+//                .showImageOnFail(mDefaultImg)  //设置图片加载/解码过程中错误时候显示的图片
+//                .considerExifParams(true)  //是否考虑JPEG图像EXIF参数（旋转，翻转）
+//                .bitmapConfig(Bitmap.Config.RGB_565)//设置图片的解码类型
+//                .build(); // 创建配置过得DisplayImageOption对象
+//        for (int i = 0; i < mViewPagerUrlList.length; i++) {
+//            LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
+//            final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
+//            final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
+//            mImgLl.addView(child);
+//            ImageLoader.getInstance().displayImage(mViewPagerUrlList[i], img, options);
+//        }
+//        mLoadLayout.setVisibility(View.GONE);
+//        mDataLayout.setVisibility(View.VISIBLE);
+//    }
 
     class DetailImplCallback implements ImplChangeCallback {
         @Override

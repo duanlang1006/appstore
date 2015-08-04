@@ -1,6 +1,9 @@
 package com.mit.market;
 
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Bundle;
+import android.text.TextUtils;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,6 +12,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
 import android.view.Window;
+import android.widget.ImageView;
+
+import com.applite.common.AppliteUtils;
+import com.applite.common.Constant;
+import com.applite.sharedpreferences.GuideSPUtils;
+import com.mit.bean.ApkplugModel;
+import com.mit.bean.ApkplugQueryModel;
+import com.mit.mitupdatesdk.MitApkplugCloudAgent;
 
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
@@ -35,6 +46,7 @@ public class MitMarketActivity extends ApkPluginActivity implements OSGIServiceH
         LogUtils.d(TAG,"onCreate:"+savedInstanceState);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mit_market);
+
         setOverflowShowingAlways();
 
         long current = System.currentTimeMillis();

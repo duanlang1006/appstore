@@ -389,11 +389,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mChangeNumbew = mChangeNumbew + 1;
                 break;
             case R.id.refresh:
-                if (TextUtils.isEmpty(mEtView.getText().toString())) {
-                    postHotWord();
-                } else {
-                    postSearch(mEtView.getText().toString());
-                }
+                no_network.setVisibility(View.GONE);
+                postSearch(mEtView.getText().toString());
                 break;
         }
     }
