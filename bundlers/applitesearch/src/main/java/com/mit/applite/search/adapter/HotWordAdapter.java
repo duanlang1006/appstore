@@ -15,6 +15,7 @@ import com.mit.applite.search.R;
 import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.main.BundleContextFactory;
 import com.mit.applite.search.utils.SearchUtils;
+import com.osgi.extra.OSGIServiceHost;
 
 import java.util.List;
 
@@ -86,9 +87,11 @@ public class HotWordAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 if (data.getmType() == 0) {//进入应用详情
-                    SearchUtils.toDetailFragment(data.getmPackageName(), data.getmName(), data.getmImgUrl());
+                    SearchUtils.toDetailFragment((OSGIServiceHost)mActivity,
+                            data.getmPackageName(), data.getmName(), data.getmImgUrl());
                 } else if (data.getmType() == 1) {//进入专题
-                    SearchUtils.toTopicFragment(data.getmPackageName(), data.getmName(), data.getmStep(), data.getmDataType());
+                    SearchUtils.toTopicFragment((OSGIServiceHost)mActivity,
+                            data.getmPackageName(), data.getmName(), data.getmStep(), data.getmDataType());
                 }
             }
         });

@@ -8,8 +8,8 @@ android {
         applicationId "com.shly.appstore"
         minSdkVersion 10
         targetSdkVersion 21
-        versionCode 26
-        versionName "2.0.026"
+        versionCode 27
+        versionName "2.0.027"
         multiDexEnabled true
         manifestPlaceholders = [UMENG_CHANNEL_VALUE: "leadexceed_buildin"]
     }
@@ -111,6 +111,7 @@ dependencies {
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.google.code.gson:gson:2.2.4'
+    compile project(':bundlers:applitelogo')
     compile project(':extras:mitUpdateSDK')
     compile project(':extras:impl')
     compile project(':extras:applitecommon')

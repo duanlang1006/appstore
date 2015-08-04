@@ -18,9 +18,7 @@ import com.mit.bean.ApkplugUpdateBean;
 import com.mit.bean.ApkplugUpdateCallback;
 import com.mit.bean.ApkplugUpdateInfo;
 import com.mit.mitupdatesdk.MitApkplugCloudAgent;
-
-import org.apkplug.Bundle.ApkplugOSGIService;
-import org.apkplug.Bundle.OSGIServiceAgent;
+import com.osgi.extra.OSGIServiceHost;
 import org.apkplug.Bundle.installCallback;
 import org.apkplug.app.FrameworkInstance;
 import org.osgi.framework.BundleContext;
@@ -39,27 +37,23 @@ import java.util.Set;
 public abstract class ApkPluginActivity extends ActionBarActivity {
     private static final String TAG = "applite_ApkPlugin";
     private List<org.osgi.framework.Bundle> bundles=null;
-    private Set<String> mPluginList= new HashSet<String>();/*{"applitelogo.apk","applitehomepage.apk"};*/
+    private Set<String> mPluginList= new HashSet<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        installBundles();
-        initBundleList();
-        startAllBundles();
-        ListenerBundleEvent();
-        checkUpdate();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         stopAllBundles();
-        bundles.clear();
+        if (null != bundles) {
+            bundles.clear();
+        }
     }
 
-
-    private void initPluginList(){
+    void initPluginList(){
         try {
 //            SharedPreferences sp = getSharedPreferences(Constant.CONFIG_BUNDLES_INFO,MODE_PRIVATE);
             mPluginList.clear();
@@ -77,10 +71,10 @@ public abstract class ApkPluginActivity extends ActionBarActivity {
         }
     }
 
-    private void installBundles(){
+    void installBundles(){
         try {
             initPluginList();
-            FrameworkInstance frame = ((AppLiteApplication) getApplication()).getFrame();
+            FrameworkInstance frame = AppLiteApplication.getFrame(this);
             BundleContext context = frame.getSystemBundleContext();
             InstallBundle ib = new InstallBundle(context);
             for (final String apk : mPluginList) {
@@ -103,10 +97,10 @@ public abstract class ApkPluginActivity extends ActionBarActivity {
     /**
      * 初始化显示已安装插件的UI
      */
-    public void initBundleList(){
+    void initBundleList(){
         bundles = new ArrayList<org.osgi.framework.Bundle>();
         try {
-            FrameworkInstance frame = ((AppLiteApplication) getApplication()).getFrame();
+            FrameworkInstance frame = AppLiteApplication.getFrame(this);
             BundleContext context = frame.getSystemBundleContext();
             for (org.osgi.framework.Bundle bundle : context.getBundles()) {
                 if (0 == bundle.getBundleId()){
@@ -137,9 +131,9 @@ public abstract class ApkPluginActivity extends ActionBarActivity {
     /**
      * 监听插件安装事件，当有新插件安装或卸载时成功也更新一下
      */
-    private void ListenerBundleEvent(){
+    void ListenerBundleEvent(){
         try {
-            final FrameworkInstance frame = ((AppLiteApplication) getApplication()).getFrame();
+            final FrameworkInstance frame = AppLiteApplication.getFrame(this);
             frame.getSystemBundleContext().addBundleListener(
                     new SynchronousBundleListener() {
                         public void bundleChanged(BundleEvent event) {
@@ -157,54 +151,13 @@ public abstract class ApkPluginActivity extends ActionBarActivity {
         }
     }
 
-    protected Fragment getFragment(String serviceName){
-        Fragment fg = null;
-        try {
-            FrameworkInstance frame= ((AppLiteApplication)getApplication()).getFrame();
-            BundleContext bundleContext = frame.getSystemBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName="+serviceName+")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            fg = (Fragment)agent.getService().ApkplugOSGIService(bundleContext, serviceName, 0, "host");
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
-        return fg;
-    }
-
-    protected void launchFragment(int node,Object... objects){
-        boolean ret = false;
-        try {
-            String serviceName = (String)objects[0];
-            FrameworkInstance frame= ((AppLiteApplication)getApplication()).getFrame();
-            BundleContext bundleContext = frame.getSystemBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName="+serviceName+")", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            objects[0] = getSupportFragmentManager();
-            agent.getService().ApkplugOSGIService(bundleContext, serviceName, node, objects);
-            ret = true;
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
-        if (!ret){
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
-                    .commit();
-        }
-    }
-
-    protected ServiceRegistration registerOSGIService(String serviceName,ApkplugOSGIService service){
+    protected ServiceRegistration registerOSGIService(String serviceName,OSGIServiceHost service){
         Dictionary<String,Object> properties =new Hashtable<String,Object>();
         properties.put("serviceName", serviceName);
         //注册一个服务给Host调用
-        FrameworkInstance frame= ((AppLiteApplication)getApplication()).getFrame();
+        FrameworkInstance frame= AppLiteApplication.getFrame(this);
         return frame.getSystemBundleContext().registerService(
-                ApkplugOSGIService.class.getName(),
+                OSGIServiceHost.class.getName(),
                 service,
                 properties);
     }
@@ -215,7 +168,7 @@ public abstract class ApkPluginActivity extends ActionBarActivity {
         }
     }
 
-    private void startAllBundles(){
+    void startAllBundles(){
         try {
             for (org.osgi.framework.Bundle bundle : bundles) {
                 Log.d(TAG, "start,bundle info:" + bundle.toString()/*getName() + "," + bundle.getState() + "," + bundle.getVersion() + "," + bundle.getBundleId() + "," + bundle.getPackageInfo()*/);
@@ -226,7 +179,7 @@ public abstract class ApkPluginActivity extends ActionBarActivity {
         }
     }
 
-    private void stopAllBundles(){
+    void stopAllBundles(){
         try {
             for (org.osgi.framework.Bundle bundle : bundles) {
                 Log.d(TAG, "stop,bundle info:" + bundle.toString());
@@ -286,7 +239,7 @@ public abstract class ApkPluginActivity extends ActionBarActivity {
         public void onDownLoadSuccess(final String path) {
             Log.d(TAG, "MyApkplugDownloadCallback,onDownLoadSuccess("+path);
             try {
-                FrameworkInstance frame= ((AppLiteApplication)getApplication()).getFrame();
+                FrameworkInstance frame= AppLiteApplication.getFrame(ApkPluginActivity.this);
                 BundleContext bundleContext = frame.getSystemBundleContext();
                 InstallBundle ib=new InstallBundle(bundleContext);
                 ib.install(getApplicationContext(),bundleContext,path,new installCallback() {

@@ -1,4 +1,3 @@
 include ':app'
 include ':bundlers:applitedm',':bundlers:appliteupdate',':bundlers:applitelogo',':bundlers:applitesearch',':bundlers:applitedetail',':bundlers:applitehomepage'
-include ':extras:mitUpdateSDK',':extras:applitecommon',':extras:androidpnclient', ':extras:impl', ':extras:dscdownloader'
-
+include ':extras:mitUpdateSDK',':extras:applitecommon',':extras:impl'

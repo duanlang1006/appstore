@@ -23,6 +23,8 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.util.Log;
 
+import com.applite.common.LogUtils;
+
 import org.apkplug.app.FrameworkFactory;
 import org.apkplug.app.FrameworkInstance;
 
@@ -73,25 +75,7 @@ public class AppLiteApplication extends Application {
         }
     }
 
-
-
-
-//    AppLiteModel getModel() {
-//        return mModel;
-//    }
-
     private void initAppForMainProcess(){
-        try{
-            //启动框架
-            //文档见 http://www.apkplug.com/javadoc/Maindoc1.4.6/
-            //org.apkplug.app
-            //     接口 FrameworkInstance
-            sframe = FrameworkFactory.getInstance().start(null,this);
-        } catch (Exception ex){
-            Log.e(TAG,"Could not create : " + ex);
-            ex.printStackTrace();
-        }
-
 
     }
 
@@ -126,8 +110,17 @@ public class AppLiteApplication extends Application {
         return null;
     }
 
-    public static FrameworkInstance getFrame(){
-        Log.d(TAG,"getFrame("+sframe+")");
+    public static FrameworkInstance getFrame(Context context){
+        if (null == sframe){
+            if (context.getPackageName().equals(getProcessName(context, android.os.Process.myPid()))) {
+                try {
+                    sframe = FrameworkFactory.getInstance().start(null, context.getApplicationContext());
+                } catch (Exception ex) {
+                    Log.e(TAG, "Could not create : " + ex);
+                    ex.printStackTrace();
+                }
+            }
+        }
         return sframe;
     }
 }

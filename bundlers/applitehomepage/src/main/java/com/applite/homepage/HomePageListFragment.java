@@ -3,12 +3,11 @@ package com.applite.homepage;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -24,20 +23,18 @@ import com.applite.common.LogUtils;
 import com.applite.data.ListArrayAdapter;
 import com.applite.utils.HomepageUtils;
 import com.google.gson.Gson;
+import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
+
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
-import org.apkplug.Bundle.ApkplugOSGIService;
-import org.apkplug.Bundle.OSGIServiceAgent;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.osgi.framework.BundleContext;
 import java.util.List;
 
 /**
 * Created by hxd on 15-6-9.
 */
-public class HomePageListFragment extends Fragment implements AbsListView.OnItemClickListener{
+public class HomePageListFragment extends OSGIBaseFragment implements AbsListView.OnItemClickListener{
     private final static String TAG = "homepage_ListFragment";
     private final static int MSG_LOAD_DATA = 0;
 
@@ -51,36 +48,43 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
     private View mMoreView;
     private SlideShowView mTopicView;
     private ListArrayAdapter mListAdapter = null;
-    private int mCurCheckPosition = 0;
     private boolean showHome = false;
     private MySlideViewListener mSlideViewListener = new MySlideViewListener();
     private MyScrollListener mOnScrollListener = new MyScrollListener();
 
     private boolean isend;
     private boolean sendhttpreq = true;
-    public HomePageListFragment(){
-        this(null);
+
+    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
+        return new HomePageListFragment(fg,params);
     }
 
-    public HomePageListFragment(SubjectData data) {
-        this.mData = data;
+    public static Bundle newBundle(SubjectData data,boolean showHome){
+        Bundle b = new Bundle();
+        b.putParcelable("subject_data", data);
+        b.putBoolean("show_home", showHome);
+        return b;
+    }
+
+    private HomePageListFragment(Fragment mFragment, Bundle params) {
+        super(mFragment, params);
+        if (null != params) {
+            this.mData = params.getParcelable("subject_data");
+            this.showHome = params.getBoolean("show_home");;
+        }
+
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LogUtils.i(TAG, "ListFragment.onCreate() ");
-        Bundle b = getArguments();
-        if (null != b){
-            showHome = true;
-        }
     }
 
     @Override
     public void onAttach(Activity activity) {
         LogUtils.i(TAG, "onAttach ");
         super.onAttach(activity);
-        setHasOptionsMenu(true);
         mActivity = activity;
     }
 
@@ -120,49 +124,6 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
 
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        LogUtils.i(TAG, "onActivityCreated ");
-        //PullToRefreshListView listView = new PullToRefreshListView(getActivity());
-
-        if (savedInstanceState != null) {
-            // Restore last state for checked position.
-            mCurCheckPosition = savedInstanceState.getInt("curChoice", 0);
-        }
-
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        LogUtils.i(TAG, "onSaveInstanceState ");
-        outState.putInt("curChoice", mCurCheckPosition);
-    }
-
-    @Override
-    public void onDetach(){
-        super.onDetach();
-        LogUtils.i(TAG, "onDetach ");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        LogUtils.i(TAG, "onDestroy");
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
-            case android.R.id.home:
-                getFragmentManager().popBackStack();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ListArrayAdapter.ViewHolder viewHolder = (ListArrayAdapter.ViewHolder)view.getTag();
         if (null == viewHolder){
@@ -173,37 +134,9 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
             return;
         }
         if (viewHolder.getLayoutStr().equals("fragment_categorylist")) {
-            try {
-                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                        bundleContext, ApkplugOSGIService.class,
-                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                        OSGIServiceAgent.real_time);   //每次都重新查询
-                agent.getService().ApkplugOSGIService(bundleContext,
-                        Constant.OSGI_SERVICE_MAIN_FRAGMENT,
-                        0, Constant.OSGI_SERVICE_MAIN_FRAGMENT,itemData.getKey(),itemData.getName());
-            } catch (Exception e) {
-                // TODO 自动生成的 catch 块
-                e.printStackTrace();
-            }
+            HomepageUtils.toHomePageCategory(((OSGIServiceHost)mActivity),itemData.getKey(),itemData.getName());
         }else if (viewHolder.getLayoutStr().equals("fragment_apklist")){
-            try {
-                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                        bundleContext, ApkplugOSGIService.class,
-                        "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                        OSGIServiceAgent.real_time);   //每次都重新查询
-                agent.getService().ApkplugOSGIService(bundleContext,
-                        Constant.OSGI_SERVICE_MAIN_FRAGMENT,
-                        0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
-                        itemData.getPackageName(),
-                        itemData.getName(),
-                        itemData.getIconUrl(),
-                        Constant.OSGI_SERVICE_MAIN_FRAGMENT);
-            } catch (Exception e) {
-                // T
-                e.printStackTrace();
-            }
+            HomepageUtils.launchDetail(((OSGIServiceHost)mActivity),itemData.getPackageName(),itemData.getName(),itemData.getIconUrl());
         }
     }
 
@@ -266,12 +199,12 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
-                LogUtils.i(TAG, "HomePageList网络请求成功，" + (String)o);
-                HomePageDataBean pageData = gson.fromJson((String)o, HomePageDataBean.class);
-                if (null != pageData && null != pageData.getSubjectData()){
-                    for (int i = 0;i < pageData.getSubjectData().size(); i++) {
+                LogUtils.i(TAG, "HomePageList网络请求成功，" + (String) o);
+                HomePageDataBean pageData = gson.fromJson((String) o, HomePageDataBean.class);
+                if (null != pageData && null != pageData.getSubjectData()) {
+                    for (int i = 0; i < pageData.getSubjectData().size(); i++) {
                         SubjectData subject = pageData.getSubjectData().get(i);
-                        if (subject.getS_key().equals(mData.getS_key())){
+                        if (subject.getS_key().equals(mData.getS_key())) {
                             mData.setS_datatype(subject.getS_datatype());
                             mData.setStep(subject.getStep());
                             if (null != subject.getData()) {
@@ -281,9 +214,9 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
                         }
                     }
                 }
-                if(pageData.getSubjectData().get(0).getData().isEmpty()){
+                if (pageData.getSubjectData().get(0).getData().isEmpty()) {
                     isend = true;
-                }else{
+                } else {
                     isend = false;
                 }
                 sendhttpreq = true;
@@ -347,9 +280,9 @@ public class HomePageListFragment extends Fragment implements AbsListView.OnItem
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
             LogUtils.i(TAG, "topicData = " + topicData);
             if(topicData.getT_skiptype() == 1){
-                HomepageUtils.toDetialFragment(topicData.getT_packagename(),topicData.getT_name(),topicData.getT_iconurl());
+                HomepageUtils.launchDetail(((OSGIServiceHost)mActivity),topicData.getTt_packageName(),topicData.getTt_name(),topicData.getTt_iconUrl());
             }else{
-                HomepageUtils.toTopicFragment(topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype());
+                HomepageUtils.toTopicFragment(((OSGIServiceHost)mActivity),topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype());
             }
         }
     }

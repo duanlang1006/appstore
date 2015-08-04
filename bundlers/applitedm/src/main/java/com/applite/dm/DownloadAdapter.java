@@ -26,6 +26,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
@@ -44,16 +46,14 @@ import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadFrom;
-import com.lidroid.xutils.util.MimeTypeUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
-import org.apkplug.Bundle.ApkplugOSGIService;
+import com.osgi.extra.OSGIServiceHost;
+
 import org.apkplug.Bundle.OSGIServiceAgent;
 import org.osgi.framework.BundleContext;
-
 import java.lang.reflect.Method;
-import java.util.List;
 
 public class DownloadAdapter extends CursorAdapter implements View.OnClickListener{
     private Context mContext;
@@ -120,22 +120,15 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
                 implAgent.remove(vh.implInfo);
                 break;
             case R.id.button_detail:
-                try {
-                    BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                    OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                            bundleContext, ApkplugOSGIService.class,
-                            "(serviceName="+ Constant.OSGI_SERVICE_HOST_OPT+")", //服务查询条件
-                            OSGIServiceAgent.real_time);   //每次都重新查询
-                    agent.getService().ApkplugOSGIService(bundleContext,
-                            Constant.OSGI_SERVICE_DM_FRAGMENT,
-                            0, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
-                            vh.implInfo.getPackageName(),
-                            vh.implInfo.getTitle(),
-                            vh.implInfo.getIconUrl(),
-                            Constant.OSGI_SERVICE_DM_FRAGMENT);
-                } catch (Exception e) {
-                    // TODO 自动生成的 catch 块
-                    e.printStackTrace();
+                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+                OSGIServiceHost host = (OSGIServiceHost)mContext;
+                if (null != host){
+                    Bundle bundle = new Bundle();
+                    bundle.putString("packageName",vh.implInfo.getPackageName());
+                    bundle.putString("name",vh.implInfo.getTitle());
+                    bundle.putString("iconUrl",vh.implInfo.getIconUrl());
+                    AppliteUtils.putFgParams(bundle,Constant.OSGI_SERVICE_DM_FRAGMENT,"replace",true);
+                    host.jumpto(bundleContext,Constant.OSGI_SERVICE_DETAIL_FRAGMENT,null,bundle);
                 }
                 break;
             case R.id.button_op:

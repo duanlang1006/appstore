@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/extras/androidpnclient/androidpnclient.iml" filepath="$PROJECT_DIR$/extras/androidpnclient/androidpnclient.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/appliteStudio.iml" filepath="$PROJECT_DIR$/appliteStudio.iml" />
       <module fileurl="file://$PROJECT_DIR$/extras/applitecommon/applitecommon.iml" filepath="$PROJECT_DIR$/extras/applitecommon/applitecommon.iml" />
@@ -11,12 +10,13 @@
       <module fileurl="file://$PROJECT_DIR$/bundlers/applitehomepage/applitehomepage.iml" filepath="$PROJECT_DIR$/bundlers/applitehomepage/applitehomepage.iml" />
       <module fileurl="file://$PROJECT_DIR$/bundlers/applitelogo/applitelogo.iml" filepath="$PROJECT_DIR$/bundlers/applitelogo/applitelogo.iml" />
       <module fileurl="file://$PROJECT_DIR$/bundlers/applitesearch/applitesearch.iml" filepath="$PROJECT_DIR$/bundlers/applitesearch/applitesearch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/applitestudio.iml" filepath="$PROJECT_DIR$/applitestudio.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bundlers/appliteupdate/appliteupdate.iml" filepath="$PROJECT_DIR$/bundlers/appliteupdate/appliteupdate.iml" />
       <module fileurl="file://$PROJECT_DIR$/bundlers/bundlers.iml" filepath="$PROJECT_DIR$/bundlers/bundlers.iml" />
-      <module fileurl="file://$PROJECT_DIR$/extras/dscdownloader/dscdownloader.iml" filepath="$PROJECT_DIR$/extras/dscdownloader/dscdownloader.iml" />
       <module fileurl="file://$PROJECT_DIR$/extras/extras.iml" filepath="$PROJECT_DIR$/extras/extras.iml" />
       <module fileurl="file://$PROJECT_DIR$/extras/impl/impl.iml" filepath="$PROJECT_DIR$/extras/impl/impl.iml" />
       <module fileurl="file://$PROJECT_DIR$/extras/mitUpdateSDK/mitUpdateSDK.iml" filepath="$PROJECT_DIR$/extras/mitUpdateSDK/mitUpdateSDK.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bundlers/sHMClient/sHMClient.iml" filepath="$PROJECT_DIR$/bundlers/sHMClient/sHMClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xUtils/xUtils.iml" filepath="$PROJECT_DIR$/xUtils/xUtils.iml" />
     </modules>
   </component>
 </project>

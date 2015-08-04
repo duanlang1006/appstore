@@ -8,13 +8,11 @@ import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -30,7 +28,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
@@ -47,11 +44,8 @@ import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.bean.GuideBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
+import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
-
-
-import org.apkplug.Bundle.ApkplugOSGIService;
-import org.apkplug.Bundle.OSGIServiceAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -62,8 +56,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class GuideFragment extends Fragment implements View.OnClickListener {
 
+public class GuideFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "GuideFragment";
     private FrameLayout mFLayout;
     private int mFLayoutWidth;
@@ -85,22 +79,30 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     private int POST_ALL_APK = -1;
     private List<View> mApkList = new ArrayList<View>();//存放APK的list
     private boolean mShuttingdown = false;
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-            }
-        }
-    };
+    private Handler mHandler = new Handler();
     private Runnable mThread = new Runnable() {//延时线程
         public void run() {
-            toHome();
+            jump();
         }
     };
     private ImplAgent implAgent;
     private BitmapUtils mBitmapUtil;
     private HttpUtils mHttpUtils;
-    private Context mContext;
+
+    private String mWhichService;
+    private String mWhichFragment;
+    private Bundle mParams;
+
+
+    public static Fragment newInstance(String whichService,String whichFragment,Bundle params){
+        Fragment fg = new GuideFragment();
+        Bundle b = new Bundle();
+        b.putString("service",whichService);
+        b.putString("fragment",whichFragment);
+        b.putBundle("params", params);
+        fg.setArguments(b);
+        return fg;
+    }
 
     public GuideFragment() {
     }
@@ -110,6 +112,13 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         super.onAttach(activity);
         mActivity = activity;
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
+
+        Bundle arguments = getArguments();
+        if (null != arguments){
+            mWhichService = arguments.getString("service");
+            mWhichFragment = arguments.getString("fragment");
+            mParams = arguments.getBundle("params");
+        }
     }
 
     @Override
@@ -125,19 +134,10 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         mInflater = inflater;
         try {
-            Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            mInflater = LayoutInflater.from(context);
-            mInflater = mInflater.cloneInContext(context);
-
-            mContext = context;
-
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.hide();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        if (null == mInflater) {
-            mInflater = inflater;
         }
         this.container = container;
 
@@ -150,14 +150,28 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         } else {
             rootView = mInflater.inflate(R.layout.fragment_logo, container, false);
             logoInitView();
-            mHandler.postDelayed(mThread,
-                    (long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_SHOW_TIME, 3000L));
             if (System.currentTimeMillis() / 1000 >
                     (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_NEXT_TIME, 0L)) {
                 logoPost();
             }
         }
 
+        final long current = System.currentTimeMillis();
+        OSGIServiceHost host = (OSGIServiceHost)mActivity;
+        host.initPlugins(new OSGIServiceHost.OnInitFinishedListener() {
+            @Override
+            public void onInitFinished() {
+                long takeTime = System.currentTimeMillis()-current;
+                long timeout = (long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_SHOW_TIME, 3000L);
+                if (null != mToHomeView){
+                    mToHomeView.setEnabled(true);
+                }else{
+
+                    mHandler.postDelayed(mThread,(takeTime>=timeout)?50:(timeout - takeTime));
+                }
+                LogUtils.d(TAG,"InitPlugin take "+takeTime+" ms,dur="+timeout);
+            }
+        });
         return rootView;
     }
 
@@ -365,8 +379,8 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
 
         mAppTV.setText(bean.getName());
 
-        mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
-        mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadingImage(getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadFailedImage(getResources().getDrawable(R.drawable.apk_icon_defailt_img));
         mBitmapUtil.display(mAppIV, bean.getImgurl());
 
         child.setTag(apkPsition);
@@ -400,33 +414,21 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     /**
      * 去首页
      */
-    private void toHome() {
-        try {
-            GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
-            BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-            OSGIServiceAgent<ApkplugOSGIService> agent = new OSGIServiceAgent<ApkplugOSGIService>(
-                    bundleContext, ApkplugOSGIService.class,
-                    "(serviceName=osgi.service.host.opt)", //服务查询条件
-                    OSGIServiceAgent.real_time);   //每次都重新查询
-            agent.getService().ApkplugOSGIService(bundleContext, SimpleBundle.OSGI_SERVICE_LOGO_FRAGMENT, 0, Constant.OSGI_SERVICE_MAIN_FRAGMENT);
-        } catch (Exception e) {
-            // TODO 自动生成的 catch 块
-            e.printStackTrace();
-        }
+    private void jump() {
+        GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
+
+        OSGIServiceHost host = (OSGIServiceHost)mActivity;
+        BundleContext bundleContext = host.getSystemBundleContext();
+        host.jumpto(bundleContext, mWhichService,mWhichFragment,mParams);
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.guide_tohome:
-                toHome();
-                break;
-            case R.id.guide_install:
-                installAllApp();
-                post((int) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 1, 10, POST_ALL_APK);
-                break;
-            default:
-                break;
+        if (v.getId() == R.id.guide_tohome){
+            jump();
+        }else if (v.getId() ==  R.id.guide_install){
+            installAllApp();
+            post((int) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 1, 10, POST_ALL_APK);
         }
     }
 

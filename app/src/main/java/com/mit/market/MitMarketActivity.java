@@ -4,6 +4,10 @@ import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
@@ -16,60 +20,56 @@ import com.applite.sharedpreferences.GuideSPUtils;
 import com.mit.bean.ApkplugModel;
 import com.mit.bean.ApkplugQueryModel;
 import com.mit.mitupdatesdk.MitApkplugCloudAgent;
+
+import com.applite.common.AppliteUtils;
+import com.applite.common.Constant;
+import com.applite.common.IconCache;
+import com.applite.common.LogUtils;
+import com.mit.main.GuideFragment;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
 import com.applite.android.R;
+import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 
-import org.apkplug.Bundle.ApkplugOSGIService;
+import org.apkplug.app.FrameworkInstance;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 
-public class MitMarketActivity extends ApkPluginActivity {
+public class MitMarketActivity extends ApkPluginActivity implements OSGIServiceHost{
     private static final String TAG = "applite_MitMarketActivity";
-    private ApkplugOSGIService mOptService = new ApkplugOSGIService() {
-        @Override
-        public Object ApkplugOSGIService(BundleContext bundleContext, String from, int type, Object... objects) {
-            switch (type) {
-                case 0:
-                    launchFragment(R.id.container, objects);
-                    break;
-                case 1:
-                    MitApkplugCloudAgent.download(MitMarketActivity.this, new ApkplugQueryModel<ApkplugModel>(), new MyApkplugDownloadCallback());
-                    break;
-                case 2:
-                    UpdateNotification.getInstance().showNot(MitMarketActivity.this, objects[0].toString());
-                    break;
-            }
-            return null;
-        }
-    };
-    private ServiceRegistration mOptReg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LogUtils.d(TAG,"onCreate:"+savedInstanceState);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mit_market);
 
         setOverflowShowingAlways();
-        mOptReg = registerOSGIService(Constant.OSGI_SERVICE_HOST_OPT, mOptService);
 
+        long current = System.currentTimeMillis();
         MobclickAgent.openActivityDurationTrack(false);//禁止默认的页面统计方式
         MobclickAgent.updateOnlineConfig(this);
         MitUpdateAgent.setDebug(true);
         MitUpdateAgent.update(this);
+        LogUtils.d(TAG,"onCreate take "+(System.currentTimeMillis()-current)+" ms");
 
-        Intent mIntent = getIntent();
-        if (Constant.UPDATE_FRAGMENT_NOT.equals(mIntent.getStringExtra("update"))) {
-            launchFragment(R.id.container, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
-        } else {
-            if (savedInstanceState == null) {
-                launchFragment(R.id.container, Constant.OSGI_SERVICE_LOGO_FRAGMENT);
+        FragmentManager fgm = getSupportFragmentManager();
+        Fragment fg = fgm.findFragmentByTag(Constant.OSGI_SERVICE_LOGO_FRAGMENT);
+        if (null == fg ){
+            Intent intent = getIntent();
+            if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))){
+                fg = GuideFragment.newInstance(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,
+                        AppliteUtils.putFgParams(new Bundle(),null,"replace",false));
+            }else {
+                fg = GuideFragment.newInstance(Constant.OSGI_SERVICE_MAIN_FRAGMENT,null,
+                        AppliteUtils.putFgParams(new Bundle(),null,"replace",false));
             }
+            fgm.beginTransaction()
+                    .replace(R.id.container,fg,Constant.OSGI_SERVICE_LOGO_FRAGMENT)
+                    .commit();
         }
     }
 
@@ -144,17 +144,94 @@ public class MitMarketActivity extends ApkPluginActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-//        Intent mIntent = getIntent();
         setIntent(intent);
-        if (Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update")))
-            launchFragment(R.id.container, Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
+
+        FragmentManager fgm = getSupportFragmentManager();
+        if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))){
+            Fragment fg = GuideFragment.newInstance(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,
+                    AppliteUtils.putFgParams(new Bundle(),null,"replace",false));
+            fgm.beginTransaction()
+                    .replace(R.id.container,fg,Constant.OSGI_SERVICE_LOGO_FRAGMENT)
+                    .commit();
+        }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        LogUtils.d(TAG,"onSaveInstanceState");
+    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterOSGIService(mOptReg);
+        IconCache.getInstance(this).flush();
+    }
+
+
+    @Override
+    public void initPlugins(final OnInitFinishedListener listener) {
+        new Thread(){
+            @Override
+            public void run() {
+                installBundles();
+                initBundleList();
+                startAllBundles();
+                ListenerBundleEvent();
+                if (null != listener){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onInitFinished();
+                            checkUpdate();
+                        }
+                    });
+                }
+            }
+        }.start();
+    }
+
+    @Override
+    public BundleContext getSystemBundleContext() {
+        FrameworkInstance frame = AppLiteApplication.getFrame(this);
+        return (null == frame)?null:frame.getSystemBundleContext();
+    }
+
+    @Override
+    public void notify(BundleContext bundleContext, Bundle params) {
+        if (null != params){
+            int number = params.getInt("number");
+            UpdateNotification.getInstance().showNot(MitMarketActivity.this, String.valueOf(number));
+        }
+    }
+
+    @Override
+    public void jumpto(BundleContext bundleContext, String whichService, String whichFragment, Bundle params) {
+        Fragment fragment = newFragment(bundleContext, whichService, whichFragment, params);
+        String fromTag = params.getString("fromTag");
+        String operate = params.getString("operate");
+        boolean addToBackStack = params.getBoolean("addToBackStack");
+
+        FragmentManager fgm = getSupportFragmentManager();
+        FragmentTransaction ft = fgm.beginTransaction();
+        if ("add".equals(operate)){
+            Fragment fromFragment = fgm.findFragmentByTag(fromTag);
+            if (null != fromFragment){
+                ft.hide(fromFragment);
+            }
+            ft.add(R.id.container, fragment, whichService);
+        }else if ("replace".equals(operate)){
+            ft.replace(R.id.container, fragment, whichService);
+        }
+        if (addToBackStack) {
+            ft.addToBackStack(null);
+        }
+        ft.commit();
+    }
+
+    @Override
+    public Fragment newFragment(BundleContext bundleContext, String whichService, String whichFragment, Bundle params) {
+        return ApkPluginFragment.newInstance(whichService,whichFragment,params);
     }
 
     private void setOverflowShowingAlways() {

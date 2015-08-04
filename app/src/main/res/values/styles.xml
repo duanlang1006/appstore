@@ -24,7 +24,7 @@
         <!-- 状态栏颜色 -->
         <item name="colorPrimaryDark">#FFdddddd</item>
         <!-- 窗口的背景颜色 -->
-        <item name="android:windowBackground">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
         <!-- SearchView -->
         <item name="searchViewStyle">@style/MySearchViewStyle</item>
     </style>
