@@ -184,7 +184,6 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
 
         public void initView(HomePageApkData itemData,String layout){
-            LogUtils.i("duanlang", "itemData = "+itemData.toString());
             this.itemData = itemData;
             this.layoutStr = layout;
             this.implInfo = implAgent.getImplInfo(itemData.getPackageName(), itemData.getPackageName(), itemData.getVersionCode());
@@ -242,11 +241,9 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             }
             if (null != this.mAppBrief){
                 if(!TextUtils.isEmpty(itemData.getBrief())){
-                    LogUtils.i("duanlang", "appName = "+itemData.getName());
                     this.mAppBrief.setText(itemData.getBrief());
                     this.mAppBrief.setVisibility(View.VISIBLE);
                 }else{
-                    LogUtils.i("duanlang", "appName = " + itemData.getName() + "itemData.getBrief() = " + itemData.getBrief());
                     this.mAppBrief.setVisibility(View.GONE);
                 }
             }

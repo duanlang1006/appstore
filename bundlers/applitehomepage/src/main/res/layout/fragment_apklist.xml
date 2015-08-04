@@ -76,10 +76,10 @@
 
         <Button
             android:id="@+id/list_item_progress_button"
-            android:layout_width="70dp"
-            android:layout_height="30dp"
+            android:layout_width="50dp"
+            android:layout_height="24dp"
             android:text="install"
-            android:textSize="10sp"
+            android:textSize="11sp"
             android:layout_marginRight="5dp"
             style="@style/apkListButton"/>
     </LinearLayout>
