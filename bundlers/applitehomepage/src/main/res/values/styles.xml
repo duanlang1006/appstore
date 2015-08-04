@@ -58,7 +58,7 @@
         <item name="android:layout_marginLeft">@dimen/apkList_bottom_marginLeft</item>
         <item name="android:textColor">@drawable/item_button_text_color</item>
         <item name="android:layout_gravity">center</item>
-        <item name="android:minWidth">60dp</item>
+        <item name="android:minWidth">40dp</item>
         <item name="android:paddingLeft">5dp</item>
         <item name="android:paddingRight">5dp</item>
         <item name="android:focusable">false</item>
