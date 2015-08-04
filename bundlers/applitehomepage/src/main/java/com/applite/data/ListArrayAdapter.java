@@ -236,7 +236,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                         this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type7);
                         break;
                     default:
-                        this.mExtentIcon.setVisibility(View.GONE);
+                        break;
                 }
             }
             if (null != this.mAppBrief){
