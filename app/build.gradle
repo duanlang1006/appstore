@@ -8,8 +8,8 @@ android {
         applicationId "com.shly.appstore"
         minSdkVersion 10
         targetSdkVersion 21
-        versionCode 27
-        versionName "2.0.027"
+        versionCode 28
+        versionName "2.0.028"
         multiDexEnabled true
         manifestPlaceholders = [UMENG_CHANNEL_VALUE: "leadexceed_buildin"]
     }
