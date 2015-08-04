@@ -5,14 +5,14 @@
     android:background="#ffffffff"
     android:orientation="vertical"
     android:id="@+id/homepage_content"
-    tools:context="com.mit.homepage.TestActivity"
+    tools:context="com.com.mit.homepage.TestActivity"
     android:weightSum="1">
 
     <android.support.v4.view.ViewPager
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/pager"
-        tools:context="com.mit.homepage.TesActivity"
+        tools:context="com.com.mit.homepage.TesActivity"
         />
 
     <RelativeLayout

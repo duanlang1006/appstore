@@ -366,7 +366,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 case R.id.pop_img_exit:
                     break;
                 case R.id.pop_img_img:
-                    HomepageUtils.toTopicFragment(mPopData.getS_key(), mPopData.getS_name(), mPopData.getStep(), mPopData.getS_datatype());
+                    HomepageUtils.toTopicFragment(((OSGIServiceHost)mActivity),mPopData.getS_key(), mPopData.getS_name(), mPopData.getStep(), mPopData.getS_datatype());
                     break;
             }
         }
@@ -430,10 +430,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.action_personal:
-                HomepageUtils.launchPersonalFragment();
+                HomepageUtils.launchPersonalFragment(((OSGIServiceHost)mActivity));
                 break;
             case R.id.action_search:
-                HomepageUtils.launchSearchFragment();
+                HomepageUtils.launchSearchFragment(((OSGIServiceHost)mActivity));
                 MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
                 break;
         }
@@ -547,15 +547,11 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         @Override
         public Fragment getItem(int position) {
             LogUtils.d(TAG,"getItem,"+position);
-            Fragment fg = null;
-            OSGIServiceHost host = AppliteUtils.getHostOSGIService(BundleContextFactory.getInstance().getBundleContext());
-            if (null != host) {
-                fg = host.newFragment(
-                        BundleContextFactory.getInstance().getBundleContext(),
-                        Constant.OSGI_SERVICE_MAIN_FRAGMENT,
-                        HomePageListFragment.class.getName(),
-                        HomePageListFragment.newBundle(mPageData.get(position),false));
-            }
+            OSGIServiceHost host = (OSGIServiceHost)mActivity;
+            Fragment fg = host.newFragment(BundleContextFactory.getInstance().getBundleContext(),
+                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,
+                    HomePageListFragment.class.getName(),
+                    HomePageListFragment.newBundle(mPageData.get(position),false));
             return fg;
         }
 

@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.applite.android.R;
 import com.applite.common.AppliteUtils;
 import com.applite.common.LogUtils;
 import com.osgi.extra.OSGIServiceClient;
@@ -86,7 +87,7 @@ public class ApkPluginFragment extends Fragment{
         }
         LogUtils.d(TAG, "onAttach ,this:"+this);
 
-        FrameworkInstance frame= ((AppLiteApplication)mActivity.getApplication()).getFrame();
+        FrameworkInstance frame= AppLiteApplication.getFrame(mActivity);
         BundleContext bundleContext = frame.getSystemBundleContext();
         mPluginService = AppliteUtils.getClientOSGIService(bundleContext, mWhichService);
         if (null != mPluginService){
@@ -194,7 +195,7 @@ public class ApkPluginFragment extends Fragment{
             return mPluginService.onCreateView(mPluginFragment,inflater, container, savedInstanceState);
         }else{
             //wrong
-            return super.onCreateView(inflater, container, savedInstanceState);
+            return inflater.inflate(R.layout.fragment_mit_market,container,false);
         }
     }
 
