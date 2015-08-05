@@ -49,10 +49,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/ratingbar_Indicator"
-                style="?android:attr/ratingBarStyleSmall"
                 android:numStars ="5"
                 android:focusable = "false"
-                android:focusableInTouchMode = "false"/>
+                android:focusableInTouchMode = "false"
+                style="@style/apkListRating"/>
             <LinearLayout
                 android:layout_margin="2dp"
                 android:gravity="center_vertical"
@@ -88,7 +88,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="8dp"
-        android:maxEms="18"
+        android:maxEms="17"
         android:singleLine="true"
         android:ellipsize="end"
         style="@style/apkListSize"/>
