@@ -20,5 +20,5 @@
     <color name="button_normal">#8d17b571</color>
     <color name="button_pressed">#03db57</color>
     <color name="button_disable">#9a999a</color>
-    <color name="personal_text_color">#9a999a</color>
+    <color name="personal_text_color">#000000</color>
 </resources>

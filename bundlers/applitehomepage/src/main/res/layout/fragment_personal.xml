@@ -6,16 +6,43 @@
     android:background="#ffFFFFFF"
     tools:context=".PersonalFragment">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="18dp"
+        android:background="#ffFFFFFF"
+        android:text="@string/manager_catergory_title"
+        android:textColor="@color/black"
+        android:textSize="16sp"/>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="12dp"
+        android:background="@color/dividing_line" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/action_upgrade">
+        <ImageView
+            android:id="@+id/upgrade_img"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="18dp"
+            android:src="@drawable/icon_update" />
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
+            android:layout_height="40dp"
             android:gravity="center_vertical"
             android:background="#ffFFFFFF"
             android:text="@string/upgrade_manager"
+            android:layout_toRightOf="@+id/upgrade_img"
+            android:layout_marginRight="2dp"
+            android:textStyle="bold"
             style="@style/personalListText"/>
         <ImageView
             android:layout_width="wrap_content"
@@ -27,15 +54,32 @@
             style="@style/personalListText" />
     </RelativeLayout>
 
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="12dp"
+        android:background="@color/dividing_line" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/action_dm">
+        <ImageView
+            android:id="@+id/download_img"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginLeft="18dp"
+            android:gravity="center_vertical"
+            android:src="@drawable/icon_download_list" />
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="40dp"
             android:gravity="center_vertical"
             android:text="@string/download_manager"
+            android:layout_toRightOf="@+id/download_img"
+            android:layout_marginRight="2dp"
+            android:textStyle="bold"
             style="@style/personalListText"/>
         <ImageView
             android:layout_width="wrap_content"
@@ -46,4 +90,12 @@
             android:layout_alignParentRight="true"
             style="@style/personalListText" />
     </RelativeLayout>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="12dp"
+        android:background="@color/dividing_line" />
+
 </LinearLayout>
