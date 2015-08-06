@@ -168,7 +168,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setDisplayShowCustomEnabled(false);
-            actionBar.setTitle("更新管理");
+            actionBar.setTitle("应用升级");
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.show();
         } catch (Exception e) {
