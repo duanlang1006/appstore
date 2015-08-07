@@ -78,9 +78,8 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
         try {
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setDisplayShowCustomEnabled(false);
-            actionBar.setTitle("个人中心");
             ViewGroup customView = (ViewGroup)mInflater.inflate(R.layout.actionbar_personal,null);
             actionBar.setCustomView(customView);
             actionBar.show();

@@ -13,8 +13,8 @@
         android:layout_marginLeft="18dp"
         android:background="#ffFFFFFF"
         android:text="@string/manager_catergory_title"
-        android:textColor="@color/black"
-        android:textSize="16sp"/>
+        android:textColor="@color/category_title"
+        android:textSize="14sp"/>
 
     <ImageView
         android:layout_width="fill_parent"
@@ -42,7 +42,6 @@
             android:text="@string/upgrade_manager"
             android:layout_toRightOf="@+id/upgrade_img"
             android:layout_marginRight="2dp"
-            android:textStyle="bold"
             style="@style/personalListText"/>
         <ImageView
             android:layout_width="wrap_content"
@@ -79,7 +78,6 @@
             android:text="@string/download_manager"
             android:layout_toRightOf="@+id/download_img"
             android:layout_marginRight="2dp"
-            android:textStyle="bold"
             style="@style/personalListText"/>
         <ImageView
             android:layout_width="wrap_content"

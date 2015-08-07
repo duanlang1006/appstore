@@ -25,6 +25,7 @@ import com.osgi.extra.OSGIBaseFragment;
 import com.umeng.analytics.MobclickAgent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observer;
 
 public class DownloadListFragment extends OSGIBaseFragment implements ListView.OnItemClickListener{
     private Activity mActivity;
@@ -176,7 +177,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         }
         if (null == mAdapter){
             if (null != cursor) {
-                mAdapter = new DownloadAdapter(mActivity, cursor);
+                mAdapter = new DownloadAdapter(mActivity, cursor, mStatusFlags);
                 mListview.setAdapter(mAdapter);
             }
         }else{

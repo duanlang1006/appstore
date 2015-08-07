@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,7 +66,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
     };
     private Context mContext;
-    private LinearLayout mStatsLayout;
+    private RelativeLayout mStatsLayout;
     private ImageView mStatsImgView;
     private Button mStatsButton;
     private boolean mPostStats = true;
@@ -179,7 +180,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private void initView() {
         mAllUpdateView = (TextView) rootView.findViewById(R.id.update_all_update);
         mListView = (ListView) rootView.findViewById(R.id.update_listview);
-        mStatsLayout = (LinearLayout) rootView.findViewById(R.id.update_stats);
+        mStatsLayout = (RelativeLayout) rootView.findViewById(R.id.update_stats);
         mStatsImgView = (ImageView) rootView.findViewById(R.id.update_stats_img);
         mStatsButton = (Button) rootView.findViewById(R.id.update_post_button);
 

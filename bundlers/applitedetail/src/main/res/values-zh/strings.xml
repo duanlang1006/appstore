@@ -36,5 +36,5 @@
     <string name="start_up">"启动"</string>
 
     <string name="refresh">刷新</string>
-    <string name="loading">正在加载</string>
+    <string name="loading">正在加载应用列表···</string>
 </resources>

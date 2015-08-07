@@ -27,10 +27,10 @@ android {
         }
 
         def config = release {
-            storeFile file(System.getenv("ANDROID_HOME")+"/security/SC8825/platform.keystore")
-            storePassword "android"
-            keyAlias "androidsystemkey"
-            keyPassword "android"
+            storeFile file("../../dsc.keystore")
+            storePassword "shly123456"
+            keyAlias "dbservice"
+            keyPassword "shly123456"
         }
         config
     }
@@ -38,7 +38,8 @@ android {
         release {
             buildConfigField "boolean", "LOG_DEBUG", "false"
 
-            zipAlignEnabled true
+            zipAlignEnabled t
+            rue
             // 移除无用的resource文件
             shrinkResources true
             minifyEnabled false

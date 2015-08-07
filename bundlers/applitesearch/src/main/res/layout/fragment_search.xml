@@ -6,31 +6,48 @@
     android:orientation="vertical"
     tools:context="com.mit.search.SearchFragment">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/no_network"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="470dp"
         android:orientation="vertical"
         android:visibility="gone">
 
         <ImageView
+            android:id="@+id/off_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:src="@drawable/post_failure" />
+            android:background="#ffffffff"
+            android:src="@drawable/no_network"
+            android:layout_marginBottom="20dp"
+            android:layout_above="@+id/no_network_text"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:id="@+id/no_network_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="无网络, 请联网再试试"
+            android:textSize="16sp"
+            android:textColor="#ff000000"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
 
         <Button
-            android:id="@+id/refresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/refresh_btn"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:text="刷新"
+            android:textSize="14sp"
+            android:textColor="#ff000000"
+            android:background="@color/gray"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/hot_word_change_bg"
-            android:padding="15dp"
-            android:text="@string/refresh"
-            android:textColor="@color/black" />
+            android:layout_marginTop="40dp"
+            android:layout_below="@+id/no_network_text"
+            android:layout_centerHorizontal="true">
+        </Button>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <!--在线热词LinearLayout-->
     <LinearLayout

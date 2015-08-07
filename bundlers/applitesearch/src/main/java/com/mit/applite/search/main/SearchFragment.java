@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -97,7 +98,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private int mShowHotWordNumber = 9;
 
     private Button refresh;
-    private LinearLayout no_network;
+    private RelativeLayout no_network;
 
     private Runnable mNotifyRunnable = new Runnable() {
         @Override
@@ -277,8 +278,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         mHotChangeView = (TextView) rootView.findViewById(R.id.hot_word_change);
         mPreloadListView = (ListView) rootView.findViewById(R.id.search_preload_listview);
 
-        refresh = (Button) rootView.findViewById(R.id.refresh);
-        no_network = (LinearLayout) rootView.findViewById(R.id.no_network);
+        refresh = (Button) rootView.findViewById(R.id.refresh_btn);
+        no_network = (RelativeLayout) rootView.findViewById(R.id.no_network);
 
         mPreloadListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -393,7 +394,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 setHotWordShowData(mChangeNumbew);
                 mChangeNumbew = mChangeNumbew + 1;
                 break;
-            case R.id.refresh:
+            case R.id.refresh_btn:
                 no_network.setVisibility(View.GONE);
                 postSearch(mEtView.getText().toString());
                 break;

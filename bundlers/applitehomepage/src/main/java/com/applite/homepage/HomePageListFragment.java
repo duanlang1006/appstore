@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
+
 import com.applite.bean.HomePageApkData;
 import com.applite.bean.HomePageDataBean;
 import com.applite.bean.SpecialTopicData;
@@ -44,8 +46,12 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     private Activity mActivity;
     private SubjectData mData;
 
+    LayoutInflater mInflater;
+
     private ListView mListView;
     private View mMoreView;
+    private TextView mMoreTextView;
+    private View mEndView;
     private SlideShowView mTopicView;
     private ListArrayAdapter mListAdapter = null;
     private boolean showHome = false;
@@ -92,7 +98,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         LogUtils.i(TAG, "ListFragment.onCreateView() ");
         Context context = mActivity;
-        LayoutInflater mInflater = LayoutInflater.from(context);
+        mInflater = LayoutInflater.from(context);
         try {
             context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             if (null != context) {
@@ -174,7 +180,29 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
             mListView.removeFooterView(mMoreView);
         }
         mMoreView = inflater.inflate(R.layout.more, null);
+        mMoreTextView = (TextView) mMoreView.findViewById(R.id.loadmore_text);
         mListView.addFooterView(mMoreView);
+    }
+
+    private void removeMoreView(){
+        if (null != mMoreView){
+            mListView.removeFooterView(mMoreView);
+        }
+    }
+
+    private void setEndView(LayoutInflater inflater){
+        if (null != mEndView){
+            mListView.removeFooterView(mEndView);
+        }
+        mEndView = inflater.inflate(R.layout.notify_end, null);
+        mListView.addFooterView(mEndView);
+        mListView.invalidate();
+    }
+
+    private void removeEndView(){
+        if (null != mEndView){
+            mListView.removeFooterView(mEndView);
+        }
     }
 
     private void httpRequest() {
@@ -214,15 +242,25 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                         }
                     }
                 }
+                sendhttpreq = true;
+
+                mListAdapter.notifyDataSetChanged();
+                //mMoreView.setVisibility(View.GONE);
+                mMoreTextView.setVisibility(View.GONE);
+
                 if (pageData.getSubjectData().get(0).getData().isEmpty()) {
                     isend = true;
+                    //mMoreView.setVisibility(View.GONE);
+                    mMoreTextView.setVisibility(View.GONE);
+                    //removeMoreView();
+                    //setEndView(mInflater);
                 } else {
                     isend = false;
+                    removeEndView();
                 }
                 sendhttpreq = true;
 
                 mListAdapter.notifyDataSetChanged();
-                mMoreView.setVisibility(View.GONE);
             }
 
             @Override
@@ -230,7 +268,9 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                 super.onFailure(t, errorNo, strMsg);
                 LogUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
                 sendhttpreq = true;
-                mMoreView.setVisibility(View.GONE);
+                //mMoreView.setVisibility(View.GONE);
+                mMoreTextView.setVisibility(View.GONE);
+
             }
         });
     }
@@ -253,7 +293,8 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
             if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
                 LogUtils.i(TAG, "拉到最底部");
                 if(!isend){
-                    mMoreView.setVisibility(view.VISIBLE);
+                    //mMoreView.setVisibility(view.VISIBLE);
+                    mMoreTextView.setVisibility(View.VISIBLE);
                 }
                 if(sendhttpreq){
                     httpRequest();
