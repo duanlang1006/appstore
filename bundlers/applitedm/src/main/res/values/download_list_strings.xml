@@ -16,9 +16,10 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- The title that appears at the top of the activity listing downloads [CHAR LIMIT=25] -->
     <string name="download_title">Downloads</string>
-    <string name="no_downloads">No downloads.</string>
+    <string name="no_downloads">No downloads</string>
     <string name="missing_title">&lt;Unknown&gt;</string>
     <string name="delete_download">Delete</string>
     <string name="detail_download">Detail</string>
     <string name="apk_version">version:%1$s</string>
 </resources>
+    

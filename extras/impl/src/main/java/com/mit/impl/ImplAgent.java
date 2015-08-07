@@ -330,9 +330,9 @@ public class ImplAgent {
                     if (null != archivePkg){
                         Intent intent = getLaunchDownloadIntent(mContext,archivePkg.packageName);
                         if (null == intent){
-                            actionText = mResources.getString(R.string.action_open);
+                            actionText = mResources.getString(R.string.action_install);
                         }else{
-                            actionText = mResources.getString(R.string.action_run);
+                            actionText = mResources.getString(R.string.action_open);
                         }
                     }else{//下载apk解析错误
                         actionText = mResources.getString(R.string.action_retry);
@@ -343,7 +343,7 @@ public class ImplAgent {
             case Constant.STATUS_INSTALLED:
                 try {
                     PackageInfo installPkg = mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
-                    actionText = mResources.getString(R.string.action_run);
+                    actionText = mResources.getString(R.string.action_open);
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                     actionText = mResources.getString(R.string.action_retry);

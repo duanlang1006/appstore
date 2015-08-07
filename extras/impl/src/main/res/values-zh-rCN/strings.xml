@@ -17,7 +17,6 @@
     <string name="action_pause">暂停</string>
     <string name="action_install" >安装</string>
     <string name="action_upgrade" >更新</string>
-    <string name="action_run" >运行</string>
     <string name="action_resume" >继续</string>
     <string name="action_waiting" >等待</string>
 

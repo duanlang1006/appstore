@@ -25,10 +25,10 @@ android {
         }
 
         def config = release {
-            storeFile file(System.getenv("ANDROID_HOME") + "/security/SC8825/platform.keystore")
-            storePassword "android"
-            keyAlias "androidsystemkey"
-            keyPassword "android"
+            storeFile file("../../dsc.keystore")
+            storePassword "shly123456"
+            keyAlias "dbservice"
+            keyPassword "shly123456"
         }
         config
     }
@@ -66,6 +66,7 @@ dependencies {
     provided files('../../extras/impl/applite-impl-v1.1.jar')
     provided files('../../extras/mitUpdateSDK/mit-update-v1.0.jar')
     provided files('../../app/reflibs/gson-2.2.4.jar')
+    compile project(':extras:mittheme')
 }
 
 task clearPlugin(type: Delete) {
