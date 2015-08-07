@@ -2,6 +2,9 @@ package com.mit.applite.main;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -26,6 +29,9 @@ import com.applite.common.LogUtils;
 import com.applite.view.ProgressButton;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
+import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
+import com.lidroid.xutils.bitmap.callback.BitmapLoadFrom;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
@@ -36,6 +42,9 @@ import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 import com.osgi.extra.OSGIBaseFragment;
 import com.umeng.analytics.MobclickAgent;
+
+import net.tsz.afinal.FinalBitmap;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,9 +80,15 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private LinearLayout mLoadLayout;
     private ImageView mLoadView;
     private Animation LoadingAnimation;
+    private FinalBitmap mFinalBitmap;
+    private LinearLayout mOpenIntroduceLayout;
+    private LinearLayout mOpenUpdateLogLayout;
+    private TextView mUpdateLogView;
+    private String mDescription;
+    private String mUpdateLog;
 
-    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
-        return new DetailFragment(fg,params);
+    public static OSGIBaseFragment newInstance(Fragment fg, Bundle params) {
+        return new DetailFragment(fg, params);
     }
 
 //    public static OSGIBaseFragment newInstance(OSGIServiceHost host,String packageName,String name,String imgUrl){
@@ -113,6 +128,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
+        mFinalBitmap = FinalBitmap.create(mActivity);
     }
 
     @Override
@@ -154,7 +170,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onDetach() {
         super.onDetach();
-        System.gc();
     }
 
 
@@ -199,6 +214,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         no_network = (LinearLayout) rootView.findViewById(R.id.no_network);
         refreshButton = (Button) rootView.findViewById(R.id.refresh_btn);
 
+        mOpenIntroduceLayout = (LinearLayout) rootView.findViewById(R.id.detail_open_introduce_content_layout);
+        mOpenUpdateLogLayout = (LinearLayout) rootView.findViewById(R.id.detail_open_update_log_layout);
+        mUpdateLogView = (TextView) rootView.findViewById(R.id.detail_update_log);
+
         mName1View.setText(mApkName);
 
         mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
@@ -209,6 +228,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             @Override
             public void onClickListener() {
                 if (!TextUtils.isEmpty(mPackageName)) {
+                    mProgressButton.setBackgroundColor(mContext.getResources().getColor(R.color.progress_background));
                     ImplInfo implinfo = (ImplInfo) mProgressButton.getTag();
                     if (null != implinfo) {
                         if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implinfo)) {
@@ -239,6 +259,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 }
             }
         });
+        mOpenIntroduceLayout.setOnClickListener(this);
+        mOpenUpdateLogLayout.setOnClickListener(this);
         refreshButton.setOnClickListener(this);
     }
 
@@ -248,6 +270,14 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             case R.id.refresh_btn:
                 no_network.setVisibility(View.GONE);
                 post(mPackageName);
+                break;
+            case R.id.detail_open_introduce_content_layout:
+                mOpenIntroduceLayout.setVisibility(View.GONE);
+                mApkContentView.setText(mDescription);
+                break;
+            case R.id.detail_open_update_log_layout:
+                mOpenUpdateLogLayout.setVisibility(View.GONE);
+                mUpdateLogView.setText(mUpdateLog);
                 break;
         }
     }
@@ -307,16 +337,30 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     mDownloadUrl = obj.getString("rDownloadUrl");
                     long size = obj.getLong("apkSize");
                     String mDownloadNumber = obj.getString("downloadTimes");
-                    String content = obj.getString("description");
+                    mDescription = obj.getString("description");
                     mViewPagerUrl = obj.getString("screenshotsUrl");
                     String developer = obj.getString("developer");
+                    mUpdateLog = obj.getString("updateInfo");
 
                     mName1View.setText(mName);
                     mXingView.setRating(Float.parseFloat(xing) / 2.0f);
                     mBitmapUtil.display(mApkImgView, mImgUrl);
                     mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size) + " | " + developer);
-                    mApkContentView.setText(content);
-                    LogUtils.i(TAG, "应用介绍：" + content);
+
+                    LogUtils.i(TAG, "应用介绍：" + mDescription);
+                    if (mDescription.length() > 150) {
+                        mApkContentView.setText(mDescription.substring(0, 150) + "...");
+                    } else {
+                        mApkContentView.setText(mDescription);
+                        mOpenIntroduceLayout.setVisibility(View.GONE);
+                    }
+                    LogUtils.i(TAG, "更新日志：" + mDescription);
+                    if (mUpdateLog.length() > 150) {
+                        mUpdateLogView.setText(mUpdateLog.substring(0, 150) + "...");
+                    } else {
+                        mUpdateLogView.setText(mUpdateLog);
+                        mOpenUpdateLogLayout.setVisibility(View.GONE);
+                    }
                 }
                 mViewPagerUrlList = mViewPagerUrl.split(",");
                 setPreViewImg();
@@ -327,6 +371,11 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 implAgent.setImplCallback(implCallback, implinfo);
                 mProgressButton.setText(implAgent.getActionText(implinfo));
                 mProgressButton.setProgress(implAgent.getProgress(implinfo));
+                if (mProgressButton.getProgress() == 0) {
+                    mProgressButton.setBackgroundColor(mContext.getResources().getColor(R.color.progress_foreground));
+                } else {
+                    mProgressButton.setBackgroundColor(mContext.getResources().getColor(R.color.progress_background));
+                }
                 mProgressButton.setTag(implinfo);
             }
         } catch (JSONException e) {
@@ -336,53 +385,47 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     }
 
-    /**
-     * 设置应用介绍的图片
-     */
-    private void setPreViewImg() {
-        BitmapUtils bitmapUtils = new BitmapUtils(mActivity);
-        // 下面添加参数，显示读出时内容和读取失败时的内容
-        bitmapUtils.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.detail_default_img));
-        bitmapUtils.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.detail_default_img));
-        for (int i = 0; i < mViewPagerUrlList.length; i++) {
-            LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
-            final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
-            final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
-            mImgLl.addView(child);
-            bitmapUtils.display(img, mViewPagerUrlList[i]);
-        }
-        mLoadLayout.setVisibility(View.GONE);
-        mDataLayout.setVisibility(View.VISIBLE);
-    }
-
 //    /**
 //     * 设置应用介绍的图片
 //     */
 //    private void setPreViewImg() {
-//        Drawable mDefaultImg = mContext.getResources().getDrawable(R.drawable.detail_default_img);
-//        // 创建默认的ImageLoader配置参数
-//        ImageLoaderConfiguration configuration = ImageLoaderConfiguration
-//                .createDefault(getActivity());
-//        ImageLoader.getInstance().init(configuration);
-//        DisplayImageOptions options = new DisplayImageOptions.Builder()
-//                .cacheInMemory(true) // 设置下载的图片是否缓存在内存中
-//                .cacheOnDisk(true) // 设置下载的图片是否缓存在SD卡中
-//                .showImageOnLoading(mDefaultImg) //设置图片在下载期间显示的图片
-//                .showImageForEmptyUri(mDefaultImg)//设置图片Uri为空或是错误的时候显示的图片
-//                .showImageOnFail(mDefaultImg)  //设置图片加载/解码过程中错误时候显示的图片
-//                .considerExifParams(true)  //是否考虑JPEG图像EXIF参数（旋转，翻转）
-//                .bitmapConfig(Bitmap.Config.RGB_565)//设置图片的解码类型
-//                .build(); // 创建配置过得DisplayImageOption对象
+//        BitmapUtils bitmapUtils = new BitmapUtils(mActivity);
 //        for (int i = 0; i < mViewPagerUrlList.length; i++) {
 //            LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
 //            final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
 //            final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
 //            mImgLl.addView(child);
-//            ImageLoader.getInstance().displayImage(mViewPagerUrlList[i], img, options);
+//            bitmapUtils.display(img, mViewPagerUrlList[i], new BitmapLoadCallBack<ImageView>() {
+//                @Override
+//                public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
+//                    imageView.setBackground(new BitmapDrawable(bitmap));
+//                }
+//
+//                @Override
+//                public void onLoadFailed(ImageView imageView, String s, Drawable drawable) {
+//                    imageView.setBackground(mContext.getResources().getDrawable(R.drawable.detail_default_img));
+//                }
+//            });
 //        }
 //        mLoadLayout.setVisibility(View.GONE);
 //        mDataLayout.setVisibility(View.VISIBLE);
 //    }
+
+    /**
+     * 设置应用介绍的图片
+     */
+    private void setPreViewImg() {
+        // 下面添加参数，显示读出时内容和读取失败时的内容
+        for (int i = 0; i < mViewPagerUrlList.length; i++) {
+            LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
+            final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
+            final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
+            mImgLl.addView(child);
+            mFinalBitmap.display(img, mViewPagerUrlList[i]);
+        }
+        mLoadLayout.setVisibility(View.GONE);
+        mDataLayout.setVisibility(View.VISIBLE);
+    }
 
     class DetailImplCallback implements ImplChangeCallback {
         @Override

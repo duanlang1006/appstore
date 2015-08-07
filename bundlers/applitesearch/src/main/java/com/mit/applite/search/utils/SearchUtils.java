@@ -5,10 +5,15 @@ import android.os.Bundle;
 
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.mit.applite.search.R;
 import com.mit.applite.search.main.BundleContextFactory;
 import com.osgi.extra.OSGIServiceHost;
+
 import org.osgi.framework.BundleContext;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by LSY on 15-5-22.
@@ -16,6 +21,8 @@ import org.osgi.framework.BundleContext;
 public class SearchUtils {
 
     private static final String TAG = "SearchUtils";
+    private static Pattern mPattern;
+    private static Matcher mMatcher;
 
     public static String getDownloadNumber(Context context, int number) {
         String s = null;
@@ -36,33 +43,46 @@ public class SearchUtils {
     }
 
     /**
+     * 判断字符串是不是由字母组成
+     *
+     * @param s
+     * @return
+     */
+    public static boolean isLetter(String s) {
+        mPattern = Pattern.compile("[a-zA-Z]+");
+        mMatcher = mPattern.matcher(s);
+        LogUtils.i(TAG, "mMatcher.matches():" + mMatcher.matches());
+        return mMatcher.matches();
+    }
+
+    /**
      * 去详情页面
      */
-    public static void toDetailFragment(OSGIServiceHost host,String packageName, String name, String imgUrl) {
+    public static void toDetailFragment(OSGIServiceHost host, String packageName, String name, String imgUrl) {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        if (null != host){
+        if (null != host) {
             Bundle b = new Bundle();
-            b.putString("packageName",packageName);
-            b.putString("name",name);
-            b.putString("imgUrl",imgUrl);
-            AppliteUtils.putFgParams(b,Constant.OSGI_SERVICE_SEARCH_FRAGMENT,"add",true);
-            host.jumpto(bundleContext, Constant.OSGI_SERVICE_DETAIL_FRAGMENT,null, b);
+            b.putString("packageName", packageName);
+            b.putString("name", name);
+            b.putString("imgUrl", imgUrl);
+            AppliteUtils.putFgParams(b, Constant.OSGI_SERVICE_SEARCH_FRAGMENT, "add", true);
+            host.jumpto(bundleContext, Constant.OSGI_SERVICE_DETAIL_FRAGMENT, null, b);
         }
     }
 
     /**
      * 去主题页面
      */
-    public static void toTopicFragment(OSGIServiceHost host,String key, String name, int step, String datatype) {
+    public static void toTopicFragment(OSGIServiceHost host, String key, String name, int step, String datatype) {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-        if (null != host){
+        if (null != host) {
             Bundle b = new Bundle();
-            b.putString("key",key);
-            b.putString("name",name);
-            b.putInt("step",step);
-            b.putString("datatype",datatype);
-            AppliteUtils.putFgParams(b,Constant.OSGI_SERVICE_SEARCH_FRAGMENT,"add",true);
-            host.jumpto(bundleContext, Constant.OSGI_SERVICE_TOPIC_FRAGMENT,null, b);
+            b.putString("key", key);
+            b.putString("name", name);
+            b.putInt("step", step);
+            b.putString("datatype", datatype);
+            AppliteUtils.putFgParams(b, Constant.OSGI_SERVICE_SEARCH_FRAGMENT, "add", true);
+            host.jumpto(bundleContext, Constant.OSGI_SERVICE_TOPIC_FRAGMENT, null, b);
         }
     }
 

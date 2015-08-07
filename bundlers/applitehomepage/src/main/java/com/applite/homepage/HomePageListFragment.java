@@ -70,7 +70,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         super(mFragment, params);
         if (null != params) {
             this.mData = params.getParcelable("subject_data");
-            this.showHome = params.getBoolean("show_home");;
+            this.showHome = params.getBoolean("show_home");
         }
 
     }

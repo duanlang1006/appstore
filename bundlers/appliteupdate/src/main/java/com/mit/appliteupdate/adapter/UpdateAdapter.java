@@ -1,6 +1,8 @@
 package com.mit.appliteupdate.adapter;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +31,7 @@ import java.util.List;
 public class UpdateAdapter extends BaseAdapter {
 
     private final BitmapUtils mBitmapUtil;
+    private final PackageManager mPackageManager;
     private Context mActivity;
     private Context mContext;
     private List<DataBean> mDatas;
@@ -39,6 +42,7 @@ public class UpdateAdapter extends BaseAdapter {
         this.mDatas = mDatas;
         mActivity = context;
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
+        mPackageManager = mActivity.getPackageManager();
         try {
             Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             this.mContext = mContext;
@@ -149,7 +153,12 @@ public class UpdateAdapter extends BaseAdapter {
             mBitmapUtil.configDefaultLoadFailedImage(mContext.getDrawable(R.drawable.apk_icon_defailt_img));
             mBitmapUtil.display(mImg, bean.getmImgUrl());
 
-            mVersionName.setText("V " + bean.getmVersionName());
+            try {
+                PackageInfo pakageinfo = mPackageManager.getPackageInfo(bean.getmPackageName(), PackageManager.GET_ACTIVITIES);
+                mVersionName.setText(pakageinfo.versionName + " -> " + bean.getmVersionName());
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
             mApkSize.setText(AppliteUtils.bytes2kb(bean.getmSize()));
             initProgressButton();
         }

@@ -43,6 +43,7 @@ import com.mit.applite.search.adapter.SearchApkAdapter;
 import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.KeyBoardUtils;
+import com.mit.applite.search.utils.SearchUtils;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
@@ -53,6 +54,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SearchFragment extends OSGIBaseFragment implements View.OnClickListener, SearchApkAdapter.UpdateInatsllButtonText {
 
@@ -80,7 +83,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private TextView mHotChangeView;
 
     private ListView mPreloadListView;
-    private List<String> mPreloadData = new ArrayList<String>();
+    private List<SearchBean> mPreloadData = new ArrayList<SearchBean>();
     private boolean isClickPreloadItem = false;
     private int mPostPreloadNumber = 0;
     private PreloadAdapter mPreloadAdapter;
@@ -145,9 +148,10 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private LayoutInflater mInflater;
     private String mEtViewText;//页面隐藏时mEtView里面的字
     private HttpUtils mHttpUtils;
+    private ViewGroup customView;
 
-    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
-        return new SearchFragment(fg,params);
+    public static OSGIBaseFragment newInstance(Fragment fg, Bundle params) {
+        return new SearchFragment(fg, params);
     }
 
 
@@ -235,7 +239,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 
     private void initActionBar() {
         try {
-            ViewGroup customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_search, null);
+            if (null == customView)
+                customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_search, null);
             mBackView = (ImageButton) customView.findViewById(R.id.search_back);
             mBackView.setOnClickListener(this);
             mEtView = (EditText) customView.findViewById(R.id.search_et);
@@ -279,11 +284,11 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 isClickPreloadItem = true;
-                mEtView.setText(mPreloadData.get(position));
+                mEtView.setText(mPreloadData.get(position).getmName());
                 mPreloadListView.setVisibility(View.GONE);
 
                 mSearchPostPage = 0;
-                postSearch(mPreloadData.get(position));
+                postSearch(mPreloadData.get(position).getmName());
             }
         });
 
@@ -404,27 +409,33 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      *
      * @param name
      */
-    public void postSearch(final String name) {
+    public void postSearch(String name) {
+        if (SearchUtils.isLetter(name)) {
+            name = AppliteUtils.SplitLetter(name);
+        }
+        LogUtils.i(TAG, "name:" + name);
         RequestParams params = new RequestParams();
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "search");
         params.addBodyParameter("key", name);
         params.addBodyParameter("page", mSearchPostPage + "");
+        final String finalName = name;
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 LogUtils.i(TAG, "搜索网络请求成功，result:" + responseInfo.result);
                 setSearchData(responseInfo.result);
 
-                mSearchText = name;
+                mSearchText = finalName;
                 ISPOSTSEARCH = true;//请求结束后，才可以继续请求
                 mSearchPostPage = mSearchPostPage + 1;//请求成功后，请求的页数加1
             }
 
             @Override
             public void onFailure(HttpException e, String s) {
-                no_network.setVisibility(View.VISIBLE);
+                if (mListView.getVisibility() == View.GONE)
+                    no_network.setVisibility(View.VISIBLE);
                 ISPOSTSEARCH = true;
                 moreView.setVisibility(View.GONE);
                 if (null != mAdapter)
@@ -502,7 +513,11 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      * @param name
      * @param number 点击搜索随便填
      */
-    public void postPreload(final String name, final int number) {
+    public void postPreload(String name, final int number) {
+        if (SearchUtils.isLetter(name)) {
+            name = AppliteUtils.SplitLetter(name);
+        }
+        LogUtils.i(TAG, "name:" + name);
         RequestParams params = new RequestParams();
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
@@ -531,18 +546,26 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private void setPreloadData(String result) {
         if (!mPreloadData.isEmpty())
             mPreloadData.clear();
+        SearchBean bean = null;
         try {
             JSONObject object = new JSONObject(result);
             int app_key = object.getInt("app_key");
             String json = object.getString("search_info");
             JSONArray array = new JSONArray(json);
-            if (array.length() == 0) {
-
-            } else {
+            if (array.length() != 0) {
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject obj = new JSONObject(array.get(i).toString());
-                    String name = obj.getString("name");
-                    mPreloadData.add(name);
+                    bean = new SearchBean();
+                    bean.setmPackageName(obj.getString("packageName"));
+                    bean.setmName(obj.getString("name"));
+                    bean.setmImgUrl(obj.getString("iconUrl"));
+                    bean.setmApkSize(obj.getString("apkSize"));
+                    bean.setmDownloadNumber(obj.getString("downloadTimes"));
+                    bean.setmXing(obj.getString("rating"));
+                    bean.setmVersionName(obj.getString("versionName"));
+                    bean.setmVersionCode(obj.getInt("versionCode"));
+                    bean.setmDownloadUrl(obj.getString("rDownloadUrl"));
+                    mPreloadData.add(bean);
                 }
 
                 isHotWordLayoutVisibility(View.GONE);
@@ -551,8 +574,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                     mPreloadListView.setVisibility(View.VISIBLE);
                 }
 
+                int SHOW_ICON_NUMBER = 1 + (int) (Math.random() * 3);
                 if (null == mPreloadAdapter) {
-                    mPreloadAdapter = new PreloadAdapter(mActivity, mPreloadData);
+                    mPreloadAdapter = new PreloadAdapter(mActivity, mPreloadData, SHOW_ICON_NUMBER);
                     mPreloadListView.setAdapter(mPreloadAdapter);
                 } else {
                     mPreloadAdapter.notifyDataSetChanged();
