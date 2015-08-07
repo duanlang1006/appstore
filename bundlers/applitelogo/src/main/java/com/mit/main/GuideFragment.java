@@ -73,10 +73,9 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     private View rootView;
     private LayoutInflater mInflater;
     private ViewGroup container;
-    private int[] mX;//APK的X坐标数组
-
-    private int[] mY;//APK的Y坐标数组
-    private boolean[] mApkMovePath = new boolean[10];//APK移动方向数组  true右  false左
+    private float[] mX;//APK的X坐标数组
+    private float[] mY;//APK的Y坐标数组
+    private boolean[] mApkMovePath = {false, false, true, true, false, false, true, true, false, false};//APK移动方向数组  true右  false左
     private int POST_ALL_APK = -1;
     private List<View> mApkList = new ArrayList<View>();//存放APK的list
     private boolean mShuttingdown = false;
@@ -94,6 +93,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     private String mWhichFragment;
     private Bundle mParams;
     private int FAILURE_POST_NUMBER = 0;
+    private float mFLayoutWidthScale;
 
 
     public static Fragment newInstance(String whichService, String whichFragment, Bundle params) {
@@ -147,7 +147,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
             rootView = mInflater.inflate(R.layout.fragment_guide, container, false);
             initView();
             getResolution();
-            post(1, 10, POST_ALL_APK);
+            post((int) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0), 10, POST_ALL_APK);
             //GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
         } else {
             rootView = mInflater.inflate(R.layout.fragment_logo, container, false);
@@ -168,7 +168,6 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                 if (null != mToHomeView) {
                     mToHomeView.setEnabled(true);
                 } else {
-
                     mHandler.postDelayed(mThread, (takeTime >= timeout) ? 50 : (timeout - takeTime));
                 }
                 LogUtils.d(TAG, "InitPlugin take " + takeTime + " ms,dur=" + timeout);
@@ -229,35 +228,37 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         int H = mDisplayMetrics.heightPixels;
         LogUtils.i(TAG, "W = " + W + "-----------------H = " + H);
 
-        setAppViewXY(W);
+        mFLayoutWidthScale = (float) W / (float) mFLayoutWidth;
+        LogUtils.i(TAG, "mFLayoutWidthScale:" + mFLayoutWidthScale);
+        setAppViewXY();
     }
 
     /**
      * 保存10个控件的位置到数组里面
      */
-    private void setAppViewXY(int w) {
-        mX = new int[10];
-        mX[0] = (mFLayoutWidth * 6 / 10 - 10) * w / mFLayoutWidth;
-        mX[1] = (mFLayoutWidth * 7 / 10 - 10) * w / mFLayoutWidth;
-        mX[2] = (mFLayoutWidth * 3 / 10 - 20) * w / mFLayoutWidth;
-        mX[3] = (mFLayoutWidth * 2 / 10 - 30) * w / mFLayoutWidth;
-        mX[4] = (mFLayoutWidth * 6 / 10) * w / mFLayoutWidth;
-        mX[5] = (mFLayoutWidth * 7 / 10) * w / mFLayoutWidth;
-        mX[6] = (mFLayoutWidth * 2 / 10) * w / mFLayoutWidth;
-        mX[7] = (mFLayoutWidth * 3 / 10 - 30) * w / mFLayoutWidth;
-        mX[8] = (mFLayoutWidth * 6 / 10) * w / mFLayoutWidth;
-        mX[9] = (mFLayoutWidth * 5 / 10 + 40) * w / mFLayoutWidth;
-        mY = new int[10];
-        mY[0] = (mFLayoutHeight * 2 / 20 + 20) * w / mFLayoutWidth;
-        mY[1] = (mFLayoutHeight * 3 / 20 + 50) * w / mFLayoutWidth;
-        mY[2] = (mFLayoutHeight * 5 / 20 + 40) * w / mFLayoutWidth;
-        mY[3] = (mFLayoutHeight * 7 / 20) * w / mFLayoutWidth;
-        mY[4] = (mFLayoutHeight * 9 / 20 + 40) * w / mFLayoutWidth;
-        mY[5] = (mFLayoutHeight * 11 / 20 - 30) * w / mFLayoutWidth;
-        mY[6] = (mFLayoutHeight * 12 / 20 - 30) * w / mFLayoutWidth;
-        mY[7] = (mFLayoutHeight * 14 / 20 - 30) * w / mFLayoutWidth;
-        mY[8] = (mFLayoutHeight * 16 / 20 - 20) * w / mFLayoutWidth;
-        mY[9] = (mFLayoutHeight * 18 / 20 - 40) * w / mFLayoutWidth;
+    private void setAppViewXY() {
+        mX = new float[10];
+        mX[0] = (mFLayoutWidth * 6 / 10 - 10) * mFLayoutWidthScale;
+        mX[1] = (mFLayoutWidth * 7 / 10 - 10) * mFLayoutWidthScale;
+        mX[2] = (mFLayoutWidth * 3 / 10 - 20) * mFLayoutWidthScale;
+        mX[3] = (mFLayoutWidth * 2 / 10 - 30) * mFLayoutWidthScale;
+        mX[4] = (mFLayoutWidth * 6 / 10) * mFLayoutWidthScale;
+        mX[5] = (mFLayoutWidth * 7 / 10) * mFLayoutWidthScale;
+        mX[6] = (mFLayoutWidth * 2 / 10) * mFLayoutWidthScale;
+        mX[7] = (mFLayoutWidth * 3 / 10 - 30) * mFLayoutWidthScale;
+        mX[8] = (mFLayoutWidth * 6 / 10) * mFLayoutWidthScale;
+        mX[9] = (mFLayoutWidth * 5 / 10 + 40) * mFLayoutWidthScale;
+        mY = new float[10];
+        mY[0] = (mFLayoutHeight * 2 / 20 + 20) * mFLayoutWidthScale;
+        mY[1] = (mFLayoutHeight * 3 / 20 + 50) * mFLayoutWidthScale;
+        mY[2] = (mFLayoutHeight * 5 / 20 + 40) * mFLayoutWidthScale;
+        mY[3] = (mFLayoutHeight * 7 / 20) * mFLayoutWidthScale;
+        mY[4] = (mFLayoutHeight * 9 / 20 + 40) * mFLayoutWidthScale;
+        mY[5] = (mFLayoutHeight * 11 / 20 - 30) * mFLayoutWidthScale;
+        mY[6] = (mFLayoutHeight * 12 / 20 - 30) * mFLayoutWidthScale;
+        mY[7] = (mFLayoutHeight * 14 / 20 - 30) * mFLayoutWidthScale;
+        mY[8] = (mFLayoutHeight * 16 / 20 - 20) * mFLayoutWidthScale;
+        mY[9] = (mFLayoutHeight * 18 / 20 - 40) * mFLayoutWidthScale;
     }
 
     /**
@@ -406,16 +407,9 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         });
 
         mRLayout.addView(child);
-        AppliteUtils.setLayout(child, mX[apkPsition], mY[apkPsition]);
+        AppliteUtils.setLayout(child, (int) mX[apkPsition], (int) mY[apkPsition]);
         LogUtils.i("lang", "mX[apkPsition]: " + mX[apkPsition] + " mY[apkPsition]: " + mY[apkPsition]);
         appearAnimator(child);
-
-        int i = (child.getRight() - child.getLeft()) / 2;
-        if ((child.getLeft() + i) < mFLayoutWidth / 2) {
-            mApkMovePath[apkPsition] = true;
-        } else {
-            mApkMovePath[apkPsition] = false;
-        }
     }
 
     /**
@@ -493,7 +487,6 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      *
      * @param view
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void appearAnimator(final View view) {
         ObjectAnimator anim = ObjectAnimator//
                 .ofFloat(view, "lsy", 0.1F, 1.0F)//
