@@ -66,6 +66,7 @@
         android:layout_width="fill_parent"
         android:layout_height="470dp"
         android:orientation="vertical"
+        android:background="#fff8f8f8"
         android:visibility="gone">
 
         <!-- 无更新内容时，显示图片-->
@@ -84,7 +85,7 @@
             android:layout_height="wrap_content"
             android:text="无网络, 请联网再试试"
             android:textSize="16sp"
-            android:textColor="#ff000000"
+            android:textColor="#ff959595"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
 
@@ -98,8 +99,8 @@
             android:layout_marginTop="40dp"
             android:text="点击重新请求"
             android:textSize="14sp"
-            android:textColor="#ff000000"
-            android:background="@color/gray" />
+            android:textColor="#ff585858"
+            android:background="@color/white" />
     </RelativeLayout>
 
 
