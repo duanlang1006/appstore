@@ -42,6 +42,7 @@ import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
+import com.applite.dm.utils.HostUtils;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
@@ -59,13 +60,15 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
     private Context mContext;
     private Resources mResources;
     private LayoutInflater mInflater;
-    private int mCheckedItemPosition = -1;
+//    private int mCheckedItemPosition = -1;
+    private int mStatusFlag;
     private BitmapUtils mBitmapHelper;
     private ImplAgent implAgent;
 
-    public DownloadAdapter(Context context, Cursor cursor) {
+    public DownloadAdapter(Context context, Cursor cursor, int statusFlag) {
         super(context, cursor,true);
         mContext = context;
+        mStatusFlag = statusFlag;
         mBitmapHelper = BitmapHelper.getBitmapUtils(mContext.getApplicationContext());
         mResources = mContext.getResources();
         mInflater = LayoutInflater.from(mContext);
@@ -97,40 +100,40 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
 
         viewHolder.position = cursor.getPosition();
         viewHolder.actionBtn.setOnClickListener(this);
-        viewHolder.deleteButton.setOnClickListener(this);
-        viewHolder.detailButton.setOnClickListener(this);
+//        viewHolder.deleteButton.setOnClickListener(this);
+//        viewHolder.detailButton.setOnClickListener(this);
 
         view.setOnClickListener(this);
         String key = cursor.getString(cursor.getColumnIndex("key"));
         String packageName = cursor.getString(cursor.getColumnIndex("packageName"));
         int versionCode = cursor.getInt(cursor.getColumnIndex("versionCode"));
         viewHolder.initView(implAgent.getImplInfo(key,packageName,versionCode));
-        if (mCheckedItemPosition == cursor.getPosition()){
-            viewHolder.extra.setVisibility(View.VISIBLE);
-        }else{
-            viewHolder.extra.setVisibility(View.GONE);
-        }
+//        if (mCheckedItemPosition == cursor.getPosition()){
+//            viewHolder.extra.setVisibility(View.VISIBLE);
+//        }else{
+//            viewHolder.extra.setVisibility(View.GONE);
+//        }
     }
 
     @Override
     public void onClick(View v) {
         ViewHolder vh = (ViewHolder)v.getTag();
         switch(v.getId()){
-            case R.id.button_delete:
-                implAgent.remove(vh.implInfo);
-                break;
-            case R.id.button_detail:
-                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-                OSGIServiceHost host = (OSGIServiceHost)mContext;
-                if (null != host){
-                    Bundle bundle = new Bundle();
-                    bundle.putString("packageName",vh.implInfo.getPackageName());
-                    bundle.putString("name",vh.implInfo.getTitle());
-                    bundle.putString("iconUrl",vh.implInfo.getIconUrl());
-                    AppliteUtils.putFgParams(bundle,Constant.OSGI_SERVICE_DM_FRAGMENT,"replace",true);
-                    host.jumpto(bundleContext,Constant.OSGI_SERVICE_DETAIL_FRAGMENT,null,bundle);
-                }
-                break;
+//            case R.id.button_delete:
+//                implAgent.remove(vh.implInfo);
+//                break;
+//            case R.id.button_detail:
+//                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
+//                OSGIServiceHost host = (OSGIServiceHost)mContext;
+//                if (null != host){
+//                    Bundle bundle = new Bundle();
+//                    bundle.putString("packageName",vh.implInfo.getPackageName());
+//                    bundle.putString("name",vh.implInfo.getTitle());
+//                    bundle.putString("iconUrl",vh.implInfo.getIconUrl());
+//                    AppliteUtils.putFgParams(bundle,Constant.OSGI_SERVICE_DM_FRAGMENT,"replace",true);
+//                    host.jumpto(bundleContext,Constant.OSGI_SERVICE_DETAIL_FRAGMENT,null,bundle);
+//                }
+//                break;
             case R.id.button_op:
                 if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
                     switch (vh.implInfo.getStatus()) {
@@ -153,12 +156,16 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
                 }
                 break;
             default:
-                if (mCheckedItemPosition == vh.position){
-                    mCheckedItemPosition = -1;
-                }else{
-                    mCheckedItemPosition = vh.position;
-                }
-                notifyDataSetInvalidated();
+//                if (mCheckedItemPosition == vh.position){
+//                    mCheckedItemPosition = -1;
+//                }else{
+//                    mCheckedItemPosition = vh.position;
+//                }
+//                notifyDataSetInvalidated();
+                HostUtils.launchDetail((OSGIServiceHost)mContext,
+                        vh.implInfo.getPackageName(),
+                        vh.implInfo.getTitle(),
+                        vh.implInfo.getIconUrl());
                 break;
         }
     }
@@ -169,28 +176,28 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         TextView descView;
         TextView statusView;
         TextView actionBtn;
-        TextView deleteButton;
-        TextView detailButton;
+//        TextView deleteButton;
+//        TextView detailButton;
         ImageView iconView;
         ImplInfo implInfo;
-        View extra;
+//        View extra;
         ImplChangeCallback implCallback;
         int position;
 
         ViewHolder(View view) {
             actionBtn = (TextView) view.findViewById(R.id.button_op);
-            deleteButton = (TextView) view.findViewById(R.id.button_delete);
-            detailButton = (TextView) view.findViewById(R.id.button_detail);
+//            deleteButton = (TextView) view.findViewById(R.id.button_delete);
+//            detailButton = (TextView) view.findViewById(R.id.button_detail);
             progressBar = (ProgressBar) view.findViewById(android.R.id.progress);
             descView = (TextView) view.findViewById(R.id.size_text);
             titleView = (TextView) view.findViewById(R.id.download_title);
             statusView = (TextView) view.findViewById(R.id.domain);
             iconView = (ImageView) view.findViewById(R.id.download_icon);
-            extra = view.findViewById(R.id.extra_line);
+//            extra = view.findViewById(R.id.extra_line);
             view.setTag(this);
             actionBtn.setTag(this);
-            deleteButton.setTag(this);
-            detailButton.setTag(this);
+//            deleteButton.setTag(this);
+//            detailButton.setTag(this);
             implCallback = new DownloadImplCallback(this);
         }
 
@@ -276,6 +283,9 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         public void onChange(ImplInfo info) {
             ViewHolder vh = (ViewHolder)tag;
             vh.refresh();
+            if ((info.getStatus()&mStatusFlag) == 0){
+                notifyDataSetChanged();
+            }
         }
     }
 }

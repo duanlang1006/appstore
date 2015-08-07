@@ -1,17 +1,18 @@
 <com.applite.common.PagerSlidingTabStrip
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:applite="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/tabs"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:textSize="16sp"
-    android:textColor="@color/slidetab_text_color"
-    applite:pstsSelectedTextColor="@color/slidetab_selected_text_color"
-    applite:pstsIndicatorColor="@color/slidetab_indicator_color"
-    applite:pstsUnderlineColor="@color/slidetab_underline_color"
-    applite:pstsUnderlineHeight="0dp"
-    applite:pstsIndicatorHeight="0dp"
-    applite:pstsDividerColor="@android:color/transparent"
-    />
+    android:gravity="center"
+    android:layout_gravity="center"
+    style="@style/SlideTabStyle">
+    <LinearLayout
+        android:id="@+id/tabs_container"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:gravity="center"/>
+    </com.applite.common.PagerSlidingTabStrip>

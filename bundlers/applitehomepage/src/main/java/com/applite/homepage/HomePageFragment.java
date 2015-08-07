@@ -2,19 +2,22 @@ package com.applite.homepage;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.internal.view.SupportMenu;
+import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -26,7 +29,6 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.applite.bean.HomePageApkData;
 import com.applite.bean.ScreenBean;
 import com.applite.bean.HomePageDataBean;
 import com.applite.bean.SubjectData;
@@ -47,12 +49,11 @@ import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
 import net.tsz.afinal.http.HttpHandler;
-import org.apkplug.Bundle.OSGIServiceAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osgi.framework.BundleContext;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +63,7 @@ import java.util.List;
 public class HomePageFragment extends OSGIBaseFragment implements View.OnClickListener{
     private final String TAG = "homepage_PagerFragment";
     private Activity mActivity;
+    private Context mPlugContext;
     private View popView;
     private PopupWindow popupWindow;
     private List<ScreenBean> mScreenBeanList = new ArrayList<ScreenBean>();
@@ -147,10 +149,12 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         super.onAttach(activity);
         LogUtils.d(TAG, "onAttach ");
         mActivity = activity;
+        mPlugContext = activity;
         mInflater = LayoutInflater.from(mActivity);
         try {
             Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             if (null != context) {
+                mPlugContext = context;
                 mInflater = LayoutInflater.from(context);
                 mInflater = mInflater.cloneInContext(context);
             }
@@ -181,12 +185,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_homepage_main, container, false);
 
-        Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-
         mLoadingarea = (RelativeLayout)rootView.findViewById(R.id.top_parent);
         //加载中显示动画资源及文字
         mLoadingView = rootView.findViewById(R.id.loading_img);
-        LoadingAnimation = AnimationUtils.loadAnimation(context, R.anim.tip);
+        LoadingAnimation = AnimationUtils.loadAnimation(mPlugContext, R.anim.tip);
         LinearInterpolator lin = new LinearInterpolator();
         LoadingAnimation.setInterpolator(lin);
         if (LoadingAnimation != null) {
@@ -223,6 +225,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,container,false);
         initActionBar();
         if (null == mPageData){
             mViewPager.setVisibility(View.GONE);
@@ -427,6 +430,50 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        try {
+            Context plugContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
+            Field field = inflater.getClass().getDeclaredField("mContext");
+            field.setAccessible(true);
+            Object orgContext = field.get(inflater);
+            field.set(inflater,plugContext);
+            inflater.inflate(R.menu.menu_main,menu);
+            field.set(inflater,orgContext);
+
+            field = menu.getClass().getDeclaredField("mContext");
+            field.setAccessible(true);
+            field.set(menu,plugContext);
+
+            field = menu.getClass().getDeclaredField("mResources");
+            field.setAccessible(true);
+            field.set(menu,plugContext.getResources());
+            if (menu instanceof SupportMenu){
+                SupportMenuItem item = (SupportMenuItem)menu.findItem(R.id.action_search);
+                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                if (null == mCategory) {
+                    HomepageUtils.launchPersonalFragment((OSGIServiceHost) mActivity);
+                    return true;
+                }
+                break;
+            case R.id.action_search:
+                HomepageUtils.launchSearchFragment((OSGIServiceHost)mActivity);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.action_personal:
@@ -441,32 +488,31 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
     private void initActionBar(){
         try {
-            ViewGroup customView = (ViewGroup)mInflater.inflate(R.layout.actionbar_custom,null);
-            View personal = customView.findViewById(R.id.action_personal);
-            personal.setOnClickListener(this);
-            View search = customView.findViewById(R.id.action_search);
-            search.setOnClickListener(this);
-            //加入滑动tab管理viewPager
-            //mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,null,false);
-
-            ViewGroup title = (ViewGroup)customView.findViewById(R.id.action_title);
-            mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,title,false);
-            title.addView(mPagerSlidingTabStrip);
+//            ViewGroup customView = (ViewGroup)mInflater.inflate(R.layout.actionbar_custom,new LinearLayout(mActivity),false);
+//            View personal = customView.findViewById(R.id.action_personal);
+//            personal.setOnClickListener(this);
+//            View search = customView.findViewById(R.id.action_search);
+//            search.setOnClickListener(this);
+//            //加入滑动tab管理viewPager
+//            //mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,null,false);
+//
+//            ViewGroup title = (ViewGroup)customView.findViewById(R.id.action_title);
+//            mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,title,false);
+//            title.addView(mPagerSlidingTabStrip);
+            BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
             if (null == mCategory) {
-                personal.setVisibility(View.VISIBLE);
-                title.setVisibility(View.VISIBLE);
-                actionBar.setDisplayHomeAsUpEnabled(false);
+                actionBar.setHomeAsUpIndicator(mPlugContext.getResources().getDrawable(R.drawable.icon_personal_light));
                 actionBar.setDisplayShowTitleEnabled(false);
             }else{
+                actionBar.setHomeAsUpIndicator(mPlugContext.getResources().getDrawable(R.drawable.action_bar_back_light));
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setTitle(mTitle);
-                personal.setVisibility(View.GONE);
-                title.setVisibility(View.VISIBLE);
-                actionBar.setDisplayHomeAsUpEnabled(true);
             }
-            actionBar.setCustomView(customView);
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setCustomView(mPagerSlidingTabStrip);
             actionBar.show();
         }catch (Exception e){
             e.printStackTrace();

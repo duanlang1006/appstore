@@ -29,7 +29,7 @@ public class HomepageUtils {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
         if (null != host){
             Bundle b = HomePageFragment.newBundle(category, name);
-            AppliteUtils.putFgParams(b,Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true);
+            AppliteUtils.putFgParams(b,Constant.OSGI_SERVICE_MAIN_FRAGMENT,"add",true);
             host.jumpto(bundleContext,Constant.OSGI_SERVICE_MAIN_FRAGMENT,HomePageFragment.class.getName(),b);
         }
     }
@@ -48,7 +48,7 @@ public class HomepageUtils {
             data.setData(new ArrayList<HomePageApkData>());
             data.setSpecialtopic_data(null);
             Bundle params = HomePageListFragment.newBundle(data,true);
-            AppliteUtils.putFgParams(params,Constant.OSGI_SERVICE_TOPIC_FRAGMENT,"replace",true);
+            AppliteUtils.putFgParams(params,Constant.OSGI_SERVICE_TOPIC_FRAGMENT,"add",true);
             host.jumpto(bundleContext,Constant.OSGI_SERVICE_TOPIC_FRAGMENT,HomePageListFragment.class.getName(),params);
         }
     }
@@ -60,7 +60,7 @@ public class HomepageUtils {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
         if (null != host){
             host.jumpto(bundleContext,Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,
-                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
+                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"add",true));
         }
     }
 
@@ -71,7 +71,7 @@ public class HomepageUtils {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
         if (null != host){
             host.jumpto(bundleContext,Constant.OSGI_SERVICE_DM_FRAGMENT,null,
-                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
+                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"add",true));
         }
     }
 
@@ -82,7 +82,7 @@ public class HomepageUtils {
             b.putString("packageName",packageName);
             b.putString("name",name);
             b.putString("imgUrl",imgUrl);
-            AppliteUtils.putFgParams(b,Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true);
+            AppliteUtils.putFgParams(b,Constant.OSGI_SERVICE_MAIN_FRAGMENT,"add",true);
             host.jumpto(bundleContext,Constant.OSGI_SERVICE_DETAIL_FRAGMENT,null,b);
         }
     }
@@ -94,7 +94,7 @@ public class HomepageUtils {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
         if (null != host){
             host.jumpto(bundleContext,Constant.OSGI_SERVICE_SEARCH_FRAGMENT,null,
-                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
+                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"add",true));
         }
     }
 
@@ -105,7 +105,7 @@ public class HomepageUtils {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
         if (null != host){
             host.jumpto(bundleContext,Constant.OSGI_SERVICE_MAIN_FRAGMENT,PersonalFragment.class.getName(),
-                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
+                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"add",true));
         }
     }
 }
