@@ -36,7 +36,11 @@ public class MainActivity extends FragmentActivity {
     private void setDefaultFragment() {
         fm = getSupportFragmentManager();
         transaction = fm.beginTransaction();
-        Fragment fg  = ApkPluginFragment.newInstance(Constant.OSGI_SERVICE_DETAIL_FRAGMENT,DetailFragment.class.getName(),null);
+        Bundle b = new Bundle();
+        b.putString("packageName", "com.lanse.chinachess");
+        b.putString("name", "呵呵呵");
+        b.putString("imgUrl", "http://p16.qhimg.com/t017167b64d7b0787e2.png");
+        Fragment fg = ApkPluginFragment.newInstance(Constant.OSGI_SERVICE_DETAIL_FRAGMENT,DetailFragment.class.getName(),b);
         transaction.replace(R.id.detail_main, fg);
         transaction.commit();
     }
@@ -95,7 +99,8 @@ public class MainActivity extends FragmentActivity {
             }
             try {
                 Class<?> cls = Class.forName(mWhichFragment);
-                Constructor ct = cls.getConstructor(Fragment.class, String[].class);
+                Constructor ct = cls.getDeclaredConstructor(Fragment.class, Bundle.class);
+                ct.setAccessible(true);
                 mPluginFragment = (OSGIBaseFragment) ct.newInstance(this, mParams);
             } catch (Exception e) {
                 e.printStackTrace();
