@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.mit.applite.main"
-        minSdkVersion 8
+        minSdkVersion 10
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -54,6 +54,9 @@ dependencies {
     provided files('../../app/reflibs/osgi2.8.0.jar')
     provided files('../../extras/applitecommon/applite-common-v1.0.jar')
     provided files('../../extras/impl/applite-impl-v1.1.jar')
+//    compile project(':extras:applitecommon')
+//    compile project(':extras:impl')
+    provided files('../../app/libs/afinal_0.5.1_bin.jar')
     provided files('../../app/reflibs/android-support-v4.jar')
     provided files('../../app/reflibs/android-support-v7-appcompat.jar')
 }

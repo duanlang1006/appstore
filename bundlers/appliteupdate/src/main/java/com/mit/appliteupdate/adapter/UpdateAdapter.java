@@ -41,7 +41,6 @@ public class UpdateAdapter extends BaseAdapter {
     public UpdateAdapter(Context context, List<DataBean> mDatas) {
         this.mDatas = mDatas;
         mActivity = context;
-        mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
         mPackageManager = mActivity.getPackageManager();
         try {
             Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
@@ -51,8 +50,10 @@ public class UpdateAdapter extends BaseAdapter {
         } catch (Exception e) {
             e.printStackTrace();
             mInflater = LayoutInflater.from(context);
-            this.mContext = context;
         }
+        mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
+        mBitmapUtil.configDefaultLoadingImage(mContext.getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadFailedImage(mContext.getDrawable(R.drawable.apk_icon_defailt_img));
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
 
@@ -83,6 +84,16 @@ public class UpdateAdapter extends BaseAdapter {
         }
         final DataBean data = mDatas.get(position);
         viewholder.initView(data);
+
+        viewholder.mName.setText(data.getmName());
+        mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
+        try {
+            PackageInfo mPackageInfo = mPackageManager.getPackageInfo(data.getmPackageName(), PackageManager.GET_ACTIVITIES);
+            viewholder.mVersionName.setText(mPackageInfo.versionName + " -> " + data.getmVersionName());
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        viewholder.mApkSize.setText(AppliteUtils.bytes2kb(data.getmSize()));
         return convertView;
     }
 
@@ -147,19 +158,6 @@ public class UpdateAdapter extends BaseAdapter {
         }
 
         public void refresh() {
-            mName.setText(bean.getmName());
-
-            mBitmapUtil.configDefaultLoadingImage(mContext.getDrawable(R.drawable.apk_icon_defailt_img));
-            mBitmapUtil.configDefaultLoadFailedImage(mContext.getDrawable(R.drawable.apk_icon_defailt_img));
-            mBitmapUtil.display(mImg, bean.getmImgUrl());
-
-            try {
-                PackageInfo pakageinfo = mPackageManager.getPackageInfo(bean.getmPackageName(), PackageManager.GET_ACTIVITIES);
-                mVersionName.setText(pakageinfo.versionName + " -> " + bean.getmVersionName());
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
-            mApkSize.setText(AppliteUtils.bytes2kb(bean.getmSize()));
             initProgressButton();
         }
 
