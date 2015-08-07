@@ -69,7 +69,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:divider="@color/dividing_line"
-        android:dividerHeight="1dp"
+        android:dividerHeight="0.5dp"
         android:fadingEdge="none"
         android:visibility="gone" />
 
@@ -79,7 +79,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:divider="@color/dividing_line"
-        android:dividerHeight="1dp"
-        android:fadingEdge="none"
-        android:visibility="gone"></ListView>
+        android:dividerHeight="0.5dp"
+        android:visibility="gone"
+        android:fadingEdge="none"></ListView>
 </LinearLayout>

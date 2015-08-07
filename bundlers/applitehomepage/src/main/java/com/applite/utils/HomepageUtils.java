@@ -40,16 +40,13 @@ public class HomepageUtils {
     public static void toTopicFragment(OSGIServiceHost host,String s_key, String s_name, int step, String s_datatype) {
         BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
         if (null != host){
-            SubjectData data = new SubjectData();
-            data.setS_key(s_key);
-            data.setS_name(s_name);
-            data.setStep(step);
-            data.setS_datatype(s_datatype);
-            data.setData(new ArrayList<HomePageApkData>());
-            data.setSpecialtopic_data(null);
-            Bundle params = HomePageListFragment.newBundle(data,true);
-            AppliteUtils.putFgParams(params,Constant.OSGI_SERVICE_TOPIC_FRAGMENT,"replace",true);
-            host.jumpto(bundleContext,Constant.OSGI_SERVICE_TOPIC_FRAGMENT,HomePageListFragment.class.getName(),params);
+            Bundle bundle = new Bundle();
+            bundle.putString("key",s_key);
+            bundle.putString("name",s_name);
+            bundle.putInt("step",step);
+            bundle.putString("datatype",s_datatype);
+            AppliteUtils.putFgParams(bundle,Constant.OSGI_SERVICE_TOPIC_FRAGMENT,"replace",true);
+            host.jumpto(bundleContext,Constant.OSGI_SERVICE_TOPIC_FRAGMENT,null,bundle);
         }
     }
 

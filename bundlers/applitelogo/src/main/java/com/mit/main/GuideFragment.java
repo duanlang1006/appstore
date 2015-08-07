@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
@@ -46,6 +47,7 @@ import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,7 +56,6 @@ import org.osgi.framework.BundleContext;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 
 
 public class GuideFragment extends Fragment implements View.OnClickListener {
@@ -92,13 +93,14 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     private String mWhichService;
     private String mWhichFragment;
     private Bundle mParams;
+    private int FAILURE_POST_NUMBER = 0;
 
 
-    public static Fragment newInstance(String whichService,String whichFragment,Bundle params){
+    public static Fragment newInstance(String whichService, String whichFragment, Bundle params) {
         Fragment fg = new GuideFragment();
         Bundle b = new Bundle();
-        b.putString("service",whichService);
-        b.putString("fragment",whichFragment);
+        b.putString("service", whichService);
+        b.putString("fragment", whichFragment);
         b.putBundle("params", params);
         fg.setArguments(b);
         return fg;
@@ -114,7 +116,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
 
         Bundle arguments = getArguments();
-        if (null != arguments){
+        if (null != arguments) {
             mWhichService = arguments.getString("service");
             mWhichFragment = arguments.getString("fragment");
             mParams = arguments.getBundle("params");
@@ -157,19 +159,19 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         }
 
         final long current = System.currentTimeMillis();
-        OSGIServiceHost host = (OSGIServiceHost)mActivity;
+        OSGIServiceHost host = (OSGIServiceHost) mActivity;
         host.initPlugins(new OSGIServiceHost.OnInitFinishedListener() {
             @Override
             public void onInitFinished() {
-                long takeTime = System.currentTimeMillis()-current;
+                long takeTime = System.currentTimeMillis() - current;
                 long timeout = (long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_SHOW_TIME, 3000L);
-                if (null != mToHomeView){
+                if (null != mToHomeView) {
                     mToHomeView.setEnabled(true);
-                }else{
+                } else {
 
-                    mHandler.postDelayed(mThread,(takeTime>=timeout)?50:(timeout - takeTime));
+                    mHandler.postDelayed(mThread, (takeTime >= timeout) ? 50 : (timeout - takeTime));
                 }
-                LogUtils.d(TAG,"InitPlugin take "+takeTime+" ms,dur="+timeout);
+                LogUtils.d(TAG, "InitPlugin take " + takeTime + " ms,dur=" + timeout);
             }
         });
         return rootView;
@@ -264,7 +266,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      * @param position 第几条开始
      * @param number   给几条
      */
-    private void post(int position, int number, final int apkPsition) {
+    private void post(final int position, final int number, final int apkPsition) {
         annalPostApkNumber(apkPsition);
 
         RequestParams params = new RequestParams();
@@ -280,6 +282,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                 if (mShuttingdown) {
                     return;
                 }
+                FAILURE_POST_NUMBER = 0;
                 LogUtils.i(TAG, "首页指导网络请求成功，reuslt:" + responseInfo.result);
                 setData(responseInfo.result, apkPsition);
             }
@@ -291,6 +294,10 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                 }
                 LogUtils.e(TAG, "首页指导网络请求失败:" + s);
                 deleteNoReturn(apkPsition, 0);
+                if (FAILURE_POST_NUMBER < 3) {
+                    FAILURE_POST_NUMBER = FAILURE_POST_NUMBER + 1;
+                    post(position, number, apkPsition);
+                }
             }
         });
     }
@@ -417,16 +424,16 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     private void jump() {
         GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
 
-        OSGIServiceHost host = (OSGIServiceHost)mActivity;
+        OSGIServiceHost host = (OSGIServiceHost) mActivity;
         BundleContext bundleContext = host.getSystemBundleContext();
-        host.jumpto(bundleContext, mWhichService,mWhichFragment,mParams);
+        host.jumpto(bundleContext, mWhichService, mWhichFragment, mParams);
     }
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.guide_tohome){
+        if (v.getId() == R.id.guide_tohome) {
             jump();
-        }else if (v.getId() ==  R.id.guide_install){
+        } else if (v.getId() == R.id.guide_install) {
             installAllApp();
             post((int) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 1, 10, POST_ALL_APK);
         }
@@ -488,25 +495,17 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void appearAnimator(final View view) {
-        ObjectAnimator anim1 = ObjectAnimator.ofFloat(view, "scaleX", 0.2f, 1f);
-        ObjectAnimator anim2 = ObjectAnimator.ofFloat(view, "scaleY", 0.2f, 1f);
-        AnimatorSet animSet = new AnimatorSet();
-        animSet.setDuration(2000);
-        animSet.setInterpolator(new LinearInterpolator());
-        // 两个动画同时执行
-        animSet.playTogether(anim1, anim2);
-        animSet.start();
-        animSet.addListener(new AnimatorListenerAdapter() {
+        ObjectAnimator anim = ObjectAnimator//
+                .ofFloat(view, "lsy", 0.1F, 1.0F)//
+                .setDuration(500);//
+        anim.start();
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-//                view.setClickable(false);// 动画执行时不可以点击
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-//                view.setClickable(true);// 动画结束后才可以点击
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float cVal = (Float) animation.getAnimatedValue();
+                view.setAlpha(cVal);
+                view.setScaleX(cVal);
+                view.setScaleY(cVal);
             }
         });
     }

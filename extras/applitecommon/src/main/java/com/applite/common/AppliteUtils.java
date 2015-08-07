@@ -23,6 +23,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by LSY on 15-6-24.
@@ -30,7 +34,7 @@ import java.math.BigDecimal;
 public class AppliteUtils {
 
     private static final String TAG = "AppliteUtils";
-    private static String sdState = Environment.getExternalStorageState();
+    public static String regEx = "[^aoeiuv]?h?[iuv]?(ai|ei|ao|ou|er|ang?|eng?|ong|a|o|e|i|u|ng|n)?";
 
     /**
      * 得到AndroidManifest.xml里面MetaData的Value值
@@ -252,12 +256,35 @@ public class AppliteUtils {
         return ret;
     }
 
-    public static OSGIServiceClient getClientOSGIService(BundleContext bundleContext,String serviceName){
+    /**
+     * 分割字母
+     *
+     * @return
+     */
+    public static String SplitLetter(String letter) {
+        int tag = 0;
+        String s = "";
+        List<String> tokenResult = new LinkedList<String>();
+        for (int i = letter.length(); i > 0; i = i - tag) {
+            Pattern pat = Pattern.compile(regEx);
+            Matcher matcher = pat.matcher(letter);
+            boolean rs = matcher.find();
+            LogUtils.i(TAG, "matcher.group():" + matcher.group());
+            s = s + matcher.group() + " ";
+            System.out.println(matcher.group());
+            tag = matcher.end() - matcher.start();
+            tokenResult.add(letter.substring(0, 1));
+            letter = letter.substring(tag);
+        }
+        return s;
+    }
+
+    public static OSGIServiceClient getClientOSGIService(BundleContext bundleContext, String serviceName) {
         OSGIServiceClient service = null;
         try {
             service = new OSGIServiceAgent<OSGIServiceClient>(
                     bundleContext, OSGIServiceClient.class,
-                    "(serviceName="+ serviceName+")", //服务查询条件
+                    "(serviceName=" + serviceName + ")", //服务查询条件
                     OSGIServiceAgent.real_time).getService();   //每次都重新查询
         } catch (Exception e) {
             // TODO 自动生成的 catch 块
@@ -266,10 +293,10 @@ public class AppliteUtils {
         return service;
     }
 
-    public static Bundle putFgParams(Bundle params,String fromTag,String operate,boolean addToBackStack){
-        params.putString("fromTag",fromTag);
-        params.putString("operate",operate);
-        params.putBoolean("addToBackStack",addToBackStack);
+    public static Bundle putFgParams(Bundle params, String fromTag, String operate, boolean addToBackStack) {
+        params.putString("fromTag", fromTag);
+        params.putString("operate", operate);
+        params.putBoolean("addToBackStack", addToBackStack);
         return params;
     }
 }

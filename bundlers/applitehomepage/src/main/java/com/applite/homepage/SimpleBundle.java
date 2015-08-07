@@ -77,6 +77,14 @@ public class SimpleBundle implements BundleActivator{
                 if (Constant.OSGI_SERVICE_MAIN_FRAGMENT.equals(whichService)) {
                     fg = HomePageFragment.newInstance(container, params);
                 }else if (Constant.OSGI_SERVICE_TOPIC_FRAGMENT.equals(whichService)){
+                    SubjectData data = new SubjectData();
+                    data.setS_key(params.getString("key"));
+                    data.setS_name(params.getString("name"));
+                    data.setStep(params.getInt("step"));
+                    data.setS_datatype(params.getString("datatype"));
+                    data.setData(new ArrayList<HomePageApkData>());
+                    data.setSpecialtopic_data(null);
+                    params = HomePageListFragment.newBundle(data,true);
                     fg = HomePageListFragment.newInstance(container,params);
                 }
             }

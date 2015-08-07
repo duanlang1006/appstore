@@ -6,6 +6,10 @@
     android:orientation="vertical"
     tools:context="com.mit.detail.DetailFragment">
 
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@color/dividing_line" />
     <!-- 全局没网络时，以图片提示-->
     <LinearLayout
         android:id="@+id/no_network"
@@ -15,7 +19,6 @@
         android:visibility="gone">
 
         <ImageView
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
@@ -71,7 +74,7 @@
             <ScrollView
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_marginBottom="50dp">
+                android:layout_marginBottom="60dp">
 
                 <LinearLayout
                     android:id="@+id/detail_vp_container"
@@ -111,6 +114,13 @@
                                 android:textColor="@color/black"
                                 android:textSize="15sp" />
 
+                            <RatingBar
+                                android:id="@+id/detail_xing"
+                                style="?android:attr/ratingBarStyleSmall"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:numStars="5" />
+
                             <TextView
                                 android:id="@+id/detail_apksize_and_company"
                                 android:layout_width="fill_parent"
@@ -120,26 +130,12 @@
                                 android:ellipsize="end"
                                 android:textColor="@color/dividing_line"
                                 android:textSize="12sp" />
-
-                            <RatingBar
-                                android:id="@+id/detail_xing"
-                                style="?android:attr/ratingBarStyleSmall"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:numStars="5" />
                         </LinearLayout>
                     </LinearLayout>
 
-                    <!-- 应用详情图片上面的线条-->
-                    <ImageView
-                        android:layout_width="fill_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginBottom="5dp"
-                        android:background="@color/dividing_line" />
-
                     <HorizontalScrollView
                         android:layout_width="fill_parent"
-                        android:layout_height="300dp"
+                        android:layout_height="350dp"
                         android:scrollbars="none">
 
                         <LinearLayout
@@ -149,35 +145,132 @@
                             android:orientation="horizontal"></LinearLayout>
                     </HorizontalScrollView>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="10dp"
-                        android:text="@string/app_detail"
-                        android:textColor="@color/black"
-                        android:textSize="18dp"
-                        android:textStyle="bold" />
-
-                    <!-- 详情文字内容-->
-                    <TextView
-                        android:id="@+id/detail_content"
+                    <!-- 详情内容-->
+                    <LinearLayout
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:ellipsize="end"
-                        android:textColor="@color/black"
-                        android:textSize="12sp" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="10dp"
+                            android:text="@string/app_detail"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/detail_content"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:ellipsize="end"
+                            android:textColor="@color/dividing_line"
+                            android:textSize="16sp" />
+
+                        <!--详情内容展开全文-->
+                        <LinearLayout
+                            android:id="@+id/detail_open_introduce_content_layout"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="fill_parent"
+                                android:layout_height="0.5dp"
+                                android:background="@color/open_line" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_margin="10dp"
+                                android:text="展开全文"
+                                android:textColor="@color/red"
+                                android:textSize="18sp" />
+
+                            <View
+                                android:layout_width="fill_parent"
+                                android:layout_height="0.5dp"
+                                android:background="@color/open_line" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- 更新日志内容-->
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="10dp"
+                            android:text="@string/update_log"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/detail_update_log"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:ellipsize="end"
+                            android:textColor="@color/dividing_line"
+                            android:textSize="16sp" />
+
+                        <!--更新日志展开全文-->
+                        <LinearLayout
+                            android:id="@+id/detail_open_update_log_layout"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:orientation="vertical">
+
+                            <View
+                                android:layout_width="fill_parent"
+                                android:layout_height="0.5dp"
+                                android:background="@color/open_line" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_margin="10dp"
+                                android:text="展开全文"
+                                android:textColor="@color/red"
+                                android:textSize="18sp" />
+
+                            <View
+                                android:layout_width="fill_parent"
+                                android:layout_height="0.5dp"
+                                android:background="@color/open_line" />
+                        </LinearLayout>
+                    </LinearLayout>
+
                 </LinearLayout>
             </ScrollView>
 
             <LinearLayout
                 android:id="@+id/detail_download_layout"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
+                android:layout_height="60dp"
                 android:layout_alignParentBottom="true"
-                android:gravity="center"
+                android:gravity="center_horizontal"
                 android:orientation="vertical">
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@color/open_line" />
 
             </LinearLayout>
         </RelativeLayout>
