@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="background_tab_pressed">#6633B5E5</color>
-    <color name="slidetab_text_color">#ff9a999a</color>
-    <color name="slidetab_selected_text_color">#ff05db69</color>
     <color name="slidetab_indicator_color">#FF773E</color>
     <color name="slidetab_underline_color">#ff7700</color>
+    <color name="slidetab_divider_color">#00000000</color>
 
     <color name="progress_background">#a0a0a0</color>
     <color name="progress_foreground">#00CC00</color>

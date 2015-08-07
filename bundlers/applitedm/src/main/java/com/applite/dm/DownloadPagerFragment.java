@@ -6,33 +6,40 @@ import android.content.res.Resources;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.internal.view.SupportMenu;
+import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.PagerSlidingTabStrip;
+import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
+import java.lang.reflect.Field;
 
-public class DownloadPagerFragment extends OSGIBaseFragment{
+
+public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener {
     final static String TAG = "applite_dm";
     private ViewPager mViewPager;
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
     private Activity mActivity;
     private boolean destoryView = false;
+    private LayoutInflater mInflater;
+    private Context mPlugContext;
 
     public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
         return new DownloadPagerFragment(fg,params);
@@ -53,12 +60,12 @@ public class DownloadPagerFragment extends OSGIBaseFragment{
                              Bundle savedInstanceState) {
         ImplLog.d(TAG, "onCreateView,"+this);
         destoryView = false;
-        LayoutInflater mInflater = inflater;
+        mInflater = inflater;
         try {
-            Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            if (null != context) {
-                mInflater = LayoutInflater.from(context);
-                mInflater = mInflater.cloneInContext(context);
+            mPlugContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
+            if (null != mPlugContext) {
+                mInflater = LayoutInflater.from(mPlugContext);
+                mInflater = mInflater.cloneInContext(mPlugContext);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -66,11 +73,10 @@ public class DownloadPagerFragment extends OSGIBaseFragment{
         View rootView = mInflater.inflate(R.layout.fragment_download_pager, container, false);
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
         mViewPager.setAdapter(new SectionsPagerAdapter(getChildFragmentManager()));
-//        mPagerSlidingTabStrip = (PagerSlidingTabStrip)inflater.inflate(R.layout.pager_sliding_tab,container,false);
         mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,container,false);
-        mPagerSlidingTabStrip.setViewPager(mViewPager);
 //        mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         initActionBar(mPagerSlidingTabStrip);
+        mPagerSlidingTabStrip.setViewPager(mViewPager);
         return rootView;
     }
 
@@ -103,14 +109,87 @@ public class DownloadPagerFragment extends OSGIBaseFragment{
         }
     }
 
-    private void initActionBar(View customView){
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
         try {
+            Context plugContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
+            Field field = inflater.getClass().getDeclaredField("mContext");
+            field.setAccessible(true);
+            Object orgContext = field.get(inflater);
+            field.set(inflater,plugContext);
+            inflater.inflate(R.menu.menu_main,menu);
+            field.set(inflater,orgContext);
+
+            field = menu.getClass().getDeclaredField("mContext");
+            field.setAccessible(true);
+            field.set(menu,plugContext);
+
+            field = menu.getClass().getDeclaredField("mResources");
+            field.setAccessible(true);
+            field.set(menu,plugContext.getResources());
+
+            if (menu instanceof SupportMenu){
+                SupportMenuItem item = (SupportMenuItem)menu.findItem(R.id.action_search);
+                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+//            case R.id.action_search:
+//                HostUtils.launchSearchFragment((OSGIServiceHost) getActivity());
+//                return true;
+            case android.R.id.home:
+                if (null != getFragmentManager().getFragments() && getFragmentManager().getFragments().size() > 1) {
+                    getFragmentManager().popBackStack();
+                }else{
+                    getActivity().finish();
+                }
+                return true;
+            case R.id.dm_action_pause_all:
+//                ImplAgent.getInstance(mActivity).pauseDownload();
+                return true;
+            case R.id.dm_action_resume_all:
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        FragmentManager fgm = getFragmentManager();
+        switch(v.getId()){
+            case R.id.action_back:
+                if (null != fgm.getFragments() && fgm.getFragments().size() > 0) {
+                    fgm.popBackStack();
+                }else{
+                    getActivity().finish();
+                }
+                break;
+            case R.id.action_more:
+                break;
+        }
+
+    }
+
+    private void initActionBar(View tabStrip){
+        try {
+            Resources res = mPlugContext.getResources();
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+//            actionBar.setBackgroundDrawable(res.getDrawable(R.drawable.action_bar_bg_light));
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setHomeAsUpIndicator(res.getDrawable(R.drawable.action_bar_back_light));
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setDisplayShowCustomEnabled(true);
-            actionBar.setCustomView(customView);
             actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setCustomView(tabStrip);
             actionBar.show();
         }catch (Exception e){
             e.printStackTrace();
@@ -179,6 +258,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment{
                 e.printStackTrace();
             }
             return res.getString(tabs[position]);
+        }
+
+        @Override
+        public void notifyDataSetChanged() {
+            super.notifyDataSetChanged();
         }
 
         @Override

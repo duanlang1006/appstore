@@ -17,7 +17,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="download_title">下载内容</string>
-    <string name="no_downloads">无下载内容。</string>
+    <string name="no_downloads">无下载内容</string>
     <string name="missing_title">&lt;未知&gt;</string>
     <string name="delete_download" >删除</string>
     <string name="detail_download" >详情</string>

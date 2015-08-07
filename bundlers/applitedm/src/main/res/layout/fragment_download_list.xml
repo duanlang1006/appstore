@@ -12,11 +12,12 @@
         android:divider="@color/download_item_devider"
         android:dividerHeight="1dp"
         android:choiceMode="singleChoice"/>
-
     <TextView
         android:id="@+id/empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="@string/no_downloads"
-        style = "@style/DownloadListEmpty"/>
+        android:drawableTop="@drawable/content_empty_icon"
+        android:layout_centerInParent="true"
+        style="@style/TextAppearance.BlankPage"/>
 </RelativeLayout>

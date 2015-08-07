@@ -1,10 +1,8 @@
 package com.mit.market;
 
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -12,14 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
 import android.view.Window;
-import android.widget.ImageView;
-
-import com.applite.common.AppliteUtils;
-import com.applite.common.Constant;
-import com.applite.sharedpreferences.GuideSPUtils;
-import com.mit.bean.ApkplugModel;
-import com.mit.bean.ApkplugQueryModel;
-import com.mit.mitupdatesdk.MitApkplugCloudAgent;
 
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
@@ -118,10 +108,6 @@ public class MitMarketActivity extends ApkPluginActivity implements OSGIServiceH
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
