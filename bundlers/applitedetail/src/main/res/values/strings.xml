@@ -16,6 +16,7 @@
     <string name="keep_on">Keep on</string>
     <string name="srarch_content_no_null"> search can not be empty! </string>
     <string name="app_detail">App Detail</string>
+    <string name="update_log">Update Log</string>
 
     <string name="download_start">Install</string>
     <string name="download_pending">pending</string>

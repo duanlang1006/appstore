@@ -48,7 +48,6 @@ public class SearchApkAdapter extends BaseAdapter {
         mListener = listener;
         this.mSearchBeans = mSearchBeans;
         mActivity = context;
-        mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
         try {
             Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             this.mContext = mContext;
@@ -57,6 +56,9 @@ public class SearchApkAdapter extends BaseAdapter {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
+        mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
 
@@ -87,8 +89,6 @@ public class SearchApkAdapter extends BaseAdapter {
         }
         final SearchBean data = mSearchBeans.get(position);
 
-        mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
-        mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
         mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
         viewholder.initView(data);
 
