@@ -135,10 +135,13 @@
 
                             <RatingBar
                                 android:id="@+id/detail_xing"
-                                style="?android:attr/ratingBarStyleSmall"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:numStars="5" />
+                                android:numStars ="5"
+                                android:isIndicator="true"
+                                android:focusable = "false"
+                                android:focusableInTouchMode = "false"
+                                style="@style/apkListRating"/>
 
                             <TextView
                                 android:id="@+id/detail_apksize_and_company"
