@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">首页</string>
-    <string name="action_search">搜索</string>
-    <string name="load_more">加载数据中...</string>
-    <string name="download_manager">下载管理</string>
-    <string name="upgrade_manager">更新管理</string>
-    <string name="personal">个人中心</string>
+    <string name="action_settings">设置</string>
+    <string name="load_more">加载数据中···</string>
+    <string name="load_end">已经到底啦···</string>
+    <string name="download_manager">下载队列</string>s
+    <string name="upgrade_manager">应用升级</string>
+    <string name="manager_catergory_title">管理</string>
 </resources>

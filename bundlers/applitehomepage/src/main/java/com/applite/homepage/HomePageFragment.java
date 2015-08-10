@@ -199,7 +199,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         //无网络连接时显示图片资源
         mOffnetView = rootView.findViewById(R.id.middle_parent);
         offnetImg = (ImageView)rootView.findViewById(R.id.off_img);
-        mRetrybtn = (Button)rootView.findViewById(R.id.retry_btn);
+        mRetrybtn = (Button)rootView.findViewById(R.id.refresh_btn);
 
         mOffnetView.setVisibility(View.GONE);
 
