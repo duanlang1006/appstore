@@ -51,6 +51,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     private ListView mListView;
     private View mMoreView;
     private TextView mMoreTextView;
+    private TextView mEndTextView;
     private View mEndView;
     private SlideShowView mTopicView;
     private ListArrayAdapter mListAdapter = null;
@@ -181,6 +182,8 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         }
         mMoreView = inflater.inflate(R.layout.more, null);
         mMoreTextView = (TextView) mMoreView.findViewById(R.id.loadmore_text);
+        mEndTextView = (TextView) mMoreView.findViewById(R.id.loadend_text);
+        mEndTextView.setVisibility(View.GONE);
         mListView.addFooterView(mMoreView);
     }
 
@@ -245,13 +248,13 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                 sendhttpreq = true;
 
                 mListAdapter.notifyDataSetChanged();
-                //mMoreView.setVisibility(View.GONE);
-                mMoreTextView.setVisibility(View.GONE);
+                mMoreView.setVisibility(View.GONE);
+                //mMoreTextView.setVisibility(View.GONE);
 
                 if (pageData.getSubjectData().get(0).getData().isEmpty()) {
                     isend = true;
-                    //mMoreView.setVisibility(View.GONE);
-                    mMoreTextView.setVisibility(View.GONE);
+                    mMoreView.setVisibility(View.GONE);
+                    //mMoreTextView.setVisibility(View.GONE);
                     //removeMoreView();
                     //setEndView(mInflater);
                 } else {
@@ -268,8 +271,8 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                 super.onFailure(t, errorNo, strMsg);
                 LogUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
                 sendhttpreq = true;
-                //mMoreView.setVisibility(View.GONE);
-                mMoreTextView.setVisibility(View.GONE);
+                mMoreView.setVisibility(View.GONE);
+                //mMoreTextView.setVisibility(View.GONE);
 
             }
         });
@@ -293,8 +296,13 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
             if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
                 LogUtils.i(TAG, "拉到最底部");
                 if(!isend){
-                    //mMoreView.setVisibility(view.VISIBLE);
-                    mMoreTextView.setVisibility(View.VISIBLE);
+                    mMoreView.setVisibility(view.VISIBLE);
+                    mEndTextView.setVisibility(View.GONE);
+                    //mMoreTextView.setVisibility(View.VISIBLE);
+                }else{
+                    mMoreView.setVisibility(view.VISIBLE);
+                    mMoreTextView.setVisibility(View.GONE);
+                    mEndTextView.setVisibility(View.VISIBLE);
                 }
                 if(sendhttpreq){
                     httpRequest();
