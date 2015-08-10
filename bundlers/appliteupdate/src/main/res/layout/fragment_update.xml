@@ -64,7 +64,7 @@
     <RelativeLayout
         android:id="@+id/update_stats"
         android:layout_width="fill_parent"
-        android:layout_height="470dp"
+        android:layout_height="670dp"
         android:orientation="vertical"
         android:background="#fff8f8f8"
         android:visibility="gone">
@@ -74,7 +74,6 @@
             android:id="@+id/update_stats_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#ffffffff"
             android:layout_marginBottom="20dp"
             android:layout_above="@+id/no_network_text"
             android:layout_centerHorizontal="true" />
@@ -100,7 +99,7 @@
             android:text="点击重新请求"
             android:textSize="14sp"
             android:textColor="#ff585858"
-            android:background="@drawable/item_button_normal" />
+            android:background="@color/white" />
     </RelativeLayout>
 
 

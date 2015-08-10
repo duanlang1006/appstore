@@ -68,6 +68,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private Context mContext;
     private RelativeLayout mStatsLayout;
     private ImageView mStatsImgView;
+    private TextView mStatsTextView;
     private Button mStatsButton;
     private boolean mPostStats = true;
     private ImplAgent implAgent;
@@ -182,6 +183,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         mListView = (ListView) rootView.findViewById(R.id.update_listview);
         mStatsLayout = (RelativeLayout) rootView.findViewById(R.id.update_stats);
         mStatsImgView = (ImageView) rootView.findViewById(R.id.update_stats_img);
+        mStatsTextView = (TextView) rootView.findViewById(R.id.no_network_text);
         mStatsButton = (Button) rootView.findViewById(R.id.update_post_button);
 
         //加载中控件
@@ -237,6 +239,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 setLoadLayoutVisibility(View.GONE);
                 LogUtils.i(TAG, "更新请求失败：" + s);
                 setStatsLayoutVisibility(View.VISIBLE, mContext.getResources().getDrawable(R.drawable.post_failure));
+                mStatsTextView.setVisibility(View.VISIBLE);
                 mStatsButton.setVisibility(View.VISIBLE);
                 mPostStats = true;
             }
@@ -275,6 +278,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 }
                 if (array.length() == 0) {
                     setStatsLayoutVisibility(View.VISIBLE, mContext.getResources().getDrawable(R.drawable.no_update));
+                    mStatsTextView.setVisibility(View.GONE);
                     mStatsButton.setVisibility(View.GONE);
                 } else {
                     setStatsLayoutVisibility(View.GONE, null);
