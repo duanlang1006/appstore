@@ -48,6 +48,28 @@
 
     </RelativeLayout>
 
+    <LinearLayout
+        android:id="@+id/search_loading_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/search_loading_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/loading_img" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/loading"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
     <!--在线热词LinearLayout-->
     <LinearLayout
         android:id="@+id/hot_word_ll"
@@ -96,6 +118,6 @@
         android:layout_height="wrap_content"
         android:divider="@color/dividing_line"
         android:dividerHeight="0.5dp"
-        android:visibility="gone"
-        android:fadingEdge="none"></ListView>
+        android:fadingEdge="none"
+        android:visibility="gone"></ListView>
 </LinearLayout>

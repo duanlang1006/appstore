@@ -254,21 +254,33 @@ public class AppliteUtils {
      * @return
      */
     public static String SplitLetter(String letter) {
+        String defaultLetter = letter;
         int tag = 0;
-        String s = "";
+        String s = "";//分割后的结果
+        int noOne = 0;//不为0时返回分割后的字母
         List<String> tokenResult = new LinkedList<String>();
         for (int i = letter.length(); i > 0; i = i - tag) {
             Pattern pat = Pattern.compile(regEx);
             Matcher matcher = pat.matcher(letter);
             boolean rs = matcher.find();
             LogUtils.i(TAG, "matcher.group():" + matcher.group());
+
+            if (matcher.group().length() != 1) {
+                noOne = noOne + 1;
+            }
+
             s = s + matcher.group() + " ";
             System.out.println(matcher.group());
             tag = matcher.end() - matcher.start();
             tokenResult.add(letter.substring(0, 1));
             letter = letter.substring(tag);
         }
-        return s;
+        LogUtils.i(TAG, "是否分割字母:" + noOne);
+        if (noOne <= 1) {
+            return defaultLetter;
+        } else {
+            return s;
+        }
     }
 
 //    public static OSGIServiceClient getClientOSGIService(BundleContext bundleContext, String serviceName) {
