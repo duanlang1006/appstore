@@ -2,27 +2,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.mit.market.MitMarketActivity">
-    <item
-        android:id="@+id/action_search"
-        android:actionViewClass="android.widget.SearchView"
-        app:showAsAction="always|collapseActionView"
-        android:icon="@drawable/icon_search_light"
-        android:title="@string/action_search"/>
-
-    <item
-        android:id="@+id/app_action_search"
-        android:orderInCategory="80"
-        android:title="搜索"
-        android:icon="@drawable/icon_search_light"
-        app:showAsAction="always"/>
+    <!--<item-->
+        <!--android:id="@+id/action_search"-->
+        <!--app:showAsAction="always|collapseActionView"-->
+        <!--android:icon="@drawable/icon_search_light"-->
+        <!--android:title="@string/action_search"/>-->
+    <!--android:actionViewClass="android.widget.SearchView"-->
+    <!--<item-->
+        <!--android:id="@+id/app_action_search"-->
+        <!--android:orderInCategory="80"-->
+        <!--android:title="搜索"-->
+        <!--android:icon="@drawable/icon_search_light"-->
+        <!--app:showAsAction="always"/>-->
     <!--app:actionViewClass="android.support.v7.widget.SearchView"-->
-    <item
-        android:id="@+id/action_share"
-        android:orderInCategory="90"
-        android:title="action_share"
-        app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
-        android:icon="@drawable/icon_search_light"
-        app:showAsAction="never"/>
+    <!--<item-->
+        <!--android:id="@+id/action_share"-->
+        <!--android:orderInCategory="90"-->
+        <!--android:title="action_share"-->
+        <!--app:actionProviderClass="android.support.v7.widget.ShareActionProvider"-->
+        <!--android:icon="@drawable/icon_search_light"-->
+        <!--app:showAsAction="never"/>-->
     <!--<item-->
         <!--android:id="@+id/action_settings"-->
         <!--android:orderInCategory="100"-->

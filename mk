@@ -25,60 +25,6 @@ else
     exit 0
 fi
 
-#cd ../../bundlers/applitelogo
-#../../gradlew clean makePlugin
-#if [ $? -eq 0 ];then
-#    echo applitelogo ok!!!!!!!!!!!!!!!!!!!!!!!!
-#else
-#    echo applitelogo error!!!!!!!!!!!!!!!!!!!!!!!!
-#    exit 0
-#fi
-
-cd ../../bundlers/applitehomepage
-../../gradlew clean makePlugin
-if [ $? -eq 0 ];then
-    echo applitehomepage ok!!!!!!!!!!!!!!!!!!!!!!!!
-else
-    echo applitehomepage error!!!!!!!!!!!!!!!!!!!!!!!!
-    exit 0
-fi
-
-cd ../applitesearch
-../../gradlew clean makePlugin
-if [ $? -eq 0 ];then
-    echo applitesearch ok!!!!!!!!!!!!!!!!!!!!!!!!
-else
-    echo applitesearch error!!!!!!!!!!!!!!!!!!!!!!!!
-    exit 0
-fi
-
-cd ../applitedm
-../../gradlew clean makePlugin
-if [ $? -eq 0 ];then
-    echo applitedm ok!!!!!!!!!!!!!!!!!!!!!!!!
-else
-    echo applitedm error!!!!!!!!!!!!!!!!!!!!!!!!
-    exit 0
-fi
-
-cd ../applitedetail
-../../gradlew clean makePlugin
-if [ $? -eq 0 ];then
-    echo applitedetail ok!!!!!!!!!!!!!!!!!!!!!!!!
-else
-    echo applitedetail error!!!!!!!!!!!!!!!!!!!!!!!!
-    exit 0
-fi
-
-cd ../appliteupdate
-../../gradlew clean makePlugin
-if [ $? -eq 0 ];then
-    echo appliteupdate ok!!!!!!!!!!!!!!!!!!!!!!!!
-else
-    echo appliteupdate error!!!!!!!!!!!!!!!!!!!!!!!!
-    exit 0
-fi
-
 cd ../../app
 if [ $# -lt 1 ]; then
 ../gradlew clean assembleRelease installLeadexceed_buildinRelease

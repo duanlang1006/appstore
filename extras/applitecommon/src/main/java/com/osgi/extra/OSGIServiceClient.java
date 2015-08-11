@@ -1,80 +1,55 @@
 package com.osgi.extra;
-
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.text.TextUtils;
+import com.applite.common.Constant;
+import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by hxd on 15-7-30.
  */
-public abstract class OSGIServiceClient {
-//    public abstract void launchOSGIFragment(String service,Fragment fg,Bundle params);
-    public abstract OSGIBaseFragment newOSGIFragment(Fragment container,String whichService,String whichFragment,Bundle params);
+public class OSGIServiceClient {
+    private Map<String,String> mClientMap;
+    private static OSGIServiceClient mInstance = null;
 
-    public void onCreate(OSGIBaseFragment target,Bundle savedInstanceState){
-        if (null != target){
-            target.onCreate(savedInstanceState);
+    public static OSGIServiceClient getInstance(){
+        if (null ==  mInstance){
+            mInstance = new OSGIServiceClient();
         }
-    }
-    public void onAttach(OSGIBaseFragment target,Activity activity){
-        if (null != target){
-            target.onAttach(activity);
-        }
-    }
-    public void onStart(OSGIBaseFragment target){
-        if (null != target){
-            target.onStart();
-        }
-    }
-    public void onResume(OSGIBaseFragment target){
-        if (null != target){
-            target.onResume();
-        }
-    }
-    public void onSaveInstanceState(OSGIBaseFragment target,Bundle outState){
-        if (null != target){
-            target.onSaveInstanceState(outState);
-        }
-    }
-    public void onPause(OSGIBaseFragment target){
-        if (null != target){
-            target.onPause();
-        }
-    }
-    public void onStop(OSGIBaseFragment target){
-        if (null != target){
-            target.onStop();
-        }
-    }
-    public void onDestroy(OSGIBaseFragment target){
-        if (null != target){
-            target.onDestroy();
-        }
-    }
-    public void onDestroyView(OSGIBaseFragment target){
-        if (null != target){
-            target.onDestroyView();
-        }
-    }
-    public void onDetach(OSGIBaseFragment target){
-        if (null != target){
-            target.onDetach();
-        }
-    }
-    public View onCreateView(OSGIBaseFragment target,LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        View view = null;
-        if (null != target){
-            view = target.onCreateView(inflater,container,savedInstanceState);
-        }
-        return view;
+        return mInstance;
     }
 
-    public void onHiddenChanged(OSGIBaseFragment target,boolean hidden){
-        if (null != target){
-            target.onHiddenChanged(hidden);
+    private OSGIServiceClient(){
+        mClientMap =  new HashMap<String,String>();
+    }
+
+    public OSGIBaseFragment newOSGIFragment(Fragment container,String whichService,String whichFragment,Bundle params){
+        OSGIBaseFragment baseFragment = null;
+
+        if (null == whichFragment || TextUtils.isEmpty(whichFragment)){
+            whichFragment = mClientMap.get(whichService);
         }
+
+        if (null != whichFragment && !TextUtils.isEmpty(whichFragment)){
+            try {
+                Class<?> cls = Class.forName(whichFragment);
+                Constructor ct = cls.getDeclaredConstructor(Fragment.class,Bundle.class);
+                ct.setAccessible(true);
+                baseFragment = (OSGIBaseFragment)ct.newInstance(container,params);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return baseFragment;
+    }
+
+    public void register(String service,String fragment){
+        mClientMap.put(service,fragment);
+    }
+
+    public void unregister(String service){
+        mClientMap.remove(service);
     }
 }

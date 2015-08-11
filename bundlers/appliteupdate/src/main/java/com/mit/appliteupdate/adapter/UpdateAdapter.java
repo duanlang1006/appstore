@@ -15,14 +15,11 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.lidroid.xutils.BitmapUtils;
-import com.mit.appliteupdate.main.BundleContextFactory;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.bean.DataBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
-
-import java.io.File;
 import java.util.List;
 
 /**
@@ -33,27 +30,16 @@ public class UpdateAdapter extends BaseAdapter {
     private final BitmapUtils mBitmapUtil;
     private final PackageManager mPackageManager;
     private Context mActivity;
-    private Context mContext;
     private List<DataBean> mDatas;
-    private LayoutInflater mInflater;
     private ImplAgent implAgent;
 
     public UpdateAdapter(Context context, List<DataBean> mDatas) {
         this.mDatas = mDatas;
         mActivity = context;
         mPackageManager = mActivity.getPackageManager();
-        try {
-            Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            this.mContext = mContext;
-            mInflater = LayoutInflater.from(mContext);
-            mInflater = mInflater.cloneInContext(mContext);
-        } catch (Exception e) {
-            e.printStackTrace();
-            mInflater = LayoutInflater.from(context);
-        }
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
-        mBitmapUtil.configDefaultLoadingImage(mContext.getDrawable(R.drawable.apk_icon_defailt_img));
-        mBitmapUtil.configDefaultLoadFailedImage(mContext.getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadingImage(mActivity.getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadFailedImage(mActivity.getDrawable(R.drawable.apk_icon_defailt_img));
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
 
@@ -76,7 +62,8 @@ public class UpdateAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewholder;
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.item_update_listview, parent, false);
+            LayoutInflater inflater = LayoutInflater.from(mActivity);
+            convertView = inflater.inflate(R.layout.item_update_listview, parent, false);
             viewholder = new ViewHolder(convertView);
             convertView.setTag(viewholder);
         } else {
@@ -138,7 +125,7 @@ public class UpdateAdapter extends BaseAdapter {
                         }
                     } else {
                         try {
-                            mContext.startActivity(implAgent.getActionIntent(vh.implInfo));
+                            mActivity.startActivity(implAgent.getActionIntent(vh.implInfo));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

@@ -17,7 +17,7 @@
 
 <resources>
     <dimen name="app_icon_size">64dp</dimen>
-    <dimen name="slidetab_text_size">18sp</dimen>
+    <dimen name="slidetab_text_size">19sp</dimen>
     <dimen name="slidetab_padding_leftright">18dp</dimen>
     <dimen name="slidetab_indicator_height">0dp</dimen>
     <dimen name="slidetab_underline_height">0dp</dimen>

@@ -1,12 +1,11 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "com.mit.appliteupdate"
-        minSdkVersion 11
+        minSdkVersion 10
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -46,7 +45,6 @@ android {
 
 dependencies {
     provided 'com.umeng.analytics:analytics:latest.integration'
-    provided files('../../app/reflibs/osgi2.8.0.jar')
     provided files('../../app/reflibs/android-support-v4.jar')
     provided files('../../app/reflibs/android-support-v7-appcompat.jar')
     provided files('../../extras/impl/applite-impl-v1.1.jar')

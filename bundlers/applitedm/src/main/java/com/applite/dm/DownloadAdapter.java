@@ -36,13 +36,9 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
-import com.applite.common.LogUtils;
-import com.applite.dm.utils.HostUtils;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
@@ -50,10 +46,6 @@ import com.lidroid.xutils.bitmap.callback.BitmapLoadFrom;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
-import com.osgi.extra.OSGIServiceHost;
-
-import org.apkplug.Bundle.OSGIServiceAgent;
-import org.osgi.framework.BundleContext;
 import java.lang.reflect.Method;
 
 public class DownloadAdapter extends CursorAdapter implements View.OnClickListener{
@@ -72,16 +64,6 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         mBitmapHelper = BitmapHelper.getBitmapUtils(mContext.getApplicationContext());
         mResources = mContext.getResources();
         mInflater = LayoutInflater.from(mContext);
-        try {
-            Context cxt = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            if (null != cxt) {
-                mResources = cxt.getResources();
-                mInflater = LayoutInflater.from(cxt);
-                mInflater = mInflater.cloneInContext(cxt);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         implAgent = ImplAgent.getInstance(context.getApplicationContext());
     }
 
@@ -103,7 +85,7 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
 //        viewHolder.deleteButton.setOnClickListener(this);
 //        viewHolder.detailButton.setOnClickListener(this);
 
-        view.setOnClickListener(this);
+//        view.setOnClickListener(this);
         String key = cursor.getString(cursor.getColumnIndex("key"));
         String packageName = cursor.getString(cursor.getColumnIndex("packageName"));
         int versionCode = cursor.getInt(cursor.getColumnIndex("versionCode"));
@@ -118,7 +100,27 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
     @Override
     public void onClick(View v) {
         ViewHolder vh = (ViewHolder)v.getTag();
-        switch(v.getId()){
+        if (R.id.button_op == v.getId()) {
+            if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
+                switch (vh.implInfo.getStatus()) {
+                    case Constant.STATUS_PENDING:
+                    case Constant.STATUS_RUNNING:
+                        implAgent.pauseDownload(vh.implInfo);
+                        break;
+                    case Constant.STATUS_PAUSED:
+                        implAgent.resumeDownload(vh.implInfo, new DownloadImplCallback(vh));
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                try {
+                    mContext.startActivity(implAgent.getActionIntent(vh.implInfo));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 //            case R.id.button_delete:
 //                implAgent.remove(vh.implInfo);
 //                break;
@@ -134,40 +136,19 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
 //                    host.jumpto(bundleContext,Constant.OSGI_SERVICE_DETAIL_FRAGMENT,null,bundle);
 //                }
 //                break;
-            case R.id.button_op:
-                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-                    switch (vh.implInfo.getStatus()) {
-                        case Constant.STATUS_PENDING:
-                        case Constant.STATUS_RUNNING:
-                            implAgent.pauseDownload(vh.implInfo);
-                            break;
-                        case Constant.STATUS_PAUSED:
-                            implAgent.resumeDownload(vh.implInfo, new DownloadImplCallback(vh));
-                            break;
-                        default:
-                            break;
-                    }
-                } else {
-                    try {
-                        mContext.startActivity(implAgent.getActionIntent(vh.implInfo));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            default:
+//            default:
 //                if (mCheckedItemPosition == vh.position){
 //                    mCheckedItemPosition = -1;
 //                }else{
 //                    mCheckedItemPosition = vh.position;
 //                }
 //                notifyDataSetInvalidated();
-                HostUtils.launchDetail((OSGIServiceHost)mContext,
-                        vh.implInfo.getPackageName(),
-                        vh.implInfo.getTitle(),
-                        vh.implInfo.getIconUrl());
-                break;
-        }
+//                HostUtils.launchDetail((OSGIServiceHost)mContext,
+//                        vh.implInfo.getPackageName(),
+//                        vh.implInfo.getTitle(),
+//                        vh.implInfo.getIconUrl());
+//                break;
+//        }
     }
 
     class ViewHolder {
