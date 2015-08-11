@@ -52,8 +52,6 @@ public class UpdateAdapter extends BaseAdapter {
             mInflater = LayoutInflater.from(context);
         }
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
-        mBitmapUtil.configDefaultLoadingImage(mContext.getDrawable(R.drawable.apk_icon_defailt_img));
-        mBitmapUtil.configDefaultLoadFailedImage(mContext.getDrawable(R.drawable.apk_icon_defailt_img));
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
 
@@ -94,6 +92,36 @@ public class UpdateAdapter extends BaseAdapter {
             e.printStackTrace();
         }
         viewholder.mApkSize.setText(AppliteUtils.bytes2kb(data.getmSize()));
+        viewholder.mBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewHolder vh = (ViewHolder) v.getTag();
+                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
+                    switch (vh.implInfo.getStatus()) {
+                        case Constant.STATUS_PENDING:
+                        case Constant.STATUS_RUNNING:
+                            implAgent.pauseDownload(vh.implInfo);
+                            break;
+                        case Constant.STATUS_PAUSED:
+                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
+                            break;
+                        default:
+                            implAgent.newDownload(vh.implInfo,
+                                    Constant.extenStorageDirPath,
+                                    vh.bean.getmName() + ".apk",
+                                    true,
+                                    vh.implCallback);
+                            break;
+                    }
+                } else {
+                    try {
+                        mContext.startActivity(implAgent.getActionIntent(vh.implInfo));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
         return convertView;
     }
 
@@ -114,37 +142,6 @@ public class UpdateAdapter extends BaseAdapter {
             this.mVersionName = (TextView) v.findViewById(R.id.item_update_versionname);
             this.mBt = (Button) v.findViewById(R.id.item_update_button);
             this.implCallback = new ListImplCallback(this);
-            mBt.setTag(this);
-            mBt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ViewHolder vh = (ViewHolder) v.getTag();
-                    if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-                        switch (vh.implInfo.getStatus()) {
-                            case Constant.STATUS_PENDING:
-                            case Constant.STATUS_RUNNING:
-                                implAgent.pauseDownload(vh.implInfo);
-                                break;
-                            case Constant.STATUS_PAUSED:
-                                implAgent.resumeDownload(vh.implInfo, vh.implCallback);
-                                break;
-                            default:
-                                implAgent.newDownload(vh.implInfo,
-                                        Constant.extenStorageDirPath,
-                                        vh.bean.getmName() + ".apk",
-                                        true,
-                                        vh.implCallback);
-                                break;
-                        }
-                    } else {
-                        try {
-                            mContext.startActivity(implAgent.getActionIntent(vh.implInfo));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            });
         }
 
         public void initView(DataBean bean) {
@@ -154,6 +151,7 @@ public class UpdateAdapter extends BaseAdapter {
                 this.implInfo.setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl()).setTitle(bean.getmName());
                 implAgent.setImplCallback(implCallback, implInfo);
             }
+            mBt.setTag(this);
             refresh();
         }
 

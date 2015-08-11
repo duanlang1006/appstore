@@ -24,14 +24,20 @@ import java.util.List;
  */
 public class HotWordAdapter extends BaseAdapter {
 
+    private final ClickHotWordItemPostlistener mListener;
     private BitmapUtils mBitmapUtil;
     private Context mActivity;
     private Context mContext;
     private List<HotWordBean> mHotWordBeans;
     private LayoutInflater mInflater;
 
-    public HotWordAdapter(Context context, List<HotWordBean> mHotWordBeans) {
+    public interface ClickHotWordItemPostlistener {
+        void clickItem(String name);
+    }
+
+    public HotWordAdapter(Context context, List<HotWordBean> mHotWordBeans, ClickHotWordItemPostlistener listener) {
         this.mHotWordBeans = mHotWordBeans;
+        mListener = listener;
         mActivity = context;
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
         try {
@@ -74,11 +80,9 @@ public class HotWordAdapter extends BaseAdapter {
         }
         final HotWordBean data = mHotWordBeans.get(position);
         if (data.getmType() == 0) {
-            mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
-            mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
             mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
             viewholder.mImg.setVisibility(View.VISIBLE);
-        } else if (data.getmType() == 1) {
+        } else if (data.getmType() == 1 || data.getmType() == 2) {
             viewholder.mImg.setVisibility(View.GONE);
         }
         viewholder.mTv.setText(data.getmName());
@@ -87,11 +91,13 @@ public class HotWordAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 if (data.getmType() == 0) {//进入应用详情
-                    SearchUtils.toDetailFragment((OSGIServiceHost)mActivity,
+                    SearchUtils.toDetailFragment((OSGIServiceHost) mActivity,
                             data.getmPackageName(), data.getmName(), data.getmImgUrl());
                 } else if (data.getmType() == 1) {//进入专题
-                    SearchUtils.toTopicFragment((OSGIServiceHost)mActivity,
+                    SearchUtils.toTopicFragment((OSGIServiceHost) mActivity,
                             data.getmPackageName(), data.getmName(), data.getmStep(), data.getmDataType());
+                } else if (data.getmType() == 2) {
+                    mListener.clickItem(data.getmName());
                 }
             }
         });

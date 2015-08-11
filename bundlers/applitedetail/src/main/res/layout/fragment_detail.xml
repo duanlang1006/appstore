@@ -135,7 +135,7 @@
 
                     <HorizontalScrollView
                         android:layout_width="fill_parent"
-                        android:layout_height="350dp"
+                        android:layout_height="300dp"
                         android:scrollbars="none">
 
                         <LinearLayout
@@ -172,31 +172,25 @@
 
                         <!--详情内容展开全文-->
                         <LinearLayout
-                            android:id="@+id/detail_open_introduce_content_layout"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
                             android:orientation="vertical">
 
-                            <View
-                                android:layout_width="fill_parent"
-                                android:layout_height="0.5dp"
-                                android:background="@color/open_line" />
-
-                            <TextView
+                            <ImageView
+                                android:id="@+id/detail_open_introduce_content"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:layout_margin="10dp"
-                                android:text="展开全文"
-                                android:textColor="@color/red"
-                                android:textSize="18sp" />
+                                android:layout_marginBottom="5dp"
+                                android:src="@drawable/desc_more" />
 
                             <View
                                 android:layout_width="fill_parent"
                                 android:layout_height="0.5dp"
                                 android:background="@color/open_line" />
+
                         </LinearLayout>
                     </LinearLayout>
 
@@ -227,26 +221,19 @@
 
                         <!--更新日志展开全文-->
                         <LinearLayout
-                            android:id="@+id/detail_open_update_log_layout"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
                             android:orientation="vertical">
 
-                            <View
-                                android:layout_width="fill_parent"
-                                android:layout_height="0.5dp"
-                                android:background="@color/open_line" />
-
-                            <TextView
+                            <ImageView
+                                android:id="@+id/detail_open_update_log"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:layout_margin="10dp"
-                                android:text="展开全文"
-                                android:textColor="@color/red"
-                                android:textSize="18sp" />
+                                android:layout_marginBottom="5dp"
+                                android:src="@drawable/desc_more" />
 
                             <View
                                 android:layout_width="fill_parent"

@@ -84,8 +84,32 @@ public class PreloadAdapter extends BaseAdapter {
             viewholder = (ViewHolder) convertView.getTag();
         }
         final SearchBean data = mPreloadData.get(position);
-
         viewholder.initView(data, position);
+
+        if (position + 1 > SHOW_ICON_NUMBER) {
+            viewholder.mSize.setVisibility(View.GONE);
+            viewholder.mBt.setVisibility(View.GONE);
+            viewholder.mIcon.setVisibility(View.GONE);
+            viewholder.mClickItem.setClickable(false);
+            viewholder.mName.setPadding(20, 10, 10, 10);
+        } else {
+            viewholder.mName.setPadding(0, 0, 0, 0);
+            viewholder.mSize.setVisibility(View.VISIBLE);
+            viewholder.mBt.setVisibility(View.VISIBLE);
+            viewholder.mIcon.setVisibility(View.VISIBLE);
+
+            mBitmapUtil.display(viewholder.mIcon, data.getmImgUrl());
+            viewholder.mSize.setText(AppliteUtils.bytes2kb(Long.parseLong(data.getmApkSize())));
+            viewholder.mClickItem.setClickable(true);
+            viewholder.mClickItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SearchUtils.toDetailFragment((OSGIServiceHost) mActivity,
+                            data.getmPackageName(), data.getmName(), data.getmImgUrl());
+                }
+            });
+        }
+        viewholder.mName.setText(data.getmName());
         viewholder.mBt.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -153,31 +177,9 @@ public class PreloadAdapter extends BaseAdapter {
         }
 
         public void refresh() {
-            if (this.mPosition + 1 > SHOW_ICON_NUMBER) {
-                mSize.setVisibility(View.GONE);
-                mBt.setVisibility(View.GONE);
-                mIcon.setVisibility(View.GONE);
-                mClickItem.setClickable(false);
-                mName.setPadding(20, 10, 10, 10);
-            } else {
-                mName.setPadding(0, 0, 0, 0);
-                mSize.setVisibility(View.VISIBLE);
-                mBt.setVisibility(View.VISIBLE);
-                mIcon.setVisibility(View.VISIBLE);
-
-                mBitmapUtil.display(mIcon, bean.getmImgUrl());
-                mSize.setText(AppliteUtils.bytes2kb(Long.parseLong(bean.getmApkSize())));
-                mClickItem.setClickable(true);
-                mClickItem.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        SearchUtils.toDetailFragment((OSGIServiceHost) mActivity,
-                                bean.getmPackageName(), bean.getmName(), bean.getmImgUrl());
-                    }
-                });
+            if (this.mPosition + 1 <= SHOW_ICON_NUMBER) {
                 initButton();
             }
-            mName.setText(bean.getmName());
         }
 
         void initButton() {
