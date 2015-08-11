@@ -64,7 +64,7 @@
     <RelativeLayout
         android:id="@+id/update_stats"
         android:layout_width="fill_parent"
-        android:layout_height="670dp"
+        android:layout_height="470dp"
         android:orientation="vertical"
         android:background="#fff8f8f8"
         android:visibility="gone">
