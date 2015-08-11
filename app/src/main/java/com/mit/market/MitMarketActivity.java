@@ -19,6 +19,7 @@ import com.mit.main.GuideFragment;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
 import com.applite.android.R;
+import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceClient;
 import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
@@ -107,8 +108,6 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -166,32 +165,34 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     @Override
     public void jumpto(String whichService, String whichFragment, Bundle params) {
-        Fragment fragment = newFragment( whichService, whichFragment, params);
-        String fromTag = params.getString("fromTag");
-        String operate = params.getString("operate");
-        boolean addToBackStack = params.getBoolean("addToBackStack");
+        FragmentManager fgmgr = getSupportFragmentManager();
+        FragmentTransaction ft = fgmgr.beginTransaction();
 
-        FragmentManager fgm = getSupportFragmentManager();
-        FragmentTransaction ft = fgm.beginTransaction();
-        if ("add".equals(operate)){
-            Fragment fromFragment = fgm.findFragmentById(R.id.container);
-//            Fragment fromFragment = fgm.findFragmentByTag(fromTag);
-            if (null != fromFragment){
-                ft.hide(fromFragment);
-            }
-            ft.add(R.id.container, fragment, whichService);
-        }else if ("replace".equals(operate)){
-            ft.replace(R.id.container, fragment, whichService);
+        OSGIBaseFragment newFragment = null;
+        if (Constant.OSGI_SERVICE_SEARCH_FRAGMENT == whichService){
+            newFragment = (OSGIBaseFragment)fgmgr.findFragmentByTag("SearchFragment");
         }
-        if (addToBackStack) {
+
+        if (null == newFragment) {
+            newFragment = (OSGIBaseFragment) newFragment(whichService, whichFragment, params);
+            Fragment sameFragment = fgmgr.findFragmentByTag(newFragment.getTagText());
+            if (null != sameFragment){
+                ft.remove(sameFragment);
+            }
+        }
+        if (!newFragment.isAdded()) {
+            ft.add(R.id.container, newFragment, newFragment.getTagText());
+        }
+        if (params.getBoolean("addToBackStack")) {
             ft.addToBackStack(null);
         }
-        ft.commit();
+        ft.hide(fgmgr.findFragmentById(R.id.container));
+        ft.show(newFragment).commit();
     }
 
     @Override
     public Fragment newFragment(String whichService, String whichFragment, Bundle params) {
-        return ApkPluginFragment.newInstance(whichService,whichFragment,params);
+        return OSGIServiceClient.getInstance().newOSGIFragment(whichService,whichFragment,params);
     }
 
     private void setOverflowShowingAlways() {

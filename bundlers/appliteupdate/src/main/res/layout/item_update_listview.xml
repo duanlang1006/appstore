@@ -58,6 +58,7 @@
             android:layout_marginRight="20dp"
             android:background="@drawable/install_button_bg"
             android:padding="5dp"
+            android:minHeight="0dp"
             android:text="@string/install"
             android:textColor="@color/install_button_sel" />
     </LinearLayout>

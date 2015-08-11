@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by hxd on 15-6-10.
@@ -60,6 +61,7 @@ public class ImplAgent {
     private DbUtils db;
     private ImplAgentCallback mImplCallback;
     private WeakHashMap<ImplChangeCallback,ImplInfo> mWeakCallbackMap;
+    private Object mLock = new Object();
 
     private ImplAgent(Context context) {
         mContext = context;
@@ -224,7 +226,9 @@ public class ImplAgent {
 
     public void setImplCallback(ImplChangeCallback appCallback,ImplInfo implInfo){
         if (null != appCallback && null != implInfo) {
-            mWeakCallbackMap.put(appCallback, implInfo);
+            synchronized (mLock) {
+                mWeakCallbackMap.put(appCallback, implInfo);
+            }
         }
     }
 
@@ -574,6 +578,22 @@ public class ImplAgent {
             super();
         }
 
+        private void callback(final ImplInfo info){
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (mLock) {
+                        for (ImplChangeCallback callback : mWeakCallbackMap.keySet()) {
+                            ImplInfo i = mWeakCallbackMap.get(callback);
+                            if (i == info) {
+                                callback.onChange(info);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         @Override
         public void onPending(final ImplInfo info) {
             super.onPending(info);
@@ -582,17 +602,7 @@ public class ImplAgent {
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()){
-                        ImplInfo i = mWeakCallbackMap.get(callback);
-                        if (i == info){
-                            callback.onChange(info);
-                        }
-                    }
-                }
-            });
+            callback(info);
             com.applite.common.LogUtils.d(TAG, info.getTitle() + ",onStart");
         }
 
@@ -604,17 +614,7 @@ public class ImplAgent {
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()){
-                        ImplInfo i = mWeakCallbackMap.get(callback);
-                        if (i == info){
-                            callback.onChange(info);
-                        }
-                    }
-                }
-            });
+            callback(info);
             com.applite.common.LogUtils.d(TAG, info.getTitle() + ",onStart");
         }
 
@@ -626,17 +626,7 @@ public class ImplAgent {
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
-                        ImplInfo i = mWeakCallbackMap.get(callback);
-                        if (i == info){
-                            callback.onChange(info);
-                        }
-                    }
-                }
-            });
+            callback(info);
             com.applite.common.LogUtils.d(TAG, info.getTitle() + ",onCancelled");
         }
 
@@ -648,17 +638,7 @@ public class ImplAgent {
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
-                        ImplInfo i = mWeakCallbackMap.get(callback);
-                        if (i == info){
-                            callback.onChange(info);
-                        }
-                    }
-                }
-            });
+            callback(info);
             com.applite.common.LogUtils.d(TAG, info.getTitle() + ",onLoading," + total + "," + current);
         }
 
@@ -675,17 +655,7 @@ public class ImplAgent {
                 //安装
                 ImplPackageManager.getInstance(mContext).install(info, true, this);
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
-                        ImplInfo i = mWeakCallbackMap.get(callback);
-                        if (i == info){
-                            callback.onChange(info);
-                        }
-                    }
-                }
-            });
+            callback(info);
             com.applite.common.LogUtils.d(TAG, info.getTitle() + ",onCancelled");
         }
 
@@ -697,17 +667,7 @@ public class ImplAgent {
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
-                        ImplInfo i = mWeakCallbackMap.get(callback);
-                        if (i == info){
-                            callback.onChange(info);
-                        }
-                    }
-                }
-            });
+            callback(info);
             com.applite.common.LogUtils.d(TAG, info.getTitle() + ",onFailure," + msg);
         }
 
@@ -719,18 +679,7 @@ public class ImplAgent {
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
-                        ImplInfo i = mWeakCallbackMap.get(callback);
-                        if (i == info){
-                            callback.onChange(info);
-                        }
-                    }
-                }
-            });
-
+            callback(info);
         }
 
         @Override
@@ -741,18 +690,7 @@ public class ImplAgent {
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
-                        ImplInfo i = mWeakCallbackMap.get(callback);
-                        if (i == info){
-                            callback.onChange(info);
-                        }
-                    }
-                }
-            });
-
+            callback(info);
         }
 
         @Override
@@ -763,18 +701,7 @@ public class ImplAgent {
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
-                        ImplInfo i = mWeakCallbackMap.get(callback);
-                        if (i == info){
-                            callback.onChange(info);
-                        }
-                    }
-                }
-            });
-
+            callback(info);
         }
 
         @Override
@@ -785,18 +712,7 @@ public class ImplAgent {
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
-                        ImplInfo i = mWeakCallbackMap.get(callback);
-                        if (i == info){
-                            callback.onChange(info);
-                        }
-                    }
-                }
-            });
-
+            callback(info);
         }
 
         @Override
@@ -807,17 +723,7 @@ public class ImplAgent {
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
-                        ImplInfo i = mWeakCallbackMap.get(callback);
-                        if (i == info){
-                            callback.onChange(info);
-                        }
-                    }
-                }
-            });
+            callback(info);
         }
 
         @Override
@@ -828,18 +734,7 @@ public class ImplAgent {
             } catch (DbException e) {
                 e.printStackTrace();
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    for (ImplChangeCallback callback: mWeakCallbackMap.keySet()) {
-                        ImplInfo i = mWeakCallbackMap.get(callback);
-                        if (i == info){
-                            callback.onChange(info);
-                        }
-                    }
-                }
-            });
-
+            callback(info);
         }
     }
 

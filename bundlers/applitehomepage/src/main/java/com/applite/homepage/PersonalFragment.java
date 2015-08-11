@@ -1,9 +1,7 @@
 package com.applite.homepage;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
@@ -12,19 +10,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import com.applite.common.Constant;
 import com.applite.utils.HomepageUtils;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
 
 public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener{
-    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
-        return new PersonalFragment(fg,params);
-    }
-
-    private PersonalFragment(Fragment mFragment, Bundle params) {
-        super(mFragment, params);
+    public PersonalFragment() {
+        super();
     }
 
     @Override
@@ -40,11 +33,6 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
         view.findViewById(R.id.action_dm).setOnClickListener(this);
         initActionBar();
         return view;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
     }
 
     @Override
@@ -73,7 +61,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.action_search == item.getItemId()){
-            HomepageUtils.launchSearchFragment((OSGIServiceHost)getActivity());
+            HomepageUtils.launchSearchFragment((OSGIServiceHost)mActivity);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -83,23 +71,21 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onClick(View v) {
         if (R.id.action_dm == v.getId()) {
-            HomepageUtils.launchDownloadManagerFragment(((OSGIServiceHost) getActivity()));
+            HomepageUtils.launchDownloadManagerFragment(((OSGIServiceHost) mActivity));
         }else if (R.id.action_upgrade == v.getId()){
-            HomepageUtils.launchUpgradeFragment(((OSGIServiceHost)getActivity()));
+            HomepageUtils.launchUpgradeFragment(((OSGIServiceHost)mActivity));
         }
     }
 
 
     private void initActionBar(){
         try {
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-            actionBar.setDisplayUseLogoEnabled(false);
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setTitle(getActivity().getResources().getString(R.string.personal));
+            actionBar.setTitle(mActivity.getResources().getString(R.string.personal));
             actionBar.setDisplayShowCustomEnabled(false);
-            ViewGroup customView = (ViewGroup)LayoutInflater.from(getActivity()).inflate(R.layout.actionbar_personal,null);
-            actionBar.setCustomView(customView);
             actionBar.show();
         }catch (Exception e){
             e.printStackTrace();
