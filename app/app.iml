@@ -13,11 +13,8 @@
         <option name="ASSEMBLE_TASK_NAME" value="assembleLeadexceed_buildinDebug" />
         <option name="COMPILE_JAVA_TASK_NAME" value="compileLeadexceed_buildinDebugSources" />
         <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleLeadexceed_buildinDebugAndroidTest" />
-        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileLeadexceed_buildinDebugAndroidTestSources" />
-        <afterSyncTasks>
-          <task>generateLeadexceed_buildinDebugAndroidTestSources</task>
-          <task>generateLeadexceed_buildinDebugSources</task>
-        </afterSyncTasks>
+        <option name="SOURCE_GEN_TASK_NAME" value="generateLeadexceed_buildinDebugSources" />
+        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateLeadexceed_buildinDebugAndroidTestSources" />
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="MANIFEST_FILE_RELATIVE_PATH" value="/src/main/AndroidManifest.xml" />
         <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
@@ -119,9 +116,15 @@
     <orderEntry type="library" exported="" name="Bundle2.8.1.02-Dev" level="project" />
     <orderEntry type="library" exported="" name="afinal_0.5.1_bin" level="project" />
     <orderEntry type="library" exported="" name="analytics-5.5.3" level="project" />
+    <orderEntry type="module" module-name="applitedm" exported="" />
+    <orderEntry type="module" module-name="appliteupdate" exported="" />
+    <orderEntry type="module" module-name="applitehomepage" exported="" />
     <orderEntry type="module" module-name="applitelogo" exported="" />
     <orderEntry type="module" module-name="mitUpdateSDK" exported="" />
     <orderEntry type="module" module-name="applitecommon" exported="" />
     <orderEntry type="module" module-name="impl" exported="" />
+    <orderEntry type="module" module-name="applitedetail" exported="" />
+    <orderEntry type="module" module-name="applitesearch" exported="" />
   </component>
 </module>
+

@@ -7,6 +7,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import com.applite.common.Constant;
@@ -16,8 +19,6 @@ import com.osgi.extra.OSGIServiceHost;
 
 
 public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener{
-    LayoutInflater mInflater;
-
     public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
         return new PersonalFragment(fg,params);
     }
@@ -34,17 +35,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mInflater = inflater;
-        try {
-            Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            if (null != context) {
-                mInflater = LayoutInflater.from(context);
-                mInflater = mInflater.cloneInContext(context);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        View view = mInflater.inflate(R.layout.fragment_personal, container, false);
+        View view = inflater.inflate(R.layout.fragment_personal, container, false);
         view.findViewById(R.id.action_upgrade).setOnClickListener(this);
         view.findViewById(R.id.action_dm).setOnClickListener(this);
         initActionBar();
@@ -62,14 +53,39 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_main_homepage,menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        if (null != item){
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        }
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden){
+            initActionBar();
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (R.id.action_search == item.getItemId()){
+            HomepageUtils.launchSearchFragment((OSGIServiceHost)getActivity());
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
     public void onClick(View v) {
-        switch(v.getId()){
-            case R.id.action_dm:
-                HomepageUtils.launchDownloadManagerFragment(((OSGIServiceHost)getActivity()));
-                break;
-            case R.id.action_upgrade:
-                HomepageUtils.launchUpgradeFragment(((OSGIServiceHost)getActivity()));
-                break;
+        if (R.id.action_dm == v.getId()) {
+            HomepageUtils.launchDownloadManagerFragment(((OSGIServiceHost) getActivity()));
+        }else if (R.id.action_upgrade == v.getId()){
+            HomepageUtils.launchUpgradeFragment(((OSGIServiceHost)getActivity()));
         }
     }
 
@@ -77,10 +93,12 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     private void initActionBar(){
         try {
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            actionBar.setDisplayUseLogoEnabled(false);
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setTitle(getActivity().getResources().getString(R.string.personal));
             actionBar.setDisplayShowCustomEnabled(false);
-            ViewGroup customView = (ViewGroup)mInflater.inflate(R.layout.actionbar_personal,null);
+            ViewGroup customView = (ViewGroup)LayoutInflater.from(getActivity()).inflate(R.layout.actionbar_personal,null);
             actionBar.setCustomView(customView);
             actionBar.show();
         }catch (Exception e){

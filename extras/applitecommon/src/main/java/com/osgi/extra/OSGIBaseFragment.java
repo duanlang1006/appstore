@@ -89,6 +89,9 @@ public class OSGIBaseFragment{
 
     }
 
+    public void onPrepareOptionsMenu(Menu menu) {
+    }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         return false;
     }

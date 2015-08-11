@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/appliteStudio.iml" filepath="$PROJECT_DIR$/appliteStudio.iml" />
       <module fileurl="file://$PROJECT_DIR$/extras/applitecommon/applitecommon.iml" filepath="$PROJECT_DIR$/extras/applitecommon/applitecommon.iml" />
       <module fileurl="file://$PROJECT_DIR$/bundlers/applitedetail/applitedetail.iml" filepath="$PROJECT_DIR$/bundlers/applitedetail/applitedetail.iml" />
       <module fileurl="file://$PROJECT_DIR$/bundlers/applitedm/applitedm.iml" filepath="$PROJECT_DIR$/bundlers/applitedm/applitedm.iml" />
@@ -15,6 +16,8 @@
       <module fileurl="file://$PROJECT_DIR$/extras/extras.iml" filepath="$PROJECT_DIR$/extras/extras.iml" />
       <module fileurl="file://$PROJECT_DIR$/extras/impl/impl.iml" filepath="$PROJECT_DIR$/extras/impl/impl.iml" />
       <module fileurl="file://$PROJECT_DIR$/extras/mitUpdateSDK/mitUpdateSDK.iml" filepath="$PROJECT_DIR$/extras/mitUpdateSDK/mitUpdateSDK.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xUtils/xUtils.iml" filepath="$PROJECT_DIR$/xUtils/xUtils.iml" />
     </modules>
   </component>
 </project>
+
