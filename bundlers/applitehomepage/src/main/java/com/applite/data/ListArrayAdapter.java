@@ -20,7 +20,6 @@ import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
-import com.applite.homepage.BundleContextFactory;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplInfo;
@@ -49,14 +48,6 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         mResource = context.getResources();
         mInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        try {
-            Context mcontext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            mInflater = LayoutInflater.from(mcontext);
-            mInflater = mInflater.cloneInContext(mcontext);
-            mResource = mcontext.getResources();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         try {
             Field field = R.layout.class.getField(mData.getS_datatype());
             layoutResourceId = field.getInt(new R.layout());

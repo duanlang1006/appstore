@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.mit.homepage.MainActivity">
+    <!--<item android:id="@+id/action_dm"-->
+        <!--android:title="@string/action_dm"-->
+        <!--android:icon = "@drawable/icon_search_light"-->
+        <!--android:showAsAction="always"/>-->
+    <item
+        android:id="@+id/action_search"
+        android:showAsAction="always|collapseActionView"
+        android:icon="@drawable/icon_search_light"
+        android:title="@string/action_search"/>
+</menu>

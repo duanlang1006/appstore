@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">ApplitHome</string>
-    <string name="action_search">Search</string>
     <string name="personal">Personal</string>
 
     <string name="load_more">loading...</string>

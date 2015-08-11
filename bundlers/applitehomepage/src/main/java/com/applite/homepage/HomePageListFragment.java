@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
@@ -29,6 +28,8 @@ import com.osgi.extra.OSGIServiceHost;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,7 +49,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     private View mMoreView;
     private SlideShowView mTopicView;
     private ListArrayAdapter mListAdapter = null;
-    private boolean showHome = false;
+    private boolean showBack = false;
     private MySlideViewListener mSlideViewListener = new MySlideViewListener();
     private MyScrollListener mOnScrollListener = new MyScrollListener();
 
@@ -59,10 +60,10 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         return new HomePageListFragment(fg,params);
     }
 
-    public static Bundle newBundle(SubjectData data,boolean showHome){
+    public static Bundle newBundle(SubjectData data,boolean showBack){
         Bundle b = new Bundle();
         b.putParcelable("subject_data", data);
-        b.putBoolean("show_home", showHome);
+        b.putBoolean("show_home", showBack);
         return b;
     }
 
@@ -70,7 +71,17 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         super(mFragment, params);
         if (null != params) {
             this.mData = params.getParcelable("subject_data");
-            this.showHome = params.getBoolean("show_home");
+            this.showBack = params.getBoolean("show_home");
+            if (null == mData){
+                mData = new SubjectData();
+                mData.setS_key(params.getString("key"));
+                mData.setS_name(params.getString("name"));
+                mData.setStep(params.getInt("step"));
+                mData.setS_datatype(params.getString("datatype"));
+                mData.setData(new ArrayList<HomePageApkData>());
+                mData.setSpecialtopic_data(null);
+                showBack = true;
+            }
         }
 
     }
@@ -93,15 +104,6 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         LogUtils.i(TAG, "ListFragment.onCreateView() ");
         Context context = mActivity;
         LayoutInflater mInflater = LayoutInflater.from(context);
-        try {
-            context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            if (null != context) {
-                mInflater = LayoutInflater.from(context);
-                mInflater = mInflater.cloneInContext(context);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         View rootView = mInflater.inflate(R.layout.fragment_homepage_list, container, false);
 
         // Set the adapter
@@ -142,7 +144,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     private void initActionBar(){
         try {
-            if (showHome) {
+            if (showBack) {
                 ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);

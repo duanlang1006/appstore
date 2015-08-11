@@ -75,13 +75,6 @@
             </intent-filter>
         </receiver>
 
-        <!--==================apkplug=======================================-->
-        <activity
-            android:name="org.apkplug.app.apkplugActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:theme="@style/AppTheme" />
-        <!--==================apkplug=======================================-->
-
         <service android:name="com.mit.market.MyIntentService"
             android:exported="false" >
         </service>
@@ -90,15 +83,9 @@
             android:exported="false" >
         </service>
 
-
-
         <meta-data android:name="MIT_APPKEY" android:value="B+JV6gaSBbNdn1evBeJTwwjbA7JSylCOUGZbOANhWGBZYQY1VGJROFY4Wjo=" />
         <meta-data android:name="UMENG_CHANNEL" android:value="${UMENG_CHANNEL_VALUE}" />
         <meta-data android:name="UMENG_APPKEY" android:value="53c77d9c56240b2447001087" />
-        <meta-data android:name="APPLITE_DATA" android:value="folder.data"/>
-        <meta-data  android:name="apkplug-appid" android:value="e595b25764689c08" ></meta-data>
-        <meta-data  android:name="apkplug-theme-auth" android:value="mDgCmjcTa25zYSl3g6kXXuGB4178EsIpVpssWV93dqkm66kR3rUd8EfrcS3HTrmbLAYT9613SyXUn4K9FXfn3AkLiitKxWLXynSRI/eU67uU+OZ2QoqH/sqFgntPCEv+3xvGtRwO8OtDssr/0DlFy3Khgdl9ut6k3Ubh5lN8YWE=" ></meta-data>
-        <meta-data  android:name="apkplug-auth" android:value="r0NI/rx5tj+EyS9i/2fU+aTYnweKyXP5JPwcX2S5d55DpKHFLsathgRi3xBwE3UQg5NRKKBnNGukjaswYuV4TrX0F6/B4dAldTpusHhivPzC2nzBDK0WqBklPLWiTtu5mnXIBsOsbBd21mw2nVcANtRnobRXQAozX0wBEo9UNoU=" ></meta-data>
     </application>
 
 </manifest>

@@ -1,16 +1,15 @@
 package com.mit.applite.main;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -29,18 +28,17 @@ import com.applite.common.LogUtils;
 import com.applite.view.ProgressButton;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
-import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
-import com.lidroid.xutils.bitmap.callback.BitmapLoadFrom;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
+import com.mit.applite.utils.DetailUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
@@ -61,7 +59,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private RatingBar mXingView;
     private ImageView mApkImgView;
     private String mViewPagerUrlList[] = null;
-    private LayoutInflater mInflater;
     private ViewGroup container;
     private LinearLayout mImgLl;
     private String mPackageName;
@@ -69,7 +66,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private String mImgUrl;
     private ProgressButton mProgressButton;
     private int mVersionCode;
-    private Context mContext;
     private LinearLayout no_network;
     private Button refreshButton;
     private ImplAgent implAgent;
@@ -134,22 +130,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mInflater = inflater;
-        try {
-            Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            mInflater = LayoutInflater.from(context);
-            mInflater = mInflater.cloneInContext(context);
-            mContext = context;
-        } catch (Exception e) {
-            e.printStackTrace();
-            mContext = mActivity;
-        }
-        if (null == mInflater) {
-            mInflater = inflater;
-        }
         this.container = container;
 
-        rootView = mInflater.inflate(R.layout.fragment_detail, container, false);
+        rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         initView();
         if (!TextUtils.isEmpty(mPackageName))
             post(mPackageName);
@@ -194,7 +177,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         mLoadLayout = (LinearLayout) rootView.findViewById(R.id.detail_loading_layout);
         mLoadView = (ImageView) rootView.findViewById(R.id.detail_loading_img);
         //旋转动画
-        LoadingAnimation = AnimationUtils.loadAnimation(mContext, R.anim.loading);
+        LoadingAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.loading);
         LinearInterpolator lin = new LinearInterpolator();
         LoadingAnimation.setInterpolator(lin);
         mLoadView.startAnimation(LoadingAnimation);
@@ -220,15 +203,15 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
         mName1View.setText(mApkName);
 
-        mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
-        mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadingImage(mActivity.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadFailedImage(mActivity.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
         mBitmapUtil.display(mApkImgView, mImgUrl);
 
         mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
             public void onClickListener() {
                 if (!TextUtils.isEmpty(mPackageName)) {
-                    mProgressButton.setBackgroundColor(mContext.getResources().getColor(R.color.progress_background));
+                    mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
                     ImplInfo implinfo = (ImplInfo) mProgressButton.getTag();
                     if (null != implinfo) {
                         if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implinfo)) {
@@ -250,7 +233,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                             }
                         } else {
                             try {
-                                mContext.startActivity(implAgent.getActionIntent(implinfo));
+                                mActivity.startActivity(implAgent.getActionIntent(implinfo));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -265,20 +248,35 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_main_detail,menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        if (null != item){
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (R.id.action_search == item.getItemId()){
+            DetailUtils.launchSearchFragment((OSGIServiceHost)mActivity);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.refresh_btn:
-                no_network.setVisibility(View.GONE);
-                post(mPackageName);
-                break;
-            case R.id.detail_open_introduce_content_layout:
-                mOpenIntroduceLayout.setVisibility(View.GONE);
-                mApkContentView.setText(mDescription);
-                break;
-            case R.id.detail_open_update_log_layout:
-                mOpenUpdateLogLayout.setVisibility(View.GONE);
-                mUpdateLogView.setText(mUpdateLog);
-                break;
+        if (v.getId() == R.id.refresh_btn) {
+            no_network.setVisibility(View.GONE);
+            post(mPackageName);
+        }else if (v.getId() == R.id.detail_open_introduce_content_layout) {
+            mOpenIntroduceLayout.setVisibility(View.GONE);
+            mApkContentView.setText(mDescription);
+        }else if (v.getId() == R.id.detail_open_update_log_layout) {
+            mOpenUpdateLogLayout.setVisibility(View.GONE);
+            mUpdateLogView.setText(mUpdateLog);
         }
     }
 
@@ -372,9 +370,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 mProgressButton.setText(implAgent.getActionText(implinfo));
                 mProgressButton.setProgress(implAgent.getProgress(implinfo));
                 if (mProgressButton.getProgress() == 0) {
-                    mProgressButton.setBackgroundColor(mContext.getResources().getColor(R.color.progress_foreground));
+                    mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_foreground));
                 } else {
-                    mProgressButton.setBackgroundColor(mContext.getResources().getColor(R.color.progress_background));
+                    mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
                 }
                 mProgressButton.setTag(implinfo);
             }
@@ -418,7 +416,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         // 下面添加参数，显示读出时内容和读取失败时的内容
         for (int i = 0; i < mViewPagerUrlList.length; i++) {
             LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
-            final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
+            final View child = mActivity.getLayoutInflater().inflate(R.layout.item_detail_viewpager_img, container, false);
             final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
             mImgLl.addView(child);
             mFinalBitmap.display(img, mViewPagerUrlList[i]);
