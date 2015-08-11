@@ -31,19 +31,18 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <ImageView android:id="@+id/download_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/app_icon_size"
+            android:layout_height="@dimen/app_icon_size"
             android:scaleType="fitCenter"
-            android:maxWidth="@dimen/download_item_icon_size"
-            android:maxHeight="@dimen/download_item_icon_size"
             android:layout_gravity="center_vertical"
+            android:maxWidth="@dimen/app_icon_size"
+            android:maxHeight="@dimen/app_icon_size"
             android:padding="1dp"/>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/interval_distance"
             android:layout_gravity="center_vertical"
-            android:minHeight="@dimen/download_item_icon_size"
             android:padding="2dp"
             android:gravity="center"
             android:layout_weight="1">
@@ -90,7 +89,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/interval_distance"
+            android:layout_marginRight="@dimen/interval_distance"
             android:focusable="false"
+            android:layout_gravity="center_vertical"
             style="@style/DownloadOptButton"/>
     </LinearLayout>
     <!--<RelativeLayout-->

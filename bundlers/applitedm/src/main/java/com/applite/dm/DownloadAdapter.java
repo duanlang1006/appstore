@@ -82,6 +82,7 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
 
         viewHolder.position = cursor.getPosition();
         viewHolder.actionBtn.setOnClickListener(this);
+        viewHolder.progressBar.setOnClickListener(this);
 //        viewHolder.deleteButton.setOnClickListener(this);
 //        viewHolder.detailButton.setOnClickListener(this);
 
@@ -100,7 +101,7 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
     @Override
     public void onClick(View v) {
         ViewHolder vh = (ViewHolder)v.getTag();
-        if (R.id.button_op == v.getId()) {
+        if (R.id.button_op == v.getId() || android.R.id.progress == v.getId()) {
             if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
                 switch (vh.implInfo.getStatus()) {
                     case Constant.STATUS_PENDING:
@@ -174,11 +175,9 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
             titleView = (TextView) view.findViewById(R.id.download_title);
             statusView = (TextView) view.findViewById(R.id.domain);
             iconView = (ImageView) view.findViewById(R.id.download_icon);
-//            extra = view.findViewById(R.id.extra_line);
             view.setTag(this);
             actionBtn.setTag(this);
-//            deleteButton.setTag(this);
-//            detailButton.setTag(this);
+            progressBar.setTag(this);
             implCallback = new DownloadImplCallback(this);
         }
 
@@ -216,10 +215,11 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
             if(null != implInfo.getIconUrl()){
                 mBitmapHelper.configDefaultLoadFailedImage(drawable);
                 mBitmapHelper.configDefaultLoadingImage(drawable);
-                mBitmapHelper.display(iconView, implInfo.getIconUrl(),new BitmapLoadCallBack<ImageView>() {
+                mBitmapHelper.configDefaultBitmapMaxSize(iconView.getWidth(),iconView.getHeight());
+                mBitmapHelper.display(iconView, implInfo.getIconUrl()/*,new BitmapLoadCallBack<ImageView>() {
                     @Override
                     public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
-                        this.setBitmap(imageView,IconCache.getInstance(mContext).getIcon(implInfo.getPackageName(),bitmap));
+                        this.setBitmap(imageView,bitmap);
                         Animation animation = bitmapDisplayConfig.getAnimation();
                         if (animation != null) {
                             animationDisplay(imageView, animation);
@@ -240,7 +240,7 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
                             container.startAnimation(animation);
                         }
                     }
-                });
+                }*/);
             }
         }
 

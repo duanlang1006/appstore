@@ -31,15 +31,10 @@ import java.util.List;
 import java.util.Observer;
 
 public class DownloadListFragment extends OSGIBaseFragment implements ListView.OnItemClickListener{
-    private Activity mActivity;
     private ListView mListview;
     private DownloadAdapter mAdapter;
     private Integer mStatusFlags = null;
     private DbUtils db;
-
-    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
-        return new DownloadListFragment(fg,params);
-    }
 
     public static Bundle newBundle(int flag){
         Bundle b = new Bundle();
@@ -47,11 +42,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         return b;
     }
 
-    private DownloadListFragment(Fragment mFragment, Bundle params) {
-        super(mFragment, params);
-        if (null != params) {
-            mStatusFlags = params.getInt("statusFilter");
-        }
+    public DownloadListFragment() {
+        super();
     }
 
     @Override
@@ -76,8 +68,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = activity;
         db = ImplDbHelper.getDbUtils(mActivity.getApplicationContext());
+        Bundle params = getArguments();
+        if (null != params) {
+            mStatusFlags = params.getInt("statusFilter");
+        }
         ImplLog.d(DownloadPagerFragment.TAG, "onAttach," + this);
     }
 

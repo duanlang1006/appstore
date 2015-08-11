@@ -51,7 +51,6 @@ import org.json.JSONObject;
 public class DetailFragment extends OSGIBaseFragment implements View.OnClickListener {
 
     private static final String TAG = "DetailFragment";
-    private Activity mActivity;
     private View rootView;
     private String mApkName;
     private TextView mName1View;
@@ -84,10 +83,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private String mDescription;
     private String mUpdateLog;
 
-    public static OSGIBaseFragment newInstance(Fragment fg, Bundle params) {
-        return new DetailFragment(fg, params);
-    }
-
 //    public static OSGIBaseFragment newInstance(OSGIServiceHost host,String packageName,String name,String imgUrl){
 //        Fragment fg = null;
 //        if (null != host){
@@ -102,21 +97,21 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 //        return fg;
 //    }
 
-    private DetailFragment(Fragment mFragment, Bundle params) {
-        super(mFragment, params);
-        if (null != params) {
-            mPackageName = params.getString("packageName");
-            mApkName = params.getString("name");
-            mImgUrl = params.getString("imgUrl");
-        }
+    public DetailFragment() {
+        super();
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = activity;
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
         implCallback = new DetailImplCallback();
+        Bundle params = getArguments();
+        if (null != params) {
+            mPackageName = params.getString("packageName");
+            mApkName = params.getString("name");
+            mImgUrl = params.getString("imgUrl");
+        }
         LogUtils.i(TAG, "mApkName:" + mApkName + "------mPackageName:" + mPackageName + "------mImgUrl:" + mImgUrl);
         initActionBar();
     }
@@ -159,7 +154,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     private void initActionBar() {
         try {
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setDisplayShowCustomEnabled(false);
             actionBar.setTitle(mApkName);

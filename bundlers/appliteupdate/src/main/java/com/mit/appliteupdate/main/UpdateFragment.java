@@ -51,7 +51,6 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
     private static final String TAG = "UpdateFragment";
     private View rootView;
-    private Activity mActivity;
     private TextView mAllUpdateView;
     private ListView mListView;
     private List<DataBean> mDataContents = new ArrayList<DataBean>();
@@ -72,19 +71,13 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private ImageView mLoadView;
     private Animation LoadingAnimation;
 
-    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
-        return new UpdateFragment(fg,params);
-    }
-
-
-    private UpdateFragment(Fragment fg, Bundle params) {
-        super(fg, params);
+    public UpdateFragment() {
+        super();
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = activity;
         initActionBar();
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
@@ -144,7 +137,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
     private void initActionBar() {
         try {
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setDisplayShowCustomEnabled(false);
             actionBar.setTitle("应用升级");

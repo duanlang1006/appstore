@@ -1,15 +1,15 @@
 <resources>
     <style name="ItemTitleText" parent="android:TextAppearance.Medium">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/download_text_size</item>
         <item name="android:textColor">@color/download_item_title</item>
         <item name="android:textStyle">normal</item>
     </style>
     <style name="ItemStatusText" parent="android:TextAppearance.Small">
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">@dimen/download_status_text_size</item>
         <item name="android:textColor">@color/download_item_status</item>
     </style>
     <style name="ItemSizeText" parent="android:TextAppearance.Small">
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">@dimen/download_info_text_size</item>
         <item name="android:textColor">@color/download_item_size</item>
     </style>
 
@@ -21,13 +21,12 @@
     </style>
 
     <style name="DownloadOptButton" parent="@android:style/Widget.Button">
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">@dimen/button_text_size</item>
         <item name="android:textColor">@drawable/item_button_text_color</item>
-        <item name="android:background">@drawable/item_button_bg</item>
+        <item name="android:background">@drawable/btn_bg_rect_light</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center</item>
-        <item name="android:maxHeight">0dp</item>
-        <item name="android:maxWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
     </style>
     <!--<item name="android:minHeight">32dp</item>-->
     <!--<item name="android:minWidth">48dp</item>-->
