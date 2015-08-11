@@ -27,7 +27,7 @@
             android:layout_above="@+id/no_network_text"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="20dp"
-            android:background="#ffffffff"
+            android:background="@color/background"
             android:src="@drawable/no_network" />
 
         <TextView
@@ -48,7 +48,7 @@
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
-            android:background="@color/gray"
+            android:background="@drawable/item_button_normal"
             android:text="刷新"
             android:textColor="#ff000000"
             android:textSize="14sp"></Button>
@@ -134,9 +134,12 @@
 
                             <RatingBar
                                 android:id="@+id/detail_xing"
-                                style="?android:attr/ratingBarStyleSmall"
+                                style="@style/apkListRating"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:focusable="false"
+                                android:focusableInTouchMode="false"
+                                android:isIndicator="true"
                                 android:numStars="5" />
 
                             <TextView
