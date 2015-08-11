@@ -33,6 +33,6 @@
     <dimen name="categoryList_name_width">150dp</dimen>
     <dimen name="categoryList_listArrow_width">35dp</dimen>
     <dimen name="categoryList_listArrow_height">35dp</dimen>
-    <dimen name="listPaddingRight">6dp</dimen>
+    <dimen name="listPaddingRight">4dp</dimen>
     <dimen name="listPaddingLeft">4dp</dimen>
 </resources>
