@@ -34,12 +34,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:maxWidth="@dimen/apkList_iconMinWidth"
                     android:text="ApkName"
                     android:id="@+id/apkName"
+                    android:maxEms="10"
+                    android:singleLine="true"
                     style="@style/apkListName"/>
                 <View
-                    android:layout_width="12dp"
+                    android:layout_width="6dp"
                     android:layout_height="wrap_content"/>
                 <ImageView
                     android:id="@+id/extentIcon"
