@@ -41,7 +41,7 @@ public class HomepageUtils {
     public static void launchUpgradeFragment(OSGIServiceHost host) {
         if (null != host){
             host.jumpto(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,
-                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"add",true));
+                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
         }
     }
 
@@ -51,7 +51,7 @@ public class HomepageUtils {
     public static void launchDownloadManagerFragment(OSGIServiceHost host) {
         if (null != host){
             host.jumpto(Constant.OSGI_SERVICE_DM_FRAGMENT,null,
-                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"add",true));
+                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
         }
     }
 

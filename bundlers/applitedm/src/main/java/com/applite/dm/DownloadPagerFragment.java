@@ -35,22 +35,16 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     final static String TAG = "applite_dm";
     private ViewPager mViewPager;
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
-    private Activity mActivity;
     private boolean destoryView = false;
     private LayoutInflater mInflater;
 
-    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
-        return new DownloadPagerFragment(fg,params);
-    }
-
-    private DownloadPagerFragment(Fragment mFragment, Bundle params) {
-        super(mFragment, params);
+    public DownloadPagerFragment() {
+        super();
     }
 
     public void onAttach(Activity activity) {
         ImplLog.d(TAG, "onAttach," + this);
         super.onAttach(activity);
-        mActivity = activity;
     }
 
     @Override
@@ -116,13 +110,21 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     }
 
     @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden){
+            initActionBar(mPagerSlidingTabStrip);
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         FragmentManager fgm = getFragmentManager();
         if(v.getId() == R.id.action_back) {
             if (null != fgm.getFragments() && fgm.getFragments().size() > 0) {
                 fgm.popBackStack();
             } else {
-                getActivity().finish();
+                mActivity.finish();
             }
         }else if (v.getId() == R.id.action_more){
 
@@ -132,7 +134,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     private void initActionBar(View tabStrip){
         try {
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
 //            actionBar.setBackgroundDrawable(res.getDrawable(R.drawable.action_bar_bg_light));
             actionBar.setDisplayUseLogoEnabled(false);
             actionBar.setHomeButtonEnabled(true);
@@ -191,7 +193,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
         @Override
         public CharSequence getPageTitle(int position) {
-            Resources res = getActivity().getResources();
+            Resources res = mActivity.getResources();
             try {
                 res = mActivity.getResources();
             }catch (Exception e){

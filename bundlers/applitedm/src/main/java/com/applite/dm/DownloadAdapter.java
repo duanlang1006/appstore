@@ -46,6 +46,8 @@ import com.lidroid.xutils.bitmap.callback.BitmapLoadFrom;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
+import com.mit.impl.ImplLog;
+
 import java.lang.reflect.Method;
 
 public class DownloadAdapter extends CursorAdapter implements View.OnClickListener{
@@ -82,6 +84,7 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
 
         viewHolder.position = cursor.getPosition();
         viewHolder.actionBtn.setOnClickListener(this);
+        viewHolder.progressBar.setOnClickListener(this);
 //        viewHolder.deleteButton.setOnClickListener(this);
 //        viewHolder.detailButton.setOnClickListener(this);
 
@@ -104,13 +107,13 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
             if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
                 switch (vh.implInfo.getStatus()) {
                     case Constant.STATUS_PENDING:
+                        break;
                     case Constant.STATUS_RUNNING:
                         implAgent.pauseDownload(vh.implInfo);
                         break;
                     case Constant.STATUS_PAUSED:
-                        implAgent.resumeDownload(vh.implInfo, new DownloadImplCallback(vh));
-                        break;
                     default:
+                        implAgent.resumeDownload(vh.implInfo, vh.implCallback);
                         break;
                 }
             } else {
@@ -174,11 +177,9 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
             titleView = (TextView) view.findViewById(R.id.download_title);
             statusView = (TextView) view.findViewById(R.id.domain);
             iconView = (ImageView) view.findViewById(R.id.download_icon);
-//            extra = view.findViewById(R.id.extra_line);
             view.setTag(this);
             actionBtn.setTag(this);
-//            deleteButton.setTag(this);
-//            detailButton.setTag(this);
+            progressBar.setTag(this);
             implCallback = new DownloadImplCallback(this);
         }
 
@@ -216,10 +217,11 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
             if(null != implInfo.getIconUrl()){
                 mBitmapHelper.configDefaultLoadFailedImage(drawable);
                 mBitmapHelper.configDefaultLoadingImage(drawable);
-                mBitmapHelper.display(iconView, implInfo.getIconUrl(),new BitmapLoadCallBack<ImageView>() {
+                mBitmapHelper.configDefaultBitmapMaxSize(iconView.getWidth(),iconView.getHeight());
+                mBitmapHelper.display(iconView, implInfo.getIconUrl()/*,new BitmapLoadCallBack<ImageView>() {
                     @Override
                     public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
-                        this.setBitmap(imageView,IconCache.getInstance(mContext).getIcon(implInfo.getPackageName(),bitmap));
+                        this.setBitmap(imageView,bitmap);
                         Animation animation = bitmapDisplayConfig.getAnimation();
                         if (animation != null) {
                             animationDisplay(imageView, animation);
@@ -240,7 +242,7 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
                             container.startAnimation(animation);
                         }
                     }
-                });
+                }*/);
             }
         }
 
@@ -262,9 +264,10 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
 
         @Override
         public void onChange(ImplInfo info) {
+            ImplLog.d(this.getClass().getSimpleName(),"onChange,"+info.getTitle()+","+info.getStatus());
             ViewHolder vh = (ViewHolder)tag;
             vh.refresh();
-            if ((info.getStatus()&mStatusFlag) == 0){
+            if ((info.getStatus()& mStatusFlag) == 0){
                 notifyDataSetChanged();
             }
         }

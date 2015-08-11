@@ -44,7 +44,6 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     private FinalHttp mFinalHttp = new FinalHttp();
     private Gson gson = new Gson();
 
-    private Activity mActivity;
     private SubjectData mData;
     private ListView mListView;
     private View mMoreView;
@@ -60,10 +59,6 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     private boolean isend;
     private boolean sendhttpreq = true;
 
-    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
-        return new HomePageListFragment(fg,params);
-    }
-
     public static Bundle newBundle(SubjectData data,boolean showBack){
         Bundle b = new Bundle();
         b.putParcelable("subject_data", data);
@@ -71,8 +66,21 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         return b;
     }
 
-    private HomePageListFragment(Fragment mFragment, Bundle params) {
-        super(mFragment, params);
+    public HomePageListFragment() {
+        super();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        LogUtils.i(TAG, "ListFragment.onCreate() ");
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        LogUtils.i(TAG, "onAttach ");
+        super.onAttach(activity);
+        Bundle params = getArguments();
         if (null != params) {
             this.mData = params.getParcelable("subject_data");
             this.showBack = params.getBoolean("show_home");
@@ -87,20 +95,6 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                 showBack = true;
             }
         }
-
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        LogUtils.i(TAG, "ListFragment.onCreate() ");
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        LogUtils.i(TAG, "onAttach ");
-        super.onAttach(activity);
-        mActivity = activity;
     }
 
     @Override
@@ -145,10 +139,18 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         }
     }
 
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden){
+            initActionBar();
+        }
+    }
+
     private void initActionBar(){
         try {
             if (showBack) {
-                ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+                ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
                 actionBar.setDisplayShowCustomEnabled(false);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setDisplayHomeAsUpEnabled(true);
