@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.applite.common.AppliteUtils;
@@ -66,7 +67,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private String mImgUrl;
     private ProgressButton mProgressButton;
     private int mVersionCode;
-    private LinearLayout no_network;
+    private RelativeLayout no_network;
     private Button refreshButton;
     private ImplAgent implAgent;
     private ImplChangeCallback implCallback;
@@ -194,7 +195,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         mApkContentView = (TextView) rootView.findViewById(R.id.detail_content);
         mXingView = (RatingBar) rootView.findViewById(R.id.detail_xing);
         mImgLl = (LinearLayout) rootView.findViewById(R.id.detail_viewpager_img_ll);
-        no_network = (LinearLayout) rootView.findViewById(R.id.no_network);
+        no_network = (RelativeLayout) rootView.findViewById(R.id.no_network);
         refreshButton = (Button) rootView.findViewById(R.id.refresh_btn);
 
         mOpenIntroduceLayout = (LinearLayout) rootView.findViewById(R.id.detail_open_introduce_content_layout);

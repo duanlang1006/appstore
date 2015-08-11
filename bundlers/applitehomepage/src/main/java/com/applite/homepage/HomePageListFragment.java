@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
+
 import com.applite.bean.HomePageApkData;
 import com.applite.bean.HomePageDataBean;
 import com.applite.bean.SpecialTopicData;
@@ -44,9 +46,11 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     private Activity mActivity;
     private SubjectData mData;
-
     private ListView mListView;
     private View mMoreView;
+    private TextView mMoreTextView;
+    private TextView mEndTextView;
+    private View mEndView;
     private SlideShowView mTopicView;
     private ListArrayAdapter mListAdapter = null;
     private boolean showBack = false;
@@ -103,8 +107,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         LogUtils.i(TAG, "ListFragment.onCreateView() ");
         Context context = mActivity;
-        LayoutInflater mInflater = LayoutInflater.from(context);
-        View rootView = mInflater.inflate(R.layout.fragment_homepage_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_homepage_list, container, false);
 
         // Set the adapter
         mListView = (ListView) rootView.findViewById(android.R.id.list);
@@ -114,7 +117,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         }
 
         setTopicView(context);
-        setMoreView(mInflater);
+        setMoreView(inflater);
 
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(mOnScrollListener);
@@ -176,7 +179,31 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
             mListView.removeFooterView(mMoreView);
         }
         mMoreView = inflater.inflate(R.layout.more, null);
+        mMoreTextView = (TextView) mMoreView.findViewById(R.id.loadmore_text);
+        mEndTextView = (TextView) mMoreView.findViewById(R.id.loadend_text);
+        mEndTextView.setVisibility(View.GONE);
         mListView.addFooterView(mMoreView);
+    }
+
+    private void removeMoreView(){
+        if (null != mMoreView){
+            mListView.removeFooterView(mMoreView);
+        }
+    }
+
+    private void setEndView(LayoutInflater inflater){
+        if (null != mEndView){
+            mListView.removeFooterView(mEndView);
+        }
+        mEndView = inflater.inflate(R.layout.notify_end, null);
+        mListView.addFooterView(mEndView);
+        mListView.invalidate();
+    }
+
+    private void removeEndView(){
+        if (null != mEndView){
+            mListView.removeFooterView(mEndView);
+        }
     }
 
     private void httpRequest() {
@@ -216,15 +243,25 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                         }
                     }
                 }
-                if (pageData.getSubjectData().get(0).getData().isEmpty()) {
-                    isend = true;
-                } else {
-                    isend = false;
-                }
                 sendhttpreq = true;
 
                 mListAdapter.notifyDataSetChanged();
                 mMoreView.setVisibility(View.GONE);
+                //mMoreTextView.setVisibility(View.GONE);
+
+                if (pageData.getSubjectData().get(0).getData().isEmpty()) {
+                    isend = true;
+                    mMoreView.setVisibility(View.GONE);
+                    //mMoreTextView.setVisibility(View.GONE);
+                    //removeMoreView();
+                    //setEndView(mInflater);
+                } else {
+                    isend = false;
+                    removeEndView();
+                }
+                sendhttpreq = true;
+
+                mListAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -233,6 +270,8 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                 LogUtils.e(TAG, "HomePage网络请求失败:" + strMsg);
                 sendhttpreq = true;
                 mMoreView.setVisibility(View.GONE);
+                //mMoreTextView.setVisibility(View.GONE);
+
             }
         });
     }
@@ -256,6 +295,12 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                 LogUtils.i(TAG, "拉到最底部");
                 if(!isend){
                     mMoreView.setVisibility(view.VISIBLE);
+                    mEndTextView.setVisibility(View.GONE);
+                    //mMoreTextView.setVisibility(View.VISIBLE);
+                }else{
+                    mMoreView.setVisibility(view.VISIBLE);
+                    mMoreTextView.setVisibility(View.GONE);
+                    mEndTextView.setVisibility(View.VISIBLE);
                 }
                 if(sendhttpreq){
                     httpRequest();

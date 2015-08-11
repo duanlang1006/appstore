@@ -6,9 +6,8 @@
     </style>
 
     <style name="MoreText" parent="android:TextAppearance.Medium">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/loading_text_color</item>
-        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="categoryListName" parent="android:TextAppearance.Medium">
@@ -40,24 +39,23 @@
         <item name="android:visibility">visible</item>
         <item name="android:textSize">@dimen/apkList_nameText_size</item>
         <item name="android:textColor">@color/apkList_apkName_color</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:ellipsize">end</item>
         <item name="android:singleLine">true</item>
         <item name="android:focusable">false</item>
         <item name="android:focusableInTouchMode">false</item>
     </style>
 
-    <style name="apkListRating">
-        <item name="android:numStars">5</item>
-        <item name="android:focusable">false</item>
-        <item name="android:focusableInTouchMode">false</item>
+    <style name="apkListRating" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/rating_bar_full</item>
+        <item name="android:minHeight">20dp</item>
+        <item name="android:maxHeight">35dp</item>
     </style>
 
     <style name="apkListButton">
         <item name="android:layout_marginRight">@dimen/apkList_bottom_marginRight</item>
         <item name="android:layout_marginLeft">@dimen/apkList_bottom_marginLeft</item>
         <item name="android:textColor">@drawable/item_button_text_color</item>
-        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center</item>
         <item name="android:minWidth">40dp</item>
         <item name="android:paddingLeft">5dp</item>
         <item name="android:paddingRight">5dp</item>

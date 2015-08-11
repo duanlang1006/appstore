@@ -2,11 +2,8 @@ package com.applite.homepage;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.internal.view.SupportMenu;
-import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
@@ -15,15 +12,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-
 import com.applite.common.Constant;
-import com.applite.common.LogUtils;
 import com.applite.utils.HomepageUtils;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
-
-import java.lang.reflect.Field;
 
 
 public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener{
@@ -106,8 +98,8 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setTitle(getActivity().getResources().getString(R.string.personal));
             actionBar.setDisplayShowCustomEnabled(false);
-//            ViewGroup customView = (ViewGroup)mInflater.inflate(R.layout.actionbar_personal,null);
-//            actionBar.setCustomView(customView);
+            ViewGroup customView = (ViewGroup)LayoutInflater.from(getActivity()).inflate(R.layout.actionbar_personal,null);
+            actionBar.setCustomView(customView);
             actionBar.show();
         }catch (Exception e){
             e.printStackTrace();
