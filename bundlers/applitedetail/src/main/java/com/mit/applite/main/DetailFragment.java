@@ -1,7 +1,13 @@
 package com.mit.applite.main;
 
 import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -29,6 +35,9 @@ import com.applite.common.LogUtils;
 import com.applite.view.ProgressButton;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
+import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
+import com.lidroid.xutils.bitmap.callback.BitmapLoadFrom;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
@@ -43,6 +52,7 @@ import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
+import net.tsz.afinal.bitmap.display.Displayer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,11 +88,18 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private ImageView mLoadView;
     private Animation LoadingAnimation;
     private FinalBitmap mFinalBitmap;
-    private LinearLayout mOpenIntroduceLayout;
-    private LinearLayout mOpenUpdateLogLayout;
     private TextView mUpdateLogView;
     private String mDescription;
     private String mUpdateLog;
+    private ImageView mOpenIntroduceView;
+    private ImageView mOpenUpdateLogView;
+    private int DEFAULT_MAX_LINE_COUNT = 3;//应用介绍、更新日志默认最多显示3行
+    private int COLLAPSIBLE_STATE_NONE = 0;//少于3行状态
+    private int COLLAPSIBLE_STATE_SHRINKUP = 1;//收缩状态
+    private int COLLAPSIBLE_STATE_SPREAD = 2;//展开状态
+    private int CONTENT_STATE = COLLAPSIBLE_STATE_NONE;
+    private int UPDATE_LOG_STATE = COLLAPSIBLE_STATE_NONE;
+    private Handler mHandler = new Handler();
 
     public static OSGIBaseFragment newInstance(Fragment fg, Bundle params) {
         return new DetailFragment(fg, params);
@@ -156,6 +173,16 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         super.onDetach();
     }
 
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (hidden) {
+            LogUtils.i(TAG, "隐藏详情页面");
+        } else {
+            LogUtils.i(TAG, "显示详情页面");
+            initActionBar();
+        }
+    }
 
     private void initActionBar() {
         try {
@@ -198,8 +225,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         no_network = (RelativeLayout) rootView.findViewById(R.id.no_network);
         refreshButton = (Button) rootView.findViewById(R.id.refresh_btn);
 
-        mOpenIntroduceLayout = (LinearLayout) rootView.findViewById(R.id.detail_open_introduce_content_layout);
-        mOpenUpdateLogLayout = (LinearLayout) rootView.findViewById(R.id.detail_open_update_log_layout);
+        mOpenIntroduceView = (ImageView) rootView.findViewById(R.id.detail_open_introduce_content);
+        mOpenUpdateLogView = (ImageView) rootView.findViewById(R.id.detail_open_update_log);
         mUpdateLogView = (TextView) rootView.findViewById(R.id.detail_update_log);
 
         mName1View.setText(mApkName);
@@ -243,25 +270,25 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 }
             }
         });
-        mOpenIntroduceLayout.setOnClickListener(this);
-        mOpenUpdateLogLayout.setOnClickListener(this);
+        mApkContentView.setOnClickListener(this);
+        mUpdateLogView.setOnClickListener(this);
         refreshButton.setOnClickListener(this);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main_detail,menu);
+        inflater.inflate(R.menu.menu_main_detail, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        if (null != item){
+        if (null != item) {
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (R.id.action_search == item.getItemId()){
-            DetailUtils.launchSearchFragment((OSGIServiceHost)mActivity);
+        if (R.id.action_search == item.getItemId()) {
+            DetailUtils.launchSearchFragment((OSGIServiceHost) mActivity);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -272,12 +299,30 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         if (v.getId() == R.id.refresh_btn) {
             no_network.setVisibility(View.GONE);
             post(mPackageName);
-        }else if (v.getId() == R.id.detail_open_introduce_content_layout) {
-            mOpenIntroduceLayout.setVisibility(View.GONE);
-            mApkContentView.setText(mDescription);
-        }else if (v.getId() == R.id.detail_open_update_log_layout) {
-            mOpenUpdateLogLayout.setVisibility(View.GONE);
-            mUpdateLogView.setText(mUpdateLog);
+        } else if (v.getId() == R.id.detail_content) {
+            if (CONTENT_STATE == COLLAPSIBLE_STATE_SHRINKUP) {
+                LogUtils.i(TAG, "应用介绍展开");
+                mApkContentView.setMaxLines(50);
+                CONTENT_STATE = COLLAPSIBLE_STATE_SPREAD;
+                mOpenIntroduceView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_less));
+            } else if (CONTENT_STATE == COLLAPSIBLE_STATE_SPREAD) {
+                LogUtils.i(TAG, "应用介绍收缩");
+                mApkContentView.setMaxLines(DEFAULT_MAX_LINE_COUNT);
+                CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
+                mOpenIntroduceView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_more));
+            }
+        } else if (v.getId() == R.id.detail_update_log) {
+            if (UPDATE_LOG_STATE == COLLAPSIBLE_STATE_SHRINKUP) {
+                LogUtils.i(TAG, "更新日志展开");
+                mUpdateLogView.setMaxLines(Integer.MAX_VALUE);
+                UPDATE_LOG_STATE = COLLAPSIBLE_STATE_SPREAD;
+                mOpenUpdateLogView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_less));
+            } else if (UPDATE_LOG_STATE == COLLAPSIBLE_STATE_SPREAD) {
+                LogUtils.i(TAG, "更新日志收缩");
+                mUpdateLogView.setMaxLines(DEFAULT_MAX_LINE_COUNT);
+                UPDATE_LOG_STATE = COLLAPSIBLE_STATE_SHRINKUP;
+                mOpenUpdateLogView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_more));
+            }
         }
     }
 
@@ -347,19 +392,36 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size) + " | " + developer);
 
                     LogUtils.i(TAG, "应用介绍：" + mDescription);
-                    if (mDescription.length() > 150) {
-                        mApkContentView.setText(mDescription.substring(0, 150) + "...");
-                    } else {
-                        mApkContentView.setText(mDescription);
-                        mOpenIntroduceLayout.setVisibility(View.GONE);
-                    }
+                    mApkContentView.setText(mDescription);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mApkContentView.getLineCount() <= DEFAULT_MAX_LINE_COUNT) {
+                                mOpenIntroduceView.setVisibility(View.GONE);
+                            } else {
+                                mApkContentView.setLines(DEFAULT_MAX_LINE_COUNT);
+                                CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
+                            }
+                        }
+                    }, 500);
+
                     LogUtils.i(TAG, "更新日志：" + mDescription);
-                    if (mUpdateLog.length() > 150) {
-                        mUpdateLogView.setText(mUpdateLog.substring(0, 150) + "...");
+                    if (TextUtils.isEmpty(mUpdateLog)) {
+                        mUpdateLogView.setText(mActivity.getResources().getText(R.string.no_update_log));
                     } else {
                         mUpdateLogView.setText(mUpdateLog);
-                        mOpenUpdateLogLayout.setVisibility(View.GONE);
                     }
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mUpdateLogView.getLineCount() <= DEFAULT_MAX_LINE_COUNT) {
+                                mOpenUpdateLogView.setVisibility(View.GONE);
+                            } else {
+                                mUpdateLogView.setLines(DEFAULT_MAX_LINE_COUNT);
+                                UPDATE_LOG_STATE = COLLAPSIBLE_STATE_SHRINKUP;
+                            }
+                        }
+                    }, 500);
                 }
                 mViewPagerUrlList = mViewPagerUrl.split(",");
                 setPreViewImg();
@@ -384,47 +446,65 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     }
 
-//    /**
-//     * 设置应用介绍的图片
-//     */
-//    private void setPreViewImg() {
-//        BitmapUtils bitmapUtils = new BitmapUtils(mActivity);
-//        for (int i = 0; i < mViewPagerUrlList.length; i++) {
-//            LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
-//            final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
-//            final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
-//            mImgLl.addView(child);
-//            bitmapUtils.display(img, mViewPagerUrlList[i], new BitmapLoadCallBack<ImageView>() {
-//                @Override
-//                public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
-//                    imageView.setBackground(new BitmapDrawable(bitmap));
-//                }
-//
-//                @Override
-//                public void onLoadFailed(ImageView imageView, String s, Drawable drawable) {
-//                    imageView.setBackground(mContext.getResources().getDrawable(R.drawable.detail_default_img));
-//                }
-//            });
-//        }
-//        mLoadLayout.setVisibility(View.GONE);
-//        mDataLayout.setVisibility(View.VISIBLE);
-//    }
-
     /**
      * 设置应用介绍的图片
      */
     private void setPreViewImg() {
-        // 下面添加参数，显示读出时内容和读取失败时的内容
+        BitmapUtils bitmapUtils = new BitmapUtils(mActivity);
         for (int i = 0; i < mViewPagerUrlList.length; i++) {
             LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
             final View child = mActivity.getLayoutInflater().inflate(R.layout.item_detail_viewpager_img, container, false);
             final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
             mImgLl.addView(child);
-            mFinalBitmap.display(img, mViewPagerUrlList[i]);
+            bitmapUtils.display(img, mViewPagerUrlList[i], new BitmapLoadCallBack<ImageView>() {
+                @Override
+                public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
+                    if (bitmap.getWidth() > bitmap.getHeight()) {
+                        imageView.setImageBitmap(DetailUtils.rotateBitmap(bitmap, 90));
+                    } else {
+                        imageView.setImageBitmap(DetailUtils.rotateBitmap(bitmap, 0));
+                    }
+                }
+
+                @Override
+                public void onLoadFailed(ImageView imageView, String s, Drawable drawable) {
+                    imageView.setBackground(mActivity.getResources().getDrawable(R.drawable.detail_default_img));
+                }
+            });
         }
         mLoadLayout.setVisibility(View.GONE);
         mDataLayout.setVisibility(View.VISIBLE);
     }
+
+//    /**
+//     * 设置应用介绍的图片
+//     */
+//    private void setPreViewImg() {
+//        mFinalBitmap.configDisplayer(new Displayer() {
+//            @Override
+//            public void loadCompletedisplay(View view, Bitmap bitmap, net.tsz.afinal.bitmap.core.BitmapDisplayConfig bitmapDisplayConfig) {
+//                if (bitmap.getWidth() > bitmap.getHeight()) {
+//                    ((ImageView)view).setImageBitmap(DetailUtils.rotateBitmap(bitmap, 90));
+//                } else {
+//                    ((ImageView)view).setImageBitmap(bitmap);
+//                }
+//            }
+//
+//            @Override
+//            public void loadFailDisplay(View view, Bitmap bitmap) {
+//
+//            }
+//        });
+//        for (int i = 0; i < mViewPagerUrlList.length; i++) {
+//            LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
+//            final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
+//            final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
+//            mImgLl.addView(child);
+//            mFinalBitmap.display(img, mViewPagerUrlList[i]);
+//        }
+//        mLoadLayout.setVisibility(View.GONE);
+//        mDataLayout.setVisibility(View.VISIBLE);
+//    }
 
     class DetailImplCallback implements ImplChangeCallback {
         @Override

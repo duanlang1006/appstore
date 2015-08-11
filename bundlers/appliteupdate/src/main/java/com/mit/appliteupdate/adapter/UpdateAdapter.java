@@ -20,6 +20,7 @@ import com.mit.appliteupdate.bean.DataBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
+
 import java.util.List;
 
 /**
@@ -38,8 +39,6 @@ public class UpdateAdapter extends BaseAdapter {
         mActivity = context;
         mPackageManager = mActivity.getPackageManager();
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
-        mBitmapUtil.configDefaultLoadingImage(mActivity.getDrawable(R.drawable.apk_icon_defailt_img));
-        mBitmapUtil.configDefaultLoadFailedImage(mActivity.getDrawable(R.drawable.apk_icon_defailt_img));
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
 
@@ -141,6 +140,7 @@ public class UpdateAdapter extends BaseAdapter {
                 this.implInfo.setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl()).setTitle(bean.getmName());
                 implAgent.setImplCallback(implCallback, implInfo);
             }
+            mBt.setTag(this);
             refresh();
         }
 

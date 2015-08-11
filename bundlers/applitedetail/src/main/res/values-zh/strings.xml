@@ -22,6 +22,7 @@
     <string name="srarch_content_no_null">搜索内容不能为空！</string>
     <string name="app_detail">功能介绍</string>
     <string name="update_log">更新日志</string>
+    <string name="no_update_log">无更新日志</string>
 
     <string name="download_start">安装</string>
     <string name="download_pending">等待下载</string>

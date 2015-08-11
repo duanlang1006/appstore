@@ -14,6 +14,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -57,7 +60,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SearchFragment extends OSGIBaseFragment implements View.OnClickListener, SearchApkAdapter.UpdateInatsllButtonText {
+public class SearchFragment extends OSGIBaseFragment implements View.OnClickListener, SearchApkAdapter.UpdateInatsllButtonText, HotWordAdapter.ClickHotWordItemPostlistener {
 
     private static final String TAG = "SearchFragment";
     private ImageButton mBackView;
@@ -84,7 +87,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 
     private ListView mPreloadListView;
     private List<SearchBean> mPreloadData = new ArrayList<SearchBean>();
-    private boolean isClickPreloadItem = false;
+    private boolean isShowPreload = true;//是否显示预加载
     private int mPostPreloadNumber = 0;
     private PreloadAdapter mPreloadAdapter;
     private int mSearchPostPage = 0;
@@ -97,6 +100,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 
     private Button refresh;
     private RelativeLayout no_network;
+
+    private int HINT_UPDATE_TIME = 3000;
+    private int HINT_SHOW_NUMBER = 0;
 
     private Runnable mNotifyRunnable = new Runnable() {
         @Override
@@ -148,6 +154,24 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private String mEtViewText;//页面隐藏时mEtView里面的字
     private HttpUtils mHttpUtils;
     private ViewGroup customView;
+    private LinearLayout mLoadingLayout;
+    private ImageView mLoadingImgView;
+    private Animation LoadingAnimation;
+    private String[] mHint;
+    private Handler mHandler = new Handler();
+    private Runnable mRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            mEtView.setHint(mHint[HINT_SHOW_NUMBER]);
+            mHandler.postDelayed(this, HINT_UPDATE_TIME);
+            if (HINT_SHOW_NUMBER < mHint.length - 1) {
+                HINT_SHOW_NUMBER = HINT_SHOW_NUMBER + 1;
+            } else {
+                HINT_SHOW_NUMBER = 0;
+            }
+        }
+    };
 
     public static OSGIBaseFragment newInstance(Fragment fg, Bundle params) {
         return new SearchFragment(fg, params);
@@ -187,10 +211,13 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (hidden) {
+            LogUtils.i(TAG, "隐藏搜索页面");
             mEtViewText = mEtView.getText().toString();
             closeKeybord();
         } else {
+            LogUtils.i(TAG, "显示搜索页面");
             if (mListView.getVisibility() == View.GONE) {
+                LogUtils.i(TAG, "设置输入框焦点");
                 mEtView.setFocusable(true);
                 mEtView.setFocusableInTouchMode(true);
                 mEtView.requestFocus();
@@ -230,8 +257,10 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             mBackView = (ImageButton) customView.findViewById(R.id.search_back);
             mBackView.setOnClickListener(this);
             mEtView = (EditText) customView.findViewById(R.id.search_et);
-            if (null != mEtViewText)
+            if (null != mEtViewText) {
+                isShowPreload = false;
                 mEtView.setText(mEtViewText);
+            }
             mSearchView = (ImageButton) customView.findViewById(R.id.search_search);
             mSearchView.setOnClickListener(this);
             mDeleteView = (ImageView) customView.findViewById(R.id.search_delete);
@@ -254,6 +283,16 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private void initView() {
         initActionBar();
 
+        //加载中
+        mLoadingLayout = (LinearLayout) rootView.findViewById(R.id.search_loading_layout);
+        mLoadingImgView = (ImageView) rootView.findViewById(R.id.search_loading_img);
+        //旋转动画
+        LoadingAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.loading);
+        LinearInterpolator lin = new LinearInterpolator();
+        LoadingAnimation.setInterpolator(lin);
+        mLoadingImgView.startAnimation(LoadingAnimation);
+
+        //上拉加载
         mMoreText = (TextView) moreView.findViewById(R.id.loadmore_text);
         mMoreProgressBar = (ProgressBar) moreView.findViewById(R.id.load_progressbar);
 
@@ -269,12 +308,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         mPreloadListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                isClickPreloadItem = true;
-                mEtView.setText(mPreloadData.get(position).getmName());
                 mPreloadListView.setVisibility(View.GONE);
-
-                mSearchPostPage = 0;
-                postSearch(mPreloadData.get(position).getmName());
+                mEtViewModifyPostSearch(mPreloadData.get(position).getmName(), false);
             }
         });
 
@@ -305,16 +340,19 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             ISPOSTSEARCH = true;
             if (TextUtils.isEmpty(mEtView.getText().toString())) {
                 isHotWordLayoutVisibility(View.VISIBLE);
+                no_network.setVisibility(View.GONE);
+                mListView.setVisibility(View.GONE);
+                mPreloadListView.setVisibility(View.GONE);
             } else {
                 no_network.setVisibility(View.GONE);
                 isHotWordLayoutVisibility(View.GONE);
-                mListView.setVisibility(View.GONE);
-                if (!isClickPreloadItem) {//点击预加载Item，改变mEtView的文字不会postPreload请求
+                if (isShowPreload) {//是否postPreload请求
+                    mListView.setVisibility(View.GONE);
                     mPostPreloadNumber = mPostPreloadNumber + 1;
                     postPreload(mEtView.getText().toString(), mPostPreloadNumber);
                 }
             }
-            isClickPreloadItem = false;
+            isShowPreload = true;
         }
     };
 
@@ -341,40 +379,54 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     public void onClick(View v) {
         if (v.getId() == R.id.search_back) {
             getFragmentManager().popBackStack();
-        }else if (v.getId() == R.id.search_delete){
+        } else if (v.getId() == R.id.search_delete) {
             mPreloadListView.setVisibility(View.GONE);
             mListView.setVisibility(View.GONE);
             mEtView.setText(null);
             isHotWordLayoutVisibility(View.VISIBLE);
-        }else if (v.getId() == R.id.search_search){
+        } else if (v.getId() == R.id.search_search) {
             no_network.setVisibility(View.GONE);
             mPreloadListView.setVisibility(View.GONE);
             if (TextUtils.isEmpty(mEtView.getText().toString())) {
-                Toast.makeText(mActivity, AppliteUtils.getString(mActivity, R.string.srarch_content_no_null),
-                        Toast.LENGTH_SHORT).show();
+                if (TextUtils.isEmpty(mEtView.getHint().toString())) {
+                    Toast.makeText(mActivity, AppliteUtils.getString(mActivity, R.string.srarch_content_no_null),
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    mEtViewModifyPostSearch(mEtView.getHint().toString(), false);
+                }
             } else {
-                closeKeybord();
                 mListView.setSelection(0);
                 if (mSearchText.equals(mEtView.getText().toString())) {
                     mListView.setVisibility(View.VISIBLE);
                 } else {
-                    if (ISPOSTSEARCH) {
-                        ISTOEND = false;
-                        ISPOSTSEARCH = false;
-                        mSearchPostPage = 0;
-                        postSearch(mEtView.getText().toString());
-                        isHotWordLayoutVisibility(View.GONE);
-                    }
+                    mEtViewModifyPostSearch(null, true);
                 }
             }
-        }else if (v.getId() == R.id.hot_word_change){
+        } else if (v.getId() == R.id.hot_word_change) {
             if (mChangeNumbew >= mHotWordPage)
                 mChangeNumbew = 0;
             mShowHotData.clear();
             setHotWordShowData(mChangeNumbew);
             mChangeNumbew = mChangeNumbew + 1;
-        }else if (v.getId() == R.id.refresh_btn) {
+        } else if (v.getId() == R.id.refresh_btn) {
             no_network.setVisibility(View.GONE);
+            postSearch(mEtView.getText().toString());
+        }
+    }
+
+    /**
+     * 搜索框的字 改变后的搜索请求
+     */
+    private void mEtViewModifyPostSearch(String searchName, boolean showPreload) {
+        isShowPreload = showPreload;
+        if (!showPreload) {
+            closeKeybord();
+            mEtView.setText(searchName);
+        }
+        if (ISPOSTSEARCH) {
+            ISTOEND = false;
+            ISPOSTSEARCH = false;
+            mSearchPostPage = 0;
             postSearch(mEtView.getText().toString());
         }
     }
@@ -389,6 +441,10 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      * @param name
      */
     public void postSearch(String name) {
+        isHotWordLayoutVisibility(View.GONE);
+        if (mSearchPostPage == 0)
+            mLoadingLayout.setVisibility(View.VISIBLE);
+
         if (SearchUtils.isLetter(name)) {
             name = AppliteUtils.SplitLetter(name);
         }
@@ -403,6 +459,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
+                mLoadingLayout.setVisibility(View.GONE);
                 LogUtils.i(TAG, "搜索网络请求成功，result:" + responseInfo.result);
                 setSearchData(responseInfo.result);
 
@@ -413,6 +470,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 
             @Override
             public void onFailure(HttpException e, String s) {
+                mLoadingLayout.setVisibility(View.GONE);
                 if (mListView.getVisibility() == View.GONE)
                     no_network.setVisibility(View.VISIBLE);
                 ISPOSTSEARCH = true;
@@ -547,18 +605,20 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                     mPreloadData.add(bean);
                 }
 
-                isHotWordLayoutVisibility(View.GONE);
-                if (!mEtView.getText().toString().equals(mSearchText)) {
-                    mListView.setVisibility(View.GONE);
-                    mPreloadListView.setVisibility(View.VISIBLE);
-                }
+                if (!TextUtils.isEmpty(mEtView.getText().toString())) {
+                    isHotWordLayoutVisibility(View.GONE);
+                    if (!mEtView.getText().toString().equals(mSearchText)) {
+                        mListView.setVisibility(View.GONE);
+                        mPreloadListView.setVisibility(View.VISIBLE);
+                    }
 
-                int SHOW_ICON_NUMBER = 1 + (int) (Math.random() * 3);
-                if (null == mPreloadAdapter) {
-                    mPreloadAdapter = new PreloadAdapter(mActivity, mPreloadData, SHOW_ICON_NUMBER);
-                    mPreloadListView.setAdapter(mPreloadAdapter);
-                } else {
-                    mPreloadAdapter.notifyDataSetChanged();
+                    int SHOW_ICON_NUMBER = 1 + (int) (Math.random() * 3);
+                    if (null == mPreloadAdapter) {
+                        mPreloadAdapter = new PreloadAdapter(mActivity, mPreloadData, SHOW_ICON_NUMBER);
+                        mPreloadListView.setAdapter(mPreloadAdapter);
+                    } else {
+                        mPreloadAdapter.notifyDataSetChanged();
+                    }
                 }
             }
         } catch (JSONException e) {
@@ -601,10 +661,22 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         try {
             JSONObject obj = new JSONObject(data);
             int app_key = obj.getInt("app_key");
-            String s = obj.getString("hotword_info");
-            JSONArray json = new JSONArray(s);
-            for (int i = 0; i < json.length(); i++) {
-                JSONObject object = new JSONObject(json.get(i).toString());
+            String hotword_info = obj.getString("hotword_info");
+            String hint_info = obj.getString("searchscroll_info");
+            LogUtils.i(TAG, "Hint:" + hint_info);
+
+            JSONArray hint_json = new JSONArray(hint_info);
+            mHint = new String[hint_json.length()];
+            for (int i = 0; i < hint_json.length(); i++) {
+                JSONObject hint_obj = new JSONObject(hint_json.get(i).toString());
+                String hint = hint_obj.getString("searchscroll");
+                mHint[i] = hint;
+            }
+            mHandler.postDelayed(mRunnable, 0);
+
+            JSONArray hotword_json = new JSONArray(hotword_info);
+            for (int i = 0; i < hotword_json.length(); i++) {
+                JSONObject object = new JSONObject(hotword_json.get(i).toString());
                 bean = new HotWordBean();
                 bean.set_id(i);
                 bean.setmName(object.getString("name"));
@@ -650,7 +722,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             }
         }
         if (null == mGvAdapter) {
-            mGvAdapter = new HotWordAdapter(mActivity, mShowHotData);
+            mGvAdapter = new HotWordAdapter(mActivity, mShowHotData, this);
             mGridView.setAdapter(mGvAdapter);
         } else {
             mGvAdapter.notifyDataSetChanged();
@@ -665,5 +737,10 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void updateText() {
         mActivity.runOnUiThread(mNotifyRunnable);
+    }
+
+    @Override
+    public void clickItem(String name) {
+        mEtViewModifyPostSearch(name, false);
     }
 }

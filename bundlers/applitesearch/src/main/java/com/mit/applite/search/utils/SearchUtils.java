@@ -47,7 +47,7 @@ public class SearchUtils {
     public static boolean isLetter(String s) {
         mPattern = Pattern.compile("[a-zA-Z]+");
         mMatcher = mPattern.matcher(s);
-        LogUtils.i(TAG, "mMatcher.matches():" + mMatcher.matches());
+        LogUtils.i(TAG, "字符串是不是由字母组成:" + mMatcher.matches());
         return mMatcher.matches();
     }
 

@@ -46,8 +46,6 @@ public class SearchApkAdapter extends BaseAdapter {
         this.mSearchBeans = mSearchBeans;
         mActivity = context;
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
-        mBitmapUtil.configDefaultLoadingImage(mActivity.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
-        mBitmapUtil.configDefaultLoadFailedImage(mActivity.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
 
@@ -79,9 +77,22 @@ public class SearchApkAdapter extends BaseAdapter {
         }
         final SearchBean data = mSearchBeans.get(position);
 
-        mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
         viewholder.initView(data);
-
+        mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
+        viewholder.mName.setText(data.getmName());
+        viewholder.mApkSize.setText(AppliteUtils.bytes2kb(Long.parseLong(data.getmApkSize())));
+        viewholder.mDownloadNumber.setText(
+                SearchUtils.getDownloadNumber(mActivity, Integer.parseInt(data.getmDownloadNumber())) +
+                        mActivity.getResources().getString(R.string.download_number));
+        viewholder.mVersionName.setText(mActivity.getResources().getString(R.string.version) +
+                data.getmVersionName());
+        viewholder.mToDetail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SearchUtils.toDetailFragment((OSGIServiceHost) mActivity,
+                        data.getmPackageName(), data.getmName(), data.getmImgUrl());
+            }
+        });
         viewholder.mBt.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -155,21 +166,6 @@ public class SearchApkAdapter extends BaseAdapter {
         }
 
         public void refresh() {
-            mName.setText(bean.getmName());
-            mApkSize.setText(AppliteUtils.bytes2kb(Long.parseLong(bean.getmApkSize())));
-            mDownloadNumber.setText(
-                    SearchUtils.getDownloadNumber(mActivity, Integer.parseInt(bean.getmDownloadNumber())) +
-                            mActivity.getResources().getString(R.string.download_number));
-            mVersionName.setText(mActivity.getResources().getString(R.string.version) +
-                    bean.getmVersionName());
-            mToDetail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    SearchUtils.toDetailFragment((OSGIServiceHost)mActivity,
-                            bean.getmPackageName(), bean.getmName(), bean.getmImgUrl());
-                }
-            });
-//            mProgressButton.setText(implAgent.getProgress(implInfo) + "");
             initProgressButton();
         }
 
@@ -190,10 +186,6 @@ public class SearchApkAdapter extends BaseAdapter {
                         break;
                 }
             }
-        }
-
-        public ImplInfo getImplInfo() {
-            return implInfo;
         }
     }
 
