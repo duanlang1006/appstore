@@ -16,7 +16,6 @@ import com.applite.common.Constant;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.SearchBean;
-import com.mit.applite.search.main.BundleContextFactory;
 import com.mit.applite.search.utils.SearchUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
@@ -35,24 +34,15 @@ public class PreloadAdapter extends BaseAdapter {
     private ImplAgent implAgent;
     private int SHOW_ICON_NUMBER;
     private LayoutInflater mInflater;
-    private Context mContext;
     private List<SearchBean> mPreloadData;
 
     public PreloadAdapter(Context context, List<SearchBean> data, int i) {
         mPreloadData = data;
         mActivity = context;
+        mInflater = LayoutInflater.from(context);
         SHOW_ICON_NUMBER = i;
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
-        try {
-            Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            this.mContext = mContext;
-            mInflater = LayoutInflater.from(mContext);
-            mInflater = mInflater.cloneInContext(mContext);
-        } catch (Exception e) {
-            e.printStackTrace();
-            mInflater = LayoutInflater.from(context);
-        }
     }
 
     @Override

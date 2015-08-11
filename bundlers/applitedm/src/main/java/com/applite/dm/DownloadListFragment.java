@@ -13,6 +13,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
+import com.applite.dm.utils.HostUtils;
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
 import com.lidroid.xutils.db.sqlite.WhereBuilder;
@@ -22,6 +24,7 @@ import com.mit.impl.ImplDbHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,19 +65,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                              Bundle savedInstanceState) {
         ImplLog.d(DownloadPagerFragment.TAG, "onCreateView," + this);
         LayoutInflater mInflater = inflater;
-        try {
-            Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            if (null != context) {
-                mInflater = LayoutInflater.from(context);
-                mInflater = mInflater.cloneInContext(context);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         View view = mInflater.inflate(R.layout.fragment_download_list, container, false);
         mListview = (ListView) view.findViewById(android.R.id.list);
         mListview.setEmptyView(view.findViewById(R.id.empty));
-//        mListview.setOnItemClickListener(this);
+        mListview.setOnItemClickListener(this);
         setAdapter();
         return view;
     }
@@ -126,6 +120,13 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        DownloadAdapter.ViewHolder vh = (DownloadAdapter.ViewHolder)view.getTag();
+        if (null != vh){
+            HostUtils.launchDetail((OSGIServiceHost) mActivity,
+                    vh.implInfo.getPackageName(),
+                    vh.implInfo.getTitle(),
+                    vh.implInfo.getIconUrl());
+        }
     }
 
     private void setAdapter(){
@@ -169,19 +170,21 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         }
         Selector selector = Selector.from(ImplInfo.class).where(wb);
         String sql = selector.toString();
+        LogUtils.d("applitedm",sql);
         Cursor cursor = null;
         try {
             cursor = db.execQuery(sql);
         } catch (DbException e) {
             e.printStackTrace();
         }
-        if (null == mAdapter){
+//        if (null == mAdapter){
             if (null != cursor) {
                 mAdapter = new DownloadAdapter(mActivity, cursor, mStatusFlags);
                 mListview.setAdapter(mAdapter);
             }
-        }else{
-            mAdapter.changeCursor(cursor);
-        }
+//        }else{
+//            mAdapter.changeCursor(cursor);
+//            mAdapter.notifyDataSetChanged();
+//        }
     }
 }

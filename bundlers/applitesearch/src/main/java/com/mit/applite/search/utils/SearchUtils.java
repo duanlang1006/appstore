@@ -7,11 +7,7 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.mit.applite.search.R;
-import com.mit.applite.search.main.BundleContextFactory;
 import com.osgi.extra.OSGIServiceHost;
-
-import org.osgi.framework.BundleContext;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,14 +55,13 @@ public class SearchUtils {
      * 去详情页面
      */
     public static void toDetailFragment(OSGIServiceHost host, String packageName, String name, String imgUrl) {
-        BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
         if (null != host) {
             Bundle b = new Bundle();
             b.putString("packageName", packageName);
             b.putString("name", name);
             b.putString("imgUrl", imgUrl);
             AppliteUtils.putFgParams(b, Constant.OSGI_SERVICE_SEARCH_FRAGMENT, "add", true);
-            host.jumpto(bundleContext, Constant.OSGI_SERVICE_DETAIL_FRAGMENT, null, b);
+            host.jumpto( Constant.OSGI_SERVICE_DETAIL_FRAGMENT, null, b);
         }
     }
 
@@ -74,7 +69,6 @@ public class SearchUtils {
      * 去主题页面
      */
     public static void toTopicFragment(OSGIServiceHost host, String key, String name, int step, String datatype) {
-        BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
         if (null != host) {
             Bundle b = new Bundle();
             b.putString("key", key);
@@ -82,7 +76,7 @@ public class SearchUtils {
             b.putInt("step", step);
             b.putString("datatype", datatype);
             AppliteUtils.putFgParams(b, Constant.OSGI_SERVICE_SEARCH_FRAGMENT, "add", true);
-            host.jumpto(bundleContext, Constant.OSGI_SERVICE_TOPIC_FRAGMENT, null, b);
+            host.jumpto(Constant.OSGI_SERVICE_TOPIC_FRAGMENT, null, b);
         }
     }
 

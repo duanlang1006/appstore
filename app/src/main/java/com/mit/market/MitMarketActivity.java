@@ -2,10 +2,10 @@ package com.mit.market;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
@@ -19,16 +19,14 @@ import com.mit.main.GuideFragment;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
 import com.applite.android.R;
+import com.osgi.extra.OSGIServiceClient;
 import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
-
-import org.apkplug.app.FrameworkInstance;
-import org.osgi.framework.BundleContext;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 
-public class MitMarketActivity extends ApkPluginActivity implements OSGIServiceHost{
+public class MitMarketActivity extends ActionBarActivity implements OSGIServiceHost{
     private static final String TAG = "applite_MitMarketActivity";
 
     @Override
@@ -45,6 +43,8 @@ public class MitMarketActivity extends ApkPluginActivity implements OSGIServiceH
         MitUpdateAgent.setDebug(true);
         MitUpdateAgent.update(this);
         LogUtils.d(TAG,"onCreate take "+(System.currentTimeMillis()-current)+" ms");
+
+        registerClients();
 
         FragmentManager fgm = getSupportFragmentManager();
         Fragment fg = fgm.findFragmentByTag(Constant.OSGI_SERVICE_LOGO_FRAGMENT);
@@ -83,7 +83,7 @@ public class MitMarketActivity extends ApkPluginActivity implements OSGIServiceH
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_mit_market, menu);
+        getMenuInflater().inflate(R.menu.menu_mit_market, menu);
 //        MenuItem searchItem=menu.findItem(R.id.action_search);
 //        final SearchView searchView=(SearchView)MenuItemCompat.getActionView(searchItem);
 //        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
@@ -151,40 +151,13 @@ public class MitMarketActivity extends ApkPluginActivity implements OSGIServiceH
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterClients();
         IconCache.getInstance(this).flush();
     }
 
 
     @Override
-    public void initPlugins(final OnInitFinishedListener listener) {
-        new Thread(){
-            @Override
-            public void run() {
-                installBundles();
-                initBundleList();
-                startAllBundles();
-                ListenerBundleEvent();
-                if (null != listener){
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onInitFinished();
-                            checkUpdate();
-                        }
-                    });
-                }
-            }
-        }.start();
-    }
-
-    @Override
-    public BundleContext getSystemBundleContext() {
-        FrameworkInstance frame = AppLiteApplication.getFrame(this);
-        return (null == frame)?null:frame.getSystemBundleContext();
-    }
-
-    @Override
-    public void notify(BundleContext bundleContext, Bundle params) {
+    public void notify(Bundle params) {
         if (null != params){
             int number = params.getInt("number");
             UpdateNotification.getInstance().showNot(MitMarketActivity.this, String.valueOf(number));
@@ -192,8 +165,8 @@ public class MitMarketActivity extends ApkPluginActivity implements OSGIServiceH
     }
 
     @Override
-    public void jumpto(BundleContext bundleContext, String whichService, String whichFragment, Bundle params) {
-        Fragment fragment = newFragment(bundleContext, whichService, whichFragment, params);
+    public void jumpto(String whichService, String whichFragment, Bundle params) {
+        Fragment fragment = newFragment( whichService, whichFragment, params);
         String fromTag = params.getString("fromTag");
         String operate = params.getString("operate");
         boolean addToBackStack = params.getBoolean("addToBackStack");
@@ -201,7 +174,8 @@ public class MitMarketActivity extends ApkPluginActivity implements OSGIServiceH
         FragmentManager fgm = getSupportFragmentManager();
         FragmentTransaction ft = fgm.beginTransaction();
         if ("add".equals(operate)){
-            Fragment fromFragment = fgm.findFragmentByTag(fromTag);
+            Fragment fromFragment = fgm.findFragmentById(R.id.container);
+//            Fragment fromFragment = fgm.findFragmentByTag(fromTag);
             if (null != fromFragment){
                 ft.hide(fromFragment);
             }
@@ -216,7 +190,7 @@ public class MitMarketActivity extends ApkPluginActivity implements OSGIServiceH
     }
 
     @Override
-    public Fragment newFragment(BundleContext bundleContext, String whichService, String whichFragment, Bundle params) {
+    public Fragment newFragment(String whichService, String whichFragment, Bundle params) {
         return ApkPluginFragment.newInstance(whichService,whichFragment,params);
     }
 
@@ -229,5 +203,23 @@ public class MitMarketActivity extends ApkPluginActivity implements OSGIServiceH
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void registerClients(){
+        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_MAIN_FRAGMENT, "com.applite.homepage.HomePageFragment");
+        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_TOPIC_FRAGMENT, "com.applite.homepage.HomePageListFragment");
+        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_DETAIL_FRAGMENT, "com.mit.applite.main.DetailFragment");
+        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_SEARCH_FRAGMENT, "com.mit.applite.search.main.SearchFragment");
+        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, "com.mit.appliteupdate.main.UpdateFragment");
+        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_DM_FRAGMENT, "com.applite.dm.DownloadPagerFragment");
+    }
+
+    private void unregisterClients(){
+        OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_MAIN_FRAGMENT);
+        OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_TOPIC_FRAGMENT);
+        OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_DETAIL_FRAGMENT);
+        OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
+        OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
+        OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_DM_FRAGMENT);
     }
 }

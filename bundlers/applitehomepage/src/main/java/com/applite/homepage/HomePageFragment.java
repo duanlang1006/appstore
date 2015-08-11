@@ -63,7 +63,6 @@ import java.util.List;
 public class HomePageFragment extends OSGIBaseFragment implements View.OnClickListener{
     private final String TAG = "homepage_PagerFragment";
     private Activity mActivity;
-    private Context mPlugContext;
     private View popView;
     private PopupWindow popupWindow;
     private List<ScreenBean> mScreenBeanList = new ArrayList<ScreenBean>();
@@ -149,18 +148,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         super.onAttach(activity);
         LogUtils.d(TAG, "onAttach ");
         mActivity = activity;
-        mPlugContext = activity;
         mInflater = LayoutInflater.from(mActivity);
-        try {
-            Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            if (null != context) {
-                mPlugContext = context;
-                mInflater = LayoutInflater.from(context);
-                mInflater = mInflater.cloneInContext(context);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -188,7 +176,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         mLoadingarea = (RelativeLayout)rootView.findViewById(R.id.top_parent);
         //加载中显示动画资源及文字
         mLoadingView = rootView.findViewById(R.id.loading_img);
-        LoadingAnimation = AnimationUtils.loadAnimation(mPlugContext, R.anim.tip);
+        LoadingAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.tip);
         LinearInterpolator lin = new LinearInterpolator();
         LoadingAnimation.setInterpolator(lin);
         if (LoadingAnimation != null) {
@@ -199,7 +187,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         //无网络连接时显示图片资源
         mOffnetView = rootView.findViewById(R.id.middle_parent);
         offnetImg = (ImageView)rootView.findViewById(R.id.off_img);
-        mRetrybtn = (Button)rootView.findViewById(R.id.retry_btn);
+        mRetrybtn = (Button)rootView.findViewById(R.id.refresh_btn);
 
         mOffnetView.setVisibility(View.GONE);
 
@@ -259,6 +247,13 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             LogUtils.i(TAG, "重新显示ActionBar");
             initActionBar();
             mActivity.runOnUiThread(mRefreshRunnable);
+        }else{
+            try{
+                ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+                actionBar.setHomeAsUpIndicator(getActivity().getResources().getDrawable(R.drawable.action_bar_back_light));
+            }catch(Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -365,12 +360,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             SPUtils.put(mActivity,SPUtils.POP_IMGURL_ISCLICK,mPopIsClick);
             popupWindow.dismiss();
             LogUtils.i("lang", "v.getId() = "+v.getId());
-            switch (v.getId()){
-                case R.id.pop_img_exit:
-                    break;
-                case R.id.pop_img_img:
-                    HomepageUtils.toTopicFragment(((OSGIServiceHost)mActivity),mPopData.getS_key(), mPopData.getS_name(), mPopData.getStep(), mPopData.getS_datatype());
-                    break;
+            if (v.getId() == R.id.pop_img_exit) {
+
+            }else if (v.getId() == R.id.pop_img_img) {
+                HomepageUtils.toTopicFragment(((OSGIServiceHost) mActivity), mPopData.getS_key(), mPopData.getS_name(), mPopData.getStep(), mPopData.getS_datatype());
             }
         }
     };
@@ -432,57 +425,38 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        try {
-            Context plugContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            Field field = inflater.getClass().getDeclaredField("mContext");
-            field.setAccessible(true);
-            Object orgContext = field.get(inflater);
-            field.set(inflater,plugContext);
-            inflater.inflate(R.menu.menu_main,menu);
-            field.set(inflater,orgContext);
-
-            field = menu.getClass().getDeclaredField("mContext");
-            field.setAccessible(true);
-            field.set(menu,plugContext);
-
-            field = menu.getClass().getDeclaredField("mResources");
-            field.setAccessible(true);
-            field.set(menu,plugContext.getResources());
-            if (menu instanceof SupportMenu){
-                SupportMenuItem item = (SupportMenuItem)menu.findItem(R.id.action_search);
-                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        inflater.inflate(R.menu.menu_main_homepage, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        if (null != item){
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:
-                if (null == mCategory) {
-                    HomepageUtils.launchPersonalFragment((OSGIServiceHost) mActivity);
-                    return true;
-                }
-                break;
-            case R.id.action_search:
-                HomepageUtils.launchSearchFragment((OSGIServiceHost)mActivity);
+        if (item.getItemId() == android.R.id.home){
+            if (null == mCategory){
+                HomepageUtils.launchPersonalFragment(((OSGIServiceHost) mActivity));
                 return true;
+            }
+        }else if (item.getItemId() == R.id.action_search){
+            HomepageUtils.launchSearchFragment((OSGIServiceHost)mActivity);
+            MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
+            return true;
+        }else if (item.getItemId() == R.id.action_dm){
+            HomepageUtils.launchDmFragment((OSGIServiceHost)mActivity);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
-            case R.id.action_personal:
-                HomepageUtils.launchPersonalFragment(((OSGIServiceHost)mActivity));
-                break;
-            case R.id.action_search:
-                HomepageUtils.launchSearchFragment(((OSGIServiceHost)mActivity));
-                MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
-                break;
+        if (v.getId() == R.id.action_personal) {
+            HomepageUtils.launchPersonalFragment(((OSGIServiceHost) mActivity));
+        }else if (v.getId() == R.id.action_search){
+            HomepageUtils.launchSearchFragment(((OSGIServiceHost)mActivity));
+            MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
         }
     }
 
@@ -499,15 +473,16 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 //            ViewGroup title = (ViewGroup)customView.findViewById(R.id.action_title);
 //            mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,title,false);
 //            title.addView(mPagerSlidingTabStrip);
-            BundleContextFactory.getInstance().getBundleContext().getBundleContext();
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
+
             if (null == mCategory) {
-                actionBar.setHomeAsUpIndicator(mPlugContext.getResources().getDrawable(R.drawable.icon_personal_light));
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setHomeAsUpIndicator(getActivity().getResources().getDrawable(R.drawable.icon_personal_light));
                 actionBar.setDisplayShowTitleEnabled(false);
             }else{
-                actionBar.setHomeAsUpIndicator(mPlugContext.getResources().getDrawable(R.drawable.action_bar_back_light));
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setHomeAsUpIndicator(getActivity().getResources().getDrawable(R.drawable.action_bar_back_light));
+                actionBar.setHomeButtonEnabled(true);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setTitle(mTitle);
             }
@@ -594,8 +569,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         public Fragment getItem(int position) {
             LogUtils.d(TAG,"getItem,"+position);
             OSGIServiceHost host = (OSGIServiceHost)mActivity;
-            Fragment fg = host.newFragment(BundleContextFactory.getInstance().getBundleContext(),
-                    Constant.OSGI_SERVICE_MAIN_FRAGMENT,
+            Fragment fg = host.newFragment(Constant.OSGI_SERVICE_MAIN_FRAGMENT,
                     HomePageListFragment.class.getName(),
                     HomePageListFragment.newBundle(mPageData.get(position),false));
             return fg;

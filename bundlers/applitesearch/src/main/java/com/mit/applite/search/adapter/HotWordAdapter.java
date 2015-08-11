@@ -13,7 +13,6 @@ import com.applite.common.BitmapHelper;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.HotWordBean;
-import com.mit.applite.search.main.BundleContextFactory;
 import com.mit.applite.search.utils.SearchUtils;
 import com.osgi.extra.OSGIServiceHost;
 
@@ -27,9 +26,7 @@ public class HotWordAdapter extends BaseAdapter {
     private final ClickHotWordItemPostlistener mListener;
     private BitmapUtils mBitmapUtil;
     private Context mActivity;
-    private Context mContext;
     private List<HotWordBean> mHotWordBeans;
-    private LayoutInflater mInflater;
 
     public interface ClickHotWordItemPostlistener {
         void clickItem(String name);
@@ -40,14 +37,6 @@ public class HotWordAdapter extends BaseAdapter {
         mListener = listener;
         mActivity = context;
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
-        try {
-            Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            this.mContext = mContext;
-            mInflater = LayoutInflater.from(mContext);
-            mInflater = mInflater.cloneInContext(mContext);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -71,7 +60,8 @@ public class HotWordAdapter extends BaseAdapter {
         /* 将convertView封装在ViewHodler中，减少系统内存占用 */
         if (convertView == null) {
             /* convertView为空则初始化 */
-            convertView = mInflater.inflate(R.layout.item_hot_word_iv, parent, false);
+            LayoutInflater inflater = LayoutInflater.from(mActivity);
+            convertView = inflater.inflate(R.layout.item_hot_word_iv, parent, false);
             viewholder = new ViewHolder(convertView);
             convertView.setTag(viewholder);
         } else {

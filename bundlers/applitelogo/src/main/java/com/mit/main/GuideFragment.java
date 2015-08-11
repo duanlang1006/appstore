@@ -51,8 +51,6 @@ import com.umeng.analytics.MobclickAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osgi.framework.BundleContext;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -158,21 +156,13 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
             }
         }
 
-        final long current = System.currentTimeMillis();
-        OSGIServiceHost host = (OSGIServiceHost) mActivity;
-        host.initPlugins(new OSGIServiceHost.OnInitFinishedListener() {
-            @Override
-            public void onInitFinished() {
-                long takeTime = System.currentTimeMillis() - current;
-                long timeout = (long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_SHOW_TIME, 3000L);
-                if (null != mToHomeView) {
-                    mToHomeView.setEnabled(true);
-                } else {
-                    mHandler.postDelayed(mThread, (takeTime >= timeout) ? 50 : (timeout - takeTime));
-                }
-                LogUtils.d(TAG, "InitPlugin take " + takeTime + " ms,dur=" + timeout);
-            }
-        });
+
+        if (null != mToHomeView) {
+            mToHomeView.setEnabled(true);
+        } else {
+            long timeout = (long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_SHOW_TIME, 3000L);
+            mHandler.postDelayed(mThread, timeout);
+        }
         return rootView;
     }
 
@@ -186,6 +176,12 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     public void onPause() {
         super.onPause();
         MobclickAgent.onPageEnd("GuideFragment");
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mHandler.removeCallbacks(mThread);
     }
 
     @Override
@@ -419,8 +415,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
 
         OSGIServiceHost host = (OSGIServiceHost) mActivity;
-        BundleContext bundleContext = host.getSystemBundleContext();
-        host.jumpto(bundleContext, mWhichService, mWhichFragment, mParams);
+        host.jumpto(mWhichService, mWhichFragment, mParams);
     }
 
     @Override

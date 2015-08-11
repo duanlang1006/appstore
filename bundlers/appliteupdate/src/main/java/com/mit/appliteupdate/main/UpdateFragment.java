@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,15 +44,12 @@ import com.umeng.analytics.MobclickAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osgi.framework.BundleContext;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class UpdateFragment extends OSGIBaseFragment implements View.OnClickListener {
 
     private static final String TAG = "UpdateFragment";
-    private LayoutInflater mInflater;
     private View rootView;
     private Activity mActivity;
     private TextView mAllUpdateView;
@@ -64,8 +62,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             mAdapter.notifyDataSetChanged();
         }
     };
-    private Context mContext;
-    private LinearLayout mStatsLayout;
+    private RelativeLayout mStatsLayout;
     private ImageView mStatsImgView;
     private Button mStatsButton;
     private boolean mPostStats = true;
@@ -101,22 +98,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mInflater = inflater;
-        try {
-            Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            mInflater = LayoutInflater.from(context);
-            mInflater = mInflater.cloneInContext(context);
-            mContext = context;
-        } catch (Exception e) {
-            e.printStackTrace();
-            mContext = mActivity;
-        }
-        if (null == mInflater) {
-            mInflater = inflater;
-        }
-//        this.container = container;
-
-        rootView = mInflater.inflate(R.layout.fragment_update, container, false);
+        rootView = inflater.inflate(R.layout.fragment_update, container, false);
         initView();
         post();
 
@@ -143,23 +125,20 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.update_all_update:
-                if (!mDataContents.isEmpty()) {
-                    DataBean data = null;
-                    for (int i = 0; i < mDataContents.size(); i++) {
-                        data = mDataContents.get(i);
-                        download(data);
-                    }
-                    mAdapter.notifyDataSetChanged();
-                } else {
-                    Toast.makeText(mContext, AppliteUtils.getString(mContext, R.string.no_update), Toast.LENGTH_SHORT).show();
+        if (v.getId() == R.id.update_all_update) {
+            if (!mDataContents.isEmpty()) {
+                DataBean data = null;
+                for (int i = 0; i < mDataContents.size(); i++) {
+                    data = mDataContents.get(i);
+                    download(data);
                 }
-                break;
-            case R.id.update_post_button:
-                if (mPostStats)
-                    post();
-                break;
+                mAdapter.notifyDataSetChanged();
+            } else {
+                Toast.makeText(mActivity, AppliteUtils.getString(mActivity, R.string.no_update), Toast.LENGTH_SHORT).show();
+            }
+        }else if (v.getId() == R.id.update_post_button){
+            if (mPostStats)
+                post();
         }
     }
 
@@ -168,7 +147,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setDisplayShowCustomEnabled(false);
-            actionBar.setTitle("更新管理");
+            actionBar.setTitle("应用升级");
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.show();
         } catch (Exception e) {
@@ -179,7 +158,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private void initView() {
         mAllUpdateView = (TextView) rootView.findViewById(R.id.update_all_update);
         mListView = (ListView) rootView.findViewById(R.id.update_listview);
-        mStatsLayout = (LinearLayout) rootView.findViewById(R.id.update_stats);
+        mStatsLayout = (RelativeLayout) rootView.findViewById(R.id.update_stats);
         mStatsImgView = (ImageView) rootView.findViewById(R.id.update_stats_img);
         mStatsButton = (Button) rootView.findViewById(R.id.update_post_button);
 
@@ -187,7 +166,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         mLoadLayout = (LinearLayout) rootView.findViewById(R.id.update_loading_layout);
         mLoadView = (ImageView) rootView.findViewById(R.id.update_loading_img);
         //旋转动画
-        LoadingAnimation = AnimationUtils.loadAnimation(mContext, R.anim.loading);
+        LoadingAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.loading);
         LinearInterpolator lin = new LinearInterpolator();
         LoadingAnimation.setInterpolator(lin);
         mLoadView.startAnimation(LoadingAnimation);
@@ -235,7 +214,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             public void onFailure(HttpException e, String s) {
                 setLoadLayoutVisibility(View.GONE);
                 LogUtils.i(TAG, "更新请求失败：" + s);
-                setStatsLayoutVisibility(View.VISIBLE, mContext.getResources().getDrawable(R.drawable.post_failure));
+                setStatsLayoutVisibility(View.VISIBLE, mActivity.getResources().getDrawable(R.drawable.post_failure));
                 mStatsButton.setVisibility(View.VISIBLE);
                 mPostStats = true;
             }
@@ -273,7 +252,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                     mDataContents.add(bean);
                 }
                 if (array.length() == 0) {
-                    setStatsLayoutVisibility(View.VISIBLE, mContext.getResources().getDrawable(R.drawable.no_update));
+                    setStatsLayoutVisibility(View.VISIBLE, mActivity.getResources().getDrawable(R.drawable.no_update));
                     mStatsButton.setVisibility(View.GONE);
                 } else {
                     setStatsLayoutVisibility(View.GONE, null);
@@ -314,12 +293,11 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
      * 发送更新通知
      */
     private void showUpdateNotification(int number) {
-        BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
         OSGIServiceHost host = (OSGIServiceHost)mActivity;
         if (null != host){
             Bundle b = new Bundle();
             b.putInt("number",number);
-            host.notify(bundleContext, b);
+            host.notify( b);
         }
     }
 

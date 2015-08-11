@@ -15,27 +15,18 @@ package com.mit.market;
  * limitations under the License.
  */
 
-
-
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.util.Log;
-
-import com.applite.common.LogUtils;
-
-import org.apkplug.app.FrameworkFactory;
-import org.apkplug.app.FrameworkInstance;
-
 import java.util.List;
 
 public class AppLiteApplication extends Application {
     private static final String TAG="applite_application";
     private static boolean sIsScreenLarge;
     private static float sScreenDensity;
-    private static FrameworkInstance sframe=null;
-    
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -69,10 +60,6 @@ public class AppLiteApplication extends Application {
     @Override
     public void onTerminate() {
         super.onTerminate();
-
-        if (null != sframe){
-            sframe.shutdown();
-        }
     }
 
     private void initAppForMainProcess(){
@@ -108,19 +95,5 @@ public class AppLiteApplication extends Application {
             }
         }
         return null;
-    }
-
-    public static FrameworkInstance getFrame(Context context){
-        if (null == sframe){
-            if (context.getPackageName().equals(getProcessName(context, android.os.Process.myPid()))) {
-                try {
-                    sframe = FrameworkFactory.getInstance().start(null, context.getApplicationContext());
-                } catch (Exception ex) {
-                    Log.e(TAG, "Could not create : " + ex);
-                    ex.printStackTrace();
-                }
-            }
-        }
-        return sframe;
     }
 }

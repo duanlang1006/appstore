@@ -15,14 +15,12 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.lidroid.xutils.BitmapUtils;
-import com.mit.appliteupdate.main.BundleContextFactory;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.bean.DataBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -33,24 +31,13 @@ public class UpdateAdapter extends BaseAdapter {
     private final BitmapUtils mBitmapUtil;
     private final PackageManager mPackageManager;
     private Context mActivity;
-    private Context mContext;
     private List<DataBean> mDatas;
-    private LayoutInflater mInflater;
     private ImplAgent implAgent;
 
     public UpdateAdapter(Context context, List<DataBean> mDatas) {
         this.mDatas = mDatas;
         mActivity = context;
         mPackageManager = mActivity.getPackageManager();
-        try {
-            Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            this.mContext = mContext;
-            mInflater = LayoutInflater.from(mContext);
-            mInflater = mInflater.cloneInContext(mContext);
-        } catch (Exception e) {
-            e.printStackTrace();
-            mInflater = LayoutInflater.from(context);
-        }
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
@@ -74,7 +61,8 @@ public class UpdateAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewholder;
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.item_update_listview, parent, false);
+            LayoutInflater inflater = LayoutInflater.from(mActivity);
+            convertView = inflater.inflate(R.layout.item_update_listview, parent, false);
             viewholder = new ViewHolder(convertView);
             convertView.setTag(viewholder);
         } else {
@@ -92,36 +80,6 @@ public class UpdateAdapter extends BaseAdapter {
             e.printStackTrace();
         }
         viewholder.mApkSize.setText(AppliteUtils.bytes2kb(data.getmSize()));
-        viewholder.mBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ViewHolder vh = (ViewHolder) v.getTag();
-                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-                    switch (vh.implInfo.getStatus()) {
-                        case Constant.STATUS_PENDING:
-                        case Constant.STATUS_RUNNING:
-                            implAgent.pauseDownload(vh.implInfo);
-                            break;
-                        case Constant.STATUS_PAUSED:
-                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
-                            break;
-                        default:
-                            implAgent.newDownload(vh.implInfo,
-                                    Constant.extenStorageDirPath,
-                                    vh.bean.getmName() + ".apk",
-                                    true,
-                                    vh.implCallback);
-                            break;
-                    }
-                } else {
-                    try {
-                        mContext.startActivity(implAgent.getActionIntent(vh.implInfo));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
         return convertView;
     }
 
@@ -142,6 +100,37 @@ public class UpdateAdapter extends BaseAdapter {
             this.mVersionName = (TextView) v.findViewById(R.id.item_update_versionname);
             this.mBt = (Button) v.findViewById(R.id.item_update_button);
             this.implCallback = new ListImplCallback(this);
+            mBt.setTag(this);
+            mBt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ViewHolder vh = (ViewHolder) v.getTag();
+                    if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
+                        switch (vh.implInfo.getStatus()) {
+                            case Constant.STATUS_PENDING:
+                            case Constant.STATUS_RUNNING:
+                                implAgent.pauseDownload(vh.implInfo);
+                                break;
+                            case Constant.STATUS_PAUSED:
+                                implAgent.resumeDownload(vh.implInfo, vh.implCallback);
+                                break;
+                            default:
+                                implAgent.newDownload(vh.implInfo,
+                                        Constant.extenStorageDirPath,
+                                        vh.bean.getmName() + ".apk",
+                                        true,
+                                        vh.implCallback);
+                                break;
+                        }
+                    } else {
+                        try {
+                            mActivity.startActivity(implAgent.getActionIntent(vh.implInfo));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
         }
 
         public void initView(DataBean bean) {

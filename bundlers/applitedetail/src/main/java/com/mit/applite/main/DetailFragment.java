@@ -13,6 +13,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -22,6 +25,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.applite.common.AppliteUtils;
@@ -44,6 +48,7 @@ import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
@@ -65,7 +70,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private RatingBar mXingView;
     private ImageView mApkImgView;
     private String mViewPagerUrlList[] = null;
-    private LayoutInflater mInflater;
     private ViewGroup container;
     private LinearLayout mImgLl;
     private String mPackageName;
@@ -73,8 +77,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private String mImgUrl;
     private ProgressButton mProgressButton;
     private int mVersionCode;
-    private Context mContext;
-    private LinearLayout no_network;
+    private RelativeLayout no_network;
     private Button refreshButton;
     private ImplAgent implAgent;
     private ImplChangeCallback implCallback;
@@ -145,22 +148,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mInflater = inflater;
-        try {
-            Context context = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            mInflater = LayoutInflater.from(context);
-            mInflater = mInflater.cloneInContext(context);
-            mContext = context;
-        } catch (Exception e) {
-            e.printStackTrace();
-            mContext = mActivity;
-        }
-        if (null == mInflater) {
-            mInflater = inflater;
-        }
         this.container = container;
 
-        rootView = mInflater.inflate(R.layout.fragment_detail, container, false);
+        rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         initView();
         if (!TextUtils.isEmpty(mPackageName))
             post(mPackageName);
@@ -215,7 +205,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         mLoadLayout = (LinearLayout) rootView.findViewById(R.id.detail_loading_layout);
         mLoadView = (ImageView) rootView.findViewById(R.id.detail_loading_img);
         //旋转动画
-        LoadingAnimation = AnimationUtils.loadAnimation(mContext, R.anim.loading);
+        LoadingAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.loading);
         LinearInterpolator lin = new LinearInterpolator();
         LoadingAnimation.setInterpolator(lin);
         mLoadView.startAnimation(LoadingAnimation);
@@ -232,7 +222,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         mApkContentView = (TextView) rootView.findViewById(R.id.detail_content);
         mXingView = (RatingBar) rootView.findViewById(R.id.detail_xing);
         mImgLl = (LinearLayout) rootView.findViewById(R.id.detail_viewpager_img_ll);
-        no_network = (LinearLayout) rootView.findViewById(R.id.no_network);
+        no_network = (RelativeLayout) rootView.findViewById(R.id.no_network);
         refreshButton = (Button) rootView.findViewById(R.id.refresh_btn);
 
         mOpenIntroduceView = (ImageView) rootView.findViewById(R.id.detail_open_introduce_content);
@@ -241,15 +231,15 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
         mName1View.setText(mApkName);
 
-        mBitmapUtil.configDefaultLoadingImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
-        mBitmapUtil.configDefaultLoadFailedImage(mContext.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadingImage(mActivity.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
+        mBitmapUtil.configDefaultLoadFailedImage(mActivity.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
         mBitmapUtil.display(mApkImgView, mImgUrl);
 
         mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
             public void onClickListener() {
                 if (!TextUtils.isEmpty(mPackageName)) {
-                    mProgressButton.setBackgroundColor(mContext.getResources().getColor(R.color.progress_background));
+                    mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
                     ImplInfo implinfo = (ImplInfo) mProgressButton.getTag();
                     if (null != implinfo) {
                         if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implinfo)) {
@@ -271,7 +261,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                             }
                         } else {
                             try {
-                                mContext.startActivity(implAgent.getActionIntent(implinfo));
+                                mActivity.startActivity(implAgent.getActionIntent(implinfo));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -286,38 +276,53 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_main_detail, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        if (null != item) {
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (R.id.action_search == item.getItemId()) {
+            DetailUtils.launchSearchFragment((OSGIServiceHost) mActivity);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.refresh_btn:
-                no_network.setVisibility(View.GONE);
-                post(mPackageName);
-                break;
-            case R.id.detail_content:
-                if (CONTENT_STATE == COLLAPSIBLE_STATE_SHRINKUP) {
-                    LogUtils.i(TAG, "应用介绍展开");
-                    mApkContentView.setMaxLines(50);
-                    CONTENT_STATE = COLLAPSIBLE_STATE_SPREAD;
-                    mOpenIntroduceView.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.desc_less));
-                } else if (CONTENT_STATE == COLLAPSIBLE_STATE_SPREAD) {
-                    LogUtils.i(TAG, "应用介绍收缩");
-                    mApkContentView.setMaxLines(DEFAULT_MAX_LINE_COUNT);
-                    CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
-                    mOpenIntroduceView.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.desc_more));
-                }
-                break;
-            case R.id.detail_update_log:
-                if (UPDATE_LOG_STATE == COLLAPSIBLE_STATE_SHRINKUP) {
-                    LogUtils.i(TAG, "更新日志展开");
-                    mUpdateLogView.setMaxLines(Integer.MAX_VALUE);
-                    UPDATE_LOG_STATE = COLLAPSIBLE_STATE_SPREAD;
-                    mOpenUpdateLogView.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.desc_less));
-                } else if (UPDATE_LOG_STATE == COLLAPSIBLE_STATE_SPREAD) {
-                    LogUtils.i(TAG, "更新日志收缩");
-                    mUpdateLogView.setMaxLines(DEFAULT_MAX_LINE_COUNT);
-                    UPDATE_LOG_STATE = COLLAPSIBLE_STATE_SHRINKUP;
-                    mOpenUpdateLogView.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.desc_more));
-                }
-                break;
+        if (v.getId() == R.id.refresh_btn) {
+            no_network.setVisibility(View.GONE);
+            post(mPackageName);
+        } else if (v.getId() == R.id.detail_content) {
+            if (CONTENT_STATE == COLLAPSIBLE_STATE_SHRINKUP) {
+                LogUtils.i(TAG, "应用介绍展开");
+                mApkContentView.setMaxLines(50);
+                CONTENT_STATE = COLLAPSIBLE_STATE_SPREAD;
+                mOpenIntroduceView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_less));
+            } else if (CONTENT_STATE == COLLAPSIBLE_STATE_SPREAD) {
+                LogUtils.i(TAG, "应用介绍收缩");
+                mApkContentView.setMaxLines(DEFAULT_MAX_LINE_COUNT);
+                CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
+                mOpenIntroduceView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_more));
+            }
+        } else if (v.getId() == R.id.detail_update_log) {
+            if (UPDATE_LOG_STATE == COLLAPSIBLE_STATE_SHRINKUP) {
+                LogUtils.i(TAG, "更新日志展开");
+                mUpdateLogView.setMaxLines(Integer.MAX_VALUE);
+                UPDATE_LOG_STATE = COLLAPSIBLE_STATE_SPREAD;
+                mOpenUpdateLogView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_less));
+            } else if (UPDATE_LOG_STATE == COLLAPSIBLE_STATE_SPREAD) {
+                LogUtils.i(TAG, "更新日志收缩");
+                mUpdateLogView.setMaxLines(DEFAULT_MAX_LINE_COUNT);
+                UPDATE_LOG_STATE = COLLAPSIBLE_STATE_SHRINKUP;
+                mOpenUpdateLogView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_more));
+            }
         }
     }
 
@@ -402,7 +407,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
                     LogUtils.i(TAG, "更新日志：" + mDescription);
                     if (TextUtils.isEmpty(mUpdateLog)) {
-                        mUpdateLogView.setText(mContext.getResources().getText(R.string.no_update_log));
+                        mUpdateLogView.setText(mActivity.getResources().getText(R.string.no_update_log));
                     } else {
                         mUpdateLogView.setText(mUpdateLog);
                     }
@@ -428,9 +433,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 mProgressButton.setText(implAgent.getActionText(implinfo));
                 mProgressButton.setProgress(implAgent.getProgress(implinfo));
                 if (mProgressButton.getProgress() == 0) {
-                    mProgressButton.setBackgroundColor(mContext.getResources().getColor(R.color.progress_foreground));
+                    mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_foreground));
                 } else {
-                    mProgressButton.setBackgroundColor(mContext.getResources().getColor(R.color.progress_background));
+                    mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
                 }
                 mProgressButton.setTag(implinfo);
             }
@@ -448,7 +453,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         BitmapUtils bitmapUtils = new BitmapUtils(mActivity);
         for (int i = 0; i < mViewPagerUrlList.length; i++) {
             LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
-            final View child = mInflater.inflate(R.layout.item_detail_viewpager_img, container, false);
+            final View child = mActivity.getLayoutInflater().inflate(R.layout.item_detail_viewpager_img, container, false);
             final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
             mImgLl.addView(child);
             bitmapUtils.display(img, mViewPagerUrlList[i], new BitmapLoadCallBack<ImageView>() {
@@ -463,7 +468,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
                 @Override
                 public void onLoadFailed(ImageView imageView, String s, Drawable drawable) {
-                    imageView.setBackground(mContext.getResources().getDrawable(R.drawable.detail_default_img));
+                    imageView.setBackground(mActivity.getResources().getDrawable(R.drawable.detail_default_img));
                 }
             });
         }

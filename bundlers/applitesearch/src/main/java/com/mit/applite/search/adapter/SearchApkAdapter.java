@@ -18,7 +18,6 @@ import com.applite.common.Constant;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.SearchBean;
-import com.mit.applite.search.main.BundleContextFactory;
 import com.mit.applite.search.utils.SearchUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
@@ -34,8 +33,6 @@ public class SearchApkAdapter extends BaseAdapter {
 
     private final UpdateInatsllButtonText mListener;
     private BitmapUtils mBitmapUtil;
-    private LayoutInflater mInflater;
-    private Context mContext;
     private List<SearchBean> mSearchBeans;
     private Context mActivity;
     private ImplAgent implAgent;
@@ -48,14 +45,6 @@ public class SearchApkAdapter extends BaseAdapter {
         mListener = listener;
         this.mSearchBeans = mSearchBeans;
         mActivity = context;
-        try {
-            Context mContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            this.mContext = mContext;
-            mInflater = LayoutInflater.from(mContext);
-            mInflater = mInflater.cloneInContext(mContext);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
@@ -79,7 +68,8 @@ public class SearchApkAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewholder;
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.item_search_listview, parent, false);
+            LayoutInflater inflater = LayoutInflater.from(mActivity);
+            convertView = inflater.inflate(R.layout.item_search_listview, parent, false);
             viewholder = new ViewHolder(convertView);
             convertView.setTag(viewholder);
         } else {
@@ -92,9 +82,9 @@ public class SearchApkAdapter extends BaseAdapter {
         viewholder.mName.setText(data.getmName());
         viewholder.mApkSize.setText(AppliteUtils.bytes2kb(Long.parseLong(data.getmApkSize())));
         viewholder.mDownloadNumber.setText(
-                SearchUtils.getDownloadNumber(mContext, Integer.parseInt(data.getmDownloadNumber())) +
-                        mContext.getResources().getString(R.string.download_number));
-        viewholder.mVersionName.setText(mContext.getResources().getString(R.string.version) +
+                SearchUtils.getDownloadNumber(mActivity, Integer.parseInt(data.getmDownloadNumber())) +
+                        mActivity.getResources().getString(R.string.download_number));
+        viewholder.mVersionName.setText(mActivity.getResources().getString(R.string.version) +
                 data.getmVersionName());
         viewholder.mToDetail.setOnClickListener(new View.OnClickListener() {
             @Override

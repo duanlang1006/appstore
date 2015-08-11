@@ -24,7 +24,6 @@ import android.view.ViewGroup;
 
 import com.applite.common.Constant;
 import com.applite.common.PagerSlidingTabStrip;
-import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
@@ -39,7 +38,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private Activity mActivity;
     private boolean destoryView = false;
     private LayoutInflater mInflater;
-    private Context mPlugContext;
 
     public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
         return new DownloadPagerFragment(fg,params);
@@ -61,15 +59,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         ImplLog.d(TAG, "onCreateView,"+this);
         destoryView = false;
         mInflater = inflater;
-        try {
-            mPlugContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            if (null != mPlugContext) {
-                mInflater = LayoutInflater.from(mPlugContext);
-                mInflater = mInflater.cloneInContext(mPlugContext);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
         View rootView = mInflater.inflate(R.layout.fragment_download_pager, container, false);
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
         mViewPager.setAdapter(new SectionsPagerAdapter(getChildFragmentManager()));
@@ -112,50 +101,15 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        try {
-            Context plugContext = BundleContextFactory.getInstance().getBundleContext().getBundleContext();
-            Field field = inflater.getClass().getDeclaredField("mContext");
-            field.setAccessible(true);
-            Object orgContext = field.get(inflater);
-            field.set(inflater,plugContext);
-            inflater.inflate(R.menu.menu_main,menu);
-            field.set(inflater,orgContext);
-
-            field = menu.getClass().getDeclaredField("mContext");
-            field.setAccessible(true);
-            field.set(menu,plugContext);
-
-            field = menu.getClass().getDeclaredField("mResources");
-            field.setAccessible(true);
-            field.set(menu,plugContext.getResources());
-
-            if (menu instanceof SupportMenu){
-                SupportMenuItem item = (SupportMenuItem)menu.findItem(R.id.action_search);
-                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        inflater.inflate(R.menu.menu_main_dm,menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
-//            case R.id.action_search:
-//                HostUtils.launchSearchFragment((OSGIServiceHost) getActivity());
-//                return true;
-            case android.R.id.home:
-                if (null != getFragmentManager().getFragments() && getFragmentManager().getFragments().size() > 1) {
-                    getFragmentManager().popBackStack();
-                }else{
-                    getActivity().finish();
-                }
-                return true;
-            case R.id.dm_action_pause_all:
+        if (item.getItemId() == R.id.dm_action_pause_all) {
 //                ImplAgent.getInstance(mActivity).pauseDownload();
-                return true;
-            case R.id.dm_action_resume_all:
+            return true;
+        }else if (item.getItemId() == R.id.dm_action_resume_all){
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -164,27 +118,24 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onClick(View v) {
         FragmentManager fgm = getFragmentManager();
-        switch(v.getId()){
-            case R.id.action_back:
-                if (null != fgm.getFragments() && fgm.getFragments().size() > 0) {
-                    fgm.popBackStack();
-                }else{
-                    getActivity().finish();
-                }
-                break;
-            case R.id.action_more:
-                break;
+        if(v.getId() == R.id.action_back) {
+            if (null != fgm.getFragments() && fgm.getFragments().size() > 0) {
+                fgm.popBackStack();
+            } else {
+                getActivity().finish();
+            }
+        }else if (v.getId() == R.id.action_more){
+
         }
 
     }
 
     private void initActionBar(View tabStrip){
         try {
-            Resources res = mPlugContext.getResources();
             ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
 //            actionBar.setBackgroundDrawable(res.getDrawable(R.drawable.action_bar_bg_light));
+            actionBar.setDisplayUseLogoEnabled(false);
             actionBar.setHomeButtonEnabled(true);
-            actionBar.setHomeAsUpIndicator(res.getDrawable(R.drawable.action_bar_back_light));
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
@@ -216,29 +167,18 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         public Fragment getItem(int position) {
             Fragment fg = null;
             OSGIServiceHost host = (OSGIServiceHost)mActivity;
+            int downloadFlag = Constant.STATUS_PENDING | Constant.STATUS_RUNNING | Constant.STATUS_PAUSED | Constant.STATUS_FAILED;
             if (null != host) {
-                switch (tabs[position]) {
-                    case R.string.dm_downloaded:
-                        fg = host.newFragment(
-                                BundleContextFactory.getInstance().getBundleContext(),
-                                Constant.OSGI_SERVICE_DM_FRAGMENT,
-                                DownloadListFragment.class.getName(),
-                                DownloadListFragment.newBundle(Constant.STATUS_SUCCESSFUL
-                                        | Constant.STATUS_INSTALLED
-                                        | Constant.STATUS_INSTALL_FAILED
-                                        | Constant.STATUS_PRIVATE_INSTALLING
-                                        | Constant.STATUS_UPGRADE));
-                        break;
-                    case R.string.dm_downloading:
-                        fg = host.newFragment(
-                                BundleContextFactory.getInstance().getBundleContext(),
-                                Constant.OSGI_SERVICE_DM_FRAGMENT,
-                                DownloadListFragment.class.getName(),
-                                DownloadListFragment.newBundle( Constant.STATUS_PENDING
-                                        | Constant.STATUS_RUNNING
-                                        | Constant.STATUS_PAUSED
-                                        | Constant.STATUS_FAILED));
-                        break;
+                if (R.string.dm_downloaded == tabs[position]) {
+                    fg = host.newFragment(
+                            Constant.OSGI_SERVICE_DM_FRAGMENT,
+                            DownloadListFragment.class.getName(),
+                            DownloadListFragment.newBundle(~downloadFlag));
+                }else if (R.string.dm_downloading == tabs[position]){
+                    fg = host.newFragment(
+                            Constant.OSGI_SERVICE_DM_FRAGMENT,
+                            DownloadListFragment.class.getName(),
+                            DownloadListFragment.newBundle( downloadFlag ));
                 }
             }
             return fg;
@@ -253,7 +193,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         public CharSequence getPageTitle(int position) {
             Resources res = getActivity().getResources();
             try {
-                res = BundleContextFactory.getInstance().getBundleContext().getBundleContext().getResources();
+                res = mActivity.getResources();
             }catch (Exception e){
                 e.printStackTrace();
             }

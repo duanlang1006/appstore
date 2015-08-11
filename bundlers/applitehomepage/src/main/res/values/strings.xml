@@ -2,10 +2,10 @@
 <resources>
 
     <string name="app_name">ApplitHome</string>
-    <string name="action_search">Search</string>
     <string name="personal">Personal</string>
 
     <string name="load_more">loading...</string>
     <string name="download_manager">Download manager</string>
     <string name="upgrade_manager">Upgrade manager</string>
+    <string name="load_end">ending...</string>
 </resources>
