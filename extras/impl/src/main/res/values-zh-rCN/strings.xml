@@ -6,7 +6,7 @@
     <string name="download_status_success">下载完成</string>
     <string name="download_status_running">正在下载</string>
     <string name="download_status_queued">已加入队列</string>
-    <string name="download_status_paused">已暂停</string>
+    <string name="download_status_paused">暂停中</string>
     <string name="download_status_waiting">等待下载</string>
 
 

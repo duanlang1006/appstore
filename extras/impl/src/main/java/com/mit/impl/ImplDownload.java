@@ -7,6 +7,7 @@ import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.HttpHandler;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.mit.impl.download.DownloadInfo;
@@ -126,9 +127,45 @@ class ImplDownload  {
             if (null != downloadInfo) {
                 dm.resumeDownload(downloadInfo, new DownloadCallback<File>(implInfo, callback));
                 downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
+                callback.onPending(implInfo);
             }
         } catch (DbException e) {
             e.printStackTrace();
+        }
+    }
+
+    void pauseAll(List<ImplInfo> implList){
+        for (ImplInfo implInfo : implList){
+            DownloadInfo downloadInfo = dm.getDownloadInfoById(implInfo.getDownloadId());
+            if (null != downloadInfo){
+                HttpHandler handler = downloadInfo.getHandler();
+                if (null != handler && !handler.isCancelled() && !handler.isPaused()
+                    && !downloadInfo.getState().equals(HttpHandler.State.SUCCESS)) {
+                    try {
+                        dm.stopDownload(downloadInfo);
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    void resumeAll(List<ImplInfo> implList,ImplListener callback){
+        for (ImplInfo implInfo : implList){
+            DownloadInfo downloadInfo = dm.getDownloadInfoById(implInfo.getDownloadId());
+            if (null != downloadInfo){
+                HttpHandler handler = downloadInfo.getHandler();
+                if ((null == handler ||  (handler.isPaused() || handler.isCancelled()))
+                    && !downloadInfo.getState().equals(HttpHandler.State.SUCCESS)) {
+                    try {
+                        dm.resumeDownload(downloadInfo, new DownloadCallback<File>(implInfo, callback));
+                        downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
+                    } catch (DbException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 

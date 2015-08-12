@@ -23,15 +23,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
+import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
 import java.lang.reflect.Field;
+import java.util.Observable;
+import java.util.Observer;
 
 
-public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener {
+public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener,Observer {
     final static String TAG = "applite_dm";
     private ViewPager mViewPager;
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
@@ -45,6 +50,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     public void onAttach(Activity activity) {
         ImplLog.d(TAG, "onAttach," + this);
         super.onAttach(activity);
+        ImplAgent.getInstance(mActivity).addObserver(this);
     }
 
     @Override
@@ -67,6 +73,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     public void onDetach() {
         super.onDetach();
         ImplLog.d(TAG, "onDetach,"+this);
+        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
     @Override
@@ -101,10 +108,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.dm_action_pause_all) {
-//                ImplAgent.getInstance(mActivity).pauseDownload();
+            ImplAgent.getInstance(mActivity.getApplicationContext()).pauseAll();
             return true;
         }else if (item.getItemId() == R.id.dm_action_resume_all){
-                return true;
+            ImplAgent.getInstance(mActivity.getApplicationContext()).resumeAll();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -132,6 +140,13 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     }
 
+    @Override
+    public void update(Observable observable, Object data) {
+//        ImplInfo info = (ImplInfo)data;
+        LogUtils.d(TAG,"update");
+        mViewPager.getAdapter().notifyDataSetChanged();
+    }
+
     private void initActionBar(View tabStrip){
         try {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
@@ -151,6 +166,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
         int[] tabs = new int[2];
+        int mChildCount = 0;
         FragmentManager mFragmentManager ;
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -204,29 +220,17 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
         @Override
         public void notifyDataSetChanged() {
+            mChildCount = getCount();
             super.notifyDataSetChanged();
         }
 
         @Override
-        public void registerDataSetObserver(DataSetObserver observer) {
-            super.registerDataSetObserver(observer);
-            ImplLog.d(TAG, "registerDataSetObserver,"+observer+","+this);
-        }
-
-        @Override
-        public void unregisterDataSetObserver(DataSetObserver observer) {
-            super.unregisterDataSetObserver(observer);
-            ImplLog.d(TAG, "unregisterDataSetObserver,"+observer+","+this);
-        }
-
-        @Override
-        public void finishUpdate(ViewGroup container) {
-//            if (!destoryView) {
-                super.finishUpdate(container);
-//            }else{
-//                mFragmentManager.beginTransaction().commit();
-//            }
-            ImplLog.d(TAG,"finishUpdate,"+destoryView);
+        public int getItemPosition(Object object) {
+            if (mChildCount > 0){
+                mChildCount -- ;
+                return POSITION_NONE;
+            }
+            return super.getItemPosition(object);
         }
     }
 }
