@@ -8,7 +8,7 @@
     <color name="dividing_line">#a0a0a0</color>
     <color name="open_line">#f0f0f0</color>
     <color name="green">#70AA39</color>
-    <color name="background">#f8f8f8</color>
+    <color name="background_main">#f8f8f8</color>
 
     <color name="progress_background">#a0a0a0</color>
     <color name="progress_foreground">#00CC00</color>

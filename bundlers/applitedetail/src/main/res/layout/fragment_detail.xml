@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/background_main"
     android:orientation="vertical"
     android:weightSum="1"
     tools:context="com.mit.detail.DetailFragment">
@@ -27,7 +27,7 @@
             android:layout_above="@+id/no_network_text"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="20dp"
-            android:background="@color/background"
+            android:background="@color/background_main"
             android:src="@drawable/no_network" />
 
         <TextView
