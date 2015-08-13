@@ -20,10 +20,13 @@ import com.lidroid.xutils.util.LogUtils;
 import com.lidroid.xutils.util.MimeTypeUtils;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
+import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by hxd on 15-6-10.
@@ -64,8 +67,7 @@ public class ImplAgent extends Observable{
     private List<ImplInfo> mImplList;
     private DbUtils db;
     private ImplAgentCallback mImplCallback;
-    private WeakHashMap<ImplChangeCallback,ImplInfo> mWeakCallbackMap;
-    private Object mLock = new Object();
+    private Map<ImplChangeCallback,ImplInfo> mWeakCallbackMap;
 
     private ImplAgent(Context context) {
         mContext = context;
@@ -79,7 +81,7 @@ public class ImplAgent extends Observable{
             mImplList = new ArrayList<ImplInfo>();
         }
         mImplCallback = new ImplAgentCallback();
-        mWeakCallbackMap = new WeakHashMap<>();
+        mWeakCallbackMap = Collections.synchronizedMap(new WeakHashMap());
 
         mDownloader = ImplDownload.getInstance(mContext);
         mInstaller = ImplPackageManager.getInstance(mContext);
@@ -231,7 +233,7 @@ public class ImplAgent extends Observable{
 
     public void install(ImplInfo implInfo,boolean silent,ImplChangeCallback appCallback){
         setImplCallback(appCallback,implInfo);
-        mInstaller.install(implInfo,silent,mImplCallback);
+        mInstaller.install(implInfo, silent, mImplCallback);
     }
 
     public void uninstall(ImplInfo implInfo,boolean silent,ImplChangeCallback appCallback){
@@ -265,7 +267,7 @@ public class ImplAgent extends Observable{
 
     public void setImplCallback(ImplChangeCallback appCallback,ImplInfo implInfo){
         if (null != appCallback && null != implInfo) {
-            synchronized (mLock) {
+            synchronized (mWeakCallbackMap) {
                 mWeakCallbackMap.put(appCallback, implInfo);
             }
         }
@@ -621,13 +623,25 @@ public class ImplAgent extends Observable{
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    synchronized (mLock) {
-                        for (ImplChangeCallback callback : mWeakCallbackMap.keySet()) {
-                            ImplInfo i = mWeakCallbackMap.get(callback);
-                            if (i == info) {
+                    synchronized (mWeakCallbackMap) {
+                        Set keyset = mWeakCallbackMap.keySet();
+                        if (null == keyset){
+                            return;
+                        }
+                        Iterator it = keyset.iterator();
+                        while(it.hasNext()){
+                            ImplChangeCallback callback = (ImplChangeCallback)it.next();
+                            if (info == mWeakCallbackMap.get(callback)) {
                                 callback.onChange(info);
                             }
                         }
+
+//                        for (ImplChangeCallback callback : mWeakCallbackMap.keySet()) {
+//                            ImplInfo i = mWeakCallbackMap.get(callback);
+//                            if (i == info) {
+//                                callback.onChange(info);
+//                            }
+//                        }
                     }
                 }
             });
