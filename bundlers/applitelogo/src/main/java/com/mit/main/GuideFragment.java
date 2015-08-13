@@ -147,7 +147,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
             getResolution();
             post((int) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0), 10, POST_ALL_APK);
             //GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
-            GuideSPUtils.put(mActivity, "personal_flag", true);
         } else {
             rootView = mInflater.inflate(R.layout.fragment_logo, container, false);
             logoInitView();
@@ -418,6 +417,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      */
     private void jump() {
         GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
+        GuideSPUtils.put(mActivity, "personal_flag", true);
 
         OSGIServiceHost host = (OSGIServiceHost) mActivity;
         host.jumpto(mWhichService, mWhichFragment, mParams);

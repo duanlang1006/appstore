@@ -81,7 +81,7 @@
             android:id="@+id/list_item_progress_button"
             android:layout_width="80dp"
             android:layout_height="30dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginRight="14dp"
             android:text="@string/install"
             android:textStyle="normal"
             android:textColor="@color/black"
