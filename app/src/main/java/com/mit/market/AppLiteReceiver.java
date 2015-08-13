@@ -11,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.applite.android.R;
+import com.mit.impl.ImplAgent;
 
 public class AppLiteReceiver extends BroadcastReceiver {
     private static final String TAG = "AppLiteReceiver";
@@ -24,7 +25,8 @@ public class AppLiteReceiver extends BroadcastReceiver {
         }else if ("com.dataservice.broadcast".equals(intent.getAction())){
             setRemind(context,intent);
         }else{
-            MyIntentService.startByOriginIntent(context,intent);
+//            MyIntentService.startByOriginIntent(context,intent);
+            ImplAgent.getInstance(context.getApplicationContext()).onReceive(context,intent);
         }
     }
 

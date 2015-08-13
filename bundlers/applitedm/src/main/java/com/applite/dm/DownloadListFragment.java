@@ -30,6 +30,7 @@ import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Observer;
 
@@ -40,6 +41,18 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     private ImplAgent mImplAgent;
     private List<ImplInfo> mImplList;
     private BitmapUtils mBitmapHelper;
+    public static final Comparator<ImplInfo> IMPL_TIMESTAMP_COMPARATOR = new Comparator<ImplInfo>() {
+        public final int compare(ImplInfo a, ImplInfo b) {
+            int result = 0;
+            if (a.getLastMod()< b.getLastMod()){
+                result = 1;
+            }else if (a.getLastMod() > b.getLastMod()){
+                result = -1;
+            }
+            return result;
+        }
+    };
+
 
     public static Bundle newBundle(int flag){
         Bundle b = new Bundle();
@@ -70,7 +83,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
 
         if (null != mImplList && mImplList.size()>0) {
             mAdapter = new DownloadAdapter(mActivity,R.layout.download_list_item,mImplList,mBitmapHelper);
+            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
             mListview.setAdapter(mAdapter);
+
         }
         return view;
     }

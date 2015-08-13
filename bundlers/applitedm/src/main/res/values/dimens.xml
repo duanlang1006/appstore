@@ -14,6 +14,10 @@
     <dimen name="download_text_size">16sp</dimen>
     <dimen name="download_info_text_size">13sp</dimen>
     <dimen name="download_status_text_size">13sp</dimen>
+
+    <dimen name="download_btn_min_height">30dp</dimen>
+    <dimen name="download_btn_min_width">55dp</dimen>
+
     <dimen name="distance_between_text_button">10.0dip</dimen>
     <dimen name="action_layout_width">45.0dip</dimen>
     <dimen name="list_item_height">100dp</dimen>

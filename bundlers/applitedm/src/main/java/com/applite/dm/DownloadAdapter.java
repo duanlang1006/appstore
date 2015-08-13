@@ -48,6 +48,8 @@ import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplLog;
+
+import java.util.Comparator;
 import java.util.List;
 
 public class DownloadAdapter extends ArrayAdapter implements View.OnClickListener{
@@ -89,8 +91,14 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                         implAgent.pauseDownload(vh.implInfo);
                         break;
                     case Constant.STATUS_PAUSED:
-                    default:
                         implAgent.resumeDownload(vh.implInfo, vh.implCallback);
+                        break;
+                    default:
+                        implAgent.newDownload(vh.implInfo,
+                                Constant.extenStorageDirPath,
+                                vh.implInfo.getTitle() + ".apk",
+                                true,
+                                vh.implCallback);
                         break;
                 }
             } else {
@@ -131,23 +139,29 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 return;
             }
             implAgent.setImplCallback(implCallback,implInfo);
-            actionBtn.setText(implAgent.getActionText(implInfo));
-            descView.setText(implAgent.getDescText(implInfo));
             String title = implInfo.getTitle();
             if(null == title || title.isEmpty()) {
                 title = mContext.getResources().getString(R.string.missing_title);
             }
             titleView.setText(title);
-            statusView.setText(implAgent.getStatusText(implInfo));
             setIcon();
-            setProgress();
+            refresh();
         }
 
         void refresh(){
             if (null == this.implInfo){
                 return;
             }
-            actionBtn.setText(implAgent.getActionText(implInfo));
+            actionBtn.setEnabled(true);
+            switch (implInfo.getStatus()){
+                case Constant.STATUS_PRIVATE_INSTALLING:
+                    actionBtn.setText(implAgent.getStatusText(implInfo));
+                    actionBtn.setEnabled(false);
+                    break;
+                default:
+                    actionBtn.setText(implAgent.getActionText(implInfo));
+                    break;
+            }
             descView.setText(implAgent.getDescText(implInfo));
             statusView.setText(implAgent.getStatusText(implInfo));
             setProgress();

@@ -35,7 +35,7 @@ public class ImplInfo {
         iconUrl = null;
         title = null;
         description = null;
-        lastMod = System.currentTimeMillis();
+        lastMod = 0;
         versionCode = 0;
         localPath = null;
         mimeType = null;

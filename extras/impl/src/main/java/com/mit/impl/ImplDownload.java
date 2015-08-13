@@ -103,6 +103,7 @@ class ImplDownload  {
                     new DownloadCallback<File>(implInfo,callback));
             implInfo.setDownloadId(downloadInfo.getId());
             implInfo.setStatus(Constant.STATUS_PENDING);
+            implInfo.setLastMod(System.currentTimeMillis());
             downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
             callback.onPending(implInfo);
         } catch (DbException e) {
