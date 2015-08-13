@@ -32,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -48,56 +49,34 @@ import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplLog;
 
-import java.lang.reflect.Method;
+import java.util.Comparator;
+import java.util.List;
 
-public class DownloadAdapter extends CursorAdapter implements View.OnClickListener{
+public class DownloadAdapter extends ArrayAdapter implements View.OnClickListener{
     private Context mContext;
-    private Resources mResources;
-    private LayoutInflater mInflater;
-//    private int mCheckedItemPosition = -1;
-    private int mStatusFlag;
+    private int mLayoutId;
     private BitmapUtils mBitmapHelper;
     private ImplAgent implAgent;
 
-    public DownloadAdapter(Context context, Cursor cursor, int statusFlag) {
-        super(context, cursor,true);
+    public DownloadAdapter(Context context, int resource, List<ImplInfo> implInfoList,BitmapUtils bitmapHelper) {
+        super(context, resource, implInfoList);
         mContext = context;
-        mStatusFlag = statusFlag;
-        mBitmapHelper = BitmapHelper.getBitmapUtils(mContext.getApplicationContext());
-        mResources = mContext.getResources();
-        mInflater = LayoutInflater.from(mContext);
+        mBitmapHelper = bitmapHelper;
         implAgent = ImplAgent.getInstance(context.getApplicationContext());
+        this.mLayoutId = resource;
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = mInflater.inflate(R.layout.download_list_item, null);
-        return view;
-    }
-
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder viewHolder = (ViewHolder)view.getTag();
-        if (null == viewHolder) {
-            viewHolder = new ViewHolder(view);
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View view = convertView;
+        if (null == view) {
+            view = LayoutInflater.from(mContext).inflate(mLayoutId,null);
+            view.setTag(new ViewHolder(view));
         }
-
-        viewHolder.position = cursor.getPosition();
-        viewHolder.actionBtn.setOnClickListener(this);
-        viewHolder.progressBar.setOnClickListener(this);
-//        viewHolder.deleteButton.setOnClickListener(this);
-//        viewHolder.detailButton.setOnClickListener(this);
-
-//        view.setOnClickListener(this);
-        String key = cursor.getString(cursor.getColumnIndex("key"));
-        String packageName = cursor.getString(cursor.getColumnIndex("packageName"));
-        int versionCode = cursor.getInt(cursor.getColumnIndex("versionCode"));
-        viewHolder.initView(implAgent.getImplInfo(key,packageName,versionCode));
-//        if (mCheckedItemPosition == cursor.getPosition()){
-//            viewHolder.extra.setVisibility(View.VISIBLE);
-//        }else{
-//            viewHolder.extra.setVisibility(View.GONE);
-//        }
+        ViewHolder vh = (ViewHolder)view.getTag();
+        vh.initView((ImplInfo)getItem(position));
+        vh.actionBtn.setOnClickListener(this);
+        return view;
     }
 
     @Override
@@ -112,8 +91,14 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
                         implAgent.pauseDownload(vh.implInfo);
                         break;
                     case Constant.STATUS_PAUSED:
-                    default:
                         implAgent.resumeDownload(vh.implInfo, vh.implCallback);
+                        break;
+                    default:
+                        implAgent.newDownload(vh.implInfo,
+                                Constant.extenStorageDirPath,
+                                vh.implInfo.getTitle() + ".apk",
+                                true,
+                                vh.implCallback);
                         break;
                 }
             } else {
@@ -124,34 +109,6 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
                 }
             }
         }
-//            case R.id.button_delete:
-//                implAgent.remove(vh.implInfo);
-//                break;
-//            case R.id.button_detail:
-//                BundleContext bundleContext = BundleContextFactory.getInstance().getBundleContext();
-//                OSGIServiceHost host = (OSGIServiceHost)mContext;
-//                if (null != host){
-//                    Bundle bundle = new Bundle();
-//                    bundle.putString("packageName",vh.implInfo.getPackageName());
-//                    bundle.putString("name",vh.implInfo.getTitle());
-//                    bundle.putString("iconUrl",vh.implInfo.getIconUrl());
-//                    AppliteUtils.putFgParams(bundle,Constant.OSGI_SERVICE_DM_FRAGMENT,"replace",true);
-//                    host.jumpto(bundleContext,Constant.OSGI_SERVICE_DETAIL_FRAGMENT,null,bundle);
-//                }
-//                break;
-//            default:
-//                if (mCheckedItemPosition == vh.position){
-//                    mCheckedItemPosition = -1;
-//                }else{
-//                    mCheckedItemPosition = vh.position;
-//                }
-//                notifyDataSetInvalidated();
-//                HostUtils.launchDetail((OSGIServiceHost)mContext,
-//                        vh.implInfo.getPackageName(),
-//                        vh.implInfo.getTitle(),
-//                        vh.implInfo.getIconUrl());
-//                break;
-//        }
     }
 
     class ViewHolder {
@@ -160,24 +117,17 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
         TextView descView;
         TextView statusView;
         TextView actionBtn;
-//        TextView deleteButton;
-//        TextView detailButton;
         ImageView iconView;
         ImplInfo implInfo;
-//        View extra;
         ImplChangeCallback implCallback;
-        int position;
 
         ViewHolder(View view) {
             actionBtn = (TextView) view.findViewById(R.id.button_op);
-//            deleteButton = (TextView) view.findViewById(R.id.button_delete);
-//            detailButton = (TextView) view.findViewById(R.id.button_detail);
             progressBar = (ProgressBar) view.findViewById(android.R.id.progress);
             descView = (TextView) view.findViewById(R.id.size_text);
             titleView = (TextView) view.findViewById(R.id.download_title);
             statusView = (TextView) view.findViewById(R.id.domain);
             iconView = (ImageView) view.findViewById(R.id.download_icon);
-            view.setTag(this);
             actionBtn.setTag(this);
             progressBar.setTag(this);
             implCallback = new DownloadImplCallback(this);
@@ -189,60 +139,51 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
                 return;
             }
             implAgent.setImplCallback(implCallback,implInfo);
-            actionBtn.setText(implAgent.getActionText(implInfo));
-            descView.setText(implAgent.getDescText(implInfo));
             String title = implInfo.getTitle();
             if(null == title || title.isEmpty()) {
-                title = mResources.getString(R.string.missing_title);
+                title = mContext.getResources().getString(R.string.missing_title);
             }
             titleView.setText(title);
-            statusView.setText(implAgent.getStatusText(implInfo));
             setIcon();
-            setProgress();
+            refresh();
         }
 
         void refresh(){
             if (null == this.implInfo){
                 return;
             }
-            actionBtn.setText(implAgent.getActionText(implInfo));
+            actionBtn.setEnabled(true);
+            switch (implInfo.getStatus()){
+                case Constant.STATUS_PRIVATE_INSTALLING:
+                    actionBtn.setText(implAgent.getStatusText(implInfo));
+                    actionBtn.setEnabled(false);
+                    break;
+                default:
+                    actionBtn.setText(implAgent.getActionText(implInfo));
+                    break;
+            }
             descView.setText(implAgent.getDescText(implInfo));
             statusView.setText(implAgent.getStatusText(implInfo));
             setProgress();
         }
 
         private void setIcon() {
-            Drawable drawable = mResources.getDrawable(R.drawable.ic_download_misc_file_type);
-            iconView.setImageDrawable(drawable);
-            if(null != implInfo.getIconUrl()){
-                mBitmapHelper.configDefaultLoadFailedImage(drawable);
-                mBitmapHelper.configDefaultLoadingImage(drawable);
-                mBitmapHelper.configDefaultBitmapMaxSize(iconView.getWidth(),iconView.getHeight());
-                mBitmapHelper.display(iconView, implInfo.getIconUrl()/*,new BitmapLoadCallBack<ImageView>() {
-                    @Override
-                    public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
-                        this.setBitmap(imageView,bitmap);
-                        Animation animation = bitmapDisplayConfig.getAnimation();
-                        if (animation != null) {
-                            animationDisplay(imageView, animation);
-                        }
-                    }
-
-                    @Override
-                    public void onLoadFailed(ImageView imageView, String s, Drawable drawable) {
-                        this.setDrawable(imageView, drawable);
-                    }
-
-                    private void animationDisplay(ImageView container, Animation animation) {
-                        try {
-                            Method cloneMethod = Animation.class.getDeclaredMethod("clone");
-                            cloneMethod.setAccessible(true);
-                            container.startAnimation((Animation) cloneMethod.invoke(animation));
-                        } catch (Throwable e) {
-                            container.startAnimation(animation);
-                        }
-                    }
-                }*/);
+            Bitmap resBitmap = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.file_type_apk);
+            String url = implInfo.getIconUrl();
+            if(null != url && !TextUtils.isEmpty(url)){
+                int width = (int)mContext.getResources().getDimension(R.dimen.list_item_icon_size);
+                int height = width;
+                mBitmapHelper.configDefaultBitmapMaxSize(width,height);
+                Bitmap cacheBitmap = mBitmapHelper.getBitmapFromMemCache(url,null);
+                if (null != cacheBitmap){
+                    iconView.setImageBitmap(cacheBitmap);
+                }else {
+                    mBitmapHelper.configDefaultLoadFailedImage(resBitmap);
+                    mBitmapHelper.configDefaultLoadingImage(resBitmap);
+                    mBitmapHelper.display(iconView, implInfo.getIconUrl());
+                }
+            }else{
+                iconView.setImageBitmap(resBitmap);
             }
         }
 
@@ -267,9 +208,6 @@ public class DownloadAdapter extends CursorAdapter implements View.OnClickListen
             ImplLog.d(this.getClass().getSimpleName(),"onChange,"+info.getTitle()+","+info.getStatus());
             ViewHolder vh = (ViewHolder)tag;
             vh.refresh();
-            if ((info.getStatus()& mStatusFlag) == 0){
-                notifyDataSetChanged();
-            }
         }
     }
 }
