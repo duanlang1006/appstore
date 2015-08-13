@@ -35,7 +35,7 @@ public class Constant {
     public final static int STATUS_NORMAL_INSTALLING=1<<10;     //普通安装
     public final static int STATUS_INSTALLED = 1<<11;           //已安装
     public final static int STATUS_INSTALL_FAILED = 1<<12;      //安装失败
-    public final static int STATUS_UPGRADE = 1<<13;             //有更新
+//    public final static int STATUS_UPGRADE = 1<<13;             //有更新
 
     public final static int INSTALL_SUCCEEDED = 1;//ApplicationManager
     public final static int DELETE_SUCCEEDED = 1; //ApplicationManager
