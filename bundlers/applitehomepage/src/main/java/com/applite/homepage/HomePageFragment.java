@@ -182,6 +182,12 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         mOffnetView = rootView.findViewById(R.id.middle_parent);
         offnetImg = (ImageView)rootView.findViewById(R.id.off_img);
         mRetrybtn = (Button)rootView.findViewById(R.id.refresh_btn);
+        mRetrybtn.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View paramView){
+                LogUtils.i(TAG, "click the retry button ");
+                httpRequest();
+            }
+        });
 
         mOffnetView.setVisibility(View.GONE);
 
@@ -191,14 +197,6 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
              //loadingText.setVisibility(View.GONE);
              mLoadingView.clearAnimation();
              mOffnetView.setVisibility(View.VISIBLE);
-
-             mRetrybtn.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View paramView){
-                    LogUtils.i(TAG, "click the retry button ");
-                    httpRequest();
-                    popupWindowPost();
-                }
-            });
         }
 
         if (null == mSectionsPagerAdapter){
