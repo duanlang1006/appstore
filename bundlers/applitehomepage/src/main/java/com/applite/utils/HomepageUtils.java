@@ -41,7 +41,7 @@ public class HomepageUtils {
     public static void launchUpgradeFragment(OSGIServiceHost host) {
         if (null != host){
             host.jumpto(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,
-                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"add",true));
+                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
         }
     }
 
@@ -51,10 +51,27 @@ public class HomepageUtils {
     public static void launchDownloadManagerFragment(OSGIServiceHost host) {
         if (null != host){
             host.jumpto(Constant.OSGI_SERVICE_DM_FRAGMENT,null,
-                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"add",true));
+                    AppliteUtils.putFgParams(new Bundle(),Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
         }
     }
 
+    /****
+     * 我的一天
+     */
+    public static void launchLogoManagerFragment(OSGIServiceHost host) {
+        if (null != host){
+            Bundle b = new Bundle();
+            b.putString("service", Constant.OSGI_SERVICE_MAIN_FRAGMENT);
+            b.putString("fragment", null);
+            b.putBundle("params", b);
+            host.jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,null,
+                    AppliteUtils.putFgParams(b,Constant.OSGI_SERVICE_MAIN_FRAGMENT,"replace",true));
+        }
+    }
+
+    /****
+     * 详情
+     */
     public static void launchDetail(OSGIServiceHost host,String packageName,String name,String imgUrl){
         if (null != host){
             Bundle b = new Bundle();

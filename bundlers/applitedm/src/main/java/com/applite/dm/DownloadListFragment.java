@@ -15,11 +15,14 @@ import android.widget.TextView;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.dm.utils.HostUtils;
+import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.DbUtils;
+import com.lidroid.xutils.bitmap.PauseOnScrollListener;
 import com.lidroid.xutils.db.sqlite.Selector;
 import com.lidroid.xutils.db.sqlite.WhereBuilder;
 import com.lidroid.xutils.db.table.Table;
 import com.lidroid.xutils.exception.DbException;
+import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplDbHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
@@ -27,19 +30,29 @@ import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Observer;
 
 public class DownloadListFragment extends OSGIBaseFragment implements ListView.OnItemClickListener{
-    private Activity mActivity;
     private ListView mListview;
     private DownloadAdapter mAdapter;
     private Integer mStatusFlags = null;
-    private DbUtils db;
+    private ImplAgent mImplAgent;
+    private List<ImplInfo> mImplList;
+    private BitmapUtils mBitmapHelper;
+    public static final Comparator<ImplInfo> IMPL_TIMESTAMP_COMPARATOR = new Comparator<ImplInfo>() {
+        public final int compare(ImplInfo a, ImplInfo b) {
+            int result = 0;
+            if (a.getLastMod()< b.getLastMod()){
+                result = 1;
+            }else if (a.getLastMod() > b.getLastMod()){
+                result = -1;
+            }
+            return result;
+        }
+    };
 
-    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
-        return new DownloadListFragment(fg,params);
-    }
 
     public static Bundle newBundle(int flag){
         Bundle b = new Bundle();
@@ -47,11 +60,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         return b;
     }
 
-    private DownloadListFragment(Fragment mFragment, Bundle params) {
-        super(mFragment, params);
-        if (null != params) {
-            mStatusFlags = params.getInt("statusFilter");
-        }
+    public DownloadListFragment() {
+        super();
     }
 
     @Override
@@ -69,15 +79,27 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         mListview = (ListView) view.findViewById(android.R.id.list);
         mListview.setEmptyView(view.findViewById(R.id.empty));
         mListview.setOnItemClickListener(this);
-        setAdapter();
+        mListview.setOnScrollListener(new PauseOnScrollListener(mBitmapHelper, false, true));
+
+        if (null != mImplList && mImplList.size()>0) {
+            mAdapter = new DownloadAdapter(mActivity,R.layout.download_list_item,mImplList,mBitmapHelper);
+            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
+            mListview.setAdapter(mAdapter);
+
+        }
         return view;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = activity;
-        db = ImplDbHelper.getDbUtils(mActivity.getApplicationContext());
+        Bundle params = getArguments();
+        if (null != params) {
+            mStatusFlags = params.getInt("statusFilter");
+        }
+        mImplAgent = ImplAgent.getInstance(activity.getApplicationContext());
+        mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
+        mBitmapHelper = new BitmapUtils(mActivity.getApplicationContext());
         ImplLog.d(DownloadPagerFragment.TAG, "onAttach," + this);
     }
 
@@ -127,64 +149,5 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                     vh.implInfo.getTitle(),
                     vh.implInfo.getIconUrl());
         }
-    }
-
-    private void setAdapter(){
-        Table table = Table.get(db, ImplInfo.class);
-        WhereBuilder wb = WhereBuilder.b();
-        if (mStatusFlags != null) {
-            List<String> parts = new ArrayList<String>();
-            if ((mStatusFlags & Constant.STATUS_PENDING) != 0) {
-                wb.or("status", "=", Constant.STATUS_PENDING);
-            }
-            if ((mStatusFlags & Constant.STATUS_RUNNING) != 0) {
-                wb.or("status", "=", Constant.STATUS_RUNNING);
-            }
-            if ((mStatusFlags & Constant.STATUS_PAUSED) != 0) {
-                wb.or("status", "=", Constant.STATUS_PAUSED);
-            }
-            if ((mStatusFlags & Constant.STATUS_SUCCESSFUL) != 0) {
-                wb.or("status", "=", Constant.STATUS_SUCCESSFUL);
-            }
-            if ((mStatusFlags & Constant.STATUS_FAILED) != 0) {
-                wb.or("status", "=", Constant.STATUS_FAILED);
-            }
-            if ((mStatusFlags & Constant.STATUS_PACKAGE_INVALID) != 0) {
-                wb.or("status", "=", Constant.STATUS_PACKAGE_INVALID);
-            }
-            if ((mStatusFlags & Constant.STATUS_PRIVATE_INSTALLING) != 0) {
-                wb.or("status", "=", Constant.STATUS_PRIVATE_INSTALLING);
-            }
-            if ((mStatusFlags & Constant.STATUS_NORMAL_INSTALLING) != 0) {
-                wb.or("status", "=", Constant.STATUS_NORMAL_INSTALLING);
-            }
-            if ((mStatusFlags & Constant.STATUS_INSTALLED) != 0) {
-                wb.or("status", "=", Constant.STATUS_INSTALLED);
-            }
-            if ((mStatusFlags & Constant.STATUS_INSTALL_FAILED) != 0) {
-                wb.or("status", "=", Constant.STATUS_INSTALL_FAILED);
-            }
-            if ((mStatusFlags & Constant.STATUS_UPGRADE) != 0) {
-                wb.or("status", "=", Constant.STATUS_UPGRADE);
-            }
-        }
-        Selector selector = Selector.from(ImplInfo.class).where(wb);
-        String sql = selector.toString();
-        LogUtils.d("applitedm",sql);
-        Cursor cursor = null;
-        try {
-            cursor = db.execQuery(sql);
-        } catch (DbException e) {
-            e.printStackTrace();
-        }
-//        if (null == mAdapter){
-            if (null != cursor) {
-                mAdapter = new DownloadAdapter(mActivity, cursor, mStatusFlags);
-                mListview.setAdapter(mAdapter);
-            }
-//        }else{
-//            mAdapter.changeCursor(cursor);
-//            mAdapter.notifyDataSetChanged();
-//        }
     }
 }

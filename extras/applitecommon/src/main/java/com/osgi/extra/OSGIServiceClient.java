@@ -25,7 +25,7 @@ public class OSGIServiceClient {
         mClientMap =  new HashMap<String,String>();
     }
 
-    public OSGIBaseFragment newOSGIFragment(Fragment container,String whichService,String whichFragment,Bundle params){
+    public OSGIBaseFragment newOSGIFragment(String whichService,String whichFragment,Bundle params){
         OSGIBaseFragment baseFragment = null;
 
         if (null == whichFragment || TextUtils.isEmpty(whichFragment)){
@@ -35,12 +35,15 @@ public class OSGIServiceClient {
         if (null != whichFragment && !TextUtils.isEmpty(whichFragment)){
             try {
                 Class<?> cls = Class.forName(whichFragment);
-                Constructor ct = cls.getDeclaredConstructor(Fragment.class,Bundle.class);
+                Constructor ct = cls.getDeclaredConstructor();
                 ct.setAccessible(true);
-                baseFragment = (OSGIBaseFragment)ct.newInstance(container,params);
+                baseFragment = (OSGIBaseFragment)ct.newInstance();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+        if (null != baseFragment){
+            baseFragment.setArguments(params);
         }
         return baseFragment;
     }

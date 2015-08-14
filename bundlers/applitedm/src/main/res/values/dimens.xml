@@ -1,8 +1,7 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="download_item_icon_size">64dp</dimen>
+    <dimen name="activity_horizontal_margin">2dp</dimen>
+    <dimen name="activity_vertical_margin">2dp</dimen>
 
     <dimen name="checkmark_area">40.0dip</dimen>
     <dimen name="distance_to_border">24.0dip</dimen>
@@ -12,17 +11,23 @@
     <dimen name="window_side_length">540.0dip</dimen>
     <dimen name="interval_distance">5.0dip</dimen>
     <dimen name="distance_to_left">4.0dip</dimen>
-    <dimen name="download_info_text_size">11.0dip</dimen>
-    <dimen name="download_text_size">13.0dip</dimen>
+    <dimen name="download_text_size">16sp</dimen>
+    <dimen name="download_info_text_size">13sp</dimen>
+    <dimen name="download_status_text_size">13sp</dimen>
+
+    <dimen name="download_btn_min_height">30dp</dimen>
+    <dimen name="download_btn_min_width">55dp</dimen>
+
     <dimen name="distance_between_text_button">10.0dip</dimen>
     <dimen name="action_layout_width">45.0dip</dimen>
-    <dimen name="list_item_height">64.0dip</dimen>
-    <dimen name="app_icon_size">40.0dip</dimen>
-    <dimen name="tab_bar_height">68.0dip</dimen>
-    <dimen name="download_status_text_size">11.0dip</dimen>
+    <dimen name="list_item_height">100dp</dimen>
+    <dimen name="list_item_icon_size">55dp</dimen>
+
     <dimen name="tab_bar_height_for_pad">78.0dip</dimen>
     <dimen name="no_content_distance_to_top">144.0dip</dimen>
     <dimen name="status_info_width">60.0dip</dimen>
-    <dimen name="distance_to_border_left">2.0dip</dimen>
-    <dimen name="distance_to_border_right">2.0dip</dimen>
+    <dimen name="distance_to_border_left">4dp</dimen>
+    <dimen name="distance_to_border_right">4dp</dimen>
+    <dimen name="distance_to_border_top">5dp</dimen>
+    <dimen name="distance_to_border_bottom">5dp</dimen>
 </resources>

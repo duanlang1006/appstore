@@ -71,7 +71,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private ListView mListView;
     private List<SearchBean> mSearchApkContents = new ArrayList<SearchBean>();
     private SearchApkAdapter mAdapter;
-    private Activity mActivity;
     private View rootView;
 
     //热词相关
@@ -102,7 +101,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private Button refresh;
     private RelativeLayout no_network;
 
-    private int HINT_UPDATE_TIME = 3000;
+    private int HINT_UPDATE_TIME = 2000;
     private int HINT_SHOW_NUMBER = 0;
 
     private Runnable mNotifyRunnable = new Runnable() {
@@ -174,19 +173,13 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         }
     };
 
-    public static OSGIBaseFragment newInstance(Fragment fg, Bundle params) {
-        return new SearchFragment(fg, params);
-    }
-
-
-    private SearchFragment(Fragment mFragment, Bundle params) {
-        super(mFragment, params);
+    public SearchFragment() {
+        super();
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = activity;
         mHttpUtils = new HttpUtils();
     }
 
@@ -268,7 +261,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             mDeleteView = (ImageView) customView.findViewById(R.id.search_delete);
             mDeleteView.setOnClickListener(this);
 
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);

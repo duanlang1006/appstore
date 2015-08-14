@@ -50,7 +50,6 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
     private static final String TAG = "UpdateFragment";
     private View rootView;
-    private Activity mActivity;
     private TextView mAllUpdateView;
     private ListView mListView;
     private List<DataBean> mDataContents = new ArrayList<DataBean>();
@@ -72,19 +71,13 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private ImageView mLoadView;
     private Animation LoadingAnimation;
 
-    public static OSGIBaseFragment newInstance(Fragment fg, Bundle params) {
-        return new UpdateFragment(fg, params);
-    }
-
-
-    private UpdateFragment(Fragment fg, Bundle params) {
-        super(fg, params);
+    public UpdateFragment() {
+        super();
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = activity;
         initActionBar();
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
     }
@@ -146,7 +139,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
     private void initActionBar() {
         try {
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setDisplayShowCustomEnabled(false);
             actionBar.setTitle("应用升级");
@@ -218,6 +211,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 setLoadLayoutVisibility(View.GONE);
                 LogUtils.i(TAG, "更新请求失败：" + s);
                 setStatsLayoutVisibility(View.VISIBLE, mActivity.getResources().getDrawable(R.drawable.post_failure));
+                mStatsTextView.setVisibility(View.VISIBLE);
                 mStatsButton.setVisibility(View.VISIBLE);
                 mPostStats = true;
             }
@@ -256,6 +250,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 }
                 if (array.length() == 0) {
                     setStatsLayoutVisibility(View.VISIBLE, mActivity.getResources().getDrawable(R.drawable.no_update));
+                    mStatsTextView.setVisibility(View.GONE);
                     mStatsButton.setVisibility(View.GONE);
                 } else {
                     setStatsLayoutVisibility(View.GONE, null);

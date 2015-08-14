@@ -23,7 +23,6 @@ import com.osgi.extra.OSGIBaseFragment;
 public class LoadingFragment extends OSGIBaseFragment implements View.OnClickListener{
     private final String TAG = "LoadingFragment";
 
-    private Activity mActivity;
     private ViewGroup rootView;
     private LayoutInflater mInflater;
 
@@ -39,19 +38,14 @@ public class LoadingFragment extends OSGIBaseFragment implements View.OnClickLis
     //加载动画
     private AnimationDrawable LoadingAnimation;
 
-    public LoadingFragment(Fragment mFragment, Bundle params) {
-        super(mFragment, params);
-    }
-
-    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
-        return new LoadingFragment(fg,params);
+    public LoadingFragment() {
+        super();
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         LogUtils.d(TAG, "onAttach ");
-        mActivity = activity;
         mInflater = LayoutInflater.from(mActivity);
     }
 
@@ -67,7 +61,7 @@ public class LoadingFragment extends OSGIBaseFragment implements View.OnClickLis
         super.onCreate(savedInstanceState);
         LogUtils.d(TAG, "onCreate savedInstanceState : " + savedInstanceState);
 
-        boolean networkState = detectNetworkState(getActivity());
+        boolean networkState = detectNetworkState(mActivity);
 
         rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_loading, container, false);
 
@@ -93,8 +87,6 @@ public class LoadingFragment extends OSGIBaseFragment implements View.OnClickLis
     public void onClick(View v) {
 
     }
-
-
 
     public static boolean detectNetworkState(Activity act) {
         ConnectivityManager manager = (ConnectivityManager) act

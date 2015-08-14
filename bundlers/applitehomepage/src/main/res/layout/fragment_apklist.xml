@@ -79,12 +79,17 @@
 
         <Button
             android:id="@+id/list_item_progress_button"
-            android:layout_width="50dp"
+            android:layout_width="80dp"
             android:layout_height="30dp"
-            android:text="安装"
-            android:textSize="13sp"
-            style="@style/apkListButton"/>
+            android:layout_marginRight="14dp"
+            android:text="@string/install"
+            android:textStyle="normal"
+            android:textColor="@color/black"
+            android:focusable="false"
+            android:background="@drawable/install_btn_bg" />
+
     </LinearLayout>
+
     <TextView
         android:id="@+id/apkBrief"
         android:layout_width="wrap_content"

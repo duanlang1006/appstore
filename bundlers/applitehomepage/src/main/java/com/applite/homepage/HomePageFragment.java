@@ -62,7 +62,6 @@ import java.util.List;
  */
 public class HomePageFragment extends OSGIBaseFragment implements View.OnClickListener{
     private final String TAG = "homepage_PagerFragment";
-    private Activity mActivity;
     private View popView;
     private PopupWindow popupWindow;
     private List<ScreenBean> mScreenBeanList = new ArrayList<ScreenBean>();
@@ -114,11 +113,6 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private ViewGroup rootView;
     private SubjectData mPopData = new SubjectData();
 
-
-    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
-        return new HomePageFragment(fg,params);
-    }
-
     public static Bundle newBundle(String category,String title){
         Bundle bundle = new Bundle();
         bundle.putString("category",category);
@@ -126,15 +120,11 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         return bundle;
     }
 
-    private HomePageFragment(Fragment mFragment, Bundle params) {
-        super(mFragment, params);
+    public HomePageFragment() {
+        super();
         mGson = new Gson();
         mFinalHttp = new FinalHttp();
         mPageData = null;
-        if (null != params){
-            mCategory = params.getString("category");
-            mTitle = params.getString("title");
-        }
     }
 
     @Override
@@ -147,8 +137,12 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         LogUtils.d(TAG, "onAttach ");
-        mActivity = activity;
         mInflater = LayoutInflater.from(mActivity);
+        Bundle params = getArguments();
+        if (null != params){
+            mCategory = params.getString("category");
+            mTitle = params.getString("title");
+        }
     }
 
     @Override
@@ -168,7 +162,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                              Bundle savedInstanceState) {
         LogUtils.d(TAG, "onCreateView");
 
-        boolean networkState = NetworkDetector.detect(getActivity());
+        boolean networkState = NetworkDetector.detect(mActivity);
         LogUtils.i(TAG, "networkState = " + networkState);
 
         rootView = (ViewGroup)mInflater.inflate(R.layout.fragment_homepage_main, container, false);
@@ -188,6 +182,12 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         mOffnetView = rootView.findViewById(R.id.middle_parent);
         offnetImg = (ImageView)rootView.findViewById(R.id.off_img);
         mRetrybtn = (Button)rootView.findViewById(R.id.refresh_btn);
+        mRetrybtn.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View paramView){
+                LogUtils.i(TAG, "click the retry button ");
+                httpRequest();
+            }
+        });
 
         mOffnetView.setVisibility(View.GONE);
 
@@ -197,14 +197,6 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
              //loadingText.setVisibility(View.GONE);
              mLoadingView.clearAnimation();
              mOffnetView.setVisibility(View.VISIBLE);
-
-             mRetrybtn.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View paramView){
-                    LogUtils.i(TAG, "click the retry button ");
-                    httpRequest();
-                    popupWindowPost();
-                }
-            });
         }
 
         if (null == mSectionsPagerAdapter){
@@ -249,8 +241,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             mActivity.runOnUiThread(mRefreshRunnable);
         }else{
             try{
-                ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-                actionBar.setHomeAsUpIndicator(getActivity().getResources().getDrawable(R.drawable.action_bar_back_light));
+                ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+                actionBar.setHomeAsUpIndicator(mActivity.getResources().getDrawable(R.drawable.action_bar_back_light));
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -460,6 +452,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         }
     }
 
+
+
     private void initActionBar(){
         try {
 //            ViewGroup customView = (ViewGroup)mInflater.inflate(R.layout.actionbar_custom,new LinearLayout(mActivity),false);
@@ -473,15 +467,18 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 //            ViewGroup title = (ViewGroup)customView.findViewById(R.id.action_title);
 //            mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,title,false);
 //            title.addView(mPagerSlidingTabStrip);
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
 
+            if(isHidden()){
+                return;
+            }
             if (null == mCategory) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
-                actionBar.setHomeAsUpIndicator(getActivity().getResources().getDrawable(R.drawable.icon_personal_light));
+                actionBar.setHomeAsUpIndicator(mActivity.getResources().getDrawable(R.drawable.icon_personal_light));
                 actionBar.setDisplayShowTitleEnabled(false);
             }else{
                 actionBar.setDisplayHomeAsUpEnabled(true);
-                actionBar.setHomeAsUpIndicator(getActivity().getResources().getDrawable(R.drawable.action_bar_back_light));
+                actionBar.setHomeAsUpIndicator(mActivity.getResources().getDrawable(R.drawable.action_bar_back_light));
                 actionBar.setHomeButtonEnabled(true);
                 actionBar.setDisplayShowTitleEnabled(true);
                 actionBar.setTitle(mTitle);

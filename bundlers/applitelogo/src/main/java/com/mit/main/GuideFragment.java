@@ -45,6 +45,7 @@ import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.bean.GuideBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
+import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 
@@ -57,7 +58,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class GuideFragment extends Fragment implements View.OnClickListener {
+public class GuideFragment extends OSGIBaseFragment implements View.OnClickListener {
     private static final String TAG = "GuideFragment";
     private FrameLayout mFLayout;
     private int mFLayoutWidth;
@@ -68,7 +69,6 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     private List<GuideBean> mGuideContents = new ArrayList<GuideBean>();
     private ImageView mLogoIV;
 
-    private Activity mActivity;
     private View rootView;
     private LayoutInflater mInflater;
     private ViewGroup container;
@@ -106,12 +106,12 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
     }
 
     public GuideFragment() {
+        super();
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mActivity = activity;
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
 
         Bundle arguments = getArguments();
@@ -135,7 +135,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         mInflater = inflater;
         try {
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.hide();
         } catch (Exception e) {
             e.printStackTrace();
@@ -213,6 +213,10 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
 
         mToHomeView.setOnClickListener(this);
         mInstallView.setOnClickListener(this);
+        if((Boolean) AppliteSPUtils.get(mActivity, "personal_flag", false)){
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.ISGUIDE, false);
+            mToHomeView.setVisibility(View.INVISIBLE);
+        }
     }
 
     /**
@@ -414,6 +418,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void jump() {
         AppliteSPUtils.put(mActivity, AppliteSPUtils.ISGUIDE, false);
+        AppliteSPUtils.put(mActivity, "personal_flag", true);
 
         OSGIServiceHost host = (OSGIServiceHost) mActivity;
         host.jumpto(mWhichService, mWhichFragment, mParams);

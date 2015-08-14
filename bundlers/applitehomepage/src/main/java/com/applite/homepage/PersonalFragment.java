@@ -1,9 +1,7 @@
 package com.applite.homepage;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
@@ -12,22 +10,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import com.applite.common.Constant;
+
 import com.applite.utils.HomepageUtils;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
 
-public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener{
+public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener {
     private Activity mActivity;
 
-    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
-        return new PersonalFragment(fg,params);
-    }
-
-    private PersonalFragment(Fragment mFragment, Bundle params) {
-        super(mFragment, params);
+    public PersonalFragment() {
+        super();
     }
 
     @Override
@@ -42,6 +36,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
         View view = inflater.inflate(R.layout.fragment_personal, container, false);
         view.findViewById(R.id.action_upgrade).setOnClickListener(this);
         view.findViewById(R.id.action_dm).setOnClickListener(this);
+        view.findViewById(R.id.action_logo).setOnClickListener(this);
         initActionBar();
         return view;
     }
@@ -60,9 +55,9 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main_homepage,menu);
+        inflater.inflate(R.menu.menu_main_homepage, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        if (null != item){
+        if (null != item) {
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
     }
@@ -70,15 +65,15 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (!hidden){
+        if (!hidden) {
             initActionBar();
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (R.id.action_search == item.getItemId()){
-            HomepageUtils.launchSearchFragment((OSGIServiceHost)getActivity());
+        if (R.id.action_search == item.getItemId()) {
+            HomepageUtils.launchSearchFragment((OSGIServiceHost) mActivity);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -88,25 +83,25 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onClick(View v) {
         if (R.id.action_dm == v.getId()) {
-            HomepageUtils.launchDownloadManagerFragment(((OSGIServiceHost) getActivity()));
-        }else if (R.id.action_upgrade == v.getId()){
-            HomepageUtils.launchUpgradeFragment(((OSGIServiceHost)getActivity()));
+            HomepageUtils.launchDownloadManagerFragment(((OSGIServiceHost) mActivity));
+        } else if (R.id.action_upgrade == v.getId()) {
+            HomepageUtils.launchUpgradeFragment(((OSGIServiceHost) mActivity));
+        } else if (R.id.action_logo == v.getId()) {
+            HomepageUtils.launchLogoManagerFragment(((OSGIServiceHost) mActivity));
         }
     }
 
 
-    private void initActionBar(){
+    private void initActionBar() {
         try {
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-            actionBar.setDisplayUseLogoEnabled(false);
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setTitle(getActivity().getResources().getString(R.string.personal));
+            actionBar.setTitle(mActivity.getResources().getString(R.string.personal));
             actionBar.setDisplayShowCustomEnabled(false);
-            ViewGroup customView = (ViewGroup)LayoutInflater.from(getActivity()).inflate(R.layout.actionbar_personal,null);
-            actionBar.setCustomView(customView);
             actionBar.show();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -23,35 +23,35 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
+import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
 import java.lang.reflect.Field;
+import java.util.Observable;
+import java.util.Observer;
 
 
-public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener {
+public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener,Observer {
     final static String TAG = "applite_dm";
     private ViewPager mViewPager;
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
-    private Activity mActivity;
     private boolean destoryView = false;
     private LayoutInflater mInflater;
 
-    public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
-        return new DownloadPagerFragment(fg,params);
-    }
-
-    private DownloadPagerFragment(Fragment mFragment, Bundle params) {
-        super(mFragment, params);
+    public DownloadPagerFragment() {
+        super();
     }
 
     public void onAttach(Activity activity) {
         ImplLog.d(TAG, "onAttach," + this);
         super.onAttach(activity);
-        mActivity = activity;
+        ImplAgent.getInstance(mActivity).addObserver(this);
     }
 
     @Override
@@ -80,6 +80,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     public void onDetach() {
         super.onDetach();
         ImplLog.d(TAG, "onDetach,"+this);
+        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
     @Override
@@ -114,12 +115,21 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.dm_action_pause_all) {
-//                ImplAgent.getInstance(mActivity).pauseDownload();
+            ImplAgent.getInstance(mActivity.getApplicationContext()).pauseAll();
             return true;
         }else if (item.getItemId() == R.id.dm_action_resume_all){
-                return true;
+            ImplAgent.getInstance(mActivity.getApplicationContext()).resumeAll();
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden){
+            initActionBar(mPagerSlidingTabStrip);
+        }
     }
 
     @Override
@@ -129,7 +139,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             if (null != fgm.getFragments() && fgm.getFragments().size() > 0) {
                 fgm.popBackStack();
             } else {
-                getActivity().finish();
+                mActivity.finish();
             }
         }else if (v.getId() == R.id.action_more){
 
@@ -137,9 +147,16 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     }
 
+    @Override
+    public void update(Observable observable, Object data) {
+//        ImplInfo info = (ImplInfo)data;
+        LogUtils.d(TAG,"update");
+        mViewPager.getAdapter().notifyDataSetChanged();
+    }
+
     private void initActionBar(View tabStrip){
         try {
-            ActionBar actionBar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
 //            actionBar.setBackgroundDrawable(res.getDrawable(R.drawable.action_bar_bg_light));
             actionBar.setDisplayUseLogoEnabled(false);
             actionBar.setHomeButtonEnabled(true);
@@ -156,6 +173,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
         int[] tabs = new int[2];
+        int mChildCount = 0;
         FragmentManager mFragmentManager ;
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -198,7 +216,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
         @Override
         public CharSequence getPageTitle(int position) {
-            Resources res = getActivity().getResources();
+            Resources res = mActivity.getResources();
             try {
                 res = mActivity.getResources();
             }catch (Exception e){
@@ -209,29 +227,17 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
         @Override
         public void notifyDataSetChanged() {
+            mChildCount = getCount();
             super.notifyDataSetChanged();
         }
 
         @Override
-        public void registerDataSetObserver(DataSetObserver observer) {
-            super.registerDataSetObserver(observer);
-            ImplLog.d(TAG, "registerDataSetObserver,"+observer+","+this);
-        }
-
-        @Override
-        public void unregisterDataSetObserver(DataSetObserver observer) {
-            super.unregisterDataSetObserver(observer);
-            ImplLog.d(TAG, "unregisterDataSetObserver,"+observer+","+this);
-        }
-
-        @Override
-        public void finishUpdate(ViewGroup container) {
-//            if (!destoryView) {
-                super.finishUpdate(container);
-//            }else{
-//                mFragmentManager.beginTransaction().commit();
-//            }
-            ImplLog.d(TAG,"finishUpdate,"+destoryView);
+        public int getItemPosition(Object object) {
+            if (mChildCount > 0){
+                mChildCount -- ;
+                return POSITION_NONE;
+            }
+            return super.getItemPosition(object);
         }
     }
 }

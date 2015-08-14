@@ -15,84 +15,37 @@ import android.view.ViewGroup;
 /**
  * Created by hxd on 15-7-30.
  */
-public class OSGIBaseFragment{
-    Fragment mContainerFragment;
-    Activity mActivity;
+public class OSGIBaseFragment extends Fragment{
+    public Activity mActivity;
 
-    public OSGIBaseFragment(Fragment mFragment,Bundle params) {
-        this.mContainerFragment = mFragment;
-    }
-
-    public FragmentManager getFragmentManager() {
-        FragmentManager fm = null;
-        if(null != mContainerFragment){
-            fm = mContainerFragment.getFragmentManager();
-        }
-        return fm;
-    }
-
-    public FragmentManager getChildFragmentManager() {
-        FragmentManager fm = null;
-        if(null != mContainerFragment){
-            fm = mContainerFragment.getChildFragmentManager();
-        }
-        return fm;
-    }
-
-    public int getId(){
-        return mContainerFragment.getId();
-    }
-
-    public Activity getActivity(){
-        return mActivity;
-    }
-
-    public void onCreate(Bundle savedInstanceState){
+    public OSGIBaseFragment() {
 
     }
 
-    public void onAttach(Activity activity){
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
         mActivity = activity;
     }
-    public void onStart(){
 
-    }
-    public void onResume(){
-
-    }
-    public void onSaveInstanceState(Bundle outState){
-
-    }
-    public void onPause(){
-
-    }
-    public void onStop(){
-
-    }
-    public void onDestroy(){
-
-    }
-    public void onDestroyView(){
-
-    }
-    public void onDetach(){
-
-    }
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        return null;
-    }
-    public void onHiddenChanged(boolean hidden){
-
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
-    }
-
-    public void onPrepareOptionsMenu(Menu menu) {
-    }
-
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return false;
+        if (android.R.id.home == item.getItemId()){
+            if (!getFragmentManager().popBackStackImmediate()){
+                mActivity.finish();
+            }
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public String getTagText(){
+        return this.getClass().getSimpleName();
     }
 }
