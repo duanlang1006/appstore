@@ -13,7 +13,6 @@
     <style name="categoryListName" parent="android:TextAppearance.Medium">
         <item name="android:textSize">@dimen/categoryList_text_size</item>
         <item name="android:textColor">@color/categoryList_text_color</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:layout_marginTop">@dimen/categoryList_text_marginTop</item>
         <item name="android:ellipsize">end</item>
         <item name="android:focusable">false</item>
