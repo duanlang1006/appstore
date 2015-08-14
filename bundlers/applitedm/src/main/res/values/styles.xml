@@ -1,13 +1,16 @@
 <resources>
+
     <style name="ItemTitleText" parent="android:TextAppearance.Medium">
         <item name="android:textSize">@dimen/download_text_size</item>
         <item name="android:textColor">@color/download_item_title</item>
         <item name="android:textStyle">normal</item>
     </style>
+
     <style name="ItemStatusText" parent="android:TextAppearance.Small">
         <item name="android:textSize">@dimen/download_status_text_size</item>
         <item name="android:textColor">@color/download_item_status</item>
     </style>
+
     <style name="ItemSizeText" parent="android:TextAppearance.Small">
         <item name="android:textSize">@dimen/download_info_text_size</item>
         <item name="android:textColor">@color/download_item_size</item>
