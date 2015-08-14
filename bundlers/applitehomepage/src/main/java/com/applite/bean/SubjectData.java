@@ -3,6 +3,7 @@ package com.applite.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,8 +32,8 @@ public class SubjectData implements Parcelable{
         s_name = in.readString();
         s_datatype = in.readString();
         step = in.readInt();
-        in.readList(specialtopic_data,SpecialTopicData.class.getClassLoader());
-        in.readList(data,HomePageApkData.class.getClassLoader());
+        specialtopic_data = in.readArrayList(SpecialTopicData.class.getClassLoader());
+        data = in.readArrayList(HomePageApkData.class.getClassLoader());
     }
 
     @Override
