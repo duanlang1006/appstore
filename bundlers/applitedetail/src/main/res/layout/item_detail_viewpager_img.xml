@@ -2,13 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/background_detail">
 
     <ImageView
         android:id="@+id/item_viewpager_img"
         android:layout_width="180dp"
         android:layout_height="300dp"
         android:layout_margin="3dp"
-        android:scaleType="fitXY"
-        android:background="@drawable/detail_default_img" />
+        android:background="@drawable/detail_default_img"
+        android:scaleType="fitXY" />
 </LinearLayout>

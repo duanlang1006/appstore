@@ -14,11 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.applite.common.Constant;
 import com.applite.utils.HomepageUtils;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
 
 public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener{
+    private Activity mActivity;
+
     public static OSGIBaseFragment newInstance(Fragment fg,Bundle params){
         return new PersonalFragment(fg,params);
     }
@@ -30,6 +33,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MitMobclickAgent.onEvent(mActivity, "toPersonalFragment");
     }
 
     @Override
@@ -45,6 +49,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        mActivity = activity;
     }
 
     @Override

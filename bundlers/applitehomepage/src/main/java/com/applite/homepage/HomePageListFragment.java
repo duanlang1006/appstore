@@ -24,6 +24,7 @@ import com.applite.common.LogUtils;
 import com.applite.data.ListArrayAdapter;
 import com.applite.utils.HomepageUtils;
 import com.google.gson.Gson;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
@@ -93,6 +94,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MitMobclickAgent.onEvent(mActivity, "toSpecialFragment");
         LogUtils.i(TAG, "ListFragment.onCreate() ");
     }
 
@@ -324,6 +326,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     class MySlideViewListener implements SlideShowView.OnSlideViewClickListener{
         @Override
         public void onClick(View v, int position){
+            MitMobclickAgent.onEvent(mActivity, "clickMainViewPager");
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
             LogUtils.i(TAG, "topicData = " + topicData);
             if(topicData.getT_skiptype() == 1){

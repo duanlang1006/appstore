@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/background_update"
     android:orientation="vertical"
     tools:context="com.mit.appliteupdate.main.UpdateFragment">
 
@@ -65,8 +65,8 @@
         android:id="@+id/update_stats"
         android:layout_width="fill_parent"
         android:layout_height="470dp"
-        android:orientation="vertical"
         android:background="#fff8f8f8"
+        android:orientation="vertical"
         android:visibility="gone">
 
         <!-- 无更新内容时，显示图片-->
@@ -74,32 +74,32 @@
             android:id="@+id/update_stats_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
             android:layout_above="@+id/no_network_text"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp" />
 
         <TextView
             android:id="@+id/no_network_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="无网络, 请联网再试试"
-            android:textSize="16sp"
-            android:textColor="#ff959595"
+            android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+            android:text="无网络, 请联网再试试"
+            android:textColor="#ff959595"
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/update_post_button"
             android:layout_width="120dp"
             android:layout_height="40dp"
-            android:layout_gravity="center_horizontal"
             android:layout_below="@+id/no_network_text"
             android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
+            android:background="@color/white"
             android:text="点击重新请求"
-            android:textSize="14sp"
             android:textColor="#ff585858"
-            android:background="@color/white" />
+            android:textSize="14sp" />
     </RelativeLayout>
 
 

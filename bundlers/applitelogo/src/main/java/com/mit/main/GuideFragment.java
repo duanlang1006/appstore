@@ -33,7 +33,7 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
-import com.applite.sharedpreferences.GuideSPUtils;
+import com.applite.sharedpreferences.AppliteSPUtils;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -51,6 +51,7 @@ import com.umeng.analytics.MobclickAgent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -141,17 +142,17 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         }
         this.container = container;
 
-        if ((Boolean) GuideSPUtils.get(mActivity, GuideSPUtils.ISGUIDE, true)) {
+        if ((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)) {
             rootView = mInflater.inflate(R.layout.fragment_guide, container, false);
             initView();
             getResolution();
-            post((int) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0), 10, POST_ALL_APK);
+            post((int) AppliteSPUtils.get(mActivity, AppliteSPUtils.GUIDE_POSITION, 0), 10, POST_ALL_APK);
             //GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
         } else {
             rootView = mInflater.inflate(R.layout.fragment_logo, container, false);
             logoInitView();
             if (System.currentTimeMillis() / 1000 >
-                    (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_NEXT_TIME, 0L)) {
+                    (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_NEXT_TIME, 0L)) {
                 logoPost();
             }
         }
@@ -160,7 +161,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
         if (null != mToHomeView) {
             mToHomeView.setEnabled(true);
         } else {
-            long timeout = (long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_SHOW_TIME, 3000L);
+            long timeout = (long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_SHOW_TIME, 3000L);
             mHandler.postDelayed(mThread, timeout);
         }
         return rootView;
@@ -344,11 +345,11 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void annalPostApkNumber(int apkPsition) {
         if (apkPsition == POST_ALL_APK) {
-            GuideSPUtils.put(mActivity, GuideSPUtils.GUIDE_POSITION,
-                    (Integer) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 10);
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.GUIDE_POSITION,
+                    (Integer) AppliteSPUtils.get(mActivity, AppliteSPUtils.GUIDE_POSITION, 0) + 10);
         } else {
-            GuideSPUtils.put(mActivity, GuideSPUtils.GUIDE_POSITION,
-                    (Integer) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 1);
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.GUIDE_POSITION,
+                    (Integer) AppliteSPUtils.get(mActivity, AppliteSPUtils.GUIDE_POSITION, 0) + 1);
         }
     }
 
@@ -360,12 +361,12 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void deleteNoReturn(int apkPsition, int number) {
         if (number < 10 && apkPsition == POST_ALL_APK) {//请求10个，但是返回数据小于10
-            GuideSPUtils.put(mActivity, GuideSPUtils.GUIDE_POSITION,
-                    (Integer) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0)
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.GUIDE_POSITION,
+                    (Integer) AppliteSPUtils.get(mActivity, AppliteSPUtils.GUIDE_POSITION, 0)
                             - (10 - number));
         } else if (number == 0 && apkPsition != POST_ALL_APK) {//请求1个，但是返回数据等于零
-            GuideSPUtils.put(mActivity, GuideSPUtils.GUIDE_POSITION,
-                    (Integer) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) - 1);
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.GUIDE_POSITION,
+                    (Integer) AppliteSPUtils.get(mActivity, AppliteSPUtils.GUIDE_POSITION, 0) - 1);
         }
     }
 
@@ -397,7 +398,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                 mApkList.remove(child);
                 paowuxianAnimator(child, mApkMovePath[apkPsition]);
 
-                post((int) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 1, 1, apkPsition);
+                post((int) AppliteSPUtils.get(mActivity, AppliteSPUtils.GUIDE_POSITION, 0) + 1, 1, apkPsition);
                 download(bean);
             }
         });
@@ -412,7 +413,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      * 去首页
      */
     private void jump() {
-        GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
+        AppliteSPUtils.put(mActivity, AppliteSPUtils.ISGUIDE, false);
 
         OSGIServiceHost host = (OSGIServiceHost) mActivity;
         host.jumpto(mWhichService, mWhichFragment, mParams);
@@ -424,7 +425,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
             jump();
         } else if (v.getId() == R.id.guide_install) {
             installAllApp();
-            post((int) GuideSPUtils.get(mActivity, GuideSPUtils.GUIDE_POSITION, 0) + 1, 10, POST_ALL_APK);
+            post((int) AppliteSPUtils.get(mActivity, AppliteSPUtils.GUIDE_POSITION, 0) + 1, 10, POST_ALL_APK);
         }
     }
 
@@ -570,7 +571,7 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                     public void onSuccess(ResponseInfo<File> responseInfo) {
                         LogUtils.i(TAG, name + "下载成功");
                         LogUtils.i(TAG, "Utils.getAppDir(name):" + AppliteUtils.getAppDir(name));
-                        GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_IMG_URL, AppliteUtils.getAppDir(name));
+                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_IMG_URL, AppliteUtils.getAppDir(name));
                     }
 
                     @Override
@@ -586,17 +587,17 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
      */
     private void logoInitView() {
         mLogoIV = (ImageView) rootView.findViewById(R.id.logo_iv);
-        if (System.currentTimeMillis() / 1000 >= (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_START_SHOW_TIME, 0L) &&
-                System.currentTimeMillis() / 1000 <= (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_END_SHOW_TIME, 0L)) {
-            if (!TextUtils.isEmpty((String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, ""))) {
+        if (System.currentTimeMillis() / 1000 >= (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_START_SHOW_TIME, 0L) &&
+                System.currentTimeMillis() / 1000 <= (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, 0L)) {
+            if (!TextUtils.isEmpty((String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_URL, ""))) {
                 mLogoIV.setBackground(new BitmapDrawable(AppliteUtils.getLoacalBitmap(
-                        (String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, ""))));
+                        (String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_URL, ""))));
             }
         }
         //判断在线LOGO的是否存在和显示时间，如果当前时间大于显示时间则删除LOGO图片
-        if (AppliteUtils.fileIsExists((String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, "")) &&
-                System.currentTimeMillis() / 1000 > (Long) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_END_SHOW_TIME, 0L))
-            AppliteUtils.delFile((String) GuideSPUtils.get(mActivity, GuideSPUtils.LOGO_IMG_URL, ""));
+        if (AppliteUtils.fileIsExists((String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_URL, "")) &&
+                System.currentTimeMillis() / 1000 > (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, 0L))
+            AppliteUtils.delFile((String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_URL, ""));
     }
 
     /**
@@ -623,10 +624,10 @@ public class GuideFragment extends Fragment implements View.OnClickListener {
                     String SmallImgUrl = obj.getString("i_smalllogourl");
                     long StartTime = obj.getLong("limit_starttime");
                     long EndTime = obj.getLong("limit_endtime");
-                    GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_NEXT_TIME, NextTime);
-                    GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_SHOW_TIME, ShowTime);
-                    GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_START_SHOW_TIME, StartTime);
-                    GuideSPUtils.put(mActivity, GuideSPUtils.LOGO_END_SHOW_TIME, EndTime);
+                    AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_NEXT_TIME, NextTime);
+                    AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_SHOW_TIME, ShowTime);
+                    AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_START_SHOW_TIME, StartTime);
+                    AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, EndTime);
                     if (!TextUtils.isEmpty(BigImgUrl)) {
                         download(Constant.LOGO_IMG_NAME, BigImgUrl);
                     }
