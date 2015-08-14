@@ -100,7 +100,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private Button refresh;
     private RelativeLayout no_network;
 
-    private int HINT_UPDATE_TIME = 3000;
+    private int HINT_UPDATE_TIME = 2000;
     private int HINT_SHOW_NUMBER = 0;
 
     private Runnable mNotifyRunnable = new Runnable() {

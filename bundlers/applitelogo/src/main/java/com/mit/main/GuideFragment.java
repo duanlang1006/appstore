@@ -212,6 +212,10 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
 
         mToHomeView.setOnClickListener(this);
         mInstallView.setOnClickListener(this);
+        if((Boolean) GuideSPUtils.get(mActivity, "personal_flag", false)){
+            GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
+            mToHomeView.setVisibility(View.INVISIBLE);
+        }
     }
 
     /**
@@ -413,6 +417,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      */
     private void jump() {
         GuideSPUtils.put(mActivity, GuideSPUtils.ISGUIDE, false);
+        GuideSPUtils.put(mActivity, "personal_flag", true);
 
         OSGIServiceHost host = (OSGIServiceHost) mActivity;
         host.jumpto(mWhichService, mWhichFragment, mParams);

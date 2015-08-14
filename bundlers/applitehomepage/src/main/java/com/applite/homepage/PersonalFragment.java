@@ -31,6 +31,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
         View view = inflater.inflate(R.layout.fragment_personal, container, false);
         view.findViewById(R.id.action_upgrade).setOnClickListener(this);
         view.findViewById(R.id.action_dm).setOnClickListener(this);
+        view.findViewById(R.id.action_logo).setOnClickListener(this);
         initActionBar();
         return view;
     }
@@ -74,6 +75,8 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
             HomepageUtils.launchDownloadManagerFragment(((OSGIServiceHost) mActivity));
         }else if (R.id.action_upgrade == v.getId()){
             HomepageUtils.launchUpgradeFragment(((OSGIServiceHost)mActivity));
+        }else if (R.id.action_logo == v.getId()){
+            HomepageUtils.launchLogoManagerFragment(((OSGIServiceHost)mActivity));
         }
     }
 

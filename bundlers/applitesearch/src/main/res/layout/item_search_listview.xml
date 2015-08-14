@@ -97,7 +97,7 @@
 
     <Button
         android:id="@+id/list_item_bt"
-        android:layout_width="60dp"
+        android:layout_width="80dp"
         android:layout_height="30dp"
         android:layout_marginRight="20dp"
         android:text="@string/install"

@@ -15,6 +15,7 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
+import com.applite.sharedpreferences.GuideSPUtils;
 import com.mit.main.GuideFragment;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
@@ -30,6 +31,7 @@ import java.lang.reflect.Method;
 public class MitMarketActivity extends ActionBarActivity implements OSGIServiceHost{
     private static final String TAG = "applite_MitMarketActivity";
 
+    private boolean personal_flag = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         LogUtils.d(TAG,"onCreate:"+savedInstanceState);
@@ -154,7 +156,6 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         IconCache.getInstance(this).flush();
     }
 
-
     @Override
     public void notify(Bundle params) {
         if (null != params){
@@ -171,6 +172,11 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         OSGIBaseFragment newFragment = null;
         if (Constant.OSGI_SERVICE_SEARCH_FRAGMENT == whichService){
             newFragment = (OSGIBaseFragment)fgmgr.findFragmentByTag("SearchFragment");
+        }
+
+        if (Constant.OSGI_SERVICE_LOGO_FRAGMENT == whichService){
+            newFragment = (OSGIBaseFragment)fgmgr.findFragmentByTag("GuideFragment");
+            GuideSPUtils.put(getApplicationContext(), GuideSPUtils.ISGUIDE, true);
         }
 
         if (null == newFragment) {
@@ -213,6 +219,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_SEARCH_FRAGMENT, "com.mit.applite.search.main.SearchFragment");
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, "com.mit.appliteupdate.main.UpdateFragment");
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_DM_FRAGMENT, "com.applite.dm.DownloadPagerFragment");
+        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_LOGO_FRAGMENT, "com.mit.main.GuideFragment");
     }
 
     private void unregisterClients(){
@@ -222,5 +229,6 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_SEARCH_FRAGMENT);
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_DM_FRAGMENT);
+        OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_LOGO_FRAGMENT);
     }
 }
