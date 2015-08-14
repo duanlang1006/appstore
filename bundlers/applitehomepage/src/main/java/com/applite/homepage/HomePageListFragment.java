@@ -251,7 +251,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                 mMoreView.setVisibility(View.GONE);
                 //mMoreTextView.setVisibility(View.GONE);
 
-                if(pageData.getSubjectData().get(0).getS_key().equals("maintype")){
+                if((pageData.getSubjectData().get(0).getS_key().equals("maintype"))||(pageData.getSubjectData().get(0).getS_key().equals("maintype_m_game"))){
                     removeMoreView();
                 }
 

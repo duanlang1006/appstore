@@ -5,12 +5,6 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="apkListRating" parent="@android:style/Widget.RatingBar">
-        <item name="android:progressDrawable">@drawable/rating_bar_full</item>
-        <item name="android:minHeight">20dp</item>
-        <item name="android:maxHeight">35dp</item>
-    </style>
-
     <style name="apkListButton" parent="@android:style/Widget.Button">
         <item name="android:textSize">@dimen/button_text_size</item>
         <item name="android:textColor">@color/apklist_btn_text_color</item>

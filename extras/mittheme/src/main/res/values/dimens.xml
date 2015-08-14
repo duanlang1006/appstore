@@ -108,4 +108,9 @@
     <dimen name="action_mode_immersion_more_margin_right">0.0dip</dimen>
     <item type="dimen" name="portrait_navigation_width">0.39</item>
     <item type="dimen" name="landscape_navigation_width">0.34</item>
+
+    <dimen name="apklist_btn_min_height">30dp</dimen>
+    <dimen name="apklist_btn_min_width">55dp</dimen>
+    <dimen name="apklist_btn_interval_distance">5.0dip</dimen>
+
 </resources>

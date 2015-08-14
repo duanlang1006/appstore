@@ -183,4 +183,7 @@
     <color name="guide_popup_text_light">#ffff7b33</color>
     <color name="guide_popup_text_dark">#7fffffff</color>
     <color name="guide_popup_background_light">#ccffffff</color>
+
+    <color name="apklist_button_pressed">#ff159f56</color>
+    <color name="apklis_button_normal">#ff159f56</color>
 </resources>
