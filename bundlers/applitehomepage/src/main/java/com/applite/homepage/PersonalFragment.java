@@ -10,12 +10,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.applite.utils.HomepageUtils;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
 
-public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener{
+public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener {
+    private Activity mActivity;
+
     public PersonalFragment() {
         super();
     }
@@ -23,6 +27,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MitMobclickAgent.onEvent(mActivity, "toPersonalFragment");
     }
 
     @Override
@@ -37,6 +42,12 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity = activity;
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
     }
@@ -44,9 +55,9 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main_homepage,menu);
+        inflater.inflate(R.menu.menu_main_homepage, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        if (null != item){
+        if (null != item) {
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
     }
@@ -54,15 +65,15 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (!hidden){
+        if (!hidden) {
             initActionBar();
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (R.id.action_search == item.getItemId()){
-            HomepageUtils.launchSearchFragment((OSGIServiceHost)mActivity);
+        if (R.id.action_search == item.getItemId()) {
+            HomepageUtils.launchSearchFragment((OSGIServiceHost) mActivity);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -73,15 +84,15 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     public void onClick(View v) {
         if (R.id.action_dm == v.getId()) {
             HomepageUtils.launchDownloadManagerFragment(((OSGIServiceHost) mActivity));
-        }else if (R.id.action_upgrade == v.getId()){
-            HomepageUtils.launchUpgradeFragment(((OSGIServiceHost)mActivity));
-        }else if (R.id.action_logo == v.getId()){
-            HomepageUtils.launchLogoManagerFragment(((OSGIServiceHost)mActivity));
+        } else if (R.id.action_upgrade == v.getId()) {
+            HomepageUtils.launchUpgradeFragment(((OSGIServiceHost) mActivity));
+        } else if (R.id.action_logo == v.getId()) {
+            HomepageUtils.launchLogoManagerFragment(((OSGIServiceHost) mActivity));
         }
     }
 
 
-    private void initActionBar(){
+    private void initActionBar() {
         try {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
 
@@ -90,7 +101,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
             actionBar.setTitle(mActivity.getResources().getString(R.string.personal));
             actionBar.setDisplayShowCustomEnabled(false);
             actionBar.show();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

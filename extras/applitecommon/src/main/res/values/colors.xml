@@ -8,4 +8,6 @@
     <color name="progress_background">#a0a0a0</color>
     <color name="progress_foreground">#00CC00</color>
     <color name="progress_textcolor">#FFFFFF</color>
+
+    <color name="similar_bg">#f8f8f8</color>
 </resources>

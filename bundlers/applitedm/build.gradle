@@ -51,6 +51,7 @@ dependencies {
 //    provided files('../../extras/dscdownloader/dsc-downloader-v1.1.jar')
     provided files('../../extras/impl/applite-impl-v1.1.jar')
     provided files('../../extras/applitecommon/applite-common-v1.0.jar')
+    provided files('../../extras/mitUpdateSDK/mit-update-v1.0.jar')
     provided files('../../app/reflibs/android-support-v4.jar')
     provided files('../../app/reflibs/android-support-v7-appcompat.jar')
     compile project(':extras:mittheme')
