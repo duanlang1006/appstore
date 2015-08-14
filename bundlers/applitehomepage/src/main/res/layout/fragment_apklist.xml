@@ -83,6 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/apklist_btn_interval_distance"
             android:layout_marginRight="@dimen/apklist_btn_interval_distance"
+            android:focusable="false"
             style="@style/apkListButton" />
 
     </LinearLayout>
