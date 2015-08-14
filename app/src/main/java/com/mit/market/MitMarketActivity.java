@@ -15,7 +15,7 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
-import com.applite.sharedpreferences.GuideSPUtils;
+import com.applite.sharedpreferences.AppliteSPUtils;
 import com.mit.main.GuideFragment;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
@@ -176,7 +176,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
         if (Constant.OSGI_SERVICE_LOGO_FRAGMENT == whichService){
             newFragment = (OSGIBaseFragment)fgmgr.findFragmentByTag("GuideFragment");
-            GuideSPUtils.put(getApplicationContext(), GuideSPUtils.ISGUIDE, true);
+            AppliteSPUtils.put(getApplicationContext(), AppliteSPUtils.ISGUIDE, true);
         }
 
         if (null == newFragment) {

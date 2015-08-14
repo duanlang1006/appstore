@@ -8,11 +8,10 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- * Created by LSY on 15-5-22.
+ * Created by LSY on 15-8-13.
  */
-public class GuideSPUtils {
-
-    public GuideSPUtils() {
+public class AppliteSPUtils {
+    public AppliteSPUtils() {
         /* cannot be instantiated */
         throw new UnsupportedOperationException("cannot be instantiated");
     }
@@ -20,7 +19,7 @@ public class GuideSPUtils {
     /**
      * 保存在手机里面的文件名
      */
-    public static final String FILE_NAME = "logo_data";
+    public static final String FILE_NAME = "applite_data";
 
     public static final String ISGUIDE = "is_guide";
     public static final String GUIDE_POSITION = "guide_position";
@@ -29,6 +28,16 @@ public class GuideSPUtils {
     public static final String LOGO_START_SHOW_TIME = "logo_start_show_time";
     public static final String LOGO_END_SHOW_TIME = "logo_end_show_time";
     public static final String LOGO_IMG_URL = "logo_img_url";
+
+    /**
+     * 通知显示时间
+     */
+    public static final String UPDATE_NOT_SHOW = "update_not_show";
+    /**
+     * WIFI自动更新时段
+     */
+    public static final String WIFI_UPDATE_START = "wifi_update_start";
+    public static final String WIFI_UPDATE_END = "wifi_update_end";
 
     /**
      * 保存数据的方法，我们需要拿到保存数据的具体类型，然后根据类型调用不同的保存方法

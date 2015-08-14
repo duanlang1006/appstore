@@ -191,28 +191,19 @@
                             android:textColor="@color/dividing_line"
                             android:textSize="16sp" />
 
-                        <!--详情内容展开全文-->
-                        <LinearLayout
-                            android:layout_width="fill_parent"
+                        <ImageView
+                            android:id="@+id/detail_open_introduce_content"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"
-                            android:orientation="vertical">
+                            android:layout_gravity="center"
+                            android:layout_marginBottom="5dp"
+                            android:src="@drawable/desc_more" />
 
-                            <ImageView
-                                android:id="@+id/detail_open_introduce_content"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginBottom="5dp"
-                                android:src="@drawable/desc_more" />
+                        <View
+                            android:layout_width="fill_parent"
+                            android:layout_height="0.5dp"
+                            android:background="@color/open_line" />
 
-                            <View
-                                android:layout_width="fill_parent"
-                                android:layout_height="0.5dp"
-                                android:background="@color/open_line" />
-
-                        </LinearLayout>
                     </LinearLayout>
 
                     <!-- 更新日志内容-->
@@ -240,27 +231,43 @@
                             android:textColor="@color/dividing_line"
                             android:textSize="16sp" />
 
-                        <!--更新日志展开全文-->
-                        <LinearLayout
+                        <ImageView
+                            android:id="@+id/detail_open_update_log"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginBottom="5dp"
+                            android:src="@drawable/desc_more" />
+
+                        <View
                             android:layout_width="fill_parent"
+                            android:layout_height="0.5dp"
+                            android:background="@color/open_line" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"
-                            android:orientation="vertical">
+                            android:layout_marginTop="10dp"
+                            android:text="猜你喜欢"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
 
-                            <ImageView
-                                android:id="@+id/detail_open_update_log"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_marginBottom="5dp"
-                                android:src="@drawable/desc_more" />
-
-                            <View
-                                android:layout_width="fill_parent"
-                                android:layout_height="0.5dp"
-                                android:background="@color/open_line" />
-                        </LinearLayout>
+                        <GridView
+                            android:id="@+id/detail_gridview"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:horizontalSpacing="1dp"
+                            android:numColumns="4"
+                            android:verticalSpacing="1dp"></GridView>
                     </LinearLayout>
 
                 </LinearLayout>

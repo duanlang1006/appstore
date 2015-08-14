@@ -28,6 +28,7 @@ import com.applite.common.PagerSlidingTabStrip;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
@@ -51,6 +52,12 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         ImplLog.d(TAG, "onAttach," + this);
         super.onAttach(activity);
         ImplAgent.getInstance(mActivity).addObserver(this);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        MitMobclickAgent.onEvent(mActivity, "toDownloadFragment");
     }
 
     @Override
