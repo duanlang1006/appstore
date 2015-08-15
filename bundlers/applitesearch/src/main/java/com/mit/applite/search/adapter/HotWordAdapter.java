@@ -14,6 +14,7 @@ import com.lidroid.xutils.BitmapUtils;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.utils.SearchUtils;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIServiceHost;
 
 import java.util.List;
@@ -80,17 +81,21 @@ public class HotWordAdapter extends BaseAdapter {
         viewholder.mLl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MitMobclickAgent.onEvent(mActivity, "clickHotWordItem");
                 if (data.getmType() == 0) {//进入应用详情
+                    MitMobclickAgent.onEvent(mActivity, "HotWordToDetailFragment");
                     ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(),
                             data.getmName(),
                             data.getmImgUrl(),true);
                 } else if (data.getmType() == 1) {//进入专题
+                    MitMobclickAgent.onEvent(mActivity, "HotWordToSpecialFragment");
                     ((OSGIServiceHost) mActivity).jumptoTopic(data.getmPackageName(),
                             data.getmName(),
                             data.getmStep(),
                             data.getmDataType(),
                             true);
                 } else if (data.getmType() == 2) {
+                    MitMobclickAgent.onEvent(mActivity, "HotWordToSrarch");
                     mListener.clickItem(data.getmName());
                 }
             }

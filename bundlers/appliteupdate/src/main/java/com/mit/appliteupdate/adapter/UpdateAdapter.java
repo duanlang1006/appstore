@@ -20,6 +20,7 @@ import com.mit.appliteupdate.bean.DataBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 
 import java.util.List;
 
@@ -120,6 +121,7 @@ public class UpdateAdapter extends BaseAdapter {
                                         vh.bean.getmName() + ".apk",
                                         true,
                                         vh.implCallback);
+                                MitMobclickAgent.onEvent(mActivity, "clickUpdate");
                                 break;
                         }
                     } else {

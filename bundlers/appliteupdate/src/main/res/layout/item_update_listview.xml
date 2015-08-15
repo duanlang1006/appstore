@@ -7,7 +7,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="2dp"
-        android:background="@drawable/hotword_box"
+        android:background="@drawable/item_bg"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -53,13 +53,10 @@
 
         <Button
             android:id="@+id/item_update_button"
-            android:layout_width="80dp"
-            android:layout_height="30dp"
-            android:layout_marginRight="20dp"
-            android:background="@drawable/install_button_bg"
-            android:padding="5dp"
-            android:minHeight="0dp"
-            android:text="@string/install"
-            android:textColor="@color/install_button_sel" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/apklist_btn_interval_distance"
+            android:layout_marginRight="@dimen/apklist_btn_interval_distance"
+            style="@style/apkListButton" />
     </LinearLayout>
 </LinearLayout>

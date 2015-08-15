@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/similar_bg"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/item_similar_img"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/icon_defailt_img" />
+
+        <TextView
+            android:id="@+id/item_similar_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:lines="1"
+            android:text="英雄联盟"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/item_similar_install_tv"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@drawable/similar_install_but_bg"
+            android:gravity="center"
+            android:padding="3dp"
+            android:text="安装"
+            android:textColor="@color/progress_foreground" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -23,6 +23,7 @@ import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.data.ListArrayAdapter;
 import com.google.gson.Gson;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
@@ -82,12 +83,14 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LogUtils.i(TAG, "ListFragment.onCreate() ");
+        MitMobclickAgent.onEvent(mActivity, "toSpecialFragment");
     }
 
     @Override
     public void onAttach(Activity activity) {
         LogUtils.i(TAG, "onAttach ");
         super.onAttach(activity);
+        mActivity = activity;
         Bundle params = getArguments();
         if (null != params) {
             this.mData = params.getParcelable("subject_data");
@@ -259,12 +262,13 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                 mMoreView.setVisibility(View.GONE);
                 //mMoreTextView.setVisibility(View.GONE);
 
+                if((pageData.getSubjectData().get(0).getS_key().equals("maintype"))||(pageData.getSubjectData().get(0).getS_key().equals("maintype_m_game"))){
+                    removeMoreView();
+                }
+
                 if (pageData.getSubjectData().get(0).getData().isEmpty()) {
                     isend = true;
                     mMoreView.setVisibility(View.GONE);
-                    //mMoreTextView.setVisibility(View.GONE);
-                    //removeMoreView();
-                    //setEndView(mInflater);
                 } else {
                     isend = false;
                     removeEndView();
@@ -334,6 +338,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     class MySlideViewListener implements SlideShowView.OnSlideViewClickListener{
         @Override
         public void onClick(View v, int position){
+            MitMobclickAgent.onEvent(mActivity, "clickMainViewPager");
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
             LogUtils.i(TAG, "topicData = " + topicData);
             if(topicData.getT_skiptype() == 1){

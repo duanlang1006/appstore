@@ -10,8 +10,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
 import android.view.Window;
-
-import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
@@ -19,9 +17,9 @@ import com.applite.dm.DownloadPagerFragment;
 import com.applite.homepage.HomePageFragment;
 import com.applite.homepage.HomePageListFragment;
 import com.applite.homepage.PersonalFragment;
-import com.applite.sharedpreferences.GuideSPUtils;
 import com.mit.applite.search.main.SearchFragment;
 import com.mit.appliteupdate.main.UpdateFragment;
+import com.applite.sharedpreferences.AppliteSPUtils;
 import com.mit.main.GuideFragment;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
@@ -32,8 +30,6 @@ import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.List;
-
 
 public class MitMarketActivity extends ActionBarActivity implements OSGIServiceHost{
     private static final String TAG = "applite_MitMarketActivity";
@@ -181,10 +177,10 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         LogUtils.d(TAG, "popBackStackImmediate("+targetService+") is "+result);
 
         OSGIBaseFragment newFragment = null;
-        if (Constant.OSGI_SERVICE_LOGO_FRAGMENT == targetService){
-//            newFragment = (OSGIBaseFragment)fgmgr.findFragmentByTag("GuideFragment");
-            GuideSPUtils.put(getApplicationContext(), GuideSPUtils.ISGUIDE, true);
-        }
+//        if (Constant.OSGI_SERVICE_LOGO_FRAGMENT == targetService){
+////            newFragment = (OSGIBaseFragment)fgmgr.findFragmentByTag("GuideFragment");
+//            AppliteSPUtils.put(getApplicationContext(), AppliteSPUtils.ISGUIDE, true);
+//        }
 
         newFragment = (OSGIBaseFragment) newFragment(targetService, targetFragment, params);
 //        ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);

@@ -12,12 +12,15 @@ import android.os.HandlerThread;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
+
 import com.applite.common.Constant;
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
 import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.util.LogUtils;
 import com.lidroid.xutils.util.MimeTypeUtils;
+import com.mit.mitupdatesdk.MitMobclickAgent;
+
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
@@ -35,7 +38,7 @@ import java.util.Set;
 /**
  * Created by hxd on 15-6-10.
  */
-public class ImplAgent extends Observable{
+public class ImplAgent extends Observable {
     private final static String TAG = "impl_agent";
 
     private final static String IMPL_ACTION_DOWNLOAD_COMPLETE = DownloadManager.ACTION_DOWNLOAD_COMPLETE;
@@ -46,19 +49,22 @@ public class ImplAgent extends Observable{
     private final static String IMPL_ACTION_SYSTEM_DELETE_RESULT = "com.installer.system.delete.result";
 
     private static final HandlerThread sWorkerThread = new HandlerThread("impl-worker");
+
     static {
         sWorkerThread.start();
     }
+
     static final Handler mWorkHandler = new Handler(sWorkerThread.getLooper());
     private static ImplAgent mInstance = null;
-    private static synchronized void initInstance(Context context){
-        if (null == mInstance ){
+
+    private static synchronized void initInstance(Context context) {
+        if (null == mInstance) {
             mInstance = new ImplAgent(context);
         }
     }
 
-    public static ImplAgent getInstance(Context appcontext){
-        if (null == mInstance){
+    public static ImplAgent getInstance(Context appcontext) {
+        if (null == mInstance) {
             initInstance(appcontext);
         }
         return mInstance;
@@ -71,7 +77,7 @@ public class ImplAgent extends Observable{
     private List<ImplInfo> mImplList;
     private DbUtils db;
     private ImplAgentCallback mImplCallback;
-    private Map<ImplInfo,WeakReference<ImplChangeCallback>> mWeakCallbackMap;
+    private Map<ImplInfo, WeakReference<ImplChangeCallback>> mWeakCallbackMap;
 
     private ImplAgent(Context context) {
         mContext = context;
@@ -91,25 +97,25 @@ public class ImplAgent extends Observable{
         mInstaller = ImplPackageManager.getInstance(mContext);
 
         //重新载始下载
-        for (ImplInfo implInfo : mImplList){
-            if (mDownloader.needKick(implInfo)){
+        for (ImplInfo implInfo : mImplList) {
+            if (mDownloader.needKick(implInfo)) {
                 mDownloader.resume(implInfo, mImplCallback);
             }
         }
     }
 
-    public ImplInfo getImplInfo(String key,String packageName,int versionCode){
-        if (null == key || null == packageName || TextUtils.isEmpty(key) || TextUtils.isEmpty(packageName)){
-             return null;
+    public ImplInfo getImplInfo(String key, String packageName, int versionCode) {
+        if (null == key || null == packageName || TextUtils.isEmpty(key) || TextUtils.isEmpty(packageName)) {
+            return null;
         }
         ImplInfo implInfo = null;
-        for (int i =0;i < mImplList.size();i++){
-            if (mImplList.get(i).getKey().equals(key)){
+        for (int i = 0; i < mImplList.size(); i++) {
+            if (mImplList.get(i).getKey().equals(key)) {
                 implInfo = mImplList.get(i);
                 break;
             }
         }
-        if (null == implInfo){
+        if (null == implInfo) {
             implInfo = new ImplInfo();
             implInfo.setKey(key);
             mImplList.add(implInfo);
@@ -128,100 +134,99 @@ public class ImplAgent extends Observable{
         return implInfo;
     }
 
-    public boolean onReceive(final Context context,final Intent intent){
+    public boolean onReceive(final Context context, final Intent intent) {
 //        mWorkHandler.post(new Runnable(){
 //            @Override
 //            public void run() {
-                String action = intent.getAction();
-                Log.d(TAG,"onReceive,"+action);
-                ImplInfo implInfo = null;
-                if (IMPL_ACTION_PACKAGE_ADDED.equals(action)){
-                    String packageName = intent.getData().getSchemeSpecificPart();
-                    implInfo = findImplInfoByPackageName(packageName);
-                    if (null != implInfo) {
-                        mInstaller.onPackageAdded(implInfo, mImplCallback);
-                    }
-                }else if (IMPL_ACTION_PACKAGE_CHANGED.equals(action)){
-                    String packageName = intent.getData().getSchemeSpecificPart();
-                    implInfo = findImplInfoByPackageName(packageName);
-                    if (null != implInfo) {
-                        mInstaller.onPackageChanged(implInfo, mImplCallback);
-                    }
-                }else if (IMPL_ACTION_PACKAGE_REMOVED.equals(action)){
-                    String packageName = intent.getData().getSchemeSpecificPart();
-                    implInfo = findImplInfoByPackageName(packageName);
-                    if (null != implInfo) {
-                        mInstaller.onPackageRemoved(implInfo, mImplCallback);
-                    }
-                }else if (IMPL_ACTION_SYSTEM_INSTALL_RESULT.equals(action)){
-                    String packageName = intent.getStringExtra("name");
-                    int result = intent.getIntExtra("result",0);
-                    implInfo = findImplInfoByPackageName(packageName);
-                    if (null != implInfo) {
-                        mInstaller.onSystemInstallResult(implInfo, result, mImplCallback);
-                    }
-                }else if (IMPL_ACTION_SYSTEM_DELETE_RESULT.equals(action)){
-                    String packageName = intent.getStringExtra("name");
-                    int result = intent.getIntExtra("result",0);
-                    implInfo = findImplInfoByPackageName(packageName);
-                    if (null != implInfo) {
-                        mInstaller.onSystemDeleteResult(implInfo, result, mImplCallback);
-                    }
-                }else if (IMPL_ACTION_DOWNLOAD_COMPLETE.equals(action)){
+        String action = intent.getAction();
+        Log.d(TAG, "onReceive," + action);
+        ImplInfo implInfo = null;
+        if (IMPL_ACTION_PACKAGE_ADDED.equals(action)) {
+            String packageName = intent.getData().getSchemeSpecificPart();
+            implInfo = findImplInfoByPackageName(packageName);
+            if (null != implInfo) {
+                mInstaller.onPackageAdded(implInfo, mImplCallback);
+            }
+        } else if (IMPL_ACTION_PACKAGE_CHANGED.equals(action)) {
+            String packageName = intent.getData().getSchemeSpecificPart();
+            implInfo = findImplInfoByPackageName(packageName);
+            if (null != implInfo) {
+                mInstaller.onPackageChanged(implInfo, mImplCallback);
+            }
+        } else if (IMPL_ACTION_PACKAGE_REMOVED.equals(action)) {
+            String packageName = intent.getData().getSchemeSpecificPart();
+            implInfo = findImplInfoByPackageName(packageName);
+            if (null != implInfo) {
+                mInstaller.onPackageRemoved(implInfo, mImplCallback);
+            }
+        } else if (IMPL_ACTION_SYSTEM_INSTALL_RESULT.equals(action)) {
+            String packageName = intent.getStringExtra("name");
+            int result = intent.getIntExtra("result", 0);
+            implInfo = findImplInfoByPackageName(packageName);
+            if (null != implInfo) {
+                mInstaller.onSystemInstallResult(implInfo, result, mImplCallback);
+            }
+        } else if (IMPL_ACTION_SYSTEM_DELETE_RESULT.equals(action)) {
+            String packageName = intent.getStringExtra("name");
+            int result = intent.getIntExtra("result", 0);
+            implInfo = findImplInfoByPackageName(packageName);
+            if (null != implInfo) {
+                mInstaller.onSystemDeleteResult(implInfo, result, mImplCallback);
+            }
+        } else if (IMPL_ACTION_DOWNLOAD_COMPLETE.equals(action)) {
 //                    mDownloader.onDownloadComplete(intent);
-                }
+        }
 //            }
 //        });
         return true;
     }
 
     /**
-     *
      * @param implInfo
      * @param publicDir 下载存储路径
      * @param filename  保存的文件名
      */
     public void newDownload(ImplInfo implInfo,
-                               String publicDir,
-                               String filename,
-                               boolean autoLauncher,
-                               ImplChangeCallback appCallback){
-        if (null == implInfo){
+                            String publicDir,
+                            String filename,
+                            boolean autoLauncher,
+                            ImplChangeCallback appCallback) {
+        if (null == implInfo) {
             return;
         }
         setImplCallback(appCallback, implInfo);
 //        implInfo.setMimeType(MimeTypeUtils.getMimeType(filename));
         implInfo.setAutoLaunch(autoLauncher);
-        mDownloader.addDownload(implInfo,publicDir,filename,mImplCallback);
+        mDownloader.addDownload(implInfo, publicDir, filename, mImplCallback);
         setChanged();
         notifyObservers();
     }
 
-    public void pauseDownload(ImplInfo implInfo){
-        if (null == implInfo){
+    public void pauseDownload(ImplInfo implInfo) {
+        if (null == implInfo) {
             return;
         }
         mDownloader.pause(implInfo);
     }
 
-    public void pauseAll(){
+    public void pauseAll() {
         mDownloader.pauseAll(mImplList);
     }
 
-    public void resumeDownload(ImplInfo implInfo,ImplChangeCallback appCallback){
-        if (null == implInfo){
+    public void resumeDownload(ImplInfo implInfo, ImplChangeCallback appCallback) {
+        if (null == implInfo) {
             return;
         }
-        setImplCallback(appCallback,implInfo);
+        setImplCallback(appCallback, implInfo);
         mDownloader.resume(implInfo, mImplCallback);
     }
 
-    public void resumeAll(){
-        mDownloader.resumeAll(mImplList,mImplCallback);
+    public void resumeAll() {
+        mDownloader.resumeAll(mImplList, mImplCallback);
     }
 
-    public void remove(ImplInfo implInfo){
-        if (null == implInfo){
+    public void remove(ImplInfo implInfo) {
+        if (null == implInfo) {
             return;
         }
         try {
@@ -235,51 +240,51 @@ public class ImplAgent extends Observable{
         notifyObservers();
     }
 
-    public void install(ImplInfo implInfo,boolean silent,ImplChangeCallback appCallback){
-        setImplCallback(appCallback,implInfo);
+    public void install(ImplInfo implInfo, boolean silent, ImplChangeCallback appCallback) {
+        setImplCallback(appCallback, implInfo);
         mInstaller.install(implInfo, silent, mImplCallback);
     }
 
-    public void uninstall(ImplInfo implInfo,boolean silent,ImplChangeCallback appCallback){
-        setImplCallback(appCallback,implInfo);
+    public void uninstall(ImplInfo implInfo, boolean silent, ImplChangeCallback appCallback) {
+        setImplCallback(appCallback, implInfo);
         mInstaller.uninstall(implInfo, silent, mImplCallback);
     }
 
-    public List<ImplInfo> getDownloadInfoList(int statusFlag){
+    public List<ImplInfo> getDownloadInfoList(int statusFlag) {
         List<ImplInfo> list = new ArrayList<ImplInfo>();
-        for (ImplInfo info : mImplList){
-            if ((info.getStatus() & statusFlag)!=0 && info.getDownloadId()>0){
+        for (ImplInfo info : mImplList) {
+            if ((info.getStatus() & statusFlag) != 0 && info.getDownloadId() > 0) {
                 list.add(info);
             }
         }
         return list;
     }
 
-    public int getImplInfoCount(int statusFlag){
+    public int getImplInfoCount(int statusFlag) {
         int count = 0;
-        for (ImplInfo info : mImplList){
-            if ((info.getStatus() & statusFlag)!=0){
-                count ++;
+        for (ImplInfo info : mImplList) {
+            if ((info.getStatus() & statusFlag) != 0) {
+                count++;
             }
         }
         return count;
     }
 
-    public int getProgress(ImplInfo implInfo){
+    public int getProgress(ImplInfo implInfo) {
         return mDownloader.getProgress(implInfo);
     }
 
-    public void setImplCallback(ImplChangeCallback appCallback,ImplInfo implInfo){
+    public void setImplCallback(ImplChangeCallback appCallback, ImplInfo implInfo) {
         if (null != appCallback && null != implInfo) {
             synchronized (mWeakCallbackMap) {
-                mWeakCallbackMap.put(implInfo,new WeakReference<ImplChangeCallback>(appCallback));
+                mWeakCallbackMap.put(implInfo, new WeakReference<ImplChangeCallback>(appCallback));
             }
         }
     }
 
     public int getAction(ImplInfo implInfo) {
         int action = ImplInfo.ACTION_DOWNLOAD;
-        if (null == implInfo){
+        if (null == implInfo) {
             return action;
         }
 
@@ -293,7 +298,7 @@ public class ImplAgent extends Observable{
 
             case Constant.STATUS_SUCCESSFUL:
                 String localPath = implInfo.getLocalPath();
-                if (null == localPath || TextUtils.isEmpty(localPath)){
+                if (null == localPath || TextUtils.isEmpty(localPath)) {
                     localPath = mDownloader.getLocalPath(implInfo);
                 }
                 String mimeType = MimeTypeUtils.getMimeType(localPath);
@@ -302,9 +307,9 @@ public class ImplAgent extends Observable{
                 if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
                     PackageInfo archivePkg = mContext.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
-                    if (null != archivePkg){
+                    if (null != archivePkg) {
                         action = ImplInfo.ACTION_OPEN;
-                    }else{//下载apk解析错误
+                    } else {//下载apk解析错误
                         action = ImplInfo.ACTION_DOWNLOAD;
                     }
                 }
@@ -339,8 +344,8 @@ public class ImplAgent extends Observable{
 
     public String getActionText(ImplInfo implInfo) {
         Resources mResources = mContext.getResources();
-        String actionText = "" ;
-        if (null == implInfo){
+        String actionText = "";
+        if (null == implInfo) {
             return actionText;
         }
 
@@ -367,7 +372,7 @@ public class ImplAgent extends Observable{
 
             case Constant.STATUS_SUCCESSFUL:
                 String localPath = implInfo.getLocalPath();
-                if (null == localPath || TextUtils.isEmpty(localPath)){
+                if (null == localPath || TextUtils.isEmpty(localPath)) {
                     localPath = mDownloader.getLocalPath(implInfo);
                 }
                 String mimeType = MimeTypeUtils.getMimeType(localPath);
@@ -376,14 +381,14 @@ public class ImplAgent extends Observable{
                 if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
                     PackageInfo archivePkg = mContext.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
-                    if (null != archivePkg){
-                        Intent intent = getLaunchDownloadIntent(mContext,archivePkg.packageName);
-                        if (null == intent){
+                    if (null != archivePkg) {
+                        Intent intent = getLaunchDownloadIntent(mContext, archivePkg.packageName);
+                        if (null == intent) {
                             actionText = mResources.getString(R.string.action_open);
-                        }else{
+                        } else {
                             actionText = mResources.getString(R.string.action_open);
                         }
-                    }else{//下载apk解析错误
+                    } else {//下载apk解析错误
                         actionText = mResources.getString(R.string.action_retry);
                     }
                 }
@@ -394,7 +399,7 @@ public class ImplAgent extends Observable{
                     PackageInfo installPkg = mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
                     if (implInfo.getVersionCode() <= installPkg.versionCode) {
                         actionText = mResources.getString(R.string.action_open);
-                    }else{
+                    } else {
                         actionText = mResources.getString(R.string.action_upgrade);
                     }
                 } catch (PackageManager.NameNotFoundException e) {
@@ -421,8 +426,8 @@ public class ImplAgent extends Observable{
 
     public String getStatusText(ImplInfo implInfo) {
         Resources mResources = mContext.getResources();
-        String statusText = "" ;
-        if (null == implInfo){
+        String statusText = "";
+        if (null == implInfo) {
             return statusText;
         }
         switch (implInfo.getStatus()) {
@@ -448,7 +453,7 @@ public class ImplAgent extends Observable{
 
             case Constant.STATUS_SUCCESSFUL:
                 String localPath = implInfo.getLocalPath();
-                if (null == localPath || TextUtils.isEmpty(localPath)){
+                if (null == localPath || TextUtils.isEmpty(localPath)) {
                     localPath = mDownloader.getLocalPath(implInfo);
                 }
                 String mimeType = MimeTypeUtils.getMimeType(localPath);
@@ -457,7 +462,7 @@ public class ImplAgent extends Observable{
                 if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
                     PackageInfo archivePkg = mContext.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
-                    if (null == archivePkg){
+                    if (null == archivePkg) {
                         statusText = mResources.getString(R.string.download_status_invalid_package);
                     }
                 }
@@ -494,8 +499,8 @@ public class ImplAgent extends Observable{
 
     public String getDescText(ImplInfo implInfo) {
         Resources mResources = mContext.getResources();
-        String descText = "" ;
-        if (null == implInfo){
+        String descText = "";
+        if (null == implInfo) {
             return descText;
         }
         ImplDownload implDownload = mDownloader;
@@ -505,12 +510,12 @@ public class ImplAgent extends Observable{
             case Constant.STATUS_RUNNING:
             case Constant.STATUS_PAUSED:
             case Constant.STATUS_FAILED:
-                descText = getSizeText(mContext,implDownload.getCurrentBytes(implInfo),implDownload.getTotalBytes(implInfo));
+                descText = getSizeText(mContext, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
                 break;
 
             case Constant.STATUS_SUCCESSFUL:
                 String localPath = implInfo.getLocalPath();
-                if (null == localPath || TextUtils.isEmpty(localPath)){
+                if (null == localPath || TextUtils.isEmpty(localPath)) {
                     localPath = mDownloader.getLocalPath(implInfo);
                 }
                 String mimeType = MimeTypeUtils.getMimeType(localPath);
@@ -519,11 +524,11 @@ public class ImplAgent extends Observable{
                 if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
                     PackageInfo archivePkg = mContext.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
-                    if (null != archivePkg){
+                    if (null != archivePkg) {
                         descText = (String.format(mResources.getString(R.string.apk_version), archivePkg.versionName));
                     }
                 }
-                descText += ("|" + millis2FormatString("yy-MM-dd",implInfo.getLastMod()));
+                descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
                 break;
 
             case Constant.STATUS_INSTALLED:
@@ -534,7 +539,7 @@ public class ImplAgent extends Observable{
                     e.printStackTrace();
                     descText = Formatter.formatFileSize(mContext, implDownload.getTotalBytes(implInfo));
                 }
-                descText += ("|" + millis2FormatString("yy-MM-dd",implInfo.getLastMod()));
+                descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
                 break;
 
 //            case Constant.STATUS_UPGRADE:
@@ -547,7 +552,7 @@ public class ImplAgent extends Observable{
             case Constant.STATUS_PACKAGE_INVALID:
             case Constant.STATUS_INSTALL_FAILED:
                 descText = Formatter.formatFileSize(mContext, implDownload.getTotalBytes(implInfo));
-                descText += ("|" + millis2FormatString("yy-MM-dd",implInfo.getLastMod()));
+                descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
                 break;
         }
         return descText;
@@ -555,7 +560,7 @@ public class ImplAgent extends Observable{
 
     public Intent getActionIntent(ImplInfo implInfo) {
         Intent actionIntent = null;
-        if (null == implInfo){
+        if (null == implInfo) {
             return actionIntent;
         }
         switch (implInfo.getStatus()) {
@@ -571,7 +576,7 @@ public class ImplAgent extends Observable{
             case Constant.STATUS_NORMAL_INSTALLING:
             case Constant.STATUS_SUCCESSFUL:
                 String localPath = implInfo.getLocalPath();
-                if (null == localPath || TextUtils.isEmpty(localPath)){
+                if (null == localPath || TextUtils.isEmpty(localPath)) {
                     localPath = mDownloader.getLocalPath(implInfo);
                 }
                 String mimeType = MimeTypeUtils.getMimeType(localPath);
@@ -579,21 +584,21 @@ public class ImplAgent extends Observable{
                 if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
                     PackageInfo archivePkg = mContext.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
-                    if (null != archivePkg){
-                        actionIntent = getLaunchDownloadIntent(mContext,archivePkg.packageName);
-                    }else{//下载apk解析错误
+                    if (null != archivePkg) {
+                        actionIntent = getLaunchDownloadIntent(mContext, archivePkg.packageName);
+                    } else {//下载apk解析错误
                         actionIntent = null;
                     }
                 }
-                if(null == actionIntent){
-                    actionIntent = getOpenDownloadIntent(localPath,mimeType);
+                if (null == actionIntent) {
+                    actionIntent = getOpenDownloadIntent(localPath, mimeType);
                 }
                 break;
 
             case Constant.STATUS_INSTALLED:
                 try {
                     PackageInfo installPkg = mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
-                    actionIntent = getLaunchDownloadIntent(mContext,implInfo.getPackageName());
+                    actionIntent = getLaunchDownloadIntent(mContext, implInfo.getPackageName());
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                     actionIntent = null;
@@ -613,11 +618,10 @@ public class ImplAgent extends Observable{
     }
 
 
-
-    private ImplInfo findImplInfoByPackageName(String packageName){
+    private ImplInfo findImplInfoByPackageName(String packageName) {
         ImplInfo implInfo = null;
-        for (int i =0;i < mImplList.size();i++){
-            if (mImplList.get(i).getPackageName().equals(packageName)){
+        for (int i = 0; i < mImplList.size(); i++) {
+            if (mImplList.get(i).getPackageName().equals(packageName)) {
                 implInfo = mImplList.get(i);
                 break;
             }
@@ -626,7 +630,7 @@ public class ImplAgent extends Observable{
     }
 
 
-    private class ImplAgentCallback extends ImplListener{
+    private class ImplAgentCallback extends ImplListener {
         private ImplAgentCallback() {
             super();
         }
@@ -651,6 +655,7 @@ public class ImplAgent extends Observable{
         @Override
         public void onStart(final ImplInfo info) {
             super.onStart(info);
+            MitMobclickAgent.onEvent(mContext, "DownloadStart");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -696,12 +701,13 @@ public class ImplAgent extends Observable{
 //                }
 //            });
             nofityChanged(info);
-            ImplLog.d(TAG, info.getTitle() + ",onLoading," + ((total!=0)?current*100/total:0));
+            ImplLog.d(TAG, info.getTitle() + ",onLoading," + ((total != 0) ? current * 100 / total : 0));
         }
 
         @Override
         public void onSuccess(final ImplInfo info, final File file) {
             super.onSuccess(info, file);
+            MitMobclickAgent.onEvent(mContext, "DownloadSuccess");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -727,6 +733,7 @@ public class ImplAgent extends Observable{
         @Override
         public void onFailure(final ImplInfo info, final Throwable t, final String msg) {
             super.onFailure(info, t, msg);
+            MitMobclickAgent.onEvent(mContext, "DownloadFailure");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -744,6 +751,7 @@ public class ImplAgent extends Observable{
         @Override
         public void onInstallSuccess(final ImplInfo info) {
             super.onInstallSuccess(info);
+            MitMobclickAgent.onEvent(mContext, "installSuccess");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -778,6 +786,7 @@ public class ImplAgent extends Observable{
         @Override
         public void onInstallFailure(final ImplInfo info, final int errorCode) {
             super.onInstallFailure(info, errorCode);
+            MitMobclickAgent.onEvent(mContext, "installFailuer");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -789,12 +798,13 @@ public class ImplAgent extends Observable{
                 }
             });
             nofityChanged(info);
-            ImplLog.d(TAG, info.getTitle() + ",onInstallFailure,errorCode="+errorCode);
+            ImplLog.d(TAG, info.getTitle() + ",onInstallFailure,errorCode=" + errorCode);
         }
 
         @Override
         public void onUninstallSuccess(final ImplInfo info) {
             super.onUninstallSuccess(info);
+            MitMobclickAgent.onEvent(mContext, "uninstallSuccess");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -829,6 +839,7 @@ public class ImplAgent extends Observable{
         @Override
         public void onUninstallFailure(final ImplInfo info, final int errorCode) {
             super.onUninstallFailure(info, errorCode);
+            MitMobclickAgent.onEvent(mContext, "uninstallFailure");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -843,38 +854,38 @@ public class ImplAgent extends Observable{
             ImplLog.d(TAG, info.getTitle() + ",onUninstalling");
         }
 
-        private void nofityChanged(final ImplInfo info){
+        private void nofityChanged(final ImplInfo info) {
             synchronized (mWeakCallbackMap) {
                 //回调
                 WeakReference<ImplChangeCallback> weakref = mWeakCallbackMap.get(info);
-                if (null != weakref){
+                if (null != weakref) {
                     ImplChangeCallback callback = weakref.get();
-                    if (null != callback){
+                    if (null != callback) {
                         callback.onChange(info);
                     }
                 }
 
                 //清理
                 Set keyset = mWeakCallbackMap.keySet();
-                if (null == keyset || keyset.size() == 0){
+                if (null == keyset || keyset.size() == 0) {
                     return;
                 }
                 Iterator it = keyset.iterator();
-                while(it.hasNext()){
-                    ImplInfo implInfo = (ImplInfo)it.next();
+                while (it.hasNext()) {
+                    ImplInfo implInfo = (ImplInfo) it.next();
                     WeakReference<ImplChangeCallback> ref = mWeakCallbackMap.get(implInfo);
-                    if (null == ref.get()){
-                        ImplLog.d(TAG,implInfo.getTitle()+",callback is null,will be deleted");
+                    if (null == ref.get()) {
+                        ImplLog.d(TAG, implInfo.getTitle() + ",callback is null,will be deleted");
                         it.remove();
                         mWeakCallbackMap.remove(implInfo);
                     }
                 }
-                ImplLog.d(TAG,"mWeakCallbackMap.size()="+mWeakCallbackMap.size());
+                ImplLog.d(TAG, "mWeakCallbackMap.size()=" + mWeakCallbackMap.size());
             }
         }
     }
 
-    public static String getSizeText(Context context,long currentBytes,long totalBytes) {
+    public static String getSizeText(Context context, long currentBytes, long totalBytes) {
         StringBuffer sizeText = new StringBuffer();
         if (totalBytes >= 0) {
             sizeText.append(Formatter.formatFileSize(context, currentBytes));
@@ -889,7 +900,7 @@ public class ImplAgent extends Observable{
         return sdf.format(new Date(millis));
     }
 
-    public static Intent getOpenDownloadIntent(String localPath,String mediaType) {
+    public static Intent getOpenDownloadIntent(String localPath, String mediaType) {
         Uri localUri = Uri.fromFile(new File(localPath));
         if (null != localUri) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -900,7 +911,7 @@ public class ImplAgent extends Observable{
         return null;
     }
 
-    public static Intent getLaunchDownloadIntent(Context context ,String packageName) {
+    public static Intent getLaunchDownloadIntent(Context context, String packageName) {
         Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
         if (null != intent) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);

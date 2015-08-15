@@ -10,11 +10,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
 
-public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener{
+public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener {
+    private Activity mActivity;
+
     public PersonalFragment() {
         super();
     }
@@ -22,6 +25,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MitMobclickAgent.onEvent(mActivity, "toPersonalFragment");
     }
 
     @Override
@@ -36,6 +40,12 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity = activity;
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
     }
@@ -43,9 +53,9 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main_homepage,menu);
+        inflater.inflate(R.menu.menu_main_homepage, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        if (null != item){
+        if (null != item) {
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
     }
@@ -53,7 +63,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (!hidden){
+        if (!hidden) {
             initActionBar();
         }
     }
@@ -80,7 +90,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     }
 
 
-    private void initActionBar(){
+    private void initActionBar() {
         try {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
 
@@ -89,7 +99,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
             actionBar.setTitle(mActivity.getResources().getString(R.string.personal));
             actionBar.setDisplayShowCustomEnabled(false);
             actionBar.show();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

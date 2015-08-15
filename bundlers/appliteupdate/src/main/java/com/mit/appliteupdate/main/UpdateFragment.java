@@ -1,7 +1,6 @@
 package com.mit.appliteupdate.main;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -34,16 +33,16 @@ import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.adapter.UpdateAdapter;
 import com.mit.appliteupdate.bean.DataBean;
-import com.mit.appliteupdate.utils.UpdateSPUtils;
-import com.mit.appliteupdate.utils.UpdateUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
-import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,6 +86,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHttpUtils = new HttpUtils();
+        MitMobclickAgent.onEvent(mActivity, "toUpdateFragment");
     }
 
     @Override
@@ -121,6 +121,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     public void onClick(View v) {
         if (v.getId() == R.id.update_all_update) {
             if (!mDataContents.isEmpty()) {
+                MitMobclickAgent.onEvent(mActivity, "clickAllUpdate");
                 DataBean data = null;
                 for (int i = 0; i < mDataContents.size(); i++) {
                     data = mDataContents.get(i);
@@ -130,7 +131,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             } else {
                 Toast.makeText(mActivity, AppliteUtils.getString(mActivity, R.string.no_update), Toast.LENGTH_SHORT).show();
             }
-        }else if (v.getId() == R.id.update_post_button){
+        } else if (v.getId() == R.id.update_post_button) {
             if (mPostStats)
                 post();
         }
@@ -195,7 +196,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "update_management");
-        params.addBodyParameter("update_info", UpdateUtils.getAllApkData(mActivity));
+        params.addBodyParameter("update_info", AppliteUtils.getAllApkData(mActivity));
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
@@ -253,11 +254,6 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                     mStatsButton.setVisibility(View.GONE);
                 } else {
                     setStatsLayoutVisibility(View.GONE, null);
-                    if (System.currentTimeMillis() >
-                            (Long) UpdateSPUtils.get(mActivity, UpdateSPUtils.UPDATE_NOT_SHOW, 0L)) {
-                        showUpdateNotification(array.length());
-                        UpdateSPUtils.put(mActivity, UpdateSPUtils.UPDATE_NOT_SHOW, System.currentTimeMillis() + 24 * 60 * 60 * 1000);
-                    }
                 }
                 mAdapter = new UpdateAdapter(mActivity, mDataContents);
                 mListView.setAdapter(mAdapter);
@@ -283,18 +279,6 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 mStatsImgView.setBackground(drawable);
                 mStatsLayout.setVisibility(visibility);
                 break;
-        }
-    }
-
-    /**
-     * 发送更新通知
-     */
-    private void showUpdateNotification(int number) {
-        OSGIServiceHost host = (OSGIServiceHost)mActivity;
-        if (null != host){
-            Bundle b = new Bundle();
-            b.putInt("number",number);
-            host.notify( b);
         }
     }
 
