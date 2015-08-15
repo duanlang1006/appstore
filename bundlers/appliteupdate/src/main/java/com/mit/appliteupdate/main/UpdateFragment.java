@@ -296,12 +296,12 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 case Constant.STATUS_PAUSED:
                     implAgent.resumeDownload(implInfo, null);
                     break;
-                case Constant.STATUS_INSTALLED:
                 case Constant.STATUS_NORMAL_INSTALLING:
                 case Constant.STATUS_PRIVATE_INSTALLING:
                     //正在安装或已安装
 //                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
                     break;
+                case Constant.STATUS_INSTALLED:
                 default:
                     implAgent.newDownload(implInfo,
                             Constant.extenStorageDirPath,
