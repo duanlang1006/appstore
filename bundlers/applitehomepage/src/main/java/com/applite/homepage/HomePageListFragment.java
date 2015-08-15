@@ -22,7 +22,6 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.data.ListArrayAdapter;
-import com.applite.utils.HomepageUtils;
 import com.google.gson.Gson;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
@@ -58,6 +57,15 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     private boolean isend;
     private boolean sendhttpreq = true;
+
+    public static Bundle newBundle(String s_key, String s_name, int step, String s_datatype){
+        Bundle bundle = new Bundle();
+        bundle.putString("key",s_key);
+        bundle.putString("name",s_name);
+        bundle.putInt("step",step);
+        bundle.putString("datatype",s_datatype);
+        return bundle;
+    }
 
     public static Bundle newBundle(SubjectData data,boolean showBack){
         Bundle b = new Bundle();
@@ -133,9 +141,9 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
             return;
         }
         if (viewHolder.getLayoutStr().equals("fragment_categorylist")) {
-            HomepageUtils.toHomePageCategory(((OSGIServiceHost)mActivity),itemData.getKey(),itemData.getName());
+            ((OSGIServiceHost)mActivity).jumptoHomepage(itemData.getKey(),itemData.getName(),true);
         }else if (viewHolder.getLayoutStr().equals("fragment_apklist")){
-            HomepageUtils.launchDetail(((OSGIServiceHost)mActivity),itemData.getPackageName(),itemData.getName(),itemData.getIconUrl());
+            ((OSGIServiceHost)mActivity).jumptoDetail(itemData.getPackageName(),itemData.getName(),itemData.getIconUrl(),true);
         }
     }
 
@@ -329,9 +337,9 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
             LogUtils.i(TAG, "topicData = " + topicData);
             if(topicData.getT_skiptype() == 1){
-                HomepageUtils.launchDetail(((OSGIServiceHost)mActivity),topicData.getTt_packageName(),topicData.getTt_name(),topicData.getTt_iconUrl());
+                ((OSGIServiceHost)mActivity).jumptoDetail(topicData.getTt_packageName(),topicData.getTt_name(),topicData.getTt_iconUrl(),true);
             }else{
-                HomepageUtils.toTopicFragment(((OSGIServiceHost)mActivity),topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype());
+                ((OSGIServiceHost)mActivity).jumptoTopic(topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype(),true);
             }
         }
     }

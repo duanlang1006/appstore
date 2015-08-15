@@ -10,7 +10,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import com.applite.utils.HomepageUtils;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
@@ -62,7 +61,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.action_search == item.getItemId()){
-            HomepageUtils.launchSearchFragment((OSGIServiceHost)mActivity);
+            ((OSGIServiceHost) mActivity).jumptoSearch(true);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -72,11 +71,11 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onClick(View v) {
         if (R.id.action_dm == v.getId()) {
-            HomepageUtils.launchDownloadManagerFragment(((OSGIServiceHost) mActivity));
+            ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
         }else if (R.id.action_upgrade == v.getId()){
-            HomepageUtils.launchUpgradeFragment(((OSGIServiceHost)mActivity));
+            ((OSGIServiceHost) mActivity).jumptoUpdate(true);
         }else if (R.id.action_logo == v.getId()){
-            HomepageUtils.launchLogoManagerFragment(((OSGIServiceHost)mActivity));
+            ((OSGIServiceHost) mActivity).jumptoMylife(true);
         }
     }
 

@@ -94,14 +94,12 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private float mFLayoutWidthScale;
 
 
-    public static Fragment newInstance(String whichService, String whichFragment, Bundle params) {
-        Fragment fg = new GuideFragment();
+    public static Bundle newBundles(String targetService, String targetFragment, Bundle params) {
         Bundle b = new Bundle();
-        b.putString("service", whichService);
-        b.putString("fragment", whichFragment);
+        b.putString("service", targetService);
+        b.putString("fragment", targetFragment);
         b.putBundle("params", params);
-        fg.setArguments(b);
-        return fg;
+        return b;
     }
 
     public GuideFragment() {
@@ -420,7 +418,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         GuideSPUtils.put(mActivity, "personal_flag", true);
 
         OSGIServiceHost host = (OSGIServiceHost) mActivity;
-        host.jumpto(mWhichService, mWhichFragment, mParams);
+        host.jumpto(mWhichService, mWhichFragment, mParams,false);
     }
 
     @Override

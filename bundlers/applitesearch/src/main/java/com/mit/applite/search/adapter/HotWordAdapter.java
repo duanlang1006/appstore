@@ -81,11 +81,15 @@ public class HotWordAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 if (data.getmType() == 0) {//进入应用详情
-                    SearchUtils.toDetailFragment((OSGIServiceHost) mActivity,
-                            data.getmPackageName(), data.getmName(), data.getmImgUrl());
+                    ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(),
+                            data.getmName(),
+                            data.getmImgUrl(),true);
                 } else if (data.getmType() == 1) {//进入专题
-                    SearchUtils.toTopicFragment((OSGIServiceHost) mActivity,
-                            data.getmPackageName(), data.getmName(), data.getmStep(), data.getmDataType());
+                    ((OSGIServiceHost) mActivity).jumptoTopic(data.getmPackageName(),
+                            data.getmName(),
+                            data.getmStep(),
+                            data.getmDataType(),
+                            true);
                 } else if (data.getmType() == 2) {
                     mListener.clickItem(data.getmName());
                 }
