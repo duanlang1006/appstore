@@ -46,7 +46,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     private Button btnShare = null;
     private boolean[] status = null;
     private Cursor cursor = null;
-    private static int len = -1;//这里长度待定
+//    private static int len = -1;//这里长度待定
 
     public static Bundle newBundle(int flag) {
         Bundle b = new Bundle();
@@ -79,15 +79,17 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         btnShare = (Button) view.findViewById(R.id.btnShare);
         btnShare.setOnClickListener(btn_clickLis);
         //这里添加一个 从adapter拿到getOunt的方法 赋给len
-//        len = mAdapter.getlen();
-        try {
-            len = mAdapter.getlen() + 1;
-            Toast.makeText(mActivity.getApplicationContext(), "!!!!", Toast.LENGTH_SHORT).show();
-//            len = cursor.getCount() + 1;
-        } catch (Exception e) {
-            Toast.makeText(mActivity.getApplicationContext(), "????", Toast.LENGTH_SHORT).show();
-            len = 20;
-        }
+////        len = mAdapter.getlen();
+//        try {
+////            len = mAdapter.getlen() + 1;
+////            len = cursor.getCount() + 1;
+//            len = cursor.getColumnCount() + 1;
+//            Toast.makeText(mActivity.getApplicationContext(), "!!!!", Toast.LENGTH_SHORT).show();
+////            len = cursor.getCount() + 1;
+//        } catch (Exception e) {
+//            Toast.makeText(mActivity.getApplicationContext(), "????", Toast.LENGTH_SHORT).show();
+        int len = 40;
+//        }
 
         status = new boolean[len];
         Arrays.fill(status, false);//全部填充为false(chechbox不选中)
@@ -106,7 +108,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                         mAdapter.resetFlag(flag_showCheckBox);
                     }
                     status[i] = !status[i];
-                    Toast.makeText(mActivity.getApplicationContext(), status[i] + "", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(mActivity.getApplicationContext(), status[i] + "", Toast.LENGTH_SHORT).show();
                     mAdapter.resetStatus(status);
                     mAdapter.notifyDataSetChanged();
                 }
@@ -189,7 +191,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     if (flag_showCheckBox) {
                         status[i] = !status[i];
-                        Toast.makeText(mActivity.getApplicationContext(), status[i] + "", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(mActivity.getApplicationContext(), status[i] + "", Toast.LENGTH_SHORT).show();
                         mAdapter.resetStatus(status);
                         mAdapter.notifyDataSetChanged();
                     }
@@ -215,7 +217,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                 flag_showCheckBox = false;
                 mAdapter.resetFlag(flag_showCheckBox);
                 Arrays.fill(status, false);//删除后将status复位
-                Toast.makeText(mActivity.getApplicationContext(), "分享功能尚未实现，敬请期待", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mActivity.getApplicationContext(), "分享功能尚未实现，敬请期待", Toast.LENGTH_SHORT).show();
             } else if (view.getId() == R.id.btnDelete) {
                 deleteItem();
             }
@@ -225,29 +227,40 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     };
 
     private void deleteItem() {
-        for (int i = len - 1; i >= 0; i--) {
+        View childView;
+        DownloadAdapter.ViewHolder vh = null;
+        ImplAgent implAgent;
+        String key;
+        String packageName;
+        int versionCode;
+        cursor.moveToFirst();
+        int count = 0;
+        for (int i = 0; i < cursor.getCount(); i++) {
             if (status[i]) {
                 //这里删除
-                View childView = mListview.getChildAt(i);
-                DownloadAdapter.ViewHolder vh = (DownloadAdapter.ViewHolder) childView.getTag();
+                childView = mListview.getChildAt(i);
+                //但是删除一个的话会正常删除
+                vh = (DownloadAdapter.ViewHolder) childView.getTag();
 //                ImplAgent.getInstance(mActivity.getApplicationContext()).remove(vh.implInfo);
-
-                ImplAgent implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
-                String key = cursor.getString(cursor.getColumnIndex("key"));
-                String packageName = cursor.getString(cursor.getColumnIndex("packageName"));
-                int versionCode = cursor.getInt(cursor.getColumnIndex("versionCode"));
+                implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
+//                LogUtils.d("dm_list", "count" + cursor.getColumnCount());
+                key = cursor.getString(cursor.getColumnIndex("key"));
+                packageName = cursor.getString(cursor.getColumnIndex("packageName"));
+                versionCode = cursor.getInt(cursor.getColumnIndex("versionCode"));
                 vh.initView(implAgent.getImplInfo(key, packageName, versionCode));
                 implAgent.remove(vh.implInfo);
+                count++;
 //                childView.setVisibility(View.GONE);
-
+//                mAdapter.notifyDataSetChanged();
             }
+            cursor.moveToNext();
         }
         flag_showCheckBox = false;
         mAdapter.resetFlag(flag_showCheckBox);
         Arrays.fill(status, false);//删除后将status复位
-//                mAdapter.notifyDataSetChanged();//并通知适配器
-        setAdapter();
-
+        setAdapter();//这里
+        Toast.makeText(mActivity.getApplicationContext(), "成功删除了" + count + "条下载", Toast.LENGTH_SHORT).show();
+//        mAdapter.notifyDataSetChanged();//并通知适配器
     }
 
     private void setAdapter() {
