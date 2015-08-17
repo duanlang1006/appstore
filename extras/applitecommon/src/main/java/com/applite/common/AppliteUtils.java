@@ -328,10 +328,10 @@ public class AppliteUtils {
 //        return service;
 //    }
 
-    public static Bundle putFgParams(Bundle params, String fromTag, String operate, boolean addToBackStack) {
-        params.putString("fromTag", fromTag);
-        params.putString("operate", operate);
-        params.putBoolean("addToBackStack", addToBackStack);
-        return params;
-    }
+//    public static Bundle putFgParams(Bundle params, String fromTag, String operate, boolean addToBackStack) {
+//        params.putString("fromTag", fromTag);
+//        params.putString("operate", operate);
+//        params.putBoolean("addToBackStack", addToBackStack);
+//        return params;
+//    }
 }

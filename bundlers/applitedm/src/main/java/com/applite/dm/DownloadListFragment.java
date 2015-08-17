@@ -3,7 +3,9 @@ package com.applite.dm;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -40,6 +42,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     private ImplAgent mImplAgent;
     private List<ImplInfo> mImplList;
     private BitmapUtils mBitmapHelper;
+    private int mCount = 0;
 
     public static final Comparator<ImplInfo> IMPL_TIMESTAMP_COMPARATOR = new Comparator<ImplInfo>() {
         public final int compare(ImplInfo a, ImplInfo b) {
@@ -200,12 +203,24 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
             });
         } else {
             if (null != vh) {
-                HostUtils.launchDetail((OSGIServiceHost) mActivity,
+                ((OSGIServiceHost) mActivity).jumptoDetail(
                         vh.implInfo.getPackageName(),
                         vh.implInfo.getTitle(),
-                        vh.implInfo.getIconUrl());
+                        vh.implInfo.getIconUrl(),
+                        true);
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Toast.makeText(mActivity.getApplicationContext(), "????", Toast.LENGTH_SHORT).show();
+        if (item.getItemId() == R.id.dm_action_pause_all) {
+            Toast.makeText(mActivity.getApplicationContext(), "dm_action_pause_all", Toast.LENGTH_SHORT).show();
+        } else if (item.getItemId() == R.id.dm_action_resume_all) {
+            Toast.makeText(mActivity.getApplicationContext(), "dm_action_resume_all", Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private View.OnClickListener btn_clickLis = new View.OnClickListener() {
@@ -232,7 +247,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         ImplAgent implAgent;
         int count = 0;//count仅统计删除的条数
         int len = mImplList.size();
-//        for (int i = 0; i < len; i++) {//这里的长度，将len改为全局
+//        for (int i = 0; i < len; i++) {
         for (int i = len - 1; i >= 0; i--) {
             if (status[i]) {
                 childView = mListview.getChildAt(i);
@@ -248,8 +263,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         mAdapter.resetFlag(flag_showCheckBox);
         Arrays.fill(status, false);//删除后将status复位
         mAdapter.resetStatus(status);
-        mListview.setAdapter(mAdapter);
+//        mListview.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();//并通知适配器
         Toast.makeText(mActivity.getApplicationContext(), "成功删除了" + count + "条下载", Toast.LENGTH_SHORT).show();
-//        mAdapter.notifyDataSetChanged();//并通知适配器
     }
 }
