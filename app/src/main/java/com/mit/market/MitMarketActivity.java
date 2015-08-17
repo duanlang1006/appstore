@@ -63,10 +63,10 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
             Intent intent = getIntent();
             if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))){
                 jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,null,
-                        GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,null),false);
+                        GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,null,false),false);
             }else {
                 jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,null,
-                        GuideFragment.newBundles(Constant.OSGI_SERVICE_MAIN_FRAGMENT,null,null),false);
+                        GuideFragment.newBundles(Constant.OSGI_SERVICE_MAIN_FRAGMENT,null,null,false),false);
             }
 //            fgm.beginTransaction()
 //                    .replace(R.id.container,fg,Constant.OSGI_SERVICE_LOGO_FRAGMENT)
@@ -144,7 +144,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         FragmentManager fgm = getSupportFragmentManager();
         if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))){
             jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,null,
-                    GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,null),
+                    GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,null,false),
                     false);
         }
     }
@@ -173,11 +173,11 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)  {
-        if (keyCode == KeyEvent.KEYCODE_BACK) { //按下的如果是BACK，同时没有重复
+/*        if (keyCode == KeyEvent.KEYCODE_BACK) { //按下的如果是BACK，同时没有重复
             //do something here
             exit();
             return true;
-        }
+        }*/
 
         return super.onKeyDown(keyCode, event);
     }
@@ -291,7 +291,9 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     @Override
     public void jumptoMylife(boolean addToBackstack) {
         jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,
-                GuideFragment.class.getName(),null,addToBackstack);
+                GuideFragment.class.getName(),
+                GuideFragment.newBundles(null,null,null,true),
+                addToBackstack);
     }
 
     private void setOverflowShowingAlways() {

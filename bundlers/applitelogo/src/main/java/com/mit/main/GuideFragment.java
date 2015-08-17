@@ -91,15 +91,17 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private String mWhichService;
     private String mWhichFragment;
     private Bundle mParams;
+    private boolean misguide;
     private int FAILURE_POST_NUMBER = 0;
     private float mFLayoutWidthScale;
 
 
-    public static Bundle newBundles(String targetService, String targetFragment, Bundle params) {
+    public static Bundle newBundles(String targetService, String targetFragment, Bundle params, boolean isguide) {
         Bundle b = new Bundle();
         b.putString("service", targetService);
         b.putString("fragment", targetFragment);
         b.putBundle("params", params);
+        b.putBoolean("isguide", isguide);
         return b;
     }
 
@@ -117,6 +119,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
             mWhichService = arguments.getString("service");
             mWhichFragment = arguments.getString("fragment");
             mParams = arguments.getBundle("params");
+            misguide = arguments.getBoolean("isguide");
         }
     }
 
@@ -140,7 +143,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         }
         this.container = container;
 
-        if ((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)) {
+        if ((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)||misguide) {
             rootView = mInflater.inflate(R.layout.fragment_guide, container, false);
             initView();
             getResolution();
