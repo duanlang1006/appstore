@@ -105,19 +105,13 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private BitmapUtils bitmapUtils;
     private List<View> mDetailImgList = new ArrayList<View>();
 
-//    public static OSGIBaseFragment newInstance(OSGIServiceHost host,String packageName,String name,String imgUrl){
-//        Fragment fg = null;
-//        if (null != host){
-//            Bundle b = new Bundle();
-//            b.putString("packageName",packageName);
-//            b.putString("name",name);
-//            b.putString("imgUrl",imgUrl);
-//            fg = host.newFragment(
-//                    BundleContextFactory.getInstance().getBundleContext(),
-//                    Constant.OSGI_SERVICE_DETAIL_FRAGMENT,DetailFragment.class.getName(),b);
-//        }
-//        return fg;
-//    }
+    public static Bundle newBundle(String packageName,String name,String imgUrl){
+        Bundle b = new Bundle();
+        b.putString("packageName",packageName);
+        b.putString("name",name);
+        b.putString("imgUrl",imgUrl);
+        return b;
+    }
 
     public DetailFragment() {
         super();
