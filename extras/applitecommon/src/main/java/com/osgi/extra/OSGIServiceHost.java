@@ -7,7 +7,7 @@ import android.support.v4.app.Fragment;
  * Created by hxd on 15-7-30.
  */
 public interface OSGIServiceHost {
-    public void notify(Bundle params);
+//    public void notify(Bundle params);
     public Fragment newFragment(String targetService, String targetFragment, Bundle param);
 
     public void jumpto(String whichService, String whichFragment, Bundle params,boolean addToBackstack);

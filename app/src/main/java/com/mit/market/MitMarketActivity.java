@@ -20,6 +20,7 @@ import com.applite.dm.DownloadPagerFragment;
 import com.applite.homepage.HomePageFragment;
 import com.applite.homepage.HomePageListFragment;
 import com.applite.homepage.PersonalFragment;
+import com.mit.applite.main.DetailFragment;
 import com.mit.applite.search.main.SearchFragment;
 import com.mit.appliteupdate.main.UpdateFragment;
 import com.applite.sharedpreferences.AppliteSPUtils;
@@ -161,13 +162,13 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         IconCache.getInstance(this).flush();
     }
 
-    @Override
-    public void notify(Bundle params) {
-        if (null != params){
-            int number = params.getInt("number");
-            UpdateNotification.getInstance().showNot(MitMarketActivity.this, String.valueOf(number));
-        }
-    }
+//    @Override
+//    public void notify(Bundle params) {
+//        if (null != params){
+//            int number = params.getInt("number");
+//            UpdateNotification.getInstance().showNot(MitMarketActivity.this, String.valueOf(number));
+//        }
+//    }
 
 
     @Override
@@ -240,12 +241,15 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     @Override
     public void jumptoDetail(String packageName,String name,String imgUrl,boolean addToBackstack) {
-
+        jumpto(Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
+                DetailFragment.class.getName(),
+                DetailFragment.newBundle(packageName,name,imgUrl),
+                true);
     }
 
     @Override
     public void jumptoDetail(String httpUrl,boolean addToBackstack) {
-
+        //TODO
     }
 
     @Override
