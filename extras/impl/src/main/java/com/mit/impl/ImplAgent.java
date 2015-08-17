@@ -318,7 +318,11 @@ public class ImplAgent extends Observable {
             case Constant.STATUS_INSTALLED:
                 try {
                     PackageInfo installPkg = mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
-                    action = ImplInfo.ACTION_OPEN;
+                    if (implInfo.getVersionCode() <= installPkg.versionCode) {
+                        action = ImplInfo.ACTION_OPEN;
+                    }else{
+                        action = ImplInfo.ACTION_DOWNLOAD;
+                    }
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                     action = ImplInfo.ACTION_DOWNLOAD;
