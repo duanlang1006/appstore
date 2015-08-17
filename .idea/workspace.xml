@@ -314,24 +314,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DownloadAdapter.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="DownloadAdapter.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadAdapter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.41336116" vertical-offset="0" max-vertical-offset="3744">
-              <caret line="53" column="24" selection-start-line="53" selection-start-column="24" selection-end-line="53" selection-end-column="24" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2941" max-vertical-offset="3744">
+              <caret line="210" column="0" selection-start-line="210" selection-start-column="0" selection-end-line="210" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DownloadListFragment.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="DownloadListFragment.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadListFragment.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1836" max-vertical-offset="4446">
-              <caret line="138" column="42" selection-start-line="138" selection-start-column="42" selection-end-line="138" selection-end-column="42" />
+            <state vertical-scroll-proportion="0.15031315" vertical-offset="270" max-vertical-offset="4482">
+              <caret line="46" column="89" selection-start-line="46" selection-start-column="89" selection-end-line="46" selection-end-column="89" />
               <folding>
-                <element signature="e#1575#1913#0" expanded="true" />
                 <element signature="e#1906#1907#0" expanded="true" />
+                <element signature="e#2096#2097#0" expanded="true" />
+                <element signature="e#2119#2120#0" expanded="true" />
                 <element signature="e#3438#4371#0" expanded="true" />
                 <element signature="e#4360#4361#0" expanded="true" />
                 <element signature="e#7223#7762#0" expanded="true" />
@@ -8484,8 +8485,8 @@
         <option value="$PROJECT_DIR$/bundlers/applitedetail/src/main/java/com/mit/applite/main/DetailFragment.java" />
         <option value="$PROJECT_DIR$/bundlers/applitedm/src/main/res/layout/download_list_item.xml" />
         <option value="$PROJECT_DIR$/bundlers/applitedm/src/main/res/layout/fragment_download_list.xml" />
-        <option value="$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadAdapter.java" />
         <option value="$PROJECT_DIR$/bundlers/applitedm/src/main/res/menu/menu_main_dm.xml" />
+        <option value="$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadAdapter.java" />
         <option value="$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadListFragment.java" />
       </list>
     </option>
@@ -9704,13 +9705,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2941" max-vertical-offset="3744">
+          <caret line="210" column="0" selection-start-line="210" selection-start-column="0" selection-end-line="210" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadListFragment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1836" max-vertical-offset="4446">
-          <caret line="138" column="42" selection-start-line="138" selection-start-column="42" selection-end-line="138" selection-end-column="42" />
+        <state vertical-scroll-proportion="0.15031315" vertical-offset="270" max-vertical-offset="4482">
+          <caret line="46" column="89" selection-start-line="46" selection-start-column="89" selection-end-line="46" selection-end-column="89" />
           <folding>
-            <element signature="e#1575#1913#0" expanded="true" />
             <element signature="e#1906#1907#0" expanded="true" />
+            <element signature="e#2096#2097#0" expanded="true" />
+            <element signature="e#2119#2120#0" expanded="true" />
             <element signature="e#3438#4371#0" expanded="true" />
             <element signature="e#4360#4361#0" expanded="true" />
             <element signature="e#7223#7762#0" expanded="true" />
@@ -9718,14 +9728,6 @@
             <element signature="e#8722#9432#0" expanded="true" />
             <element signature="e#9425#9426#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.41336116" vertical-offset="0" max-vertical-offset="3744">
-          <caret line="53" column="24" selection-start-line="53" selection-start-column="24" selection-end-line="53" selection-end-column="24" />
-          <folding />
         </state>
       </provider>
     </entry>
