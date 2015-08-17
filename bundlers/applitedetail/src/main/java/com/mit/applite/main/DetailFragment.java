@@ -85,9 +85,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private BitmapUtils mBitmapUtil;
     private String mDownloadUrl;
     private LinearLayout mDataLayout;
-    private LinearLayout mLoadLayout;
-    private ImageView mLoadView;
-    private Animation LoadingAnimation;
+//    private LinearLayout mLoadLayout;
+//    private ImageView mLoadView;
+//    private Animation LoadingAnimation;
     private TextView mUpdateLogView;
     private String mDescription;
     private String mUpdateLog;
@@ -202,13 +202,13 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      */
     private void initView() {
         //加载中控件
-        mLoadLayout = (LinearLayout) rootView.findViewById(R.id.detail_loading_layout);
-        mLoadView = (ImageView) rootView.findViewById(R.id.detail_loading_img);
-        //旋转动画
-        LoadingAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.loading);
-        LinearInterpolator lin = new LinearInterpolator();
-        LoadingAnimation.setInterpolator(lin);
-        mLoadView.startAnimation(LoadingAnimation);
+//        mLoadLayout = (LinearLayout) rootView.findViewById(R.id.detail_loading_layout);
+//        mLoadView = (ImageView) rootView.findViewById(R.id.detail_loading_img);
+//        //旋转动画
+//        LoadingAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.loading);
+//        LinearInterpolator lin = new LinearInterpolator();
+//        LoadingAnimation.setInterpolator(lin);
+//        mLoadView.startAnimation(LoadingAnimation);
 
         //下载按钮
         LinearLayout mDownloadLayout = (LinearLayout) rootView.findViewById(R.id.detail_download_layout);
@@ -230,6 +230,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         mUpdateLogView = (TextView) rootView.findViewById(R.id.detail_update_log);
 
         mGridView = (GridView) rootView.findViewById(R.id.detail_gridview);
+        mGridView.setFocusable(false);
 
         mName1View.setText(mApkName);
 
@@ -302,7 +303,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onClick(View v) {
         if (v.getId() == R.id.refresh_btn) {
             no_network.setVisibility(View.GONE);
-            mLoadLayout.setVisibility(View.VISIBLE);
+//            mLoadLayout.setVisibility(View.VISIBLE);
             post(mPackageName);
         } else if (v.getId() == R.id.detail_content || v.getId() == R.id.detail_open_introduce_content) {
             if (CONTENT_STATE == COLLAPSIBLE_STATE_SHRINKUP) {
@@ -354,7 +355,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             public void onFailure(HttpException e, String s) {
                 LogUtils.e(TAG, "应用详情网络请求失败:" + s);
                 // 这里设置没有网络时的图片
-                mLoadLayout.setVisibility(View.GONE);
+//                mLoadLayout.setVisibility(View.GONE);
                 mDataLayout.setVisibility(View.GONE);
                 no_network.setVisibility(View.VISIBLE);
             }
@@ -512,13 +513,13 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 }
             });
         }
-        mLoadLayout.setVisibility(View.GONE);
+//        mLoadLayout.setVisibility(View.GONE);
         mDataLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void refreshDetail(SimilarBean bean) {
-        mLoadLayout.setVisibility(View.VISIBLE);
+//        mLoadLayout.setVisibility(View.VISIBLE);
         mApkName = bean.getmName();
         mPackageName = bean.getmPackageName();
         mImgUrl = bean.getmImgUrl();
