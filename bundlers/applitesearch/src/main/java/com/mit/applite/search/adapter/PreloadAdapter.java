@@ -94,8 +94,10 @@ public class PreloadAdapter extends BaseAdapter {
             viewholder.mClickItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SearchUtils.toDetailFragment((OSGIServiceHost) mActivity,
-                            data.getmPackageName(), data.getmName(), data.getmImgUrl());
+                    ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(),
+                            data.getmName(),
+                            data.getmImgUrl(),
+                            true);
                 }
             });
         }

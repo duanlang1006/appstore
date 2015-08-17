@@ -144,10 +144,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         DownloadAdapter.ViewHolder vh = (DownloadAdapter.ViewHolder)view.getTag();
         if (null != vh){
-            HostUtils.launchDetail((OSGIServiceHost) mActivity,
+            ((OSGIServiceHost) mActivity).jumptoDetail(
                     vh.implInfo.getPackageName(),
                     vh.implInfo.getTitle(),
-                    vh.implInfo.getIconUrl());
+                    vh.implInfo.getIconUrl(),
+                    true);
         }
     }
 }

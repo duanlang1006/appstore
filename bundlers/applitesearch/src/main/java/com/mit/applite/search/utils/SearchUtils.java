@@ -51,33 +51,31 @@ public class SearchUtils {
         return mMatcher.matches();
     }
 
-    /**
-     * 去详情页面
-     */
-    public static void toDetailFragment(OSGIServiceHost host, String packageName, String name, String imgUrl) {
-        if (null != host) {
-            Bundle b = new Bundle();
-            b.putString("packageName", packageName);
-            b.putString("name", name);
-            b.putString("imgUrl", imgUrl);
-            AppliteUtils.putFgParams(b, Constant.OSGI_SERVICE_SEARCH_FRAGMENT, "add", true);
-            host.jumpto( Constant.OSGI_SERVICE_DETAIL_FRAGMENT, null, b);
-        }
-    }
-
-    /**
-     * 去主题页面
-     */
-    public static void toTopicFragment(OSGIServiceHost host, String key, String name, int step, String datatype) {
-        if (null != host) {
-            Bundle b = new Bundle();
-            b.putString("key", key);
-            b.putString("name", name);
-            b.putInt("step", step);
-            b.putString("datatype", datatype);
-            AppliteUtils.putFgParams(b, Constant.OSGI_SERVICE_SEARCH_FRAGMENT, "add", true);
-            host.jumpto(Constant.OSGI_SERVICE_TOPIC_FRAGMENT, null, b);
-        }
-    }
+//    /**
+//     * 去详情页面
+//     */
+//    public static void toDetailFragment(OSGIServiceHost host, String packageName, String name, String imgUrl) {
+//        if (null != host) {
+//            Bundle b = new Bundle();
+//            b.putString("packageName", packageName);
+//            b.putString("name", name);
+//            b.putString("imgUrl", imgUrl);
+//            host.jumpto( Constant.OSGI_SERVICE_DETAIL_FRAGMENT, null, b,true);
+//        }
+//    }
+//
+//    /**
+//     * 去主题页面
+//     */
+//    public static void toTopicFragment(OSGIServiceHost host, String key, String name, int step, String datatype) {
+//        if (null != host) {
+//            Bundle b = new Bundle();
+//            b.putString("key", key);
+//            b.putString("name", name);
+//            b.putInt("step", step);
+//            b.putString("datatype", datatype);
+//            host.jumpto(Constant.OSGI_SERVICE_TOPIC_FRAGMENT, null, b,true);
+//        }
+//    }
 
 }

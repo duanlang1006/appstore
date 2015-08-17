@@ -292,7 +292,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.action_search == item.getItemId()) {
-            DetailUtils.launchSearchFragment((OSGIServiceHost) mActivity);
+            ((OSGIServiceHost) mActivity).jumptoSearch(true);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -459,6 +459,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName, mVersionCode);
             if (null != implinfo) {
                 implAgent.setImplCallback(implCallback, implinfo);
+                implinfo.setDownloadUrl(mDownloadUrl).setIconUrl(mImgUrl).setTitle(mName);
                 mProgressButton.setText(implAgent.getActionText(implinfo));
                 mProgressButton.setProgress(implAgent.getProgress(implinfo));
                 if (mProgressButton.getProgress() == 0) {

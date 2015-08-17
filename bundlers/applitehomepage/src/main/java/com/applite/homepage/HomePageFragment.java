@@ -36,7 +36,6 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
-import com.applite.utils.HomepageUtils;
 import com.applite.utils.SPUtils;
 import net.tsz.afinal.FinalBitmap;
 import com.google.gson.Gson;
@@ -355,7 +354,11 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             if (v.getId() == R.id.pop_img_exit) {
 
             }else if (v.getId() == R.id.pop_img_img) {
-                HomepageUtils.toTopicFragment(((OSGIServiceHost) mActivity), mPopData.getS_key(), mPopData.getS_name(), mPopData.getStep(), mPopData.getS_datatype());
+                ((OSGIServiceHost) mActivity).jumptoTopic(mPopData.getS_key(),
+                        mPopData.getS_name(),
+                        mPopData.getStep(),
+                        mPopData.getS_datatype(),
+                        true);
             }
         }
     };
@@ -428,15 +431,15 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home){
             if (null == mCategory){
-                HomepageUtils.launchPersonalFragment(((OSGIServiceHost) mActivity));
+                ((OSGIServiceHost) mActivity).jumptoPersonal(true);
                 return true;
             }
         }else if (item.getItemId() == R.id.action_search){
-            HomepageUtils.launchSearchFragment((OSGIServiceHost)mActivity);
+            ((OSGIServiceHost) mActivity).jumptoSearch(true);
             MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
             return true;
         }else if (item.getItemId() == R.id.action_dm){
-            HomepageUtils.launchDmFragment((OSGIServiceHost)mActivity);
+            ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -445,9 +448,9 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.action_personal) {
-            HomepageUtils.launchPersonalFragment(((OSGIServiceHost) mActivity));
+            ((OSGIServiceHost) mActivity).jumptoPersonal(true);
         }else if (v.getId() == R.id.action_search){
-            HomepageUtils.launchSearchFragment(((OSGIServiceHost)mActivity));
+            ((OSGIServiceHost) mActivity).jumptoSearch(true);
             MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
         }
     }
