@@ -89,8 +89,7 @@ public class SearchApkAdapter extends BaseAdapter {
         viewholder.mToDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SearchUtils.toDetailFragment((OSGIServiceHost) mActivity,
-                        data.getmPackageName(), data.getmName(), data.getmImgUrl());
+                ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(), data.getmName(), data.getmImgUrl(),true);
             }
         });
         viewholder.mBt.setOnClickListener(new View.OnClickListener() {

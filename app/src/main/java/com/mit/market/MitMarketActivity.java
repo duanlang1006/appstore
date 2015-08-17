@@ -10,11 +10,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
 import android.view.Window;
-
-import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
+import com.applite.dm.DownloadPagerFragment;
+import com.applite.homepage.HomePageFragment;
+import com.applite.homepage.HomePageListFragment;
+import com.applite.homepage.PersonalFragment;
+import com.mit.applite.main.DetailFragment;
+import com.mit.applite.search.main.SearchFragment;
+import com.mit.appliteupdate.main.UpdateFragment;
 import com.applite.sharedpreferences.AppliteSPUtils;
 import com.mit.main.GuideFragment;
 import com.mit.mitupdatesdk.MitMobclickAgent;
@@ -26,7 +31,6 @@ import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-
 
 public class MitMarketActivity extends ActionBarActivity implements OSGIServiceHost{
     private static final String TAG = "applite_MitMarketActivity";
@@ -50,19 +54,19 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         registerClients();
 
         FragmentManager fgm = getSupportFragmentManager();
-        Fragment fg = fgm.findFragmentByTag(Constant.OSGI_SERVICE_LOGO_FRAGMENT);
+        Fragment fg = fgm.findFragmentById(R.id.container);
         if (null == fg ){
             Intent intent = getIntent();
             if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))){
-                fg = GuideFragment.newInstance(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,
-                        AppliteUtils.putFgParams(new Bundle(),null,"replace",false));
+                jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,null,
+                        GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,null),false);
             }else {
-                fg = GuideFragment.newInstance(Constant.OSGI_SERVICE_MAIN_FRAGMENT,null,
-                        AppliteUtils.putFgParams(new Bundle(),null,"replace",false));
+                jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,null,
+                        GuideFragment.newBundles(Constant.OSGI_SERVICE_MAIN_FRAGMENT,null,null),false);
             }
-            fgm.beginTransaction()
-                    .replace(R.id.container,fg,Constant.OSGI_SERVICE_LOGO_FRAGMENT)
-                    .commit();
+//            fgm.beginTransaction()
+//                    .replace(R.id.container,fg,Constant.OSGI_SERVICE_LOGO_FRAGMENT)
+//                    .commit();
         }
     }
 
@@ -135,11 +139,9 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
         FragmentManager fgm = getSupportFragmentManager();
         if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))){
-            Fragment fg = GuideFragment.newInstance(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,
-                    AppliteUtils.putFgParams(new Bundle(),null,"replace",false));
-            fgm.beginTransaction()
-                    .replace(R.id.container,fg,Constant.OSGI_SERVICE_LOGO_FRAGMENT)
-                    .commit();
+            jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,null,
+                    GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,null),
+                    false);
         }
     }
 
@@ -156,49 +158,113 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         IconCache.getInstance(this).flush();
     }
 
-    @Override
-    public void notify(Bundle params) {
-        if (null != params){
-            int number = params.getInt("number");
-            UpdateNotification.getInstance().showNot(MitMarketActivity.this, String.valueOf(number));
-        }
-    }
+//    @Override
+//    public void notify(Bundle params) {
+//        if (null != params){
+//            int number = params.getInt("number");
+//            UpdateNotification.getInstance().showNot(MitMarketActivity.this, String.valueOf(number));
+//        }
+//    }
 
     @Override
-    public void jumpto(String whichService, String whichFragment, Bundle params) {
+    public void jumpto(String targetService,
+                       String targetFragment,
+                       Bundle params,
+                       boolean addToBackStack) {
         FragmentManager fgmgr = getSupportFragmentManager();
         FragmentTransaction ft = fgmgr.beginTransaction();
 
+        boolean result = fgmgr.popBackStackImmediate(targetService,FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        LogUtils.d(TAG, "popBackStackImmediate("+targetService+") is "+result);
+
         OSGIBaseFragment newFragment = null;
-        if (Constant.OSGI_SERVICE_SEARCH_FRAGMENT == whichService){
-            newFragment = (OSGIBaseFragment)fgmgr.findFragmentByTag("SearchFragment");
-        }
+//        if (Constant.OSGI_SERVICE_LOGO_FRAGMENT == targetService){
+////            newFragment = (OSGIBaseFragment)fgmgr.findFragmentByTag("GuideFragment");
+//            AppliteSPUtils.put(getApplicationContext(), AppliteSPUtils.ISGUIDE, true);
+//        }
 
-        if (Constant.OSGI_SERVICE_LOGO_FRAGMENT == whichService){
-            newFragment = (OSGIBaseFragment)fgmgr.findFragmentByTag("GuideFragment");
-            AppliteSPUtils.put(getApplicationContext(), AppliteSPUtils.ISGUIDE, true);
-        }
-
-        if (null == newFragment) {
-            newFragment = (OSGIBaseFragment) newFragment(whichService, whichFragment, params);
-            Fragment sameFragment = fgmgr.findFragmentByTag(newFragment.getTagText());
-            if (null != sameFragment){
-                ft.remove(sameFragment);
-            }
+        newFragment = (OSGIBaseFragment) newFragment(targetService, targetFragment, params);
+//        ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+        Fragment current = fgmgr.findFragmentById(R.id.container);
+        if (null != current) {
+            ft.hide(current);
         }
         if (!newFragment.isAdded()) {
-            ft.add(R.id.container, newFragment, newFragment.getTagText());
+            ft.add(R.id.container, newFragment);
+        }else{
+            ft.show(newFragment);
         }
-        if (params.getBoolean("addToBackStack")) {
-            ft.addToBackStack(null);
+        if (addToBackStack) {
+            ft.addToBackStack(targetService);
         }
-        ft.hide(fgmgr.findFragmentById(R.id.container));
-        ft.show(newFragment).commit();
+        ft.commit();
     }
 
     @Override
     public Fragment newFragment(String whichService, String whichFragment, Bundle params) {
         return OSGIServiceClient.getInstance().newOSGIFragment(whichService,whichFragment,params);
+    }
+
+    @Override
+    public void jumptoHomepage(String category, String name,boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT + "#" + category,
+                HomePageFragment.class.getName(),
+                HomePageFragment.newBundle(category, name), addToBackstack);
+    }
+
+    @Override
+    public void jumptoDetail(String packageName,String name,String imgUrl,boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
+                DetailFragment.class.getName(),
+                DetailFragment.newBundle(packageName,name,imgUrl),
+                true);
+    }
+
+    @Override
+    public void jumptoDetail(String httpUrl,boolean addToBackstack) {
+        //TODO
+    }
+
+    @Override
+    public void jumptoTopic(String key,String name,int step,String datatype,boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_TOPIC_FRAGMENT+"#"+key,
+                HomePageListFragment.class.getName(),
+                HomePageListFragment.newBundle(key, name, step, datatype),
+                addToBackstack);
+    }
+
+    @Override
+    public void jumptoSearch(boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_SEARCH_FRAGMENT,
+                SearchFragment.class.getName(),
+                null,addToBackstack);
+    }
+
+    @Override
+    public void jumptoPersonal(boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT,
+                PersonalFragment.class.getName(),
+                null,addToBackstack);
+    }
+
+    @Override
+    public void jumptoUpdate(boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,
+                UpdateFragment.class.getName(),
+                null,addToBackstack);
+    }
+
+    @Override
+    public void jumptoDownloadManager(boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_DM_FRAGMENT,
+                DownloadPagerFragment.class.getName(),
+                null,true);
+    }
+
+    @Override
+    public void jumptoMylife(boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,
+                GuideFragment.class.getName(),null,addToBackstack);
     }
 
     private void setOverflowShowingAlways() {

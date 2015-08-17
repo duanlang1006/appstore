@@ -55,13 +55,12 @@ public class DetailUtils {
         return bm1;
     }
 
-    /****
-     * 搜索
-     */
-    public static void launchSearchFragment(OSGIServiceHost host) {
-        if (null != host){
-            host.jumpto(Constant.OSGI_SERVICE_SEARCH_FRAGMENT,null,
-                    AppliteUtils.putFgParams(new Bundle(), Constant.OSGI_SERVICE_MAIN_FRAGMENT, "add", true));
-        }
-    }
+//    /****
+//     * 搜索
+//     */
+//    public static void launchSearchFragment(OSGIServiceHost host) {
+//        if (null != host){
+//            host.jumpto(Constant.OSGI_SERVICE_SEARCH_FRAGMENT,null,null,true);
+//        }
+//    }
 }

@@ -105,19 +105,13 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private BitmapUtils bitmapUtils;
     private List<View> mDetailImgList = new ArrayList<View>();
 
-//    public static OSGIBaseFragment newInstance(OSGIServiceHost host,String packageName,String name,String imgUrl){
-//        Fragment fg = null;
-//        if (null != host){
-//            Bundle b = new Bundle();
-//            b.putString("packageName",packageName);
-//            b.putString("name",name);
-//            b.putString("imgUrl",imgUrl);
-//            fg = host.newFragment(
-//                    BundleContextFactory.getInstance().getBundleContext(),
-//                    Constant.OSGI_SERVICE_DETAIL_FRAGMENT,DetailFragment.class.getName(),b);
-//        }
-//        return fg;
-//    }
+    public static Bundle newBundle(String packageName,String name,String imgUrl){
+        Bundle b = new Bundle();
+        b.putString("packageName",packageName);
+        b.putString("name",name);
+        b.putString("imgUrl",imgUrl);
+        return b;
+    }
 
     public DetailFragment() {
         super();
@@ -293,7 +287,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.action_search == item.getItemId()) {
-            DetailUtils.launchSearchFragment((OSGIServiceHost) mActivity);
+            ((OSGIServiceHost) mActivity).jumptoSearch(true);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -460,6 +454,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName, mVersionCode);
             if (null != implinfo) {
                 implAgent.setImplCallback(implCallback, implinfo);
+                implinfo.setDownloadUrl(mDownloadUrl).setIconUrl(mImgUrl).setTitle(mName);
                 mProgressButton.setText(implAgent.getActionText(implinfo));
                 mProgressButton.setProgress(implAgent.getProgress(implinfo));
                 if (mProgressButton.getProgress() == 0) {

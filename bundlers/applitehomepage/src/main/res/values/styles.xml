@@ -13,7 +13,6 @@
     <style name="categoryListName" parent="android:TextAppearance.Medium">
         <item name="android:textSize">@dimen/categoryList_text_size</item>
         <item name="android:textColor">@color/categoryList_text_color</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:layout_marginTop">@dimen/categoryList_text_marginTop</item>
         <item name="android:ellipsize">end</item>
         <item name="android:focusable">false</item>
@@ -51,17 +50,14 @@
         <item name="android:maxHeight">35dp</item>
     </style>
 
-    <style name="apkListButton">
-        <item name="android:layout_marginRight">@dimen/apkList_bottom_marginRight</item>
-        <item name="android:layout_marginLeft">@dimen/apkList_bottom_marginLeft</item>
-        <item name="android:textColor">@drawable/item_button_text_color</item>
+    <style name="apkListButton" parent="@android:style/Widget.Button">
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:textColor">@color/apklist_btn_text_color</item>
+        <item name="android:background">@drawable/btn_bg_rect_light</item>
         <item name="android:gravity">center</item>
-        <item name="android:minWidth">40dp</item>
-        <item name="android:paddingLeft">5dp</item>
-        <item name="android:paddingRight">5dp</item>
-        <item name="android:focusable">false</item>
-        <item name="android:focusableInTouchMode">false</item>
-        <item name="android:background">@drawable/item_button_bg</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:minHeight">@dimen/apklist_btn_min_height</item>
+        <item name="android:minWidth">@dimen/apklist_btn_min_width</item>
     </style>
 
     <style name="apkListCategorySub">

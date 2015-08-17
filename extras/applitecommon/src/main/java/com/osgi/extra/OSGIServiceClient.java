@@ -29,6 +29,10 @@ public class OSGIServiceClient {
         OSGIBaseFragment baseFragment = null;
 
         if (null == whichFragment || TextUtils.isEmpty(whichFragment)){
+            int index = whichService.indexOf("#");
+            if (index > 0) {
+                whichService = whichService.substring(0, index);
+            }
             whichFragment = mClientMap.get(whichService);
         }
 
