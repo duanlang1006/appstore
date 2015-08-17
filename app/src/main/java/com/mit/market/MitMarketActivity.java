@@ -6,10 +6,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
 import android.view.Window;
+import android.widget.Toast;
+
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
@@ -35,6 +38,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     private static final String TAG = "applite_MitMarketActivity";
 
     private boolean personal_flag = false;
+    Toast toast;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         LogUtils.d(TAG,"onCreate:"+savedInstanceState);
@@ -162,6 +166,29 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         if (null != params){
             int number = params.getInt("number");
             UpdateNotification.getInstance().showNot(MitMarketActivity.this, String.valueOf(number));
+        }
+    }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (keyCode == KeyEvent.KEYCODE_BACK) { //按下的如果是BACK，同时没有重复
+            //do something here
+            exit();
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private long clickTime = 0; //记录第一次点击的时间
+
+    private void exit() {
+        if ((System.currentTimeMillis() - clickTime) > 2000) {
+            Toast.makeText(getApplicationContext(), "再按一次退出应用商店",Toast.LENGTH_SHORT).show();
+            clickTime = System.currentTimeMillis();
+        } else {
+            this.finish();
         }
     }
 
