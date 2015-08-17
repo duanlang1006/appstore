@@ -3,8 +3,6 @@ package com.applite.dm;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,39 +12,47 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.applite.common.Constant;
-import com.applite.common.LogUtils;
 import com.applite.dm.utils.HostUtils;
+import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.DbUtils;
-import com.lidroid.xutils.db.sqlite.Selector;
-import com.lidroid.xutils.db.sqlite.WhereBuilder;
-import com.lidroid.xutils.db.table.Table;
-import com.lidroid.xutils.exception.DbException;
+import com.lidroid.xutils.bitmap.PauseOnScrollListener;
 import com.mit.impl.ImplAgent;
-import com.mit.impl.ImplDbHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Observer;
 
 public class DownloadListFragment extends OSGIBaseFragment implements ListView.OnItemClickListener {
     private ListView mListview;
     private DownloadAdapter mAdapter;
-    private Integer mStatusFlags;
-    private DbUtils db;
-    private boolean flag_showCheckBox = false;
+    private boolean flag_showCheckBox = false;//长按删除的标志位
     private Button btnDelete = null;
-    private Button btnNone = null;
+    private Button btnNone = null;//占位
     private Button btnShare = null;
-    private boolean[] status = null;
-    private Cursor cursor = null;
-    private static int len = -1;//这里长度待定
+    private boolean[] status = null;//这里存放checkBox的选中状态
+    //    private int len = -1;//标志位数组的长度
+    private Integer mStatusFlags = null;
+    private ImplAgent mImplAgent;
+    private List<ImplInfo> mImplList;
+    private BitmapUtils mBitmapHelper;
+
+    public static final Comparator<ImplInfo> IMPL_TIMESTAMP_COMPARATOR = new Comparator<ImplInfo>() {
+        public final int compare(ImplInfo a, ImplInfo b) {
+            int result = 0;
+            if (a.getLastMod() < b.getLastMod()) {
+                result = 1;
+            } else if (a.getLastMod() > b.getLastMod()) {
+                result = -1;
+            }
+            return result;
+        }
+    };
+
 
     public static Bundle newBundle(int flag) {
         Bundle b = new Bundle();
@@ -78,22 +84,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         btnNone = (Button) view.findViewById(R.id.btnNone);
         btnShare = (Button) view.findViewById(R.id.btnShare);
         btnShare.setOnClickListener(btn_clickLis);
-        //这里添加一个 从adapter拿到getOunt的方法 赋给len
-//        len = mAdapter.getlen();
-        try {
-            len = mAdapter.getlen() + 1;
-            Toast.makeText(mActivity.getApplicationContext(), "!!!!", Toast.LENGTH_SHORT).show();
-//            len = cursor.getCount() + 1;
-        } catch (Exception e) {
-            Toast.makeText(mActivity.getApplicationContext(), "????", Toast.LENGTH_SHORT).show();
-            len = 20;
-        }
-
-        status = new boolean[len];
+        mListview.setAdapter(mAdapter);
+//        Toast.makeText(mActivity.getApplicationContext(), "长度成功获取", Toast.LENGTH_SHORT).show();
+        status = new boolean[mImplList.size()];
         Arrays.fill(status, false);//全部填充为false(chechbox不选中)
-        setAdapter();
-
-        //我在这里添加长按删除的代码
+        //这里是长按删除
         mListview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -106,24 +101,32 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                         mAdapter.resetFlag(flag_showCheckBox);
                     }
                     status[i] = !status[i];
-                    Toast.makeText(mActivity.getApplicationContext(), status[i] + "", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(mActivity.getApplicationContext(), status[i] + "", Toast.LENGTH_SHORT).show();
                     mAdapter.resetStatus(status);
                     mAdapter.notifyDataSetChanged();
                 }
                 return false;
             }
         });
+        mListview.setOnScrollListener(new PauseOnScrollListener(mBitmapHelper, false, true));
+        if (null != mImplList && mImplList.size() > 0) {
+            mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item, mImplList, mBitmapHelper, flag_showCheckBox);
+            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
+            mListview.setAdapter(mAdapter);
+        }
         return view;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        db = ImplDbHelper.getDbUtils(mActivity.getApplicationContext());
         Bundle params = getArguments();
         if (null != params) {
             mStatusFlags = params.getInt("statusFilter");
         }
+        mImplAgent = ImplAgent.getInstance(activity.getApplicationContext());
+        mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
+        mBitmapHelper = new BitmapUtils(mActivity.getApplicationContext());
         ImplLog.d(DownloadPagerFragment.TAG, "onAttach," + this);
     }
 
@@ -189,7 +192,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     if (flag_showCheckBox) {
                         status[i] = !status[i];
-                        Toast.makeText(mActivity.getApplicationContext(), status[i] + "", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(mActivity.getApplicationContext(), status[i] + "", Toast.LENGTH_SHORT).show();
                         mAdapter.resetStatus(status);
                         mAdapter.notifyDataSetChanged();
                     }
@@ -214,98 +217,39 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
             if (view.getId() == R.id.btnShare) {
                 flag_showCheckBox = false;
                 mAdapter.resetFlag(flag_showCheckBox);
+                mAdapter.notifyDataSetChanged();
                 Arrays.fill(status, false);//删除后将status复位
                 Toast.makeText(mActivity.getApplicationContext(), "分享功能尚未实现，敬请期待", Toast.LENGTH_SHORT).show();
             } else if (view.getId() == R.id.btnDelete) {
                 deleteItem();
             }
-
-
         }
     };
 
     private void deleteItem() {
+        View childView;
+        DownloadAdapter.ViewHolder vh;
+        ImplAgent implAgent;
+        int count = 0;//count仅统计删除的条数
+        int len = mImplList.size();
+//        for (int i = 0; i < len; i++) {//这里的长度，将len改为全局
         for (int i = len - 1; i >= 0; i--) {
             if (status[i]) {
-                //这里删除
-                View childView = mListview.getChildAt(i);
-                DownloadAdapter.ViewHolder vh = (DownloadAdapter.ViewHolder) childView.getTag();
-//                ImplAgent.getInstance(mActivity.getApplicationContext()).remove(vh.implInfo);
-
-                ImplAgent implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
-                String key = cursor.getString(cursor.getColumnIndex("key"));
-                String packageName = cursor.getString(cursor.getColumnIndex("packageName"));
-                int versionCode = cursor.getInt(cursor.getColumnIndex("versionCode"));
-                vh.initView(implAgent.getImplInfo(key, packageName, versionCode));
+                childView = mListview.getChildAt(i);
+                vh = (DownloadAdapter.ViewHolder) childView.getTag();
+                implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
                 implAgent.remove(vh.implInfo);
+                mImplList.remove(i);
+                count++;
 //                childView.setVisibility(View.GONE);
-
             }
         }
         flag_showCheckBox = false;
         mAdapter.resetFlag(flag_showCheckBox);
         Arrays.fill(status, false);//删除后将status复位
-//                mAdapter.notifyDataSetChanged();//并通知适配器
-        setAdapter();
-
-    }
-
-    private void setAdapter() {
-        Table table = Table.get(db, ImplInfo.class);
-        WhereBuilder wb = WhereBuilder.b();
-        if (mStatusFlags != null) {
-            List<String> parts = new ArrayList<String>();
-            if ((mStatusFlags & Constant.STATUS_PENDING) != 0) {
-                wb.or("status", "=", Constant.STATUS_PENDING);
-            }
-            if ((mStatusFlags & Constant.STATUS_RUNNING) != 0) {
-                wb.or("status", "=", Constant.STATUS_RUNNING);
-            }
-            if ((mStatusFlags & Constant.STATUS_PAUSED) != 0) {
-                wb.or("status", "=", Constant.STATUS_PAUSED);
-            }
-            if ((mStatusFlags & Constant.STATUS_SUCCESSFUL) != 0) {
-                wb.or("status", "=", Constant.STATUS_SUCCESSFUL);
-            }
-            if ((mStatusFlags & Constant.STATUS_FAILED) != 0) {
-                wb.or("status", "=", Constant.STATUS_FAILED);
-            }
-            if ((mStatusFlags & Constant.STATUS_PACKAGE_INVALID) != 0) {
-                wb.or("status", "=", Constant.STATUS_PACKAGE_INVALID);
-            }
-            if ((mStatusFlags & Constant.STATUS_PRIVATE_INSTALLING) != 0) {
-                wb.or("status", "=", Constant.STATUS_PRIVATE_INSTALLING);
-            }
-            if ((mStatusFlags & Constant.STATUS_NORMAL_INSTALLING) != 0) {
-                wb.or("status", "=", Constant.STATUS_NORMAL_INSTALLING);
-            }
-            if ((mStatusFlags & Constant.STATUS_INSTALLED) != 0) {
-                wb.or("status", "=", Constant.STATUS_INSTALLED);
-            }
-            if ((mStatusFlags & Constant.STATUS_INSTALL_FAILED) != 0) {
-                wb.or("status", "=", Constant.STATUS_INSTALL_FAILED);
-            }
-            if ((mStatusFlags & Constant.STATUS_UPGRADE) != 0) {
-                wb.or("status", "=", Constant.STATUS_UPGRADE);
-            }
-        }
-        Selector selector = Selector.from(ImplInfo.class).where(wb);
-        String sql = selector.toString();
-        LogUtils.d("applitedm", sql);
-
-        try {
-            cursor = db.execQuery(sql);
-        } catch (DbException e) {
-            e.printStackTrace();
-        }
-//        if (null == mAdapter){
-        if (null != cursor) {
-            mAdapter = new DownloadAdapter(mActivity, cursor, mStatusFlags, flag_showCheckBox, status);
-            mListview.setAdapter(mAdapter);
-        }
-//        }else{
-//            mAdapter.changeCursor(cursor);
-//            mAdapter.notifyDataSetChanged();
-//        }
+        mAdapter.resetStatus(status);
+        mListview.setAdapter(mAdapter);
+        Toast.makeText(mActivity.getApplicationContext(), "成功删除了" + count + "条下载", Toast.LENGTH_SHORT).show();
+//        mAdapter.notifyDataSetChanged();//并通知适配器
     }
 }

@@ -11,4 +11,14 @@
         <item name="android:maxHeight">35dp</item>
     </style>
 
+    <style name="apkListButton" parent="@android:style/Widget.Button">
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:textColor">@color/apklist_btn_text_color</item>
+        <item name="android:background">@drawable/btn_bg_rect_light</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:minHeight">@dimen/apklist_btn_min_height</item>
+        <item name="android:minWidth">@dimen/apklist_btn_min_width</item>
+    </style>
+
 </resources>

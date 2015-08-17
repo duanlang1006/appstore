@@ -255,6 +255,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         void initProgressButton() {
             if (null != mProgressButton && null != this.implInfo){
                 LogUtils.d(TAG,implInfo.getTitle()+","+implInfo.getStatus()+","+implAgent.getActionText(implInfo));
+                mProgressButton.setEnabled(true);
                 switch (implInfo.getStatus()){
                     case Constant.STATUS_PENDING:
                         mProgressButton.setText(implAgent.getActionText(implInfo));
@@ -264,6 +265,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                         break;
                     case Constant.STATUS_PAUSED:
                         mProgressButton.setText(implAgent.getStatusText(implInfo));
+                        break;
+                    case Constant.STATUS_PRIVATE_INSTALLING:
+                        mProgressButton.setText(implAgent.getStatusText(implInfo));
+                        mProgressButton.setEnabled(false);
                         break;
                     default:
                         mProgressButton.setText(implAgent.getActionText(implInfo));

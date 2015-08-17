@@ -8,8 +8,8 @@ android {
         applicationId "com.shly.appstore"
         minSdkVersion 10
         targetSdkVersion 21
-        versionCode 30
-        versionName "2.0.030"
+        versionCode 31
+        versionName "2.0.031"
         multiDexEnabled true
         manifestPlaceholders = [UMENG_CHANNEL_VALUE: "leadexceed_buildin"]
     }
@@ -121,4 +121,5 @@ dependencies {
     compile project(':extras:impl')
     compile project(':extras:applitecommon')
     compile 'com.jiechic.library:xUtils:2.6.14'
+    compile 'com.android.support:support-v4:22.2.1'
 }

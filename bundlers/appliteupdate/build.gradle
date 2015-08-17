@@ -50,6 +50,8 @@ dependencies {
     provided files('../../extras/impl/applite-impl-v1.1.jar')
     provided files('../../extras/applitecommon/applite-common-v1.0.jar')
     provided files('../../app/reflibs/xUtils-2.6.14.jar')
+    compile project(':extras:mittheme')
+    provided files('../../extras/mitUpdateSDK/mit-update-v1.0.jar')
 }
 
 task clearPlugin(type: Delete) {

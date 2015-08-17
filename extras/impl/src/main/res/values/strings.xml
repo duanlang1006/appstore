@@ -8,7 +8,7 @@
     <string name="download_status_success">Download complete</string>
     <string name="download_status_running">In progress</string>
     <string name="download_status_queued">Queued</string>
-    <string name="download_status_paused">Paused</string>
+    <string name="download_status_paused">Pausing</string>
     <string name="download_status_waiting">Waiting</string>
 
     <string name="apk_version">version:%1$s</string>

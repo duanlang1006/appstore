@@ -59,9 +59,4 @@
 
         </LinearLayout>
     </RelativeLayout>
-
-
-    <!-- android:visibility="invisible"-->
-
-    <!--android:drawableTop="@drawable/content_empty_icon"-->
 </LinearLayout>

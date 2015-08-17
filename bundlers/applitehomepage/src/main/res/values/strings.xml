@@ -5,7 +5,12 @@
     <string name="personal">Personal</string>
 
     <string name="load_more">loading...</string>
+    <string name="manager_catergory_title">manager</string>
     <string name="download_manager">Download manager</string>
     <string name="upgrade_manager">Upgrade manager</string>
+    <string name="logo_manager">Logo manager</string>
     <string name="load_end">ending...</string>
+
+    <string name="install">Install</string>
+
 </resources>

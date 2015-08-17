@@ -97,11 +97,10 @@
 
     <Button
         android:id="@+id/list_item_bt"
-        android:layout_width="60dp"
-        android:layout_height="30dp"
-        android:layout_marginRight="20dp"
-        android:text="@string/install"
-        android:textColor="@color/black"
-        android:background="@drawable/hot_word_change_bg"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/apklist_btn_interval_distance"
+        android:layout_marginRight="@dimen/apklist_btn_interval_distance"
+        style="@style/apkListButton" />
 
 </LinearLayout>

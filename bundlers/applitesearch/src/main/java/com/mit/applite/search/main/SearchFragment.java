@@ -48,6 +48,7 @@ import com.mit.applite.search.bean.HotWordBean;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.KeyBoardUtils;
 import com.mit.applite.search.utils.SearchUtils;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.umeng.analytics.MobclickAgent;
 
@@ -100,7 +101,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private Button refresh;
     private RelativeLayout no_network;
 
-    private int HINT_UPDATE_TIME = 3000;
+    private int HINT_UPDATE_TIME = 2000;
     private int HINT_SHOW_NUMBER = 0;
 
     private Runnable mNotifyRunnable = new Runnable() {
@@ -185,6 +186,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
     }
 
     @Override
@@ -378,13 +380,15 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             mEtView.setText(null);
             isHotWordLayoutVisibility(View.VISIBLE);
         } else if (v.getId() == R.id.search_search) {
+            MitMobclickAgent.onEvent(mActivity, "clickSearch");
             no_network.setVisibility(View.GONE);
             mPreloadListView.setVisibility(View.GONE);
-            if (TextUtils.isEmpty(mEtView.getText().toString())) {
-                if (TextUtils.isEmpty(mEtView.getHint().toString())) {
+            if (TextUtils.isEmpty(mEtView.getText())) {
+                if (TextUtils.isEmpty(mEtView.getHint())) {
                     Toast.makeText(mActivity, AppliteUtils.getString(mActivity, R.string.srarch_content_no_null),
                             Toast.LENGTH_SHORT).show();
                 } else {
+                    MitMobclickAgent.onEvent(mActivity, "searchHint");
                     mEtViewModifyPostSearch(mEtView.getHint().toString(), false);
                 }
             } else {
@@ -396,6 +400,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 }
             }
         } else if (v.getId() == R.id.hot_word_change) {
+            MitMobclickAgent.onEvent(mActivity, "clickHotWordChange");
             if (mChangeNumbew >= mHotWordPage)
                 mChangeNumbew = 0;
             mShowHotData.clear();

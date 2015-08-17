@@ -79,12 +79,15 @@
 
         <Button
             android:id="@+id/list_item_progress_button"
-            android:layout_width="50dp"
-            android:layout_height="30dp"
-            android:text="安装"
-            android:textSize="13sp"
-            style="@style/apkListButton"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/apklist_btn_interval_distance"
+            android:layout_marginRight="@dimen/apklist_btn_interval_distance"
+            android:focusable="false"
+            style="@style/apkListButton" />
+
     </LinearLayout>
+
     <TextView
         android:id="@+id/apkBrief"
         android:layout_width="wrap_content"

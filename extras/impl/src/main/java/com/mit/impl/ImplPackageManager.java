@@ -53,11 +53,11 @@ public class ImplPackageManager{
             default:
                 try {
                     PackageInfo pakageinfo = pm.getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
-                    if (implInfo.getVersionCode() <= pakageinfo.versionCode) {
+//                    if (implInfo.getVersionCode() <= pakageinfo.versionCode) {
                         implInfo.setStatus(Constant.STATUS_INSTALLED);
-                    }else{
-                        implInfo.setStatus(Constant.STATUS_UPGRADE);
-                    }
+//                    }else{
+//                        implInfo.setStatus(Constant.STATUS_UPGRADE);
+//                    }
                 } catch (PackageManager.NameNotFoundException e) {
                     //e.printStackTrace();
                 }
@@ -146,7 +146,7 @@ public class ImplPackageManager{
 
     void onPackageRemoved(ImplInfo implInfo,ImplListener callback) {
         implInfo.setStatus(Constant.STATUS_INIT);
-        callback.onInstallSuccess(implInfo);
+        callback.onUninstallSuccess(implInfo);
     }
 
     private void installImpl(final ImplInfo implInfo, boolean silent) {

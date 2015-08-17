@@ -25,11 +25,12 @@
 
     <style name="DownloadOptButton" parent="@android:style/Widget.Button">
         <item name="android:textSize">@dimen/button_text_size</item>
-        <item name="android:textColor">@drawable/item_button_text_color</item>
+        <item name="android:textColor">@color/apklist_btn_text_color</item>
         <item name="android:background">@drawable/btn_bg_rect_light</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center</item>
-        <item name="android:minHeight">0dp</item>
+        <item name="android:minHeight">@dimen/download_btn_min_height</item>
+        <item name="android:minWidth">@dimen/download_btn_min_width</item>
     </style>
     <!--<item name="android:minHeight">32dp</item>-->
     <!--<item name="android:minWidth">48dp</item>-->
