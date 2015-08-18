@@ -40,7 +40,7 @@
                         android:layout_marginRight="5dp"
                         android:layout_weight="1"
                         android:background="@drawable/but_bg"
-                        android:text="进入首页"
+                        android:text="@string/to_home"
                         android:textColor="@color/white" />
 
                     <Button
@@ -51,7 +51,7 @@
                         android:layout_marginRight="20dp"
                         android:layout_weight="1"
                         android:background="@drawable/but_bg"
-                        android:text="一键安装"
+                        android:text="@string/one_click_install"
                         android:textColor="@color/white" />
 
                 </LinearLayout>

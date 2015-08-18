@@ -85,7 +85,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private BitmapUtils mBitmapUtil;
     private String mDownloadUrl;
     private LinearLayout mDataLayout;
-//    private LinearLayout mLoadLayout;
+    //    private LinearLayout mLoadLayout;
 //    private ImageView mLoadView;
 //    private Animation LoadingAnimation;
     private TextView mUpdateLogView;
@@ -104,12 +104,13 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private GridView mGridView;
     private BitmapUtils bitmapUtils;
     private List<View> mDetailImgList = new ArrayList<View>();
+    private LinearLayout mHorDefaultLayout;
 
-    public static Bundle newBundle(String packageName,String name,String imgUrl){
+    public static Bundle newBundle(String packageName, String name, String imgUrl) {
         Bundle b = new Bundle();
-        b.putString("packageName",packageName);
-        b.putString("name",name);
-        b.putString("imgUrl",imgUrl);
+        b.putString("packageName", packageName);
+        b.putString("name", name);
+        b.putString("imgUrl", imgUrl);
         return b;
     }
 
@@ -222,6 +223,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         mOpenIntroduceView = (ImageView) rootView.findViewById(R.id.detail_open_introduce_content);
         mOpenUpdateLogView = (ImageView) rootView.findViewById(R.id.detail_open_update_log);
         mUpdateLogView = (TextView) rootView.findViewById(R.id.detail_update_log);
+
+        mHorDefaultLayout = (LinearLayout) rootView.findViewById(R.id.detail_hor_default_layout);
 
         mGridView = (GridView) rootView.findViewById(R.id.detail_gridview);
         mGridView.setFocusable(false);
@@ -411,7 +414,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
                     mName1View.setText(mName);
                     mXingView.setRating(Float.parseFloat(xing) / 2.0f);
-                    mBitmapUtil.display(mApkImgView, mImgUrl);
+//                    mBitmapUtil.display(mApkImgView, mImgUrl);
                     mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size) + " | " + developer);
 
                     LogUtils.i(TAG, "应用介绍：" + mDescription);
@@ -486,6 +489,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             }
             mDetailImgList.clear();
         }
+        mHorDefaultLayout.setVisibility(View.GONE);
         for (int i = 0; i < mViewPagerUrlList.length; i++) {
             LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
             final View child = mActivity.getLayoutInflater().inflate(R.layout.item_detail_viewpager_img, container, false);
@@ -515,11 +519,12 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void refreshDetail(SimilarBean bean) {
 //        mLoadLayout.setVisibility(View.VISIBLE);
-        mApkName = bean.getmName();
-        mPackageName = bean.getmPackageName();
-        mImgUrl = bean.getmImgUrl();
-        initActionBar();
-        post(bean.getmPackageName());
+//        mApkName = bean.getmName();
+//        mPackageName = bean.getmPackageName();
+//        mImgUrl = bean.getmImgUrl();
+//        initActionBar();
+//        post(bean.getmPackageName());
+        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getmPackageName(), bean.getmName(), bean.getmImgUrl(), true);
     }
 
     class DetailImplCallback implements ImplChangeCallback {
