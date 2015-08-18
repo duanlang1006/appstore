@@ -94,6 +94,8 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private int FAILURE_POST_NUMBER = 0;
     private float mFLayoutWidthScale;
 
+    private String whichPage;
+
 
     public static Bundle newBundles(String targetService, String targetFragment, Bundle params) {
         Bundle b = new Bundle();
@@ -117,6 +119,12 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
             mWhichService = arguments.getString("service");
             mWhichFragment = arguments.getString("fragment");
             mParams = arguments.getBundle("params");
+        }
+
+        if ((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)) {
+            whichPage = "GuideFragment";
+        }else{
+            whichPage = "LogoFragment";
         }
     }
 
@@ -168,13 +176,13 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
-        MobclickAgent.onPageStart("GuideFragment"); //统计页面
+        MobclickAgent.onPageStart(whichPage); //统计页面
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        MobclickAgent.onPageEnd("GuideFragment");
+        MobclickAgent.onPageEnd(whichPage);
     }
 
     @Override

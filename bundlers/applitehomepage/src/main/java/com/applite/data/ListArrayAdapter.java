@@ -24,6 +24,7 @@ import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplInfo;
 import com.applite.homepage.R;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
 import java.lang.reflect.Field;
@@ -123,6 +124,15 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                             break;
                     }
                 } else {
+                    switch(implAgent.getAction(vh.implInfo)){
+                        case ImplInfo.ACTION_INSTALL:
+                            MitMobclickAgent.onEvent(mContext, "clickInstallApk");
+                            break;
+                        case ImplInfo.ACTION_OPEN:
+                            MitMobclickAgent.onEvent(mContext, "clickOpenApk");
+                            break;
+                    }
+
                     try {
                         mContext.startActivity(implAgent.getActionIntent(vh.implInfo));
                     } catch (Exception e) {

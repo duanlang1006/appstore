@@ -265,6 +265,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     public void jumptoMylife(boolean addToBackstack) {
         jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,
                 GuideFragment.class.getName(),null,addToBackstack);
+        MitMobclickAgent.onEvent(this, "clickOneDay");
     }
 
     private void setOverflowShowingAlways() {
