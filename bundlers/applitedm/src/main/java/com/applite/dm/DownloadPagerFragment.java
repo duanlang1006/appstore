@@ -183,7 +183,9 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     @Override
     public void update(Observable observable, Object data) {
-//        ImplInfo info = (ImplInfo)data;
+        if (null == mViewPager || null == mViewPager.getAdapter()) {
+            return;
+        }
         LogUtils.d(TAG,"update");
         mViewPager.getAdapter().notifyDataSetChanged();
     }
