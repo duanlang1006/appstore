@@ -467,6 +467,9 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     @Override
     public void update(Observable observable, Object data) {
         LogUtils.d(TAG, "update");
+        if (null == implAgent || null == mInstallView || null == mActivity){
+            return;
+        }
         mDownloadQueueNumber = implAgent.getImplInfoCount(Constant.STATUS_RUNNING | Constant.STATUS_PENDING | Constant.STATUS_PAUSED);
         if (mDownloadQueueNumber == 0) {
             mInstallView.setText(mActivity.getResources().getText(R.string.one_click_install));
