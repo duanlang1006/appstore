@@ -104,18 +104,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        MobclickAgent.onPageStart("DownloadListFragment"); //统计页面
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        MobclickAgent.onPageEnd("DownloadListFragment");
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         ImplLog.d(DownloadPagerFragment.TAG, "onDetach," + this);

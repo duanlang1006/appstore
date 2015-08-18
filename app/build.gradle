@@ -81,10 +81,12 @@ android {
 
     task apkZip(type: Zip) {
         classifier = 'build'
-        from projectDir
-        include 'build/outputs/apk/appstore_*.apk'
+        from 'build/outputs/apk/'
+        include 'appstore_*.apk'
+        from "../"
+        include 'version_readme.txt'
         destinationDir file('.')
-        archiveName "appstore_v${defaultConfig.versionName}.zip"
+        archiveName "../appstore_v${defaultConfig.versionName}.zip"
     }
 
     task setTag (type : Exec) {

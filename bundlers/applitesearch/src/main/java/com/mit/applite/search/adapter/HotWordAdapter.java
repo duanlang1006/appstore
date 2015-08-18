@@ -95,7 +95,7 @@ public class HotWordAdapter extends BaseAdapter {
                             data.getmDataType(),
                             true);
                 } else if (data.getmType() == 2) {
-                    MitMobclickAgent.onEvent(mActivity, "HotWordToSrarch");
+                    MitMobclickAgent.onEvent(mActivity, "HotWordToSearch");
                     mListener.clickItem(data.getmName());
                 }
             }

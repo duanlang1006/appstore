@@ -109,6 +109,8 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private Animation mShakeAnimation;
     private int mDownloadQueueNumber = 0;
 
+    private String whichPage;
+
     public static Bundle newBundles(String targetService, String targetFragment, Bundle params, boolean isguide) {
         Bundle b = new Bundle();
         b.putString("service", targetService);
@@ -134,6 +136,12 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
             mWhichFragment = arguments.getString("fragment");
             mParams = arguments.getBundle("params");
             misguide = arguments.getBoolean("isguide");
+        }
+
+        if ((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)) {
+            whichPage = "GuideFragment";
+        }else{
+            whichPage = "LogoFragment";
         }
     }
 
@@ -185,7 +193,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
-        MobclickAgent.onPageStart("GuideFragment"); //统计页面
+        MobclickAgent.onPageStart(whichPage); //统计页面
 
         getView().setFocusableInTouchMode(true);
         getView().requestFocus();
@@ -207,7 +215,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     @Override
     public void onPause() {
         super.onPause();
-        MobclickAgent.onPageEnd("GuideFragment");
+        MobclickAgent.onPageEnd(whichPage);
     }
 
     @Override

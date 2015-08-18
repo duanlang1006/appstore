@@ -294,6 +294,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
                 GuideFragment.class.getName(),
                 GuideFragment.newBundles(null,null,null,true),
                 addToBackstack);
+        MitMobclickAgent.onEvent(this, "clickOneDay");
     }
 
     private void setOverflowShowingAlways() {
