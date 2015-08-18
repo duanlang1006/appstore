@@ -10,6 +10,7 @@ public class GuideBean {
     private String imgurl;
     private String url;
     private int mVersionCode;
+    private int mShowPosition;
 
     @Override
     public String toString() {
@@ -20,7 +21,16 @@ public class GuideBean {
                 ", imgurl='" + imgurl + '\'' +
                 ", url='" + url + '\'' +
                 ", mVersionCode=" + mVersionCode +
+                ", mShowPosition=" + mShowPosition +
                 '}';
+    }
+
+    public int getmShowPosition() {
+        return mShowPosition;
+    }
+
+    public void setmShowPosition(int mShowPosition) {
+        this.mShowPosition = mShowPosition;
     }
 
     public int getmVersionCode() {
