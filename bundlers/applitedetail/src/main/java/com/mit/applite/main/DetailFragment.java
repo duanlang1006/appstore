@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -155,6 +156,21 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onResume() {
         super.onResume();
         MobclickAgent.onPageStart("DetailFragment"); //统计页面
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    // handle back button
+                    if (!getFragmentManager().popBackStackImmediate()){
+                        mActivity.finish();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     public void onPause() {
