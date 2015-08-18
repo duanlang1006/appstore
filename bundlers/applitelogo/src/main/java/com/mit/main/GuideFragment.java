@@ -18,6 +18,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,15 +92,17 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private String mWhichService;
     private String mWhichFragment;
     private Bundle mParams;
+    private boolean misguide;
     private int FAILURE_POST_NUMBER = 0;
     private float mFLayoutWidthScale;
 
 
-    public static Bundle newBundles(String targetService, String targetFragment, Bundle params) {
+    public static Bundle newBundles(String targetService, String targetFragment, Bundle params, boolean isguide) {
         Bundle b = new Bundle();
         b.putString("service", targetService);
         b.putString("fragment", targetFragment);
         b.putBundle("params", params);
+        b.putBoolean("isguide", isguide);
         return b;
     }
 
@@ -117,6 +120,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
             mWhichService = arguments.getString("service");
             mWhichFragment = arguments.getString("fragment");
             mParams = arguments.getBundle("params");
+            misguide = arguments.getBoolean("isguide");
         }
     }
 
@@ -140,7 +144,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         }
         this.container = container;
 
-        if ((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)) {
+        if ((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)||misguide) {
             rootView = mInflater.inflate(R.layout.fragment_guide, container, false);
             initView();
             getResolution();
@@ -169,6 +173,22 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     public void onResume() {
         super.onResume();
         MobclickAgent.onPageStart("GuideFragment"); //统计页面
+
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    // handle back button
+                    if (!getFragmentManager().popBackStackImmediate()) {
+                        mActivity.finish();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
