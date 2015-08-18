@@ -287,7 +287,7 @@ class ImplDownload  {
                 implInfo.setLocalPath(null);
                 implInfo.setStatus(Constant.STATUS_FAILED);
                 if (null != baseCallback){
-                    baseCallback.onFailure(implInfo,null,"download file not exist");
+                    baseCallback.onFailure(implInfo, null, "download file not exist");
                 }
             }
             LogUtils.d(TAG,implInfo.getTitle()+",onSuccess");
