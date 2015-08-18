@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -231,6 +232,22 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         mEtView.setFocusableInTouchMode(true);
         mEtView.requestFocus();
         KeyBoardUtils.openKeybord(mEtView, mActivity);
+
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    // handle back button
+                    if (!getFragmentManager().popBackStackImmediate()) {
+                        mActivity.finish();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
