@@ -53,7 +53,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     public void onAttach(Activity activity) {
         ImplLog.d(TAG, "onAttach," + this);
         super.onAttach(activity);
-        ImplAgent.getInstance(mActivity).addObserver(this);
     }
 
     @Override
@@ -75,6 +74,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 //        mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         initActionBar(mPagerSlidingTabStrip);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
+        ImplAgent.getInstance(mActivity).addObserver(this);
         return rootView;
     }
 
@@ -89,7 +89,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     public void onDetach() {
         super.onDetach();
         ImplLog.d(TAG, "onDetach," + this);
-        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
     @Override
@@ -119,6 +118,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         super.onDestroyView();
         destoryView = true;
         ImplLog.d(TAG, "onDestroyView," + this + "," + destoryView);
+        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
     @Override
@@ -160,6 +160,9 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         super.onHiddenChanged(hidden);
         if (!hidden){
             initActionBar(mPagerSlidingTabStrip);
+            ImplAgent.getInstance(mActivity).addObserver(this);
+        }else{
+            ImplAgent.getInstance(mActivity).deleteObserver(this);
         }
     }
 

@@ -126,8 +126,8 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
 
     @Override
     public void onAttach(Activity activity) {
+        LogUtils.i(TAG, "onAttach");
         super.onAttach(activity);
-        ImplAgent.getInstance(mActivity).addObserver(this);
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
 
         Bundle arguments = getArguments();
@@ -147,6 +147,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        LogUtils.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
         mHttpUtils = new HttpUtils();
@@ -156,6 +157,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        LogUtils.i(TAG, "onCreateView");
         mInflater = inflater;
         try {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
@@ -187,11 +189,13 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
             long timeout = (long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_SHOW_TIME, 3000L);
             mHandler.postDelayed(mThread, timeout);
         }
+        implAgent.addObserver(this);
         return rootView;
     }
 
     @Override
     public void onResume() {
+        LogUtils.i(TAG, "onResume");
         super.onResume();
         MobclickAgent.onPageStart(whichPage); //统计页面
 
@@ -214,6 +218,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
 
     @Override
     public void onPause() {
+        LogUtils.i(TAG, "onPause");
         super.onPause();
         MobclickAgent.onPageEnd(whichPage);
     }
@@ -230,20 +235,25 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         LogUtils.i(TAG, "onDestroyView");
         mShuttingdown = true;
         mHandler.removeCallbacks(mThread);//关闭延时线程
+        implAgent.deleteObserver(this);
     }
 
     @Override
     public void onDetach() {
+        LogUtils.i(TAG, "onDetach");
         super.onDetach();
-        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
     @Override
     public void onHiddenChanged(boolean hidden) {
+        LogUtils.i(TAG, "onHiddenChanged");
         super.onHiddenChanged(hidden);
         if (!hidden) {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.hide();
+            ImplAgent.getInstance(mActivity).addObserver(this);
+        }else{
+            ImplAgent.getInstance(mActivity).deleteObserver(this);
         }
     }
 

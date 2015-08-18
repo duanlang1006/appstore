@@ -214,7 +214,11 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 //        ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
         Fragment current = fgmgr.findFragmentById(R.id.container);
         if (null != current) {
-            ft.hide(current);
+            if (!addToBackStack){
+                ft.remove(current);
+            }else{
+                ft.hide(current);
+            }
         }
         if (!newFragment.isAdded()) {
             ft.add(R.id.container, newFragment);
