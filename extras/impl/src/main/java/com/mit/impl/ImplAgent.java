@@ -119,11 +119,11 @@ public class ImplAgent extends Observable {
             implInfo = new ImplInfo();
             implInfo.setKey(key);
             mImplList.add(implInfo);
-            mDownloader.fillImplInfo(implInfo);
-            mInstaller.fillImplInfo(implInfo);
         }
         implInfo.setPackageName(packageName)
                 .setVersionCode(versionCode);
+        mDownloader.fillImplInfo(implInfo);
+        mInstaller.fillImplInfo(implInfo);
         return implInfo;
     }
 
@@ -812,6 +812,7 @@ public class ImplAgent extends Observable {
         @Override
         public void onUninstallSuccess(final ImplInfo info) {
             super.onUninstallSuccess(info);
+            info.setDownloadId(0);
             MitMobclickAgent.onEvent(mContext, "impl_UninstallSuccess");
             mWorkHandler.post(new Runnable() {
                 @Override
