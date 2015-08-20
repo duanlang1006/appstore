@@ -240,9 +240,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
                     // handle back button
-                    if (!getFragmentManager().popBackStackImmediate()) {
-                        mActivity.finish();
-                    }
+                    getFragmentManager().popBackStackImmediate();
                     return true;
                 }
                 return false;
@@ -269,6 +267,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             mBackView = (ImageButton) customView.findViewById(R.id.search_back);
             mBackView.setOnClickListener(this);
             mEtView = (EditText) customView.findViewById(R.id.search_et);
+            mEtView.setOnClickListener(this);
             if (null != mEtViewText) {
                 isShowPreload = false;
                 mEtView.setText(mEtViewText);
@@ -426,6 +425,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         } else if (v.getId() == R.id.refresh_btn) {
             no_network.setVisibility(View.GONE);
             postSearch(mEtView.getText().toString());
+        } else if (v.getId() == R.id.search_et){
+            LogUtils.i("duanlang", "search_et");
         }
     }
 

@@ -164,9 +164,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
                     // handle back button
-                    if (!getFragmentManager().popBackStackImmediate()){
-                        mActivity.finish();
-                    }
+                    getFragmentManager().popBackStackImmediate();
                     return true;
                 }
                 return false;
