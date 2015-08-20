@@ -54,9 +54,9 @@ import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.bean.GuideBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
-import com.umeng.analytics.MobclickAgent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -137,12 +137,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
             mParams = arguments.getBundle("params");
             misguide = arguments.getBoolean("isguide");
         }
-
-        if ((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)) {
-            whichPage = "GuideFragment";
-        }else{
-            whichPage = "LogoFragment";
-        }
     }
 
     @Override
@@ -151,6 +145,15 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         super.onCreate(savedInstanceState);
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
         mHttpUtils = new HttpUtils();
+
+        if (misguide){
+            whichPage = "MyLifeFragment";
+        }else if ((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)) {
+            whichPage = "GuideFragment";
+        }else{
+            whichPage = "LogoFragment";
+        }
+        MitMobclickAgent.onEvent(mActivity,whichPage+"_onCreate");
     }
 
 
@@ -197,7 +200,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     public void onResume() {
         LogUtils.i(TAG, "onResume");
         super.onResume();
-        MobclickAgent.onPageStart(whichPage); //统计页面
+        MitMobclickAgent.onPageStart(whichPage); //统计页面
 
         getView().setFocusableInTouchMode(true);
         getView().requestFocus();
@@ -220,7 +223,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     public void onPause() {
         LogUtils.i(TAG, "onPause");
         super.onPause();
-        MobclickAgent.onPageEnd(whichPage);
+        MitMobclickAgent.onPageEnd(whichPage);
     }
 
     @Override
@@ -236,6 +239,12 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mShuttingdown = true;
         mHandler.removeCallbacks(mThread);//关闭延时线程
         implAgent.deleteObserver(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        MitMobclickAgent.onEvent(mActivity,whichPage+"_onDestroy");
     }
 
     @Override

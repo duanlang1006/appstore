@@ -24,6 +24,7 @@ public class MitMobclickAgent {
     private static final String TAG = "MitMobclickAgent";
     private static final String UMengMobclickClass = "com.umeng.analytics.MobclickAgent";
     private static boolean bool = true;
+    private static Boolean includeUmeng = null;
     /**
      * POST请求前数据统计的值
      */
@@ -58,6 +59,55 @@ public class MitMobclickAgent {
             bool = false;
         }
     }
+
+    public static void openActivityDurationTrack(boolean value) {
+        if (isClass()) {
+            MobclickAgent.openActivityDurationTrack(value);
+        }
+    }
+
+    public static void onResume(Context context){
+        if (isClass()) {
+            MobclickAgent.onResume(context);
+        }
+    }
+
+    public static void onResume(Context context, String s, String s1) {
+        if (isClass()) {
+            MobclickAgent.onResume(context,s,s1);
+        }
+    }
+
+    public static void onPause(Context context){
+        if (isClass()) {
+            MobclickAgent.onPause(context);
+        }
+    }
+
+    public static void onPageStart(String pageId){
+        if (isClass()) {
+            MobclickAgent.onPageStart(pageId);
+        }
+    }
+
+    public static void onPageEnd(String pageId){
+        if (isClass()) {
+            MobclickAgent.onPageEnd(pageId);
+        }
+    }
+
+    public static void updateOnlineConfig(Context context, String s, String s1) {
+        if (isClass()) {
+            MobclickAgent.updateOnlineConfig(context, s, s1);
+        }
+    }
+
+    public static void updateOnlineConfig(Context context) {
+        if (isClass()) {
+            MobclickAgent.updateOnlineConfig(context);
+        }
+    }
+
 
     /**
      * 请求网络
@@ -213,13 +263,18 @@ public class MitMobclickAgent {
      * @return
      */
     private static boolean isClass() {
-        try {
-            Class.forName(UMengMobclickClass);
-            LogUtils.i(TAG, "友盟数据统计SDK存在");
-            return true;
-        } catch (ClassNotFoundException e) {
-            LogUtils.e(TAG, "友盟数据统计SDK不存在");
-            return false;
+        if (null == includeUmeng) {
+            try {
+                Class.forName(UMengMobclickClass);
+                LogUtils.i(TAG, "友盟数据统计SDK存在");
+                includeUmeng = new Boolean(true);
+            } catch (ClassNotFoundException e) {
+                LogUtils.e(TAG, "友盟数据统计SDK不存在");
+                includeUmeng = new Boolean(false);
+            }
+            return includeUmeng;
+        }else {
+            return includeUmeng;
         }
     }
 

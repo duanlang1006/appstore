@@ -28,7 +28,6 @@ import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
-import com.umeng.analytics.MobclickAgent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

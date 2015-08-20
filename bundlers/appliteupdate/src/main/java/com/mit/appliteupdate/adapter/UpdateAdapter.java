@@ -70,7 +70,7 @@ public class UpdateAdapter extends BaseAdapter {
             viewholder = (ViewHolder) convertView.getTag();
         }
         final DataBean data = mDatas.get(position);
-        viewholder.initView(data);
+        viewholder.initView(data,position);
 
         viewholder.mName.setText(data.getmName());
         mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
@@ -85,6 +85,7 @@ public class UpdateAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 ViewHolder vh = (ViewHolder) v.getTag();
+                MitMobclickAgent.onEvent(mActivity, "onClickButton" + vh.position);
                 if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
                     switch (vh.implInfo.getStatus()) {
                         case Constant.STATUS_PENDING:
@@ -100,15 +101,10 @@ public class UpdateAdapter extends BaseAdapter {
                                     vh.bean.getmName() + ".apk",
                                     true,
                                     vh.implCallback);
-                            MitMobclickAgent.onEvent(mActivity, "clickUpdate");
                             break;
                     }
                 } else {
-                    try {
-                        mActivity.startActivity(implAgent.getActionIntent(vh.implInfo));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    implAgent.startActivity(vh.implInfo);
                 }
             }
         });
@@ -124,6 +120,7 @@ public class UpdateAdapter extends BaseAdapter {
         private DataBean bean;
         private ImplInfo implInfo;
         private ListImplCallback implCallback;
+        private int position;
 
         public ViewHolder(View v) {
             this.mImg = (ImageView) v.findViewById(R.id.item_update_img);
@@ -134,8 +131,9 @@ public class UpdateAdapter extends BaseAdapter {
             this.implCallback = new ListImplCallback(this);
         }
 
-        public void initView(DataBean bean) {
+        public void initView(DataBean bean,int position) {
             this.bean = bean;
+            this.position = position;
             this.implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl()).setTitle(bean.getmName());

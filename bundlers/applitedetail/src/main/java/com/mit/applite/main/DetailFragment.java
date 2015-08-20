@@ -49,10 +49,8 @@ import com.mit.applite.utils.DetailUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
-import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
-import com.umeng.analytics.MobclickAgent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -138,7 +136,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
-        MitMobclickAgent.onEvent(mActivity, "toDetailFragment");
     }
 
     @Override
@@ -156,7 +153,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     public void onResume() {
         super.onResume();
-        MobclickAgent.onPageStart("DetailFragment"); //统计页面
         getView().setFocusableInTouchMode(true);
         getView().requestFocus();
         getView().setOnKeyListener(new View.OnKeyListener() {
@@ -176,7 +172,11 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     public void onPause() {
         super.onPause();
-        MobclickAgent.onPageEnd("DetailFragment");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
@@ -276,11 +276,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                                     break;
                             }
                         } else {
-                            try {
-                                mActivity.startActivity(implAgent.getActionIntent(implinfo));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            implAgent.startActivity(implinfo);
                         }
                     }
                 }

@@ -11,11 +11,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
-import com.umeng.analytics.MobclickAgent;
-
 
 public class PersonalFragment extends OSGIBaseFragment implements View.OnClickListener {
     private Activity mActivity;
@@ -27,7 +24,6 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MitMobclickAgent.onEvent(mActivity, "toPersonalFragment");
     }
 
     @Override

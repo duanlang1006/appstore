@@ -94,7 +94,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         if (null != mData && null != mData.getData()) {
 
             HomePageApkData itemData = mData.getData().get(position);
-            viewHolder.initView(itemData,mData.getS_datatype());
+            viewHolder.initView(itemData,mData.getS_datatype(),position);
         }
         return convertView;
     }
@@ -105,6 +105,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             Object obj = v.getTag();
             if (obj instanceof ViewHolder) {
                 ViewHolder vh = (ViewHolder) obj;
+                MitMobclickAgent.onEvent(mContext,"onClickButton"+vh.getItemPosition());
                 if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
                     switch (vh.implInfo.getStatus()) {
                         case Constant.STATUS_PENDING:
@@ -113,39 +114,25 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                             implAgent.pauseDownload(vh.implInfo);
                             break;
                         case Constant.STATUS_PAUSED:
-                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
+                            implAgent.resumeDownload(vh.implInfo, vh);
                             break;
                         default:
                             implAgent.newDownload(vh.implInfo,
                                     Constant.extenStorageDirPath,
                                     vh.itemData.getName() + ".apk",
                                     true,
-                                    vh.implCallback);
+                                    vh);
                             break;
                     }
                 } else {
-                    switch(implAgent.getAction(vh.implInfo)){
-                        case ImplInfo.ACTION_INSTALL:
-                            MitMobclickAgent.onEvent(mContext, "clickInstallApk");
-                            break;
-                        case ImplInfo.ACTION_OPEN:
-                            MitMobclickAgent.onEvent(mContext, "clickOpenApk");
-                            break;
-                    }
-
-                    try {
-                        mContext.startActivity(implAgent.getActionIntent(vh.implInfo));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    implAgent.startActivity(vh.implInfo);
                 }
             }
         }
     }
 
-
-
-    public class ViewHolder {
+    public class ViewHolder implements ImplChangeCallback{
+        //不变控件
         private ImageView mAppIcon;
         private TextView mAppName;
         private TextView mCategorySub;
@@ -156,11 +143,12 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private ImageView mCategoryListArrow;
         private ImageView mExtentIcon;
         private String layoutStr;
-        private ImplChangeCallback implCallback;
         private LinearLayout pullDownView;
 
-        ImplInfo implInfo;
-        HomePageApkData itemData;
+        //可变数据
+        private ImplInfo implInfo;
+        private HomePageApkData itemData;
+        private int position;
 
         ViewHolder(View mView){
             this.pullDownView = (LinearLayout)mView.findViewById(R.id.pullDownView);
@@ -173,7 +161,6 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             this.mCategoryListArrow = (ImageView) mView.findViewById(R.id.categoryListArrow);
             this.mExtentIcon = (ImageView) mView.findViewById(R.id.extentIcon);
             this.mAppBrief = (TextView) mView.findViewById(R.id.apkBrief);
-            this.implCallback = new ListImplCallback(this);
             if (null != mProgressButton ){
                 mProgressButton.setTag(this);
                 mProgressButton.setOnClickListener(ListArrayAdapter.this);
@@ -184,15 +171,16 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             initProgressButton();
         }
 
-        public void initView(HomePageApkData itemData,String layout){
+        public void initView(HomePageApkData itemData,String layout,int position){
             this.itemData = itemData;
             this.layoutStr = layout;
+            this.position = position;
             this.implInfo = implAgent.getImplInfo(itemData.getPackageName(), itemData.getPackageName(), itemData.getVersionCode());
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(itemData.getrDownloadUrl())
                         .setTitle(itemData.getName())
                         .setIconUrl(itemData.getIconUrl());
-                implAgent.setImplCallback(implCallback, implInfo);
+                implAgent.setImplCallback(this, implInfo);
             }
 
             if (null != this.mAppIcon && null != itemData.getIconUrl()){
@@ -262,6 +250,11 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             initProgressButton();
         }
 
+        @Override
+        public void onChange(ImplInfo info) {
+            this.refresh();
+        }
+
         void initProgressButton() {
             if (null != mProgressButton && null != this.implInfo){
                 LogUtils.d(TAG,implInfo.getTitle()+","+implInfo.getStatus()+","+implAgent.getActionText(implInfo));
@@ -294,20 +287,9 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         public HomePageApkData getItemData() {
             return itemData;
         }
-    }
 
-    class ListImplCallback implements ImplChangeCallback {
-        Object tag ;
-
-        ListImplCallback(Object tag) {
-            super();
-            this.tag = tag;
-        }
-
-        @Override
-        public void onChange(ImplInfo info) {
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
+        public int getItemPosition() {
+            return this.position;
         }
     }
 }

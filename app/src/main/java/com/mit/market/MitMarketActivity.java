@@ -31,7 +31,6 @@ import com.applite.android.R;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceClient;
 import com.osgi.extra.OSGIServiceHost;
-import com.umeng.analytics.MobclickAgent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -49,8 +48,8 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         setOverflowShowingAlways();
 
         long current = System.currentTimeMillis();
-        MobclickAgent.openActivityDurationTrack(false);//禁止默认的页面统计方式
-        MobclickAgent.updateOnlineConfig(this);
+        MitMobclickAgent.openActivityDurationTrack(false);//禁止默认的页面统计方式
+        MitMobclickAgent.updateOnlineConfig(this);
         MitUpdateAgent.setDebug(true);
         MitUpdateAgent.update(this);
         LogUtils.d(TAG,"onCreate take "+(System.currentTimeMillis()-current)+" ms");
@@ -83,12 +82,12 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     @Override
     protected void onResume() {
         super.onResume();
-        MobclickAgent.onResume(this);       //统计时长
+        MitMobclickAgent.onResume(this);       //统计时长
     }
 
     public void onPause() {
         super.onPause();
-        MobclickAgent.onPause(this);
+        MitMobclickAgent.onPause(this);
     }
 
     @Override
@@ -298,7 +297,6 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
                 GuideFragment.class.getName(),
                 GuideFragment.newBundles(null,null,null,true),
                 addToBackstack);
-        MitMobclickAgent.onEvent(this, "clickOneDay");
     }
 
     private void setOverflowShowingAlways() {
