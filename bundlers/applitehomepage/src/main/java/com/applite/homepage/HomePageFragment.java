@@ -530,6 +530,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 //        params.put("packagename", "com.android.applite1.0");
         params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
+        params.put("protocol_version", "1.0");
         if (null == mCategory) {
             params.put("type", "homepage");
             params.put("tabTitle", "tabtitle");
