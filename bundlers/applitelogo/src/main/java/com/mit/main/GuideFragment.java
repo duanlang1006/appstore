@@ -14,6 +14,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -53,6 +54,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.bean.GuideBean;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
@@ -528,30 +530,41 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         if (null == implInfo) {
             return;
         }
-        implInfo.setTitle(bean.getName()).setDownloadUrl(bean.getUrl()).setIconUrl(bean.getImgurl());
-        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
-            switch (implInfo.getStatus()) {
-                case Constant.STATUS_PENDING:
-                case Constant.STATUS_RUNNING:
-                    break;
-                case Constant.STATUS_PAUSED:
-                    implAgent.resumeDownload(implInfo, null);
-                    break;
-                case Constant.STATUS_INSTALLED:
-                case Constant.STATUS_NORMAL_INSTALLING:
-                case Constant.STATUS_PRIVATE_INSTALLING:
-                    //正在安装或已安装
-//                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
-                    break;
-                default:
-                    implAgent.newDownload(implInfo,
-                            Constant.extenStorageDirPath,
-                            bean.getName() + ".apk",
-                            true,
-                            null);
-                    break;
-            }
-        }
+        ImplHelper.downloadImpl(mActivity,
+                implInfo,
+                bean.getUrl(),
+                bean.getName(),
+                bean.getImgurl(),
+                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
+                null,
+                null);
+//        implInfo.setTitle(bean.getName()).setDownloadUrl(bean.getUrl()).setIconUrl(bean.getImgurl());
+//        if (ImplInfo.ACTION_DOWNLOAD == ImplHelper.getAction(mActivity,implInfo)) {
+//            switch (implInfo.getStatus()) {
+//                case Constant.STATUS_PENDING:
+//                case Constant.STATUS_RUNNING:
+//                    break;
+//                case Constant.STATUS_PAUSED:
+//                    implAgent.resumeDownload(implInfo, null);
+//                    break;
+//                case Constant.STATUS_INSTALLED:
+//                case Constant.STATUS_NORMAL_INSTALLING:
+//                case Constant.STATUS_PRIVATE_INSTALLING:
+//                    //正在安装或已安装
+////                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
+//                    break;
+//                default:
+//                    implAgent.newDownload(implInfo,
+//                            bean.getUrl(),
+//                            bean.getName(),
+//                            bean.getImgurl(),
+//                            Constant.extenStorageDirPath,
+//                            bean.getName() + ".apk",
+//                            true,
+//                            null);
+//                    break;
+//            }
+//        }
     }
 
     /**

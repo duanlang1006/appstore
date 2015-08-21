@@ -15,6 +15,7 @@ public class ImplInfo {
     private String key;
     private String packageName;
     private int status;
+    private int cause;
     private long downloadId ;
     private String downloadUrl;
     private String iconUrl;
@@ -24,12 +25,15 @@ public class ImplInfo {
     private int versionCode;
     private String localPath;
     private String mimeType;
-    private boolean autoLaunch;
+    private boolean autoLaunch;  //下载完成后自动启动安装
+    private long size;
+    private boolean userContinue;
 
     public ImplInfo() {
         key = null;
         packageName = null;
         status = Constant.STATUS_INIT;
+        cause = Constant.CAUSE_NONE;
         downloadId = 0;
         downloadUrl = null;
         iconUrl = null;
@@ -40,6 +44,8 @@ public class ImplInfo {
         localPath = null;
         mimeType = null;
         autoLaunch = false;
+        size = 0;
+        userContinue = false;
     }
 
     public long getId() {
@@ -52,6 +58,10 @@ public class ImplInfo {
 
     public int getStatus() {
         return status;
+    }
+
+    public int getCause() {
+        return cause;
     }
 
     public String getPackageName() {
@@ -98,6 +108,14 @@ public class ImplInfo {
         return autoLaunch;
     }
 
+    public long getSize() {
+        return size;
+    }
+
+    public boolean isUserContinue() {
+        return userContinue;
+    }
+
     public void setId(long id) {
         this._id = id;
     }
@@ -109,6 +127,12 @@ public class ImplInfo {
 
     public ImplInfo setStatus(int status) {
         this.status = status;
+        return this;
+    }
+
+    public ImplInfo setCause(int cause) {
+        this.cause = cause;
+        ImplLog.d("impl_info","setCause:"+cause);
         return this;
     }
 
@@ -164,6 +188,16 @@ public class ImplInfo {
 
     public ImplInfo setAutoLaunch(boolean autoLaunch) {
         this.autoLaunch = autoLaunch;
+        return this;
+    }
+
+    public ImplInfo setSize(long size) {
+        this.size = size;
+        return this;
+    }
+
+    public ImplInfo setUserContinue(boolean userContinue) {
+        this.userContinue = userContinue;
         return this;
     }
 }

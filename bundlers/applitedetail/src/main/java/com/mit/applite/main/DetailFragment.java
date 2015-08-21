@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -47,6 +48,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.applite.utils.DetailUtils;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 import com.osgi.extra.OSGIBaseFragment;
@@ -56,6 +58,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -258,26 +261,38 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
                     ImplInfo implinfo = (ImplInfo) mProgressButton.getTag();
                     if (null != implinfo) {
-                        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implinfo)) {
-                            switch (implinfo.getStatus()) {
-                                case Constant.STATUS_PENDING:
-                                case Constant.STATUS_RUNNING:
-                                    implAgent.pauseDownload(implinfo);
-                                    break;
-                                case Constant.STATUS_PAUSED:
-                                    implAgent.resumeDownload(implinfo, implCallback);
-                                    break;
-                                default:
-                                    implAgent.newDownload(implinfo,
-                                            Constant.extenStorageDirPath,
-                                            mApkName + ".apk",
-                                            true,
-                                            implCallback);
-                                    break;
-                            }
-                        } else {
-                            implAgent.startActivity(implinfo);
-                        }
+                        ImplHelper.onClick(mActivity,
+                                implinfo,
+                                mDownloadUrl,
+                                mName,
+                                mImgUrl,
+                                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + mApkName + ".apk",
+                                null,
+                                implCallback);
+
+//                        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implinfo)) {
+//                            switch (implinfo.getStatus()) {
+//                                case Constant.STATUS_PENDING:
+//                                case Constant.STATUS_RUNNING:
+//                                    implAgent.pauseDownload(implinfo);
+//                                    break;
+//                                case Constant.STATUS_PAUSED:
+//                                    implAgent.resumeDownload(implinfo, implCallback);
+//                                    break;
+//                                default:
+//                                    implAgent.newDownload(implinfo,
+//                                            mDownloadUrl,
+//                                            mName,
+//                                            mImgUrl,
+//                                            Constant.extenStorageDirPath,
+//                                            mApkName + ".apk",
+//                                            true,
+//                                            implCallback);
+//                                    break;
+//                            }
+//                        } else {
+//                            implAgent.startActivity(implinfo);
+//                        }
                     }
                 }
             }
@@ -482,8 +497,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             if (null != implinfo) {
                 implAgent.setImplCallback(implCallback, implinfo);
                 implinfo.setDownloadUrl(mDownloadUrl).setIconUrl(mImgUrl).setTitle(mName);
-                mProgressButton.setText(implAgent.getActionText(implinfo));
-                mProgressButton.setProgress(implAgent.getProgress(implinfo));
+                mProgressButton.setText(ImplHelper.getActionText(mActivity,implinfo));
+                mProgressButton.setProgress(ImplHelper.getProgress(mActivity,implinfo));
                 if (mProgressButton.getProgress() == 0) {
                     mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_foreground));
                 } else {
@@ -558,10 +573,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         }
 
         private void refresh(ImplInfo info) {
-            LogUtils.d(TAG, "refresh" + implAgent.getActionText(info) + "," + info.getStatus());
-            mProgressButton.setText(implAgent.getActionText(info));
-            mProgressButton.setProgress(implAgent.getProgress(info));
+            LogUtils.d(TAG, "refresh" + ImplHelper.getActionText(mActivity,info) + "," + info.getStatus());
+            mProgressButton.setText(ImplHelper.getActionText(mActivity,info));
+            mProgressButton.setProgress(ImplHelper.getProgress(mActivity,info));
         }
     }
-
 }

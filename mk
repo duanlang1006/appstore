@@ -1,4 +1,13 @@
-cd extras/applitecommon
+cd extras/impl
+../../gradlew makeJar
+if [ $? -eq 0 ];then
+    echo impl ok!!!!!!!!!!!!!!!!!!!!!!!!
+else
+    echo impl error!!!!!!!!!!!!!!!!!!!!!!!!
+    exit 0
+fi
+
+cd ../applitecommon
 ../../gradlew makeJar
 if [ $? -eq 0 ];then
     echo applitecommon ok!!!!!!!!!!!!!!!!!!!!!!!!
@@ -7,14 +16,6 @@ else
     exit 0
 fi
 
-cd ../impl
-../../gradlew makeJar
-if [ $? -eq 0 ];then
-    echo impl ok!!!!!!!!!!!!!!!!!!!!!!!!
-else
-    echo impl error!!!!!!!!!!!!!!!!!!!!!!!!
-    exit 0
-fi
 
 cd ../mitUpdateSDK
 ../../gradlew makeJar

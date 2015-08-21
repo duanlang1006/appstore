@@ -10,6 +10,8 @@
     <string name="download_status_queued">Queued</string>
     <string name="download_status_paused">Pausing</string>
     <string name="download_status_waiting">Waiting</string>
+    <string name="download_status_waiting_network">Waiting network</string>
+    <string name="download_status_waiting_wlan">Waiting WLAN</string>
 
     <string name="apk_version">version:%1$s</string>
 
