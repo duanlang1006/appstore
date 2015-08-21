@@ -105,7 +105,7 @@
     <ListView
         android:id="@+id/search_listview"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:divider="@color/dividing_line"
         android:dividerHeight="0.5dp"
         android:fadingEdge="none"
@@ -115,7 +115,7 @@
     <ListView
         android:id="@+id/search_preload_listview"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:divider="@color/dividing_line"
         android:dividerHeight="0.5dp"
         android:fadingEdge="none"

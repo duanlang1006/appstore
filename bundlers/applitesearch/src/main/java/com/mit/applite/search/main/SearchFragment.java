@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -23,7 +24,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -65,9 +65,9 @@ import java.util.regex.Pattern;
 public class SearchFragment extends OSGIBaseFragment implements View.OnClickListener, SearchApkAdapter.UpdateInatsllButtonText, HotWordAdapter.ClickHotWordItemPostlistener {
 
     private static final String TAG = "SearchFragment";
-    private ImageButton mBackView;
+    private ImageView mBackView;
     private EditText mEtView;
-    private ImageButton mSearchView;
+    private ImageView mSearchView;
     private LinearLayout mHotWordLL;
     private ListView mListView;
     private List<SearchBean> mSearchApkContents = new ArrayList<SearchBean>();
@@ -117,9 +117,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         public void onScrollStateChanged(AbsListView view, int scrollState) {
             if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
                 LogUtils.i(TAG, "拉到最底部");
-                mMoreProgressBar.setVisibility(View.VISIBLE);
-                mMoreText.setText(AppliteUtils.getString(mActivity, R.string.loading));
-                moreView.setVisibility(View.VISIBLE);
+                if (mListView.getFooterViewsCount() == 0)
+                    mListView.addFooterView(moreView);
 
                 if (ISTOEND) {
                     mMoreProgressBar.setVisibility(View.GONE);
@@ -127,6 +126,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 //                    Toast.makeText(mActivity, "木有更多数据！", Toast.LENGTH_SHORT).show();
 //                    mListView.removeFooterView(moreView); //移除底部视图
                 } else {
+                    mMoreProgressBar.setVisibility(View.VISIBLE);
+                    mMoreText.setText(AppliteUtils.getString(mActivity, R.string.loading));
                     //加载更多数据，这里可以使用异步加载
                     if (ISPOSTSEARCH) {
                         postSearch(mEtView.getText().toString());
@@ -217,7 +218,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mEtView.setFocusable(true);
                 mEtView.setFocusableInTouchMode(true);
                 mEtView.requestFocus();
-                mEtView.findFocus();
                 KeyBoardUtils.openKeybord(mEtView, mActivity);
             }
             initActionBar();
@@ -228,10 +228,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     public void onResume() {
         super.onResume();
         MobclickAgent.onPageStart("SearchFragment"); //统计页面
-        mEtView.setFocusable(true);
-        mEtView.setFocusableInTouchMode(true);
-        mEtView.requestFocus();
-        KeyBoardUtils.openKeybord(mEtView, mActivity);
 
 //        getView().setFocusableInTouchMode(true);
 //        getView().requestFocus();
@@ -246,6 +242,14 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 //                return false;
 //            }
 //        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (android.R.id.home == item.getItemId()) {
+            closeKeybord();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -264,15 +268,18 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         try {
             if (null == customView)
                 customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_search, null);
-            mBackView = (ImageButton) customView.findViewById(R.id.search_back);
+            mBackView = (ImageView) customView.findViewById(R.id.search_back);
             mBackView.setOnClickListener(this);
             mEtView = (EditText) customView.findViewById(R.id.search_et);
-            mEtView.setOnClickListener(this);
+            mEtView.setFocusable(true);
+            mEtView.setFocusableInTouchMode(true);
+            mEtView.requestFocus();
+            KeyBoardUtils.openKeybord(mEtView, mActivity);
             if (null != mEtViewText) {
                 isShowPreload = false;
                 mEtView.setText(mEtViewText);
             }
-            mSearchView = (ImageButton) customView.findViewById(R.id.search_search);
+            mSearchView = (ImageView) customView.findViewById(R.id.search_search);
             mSearchView.setOnClickListener(this);
             mDeleteView = (ImageView) customView.findViewById(R.id.search_delete);
             mDeleteView.setOnClickListener(this);
@@ -324,7 +331,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             }
         });
 
-        mListView.addFooterView(moreView);
         mListView.setSelected(true);
         mListView.setOnScrollListener(mOnScrollListener);
 
@@ -491,7 +497,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 if (mListView.getVisibility() == View.GONE)
                     no_network.setVisibility(View.VISIBLE);
                 ISPOSTSEARCH = true;
-                moreView.setVisibility(View.GONE);
+                mListView.removeFooterView(moreView);
                 if (null != mAdapter)
                     mActivity.runOnUiThread(mNotifyRunnable);
 
@@ -508,8 +514,12 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      * @param data
      */
     private void setSearchData(String data) {
-        if (!mSearchApkContents.isEmpty() && mSearchPostPage == 0)
+        if (!mSearchApkContents.isEmpty() && mSearchPostPage == 0) {
             mSearchApkContents.clear();
+            if (null != mAdapter) {
+                mAdapter.notifyDataSetChanged();
+            }
+        }
         SearchBean bean = null;
         try {
             JSONObject object = new JSONObject(data);
@@ -538,7 +548,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mPreloadListView.setVisibility(View.GONE);
                 isHotWordLayoutVisibility(View.GONE);
                 mListView.setVisibility(View.VISIBLE);
-                moreView.setVisibility(View.GONE);
+                mListView.removeFooterView(moreView);
 
                 if (null == mAdapter) {
                     mAdapter = new SearchApkAdapter(mActivity, mSearchApkContents, this);
@@ -598,8 +608,12 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      * @param result
      */
     private void setPreloadData(String result) {
-        if (!mPreloadData.isEmpty())
+        if (!mPreloadData.isEmpty()) {
             mPreloadData.clear();
+            if (null != mPreloadAdapter) {
+                mPreloadAdapter.notifyDataSetChanged();
+            }
+        }
         SearchBean bean = null;
         try {
             JSONObject object = new JSONObject(result);
@@ -672,8 +686,13 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      * @param data
      */
     private void resolve(String data) {
-        if (!mHotWordBeans.isEmpty())
+        if (!mHotWordBeans.isEmpty()) {
             mHotWordBeans.clear();
+            if (null != mGvAdapter) {
+                mGvAdapter.notifyDataSetChanged();
+            }
+            mHotWordLL.setVisibility(View.GONE);
+        }
         HotWordBean bean = null;
         try {
             JSONObject obj = new JSONObject(data);
