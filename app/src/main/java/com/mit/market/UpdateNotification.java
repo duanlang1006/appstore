@@ -9,6 +9,7 @@ import android.os.Bundle;
 
 import com.applite.android.R;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 
 import java.util.UUID;
 
@@ -60,7 +61,7 @@ public class UpdateNotification {
         if (null == mManager) {
             mManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         }
-        Intent mIntent = new Intent(context, context.getClass());
+        Intent mIntent = new Intent(context, MitMarketActivity.class);
         mIntent.putExtra("update", Constant.UPDATE_FRAGMENT_NOT);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, UUID.randomUUID().hashCode(), mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = new Notification.Builder(context)

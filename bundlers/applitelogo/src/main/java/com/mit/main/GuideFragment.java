@@ -24,9 +24,12 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -55,6 +58,7 @@ import com.mit.bean.GuideBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.mitupdatesdk.MitMobclickAgent;
+import com.mit.utils.GuideUtils;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
@@ -86,7 +90,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private float[] mX;//APK的X坐标数组
     private float[] mY;//APK的Y坐标数组
     private final boolean[] mApkMovePath = {false, false, true, true, false, false, true, true, false, false};//APK移动方向数组  true右  false左
-    private boolean mShuttingdown = false;
     private Handler mHandler = new Handler();
     private Runnable mThread = new Runnable() {//延时线程
         public void run() {
@@ -108,15 +111,17 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private int MAX_APK_SHOW_NUMBER = 5;//每个位置最多显示的APK个数
     private Animation mShakeAnimation;
     private int mDownloadQueueNumber = 0;
+    private boolean mIsNotTo;
 
     private String whichPage;
 
-    public static Bundle newBundles(String targetService, String targetFragment, Bundle params, boolean isguide) {
+    public static Bundle newBundles(String targetService, String targetFragment, Bundle params, boolean isguide, boolean mIsNotTo) {
         Bundle b = new Bundle();
         b.putString("service", targetService);
         b.putString("fragment", targetFragment);
         b.putBundle("params", params);
         b.putBoolean("isguide", isguide);
+        b.putBoolean("isNotTo", mIsNotTo);
         return b;
     }
 
@@ -143,7 +148,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     public void onCreate(Bundle savedInstanceState) {
         LogUtils.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
+        mBitmapUtil = new BitmapUtils(mActivity.getApplicationContext());
         mHttpUtils = new HttpUtils();
 
         if (misguide){
@@ -170,7 +175,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         }
         this.container = container;
 
-        if ((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)||misguide) {
+        if (((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true) || misguide) && !mIsNotTo) {
             rootView = mInflater.inflate(R.layout.fragment_guide, container, false);
             initView();
             getResolution();
@@ -179,8 +184,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         } else {
             rootView = mInflater.inflate(R.layout.fragment_logo, container, false);
             logoInitView();
-            if (System.currentTimeMillis() / 1000 >
-                    (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_NEXT_TIME, 0L)) {
+            if (System.currentTimeMillis() > (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_NEXT_TIME, 0L)) {
                 logoPost();
             }
         }
@@ -236,7 +240,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     public void onDestroyView() {
         super.onDestroyView();
         LogUtils.i(TAG, "onDestroyView");
-        mShuttingdown = true;
         mHandler.removeCallbacks(mThread);//关闭延时线程
         implAgent.deleteObserver(this);
     }
@@ -260,9 +263,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         if (!hidden) {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.hide();
-            ImplAgent.getInstance(mActivity).addObserver(this);
-        }else{
-            ImplAgent.getInstance(mActivity).deleteObserver(this);
         }
     }
 
@@ -283,7 +283,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mInstallView.setOnClickListener(this);
         if ((Boolean) AppliteSPUtils.get(mActivity, "personal_flag", false)) {
             AppliteSPUtils.put(mActivity, AppliteSPUtils.ISGUIDE, false);
-            mToHomeView.setVisibility(View.INVISIBLE);
+            mToHomeView.setVisibility(View.GONE);
         }
     }
 
@@ -311,7 +311,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mX[1] = (mFLayoutWidth * 7 / 10 - 10) * mFLayoutWidthScale;
         mX[2] = (mFLayoutWidth * 3 / 10 - 20) * mFLayoutWidthScale;
         mX[3] = (mFLayoutWidth * 2 / 10 - 30) * mFLayoutWidthScale;
-        mX[4] = (mFLayoutWidth * 6 / 10) * mFLayoutWidthScale;
+        mX[4] = (mFLayoutWidth * 6 / 10 + 20) * mFLayoutWidthScale;
         mX[5] = (mFLayoutWidth * 7 / 10) * mFLayoutWidthScale;
         mX[6] = (mFLayoutWidth * 2 / 10) * mFLayoutWidthScale;
         mX[7] = (mFLayoutWidth * 3 / 10 - 30) * mFLayoutWidthScale;
@@ -322,7 +322,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mY[1] = (mFLayoutHeight * 3 / 20 + 50) * mFLayoutWidthScale;
         mY[2] = (mFLayoutHeight * 5 / 20 + 40) * mFLayoutWidthScale;
         mY[3] = (mFLayoutHeight * 7 / 20) * mFLayoutWidthScale;
-        mY[4] = (mFLayoutHeight * 9 / 20 + 40) * mFLayoutWidthScale;
+        mY[4] = (mFLayoutHeight * 9 / 20 + 20) * mFLayoutWidthScale;
         mY[5] = (mFLayoutHeight * 11 / 20 - 30) * mFLayoutWidthScale;
         mY[6] = (mFLayoutHeight * 12 / 20 - 30) * mFLayoutWidthScale;
         mY[7] = (mFLayoutHeight * 14 / 20 - 30) * mFLayoutWidthScale;
@@ -342,9 +342,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
-                if (mShuttingdown) {
-                    return;
-                }
                 FAILURE_POST_NUMBER = 0;
                 LogUtils.i(TAG, "首页指导网络请求成功，reuslt:" + responseInfo.result);
                 setData(responseInfo.result);
@@ -352,9 +349,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
 
             @Override
             public void onFailure(HttpException e, String s) {
-                if (mShuttingdown) {
-                    return;
-                }
                 LogUtils.e(TAG, "首页指导网络请求失败:" + s);
                 if (FAILURE_POST_NUMBER < 3) {
                     FAILURE_POST_NUMBER = FAILURE_POST_NUMBER + 1;
@@ -416,34 +410,26 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mApkShowNumber[bean.getmShowPosition()] = mApkShowNumber[bean.getmShowPosition()] + 1;
 
         final View child = mInflater.inflate(R.layout.item_guide_app, container, false);
-        final LinearLayout mLL = (LinearLayout) child.findViewById(R.id.guide_app_item);
         final ImageView mAppIV = (ImageView) child.findViewById(R.id.guide_app_iv);
-        final TextView mAppTV = (TextView) child.findViewById(R.id.guidw_app_tv);
-
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mAppTV.setText(bean.getName());
-                AppliteUtils.setLayout(child, (int) mX[bean.getmShowPosition()], (int) mY[bean.getmShowPosition()]);
-                LogUtils.i(TAG, "mX[apkPsition]: " + mX[bean.getmShowPosition()] + " mY[apkPsition]: " + mY[bean.getmShowPosition()]);
-                mRLayout.addView(child);
-            }
-        }, 500);
-
-        mBitmapUtil.configDefaultLoadingImage(getResources().getDrawable(R.drawable.apk_icon_defailt_img));
-        mBitmapUtil.configDefaultLoadFailedImage(getResources().getDrawable(R.drawable.apk_icon_defailt_img));
-        mBitmapUtil.display(mAppIV, bean.getImgurl());
+        final TextView mAppTV = (TextView) child.findViewById(R.id.guide_app_tv);
 
         child.setTag(bean);
+        mAppTV.setText(bean.getName());
+        mBitmapUtil.display(mAppIV, bean.getImgurl());
 
-        mLL.setOnClickListener(new View.OnClickListener() {
+        AppliteUtils.setLayout(child, (int) mX[bean.getmShowPosition()], (int) mY[bean.getmShowPosition()]);
+        LogUtils.i(TAG, "mX[apkPsition]: " + mX[bean.getmShowPosition()] + " mY[apkPsition]: " + mY[bean.getmShowPosition()]);
+        mRLayout.addView(child);
+        appearAnimator(child);
+
+        child.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mApkShowNumber[bean.getmShowPosition()] <= MAX_APK_SHOW_NUMBER) {
                     LogUtils.i(TAG, "当前APK数据：" + bean);
                     if (mApkShowNumber[bean.getmShowPosition()] < MAX_APK_SHOW_NUMBER)
                         mGuideContents.remove(bean);
-                    mLL.setClickable(false);
+                    mAppTV.setClickable(false);
                     paowuxianAnimator(child, mApkMovePath[bean.getmShowPosition()]);
 
                     ISAPKADD[bean.getmShowPosition()] = true;
@@ -456,7 +442,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                     download(bean);
                 } else {
                     shakeAnimator(child);
-                    Toast.makeText(mActivity, mActivity.getResources().getText(R.string.apk_has_install), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, mActivity.getResources().getText(R.string.apk_has_download), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -476,7 +462,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     @Override
     public void update(Observable observable, Object data) {
         LogUtils.d(TAG, "update");
-        if (null == implAgent || null == mInstallView || null == mActivity){
+        if (null == implAgent || null == mInstallView || null == mActivity) {
             return;
         }
         mDownloadQueueNumber = implAgent.getImplInfoCount(Constant.STATUS_RUNNING | Constant.STATUS_PENDING | Constant.STATUS_PAUSED);
@@ -562,7 +548,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private void appearAnimator(final View view) {
         ObjectAnimator anim = ObjectAnimator//
                 .ofFloat(view, "lsy", 0.1F, 1.0F)//
-                .setDuration(500);//
+                .setDuration(1000);//
         anim.start();
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -581,9 +567,30 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      * @param view
      */
     private void shakeAnimator(View view) {
-        if (null == mShakeAnimation)
-            mShakeAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.shake);//加载动画资源文件
-        view.startAnimation(mShakeAnimation);
+        GuideUtils.setAnimation(view.findViewById(R.id.guide_app_iv));
+//        DisplayMetrics dm = new DisplayMetrics();
+//        mActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+//        if (dm != null) {
+//            float mDensity = dm.density;
+//            GuideUtils.shakeAnimation(view, mDensity);
+//        }
+//        AnimationSet animationSet = new AnimationSet(true);
+//        RotateAnimation rotateAnimation = new RotateAnimation(0.0f, 10.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+//        rotateAnimation.setDuration(300);
+//        rotateAnimation.setRepeatCount(-1);
+//        rotateAnimation.setRepeatMode(Animation.REVERSE);
+//        rotateAnimation.setInterpolator(new AccelerateInterpolator());
+//        animationSet.addAnimation(rotateAnimation);
+//        view.startAnimation(animationSet);
+//        Animation shake = AnimationUtils.loadAnimation(mActivity, R.anim.my_shake);
+//        shake.reset();
+//        shake.setFillAfter(true);
+//        view.startAnimation(shake);
+//        ObjectAnimator a = GuideUtils.tada(view, 1f);
+//        a.start();
+//        if (null == mShakeAnimation)
+//            mShakeAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.shake);//加载动画资源文件
+//        view.startAnimation(mShakeAnimation);
     }
 
     /**
@@ -644,6 +651,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      * 下载文件
      */
     private void download(final String name, String url) {
+        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_IMG_URL, AppliteUtils.getAppDir(name));
         HttpHandler mHttpHandler = mHttpUtils.download(url, //这里是下载的路径
                 AppliteUtils.getAppDir(name), //这是保存到本地的路径
                 true,//true:断点续传 false:不断点续传（全新下载）
@@ -658,7 +666,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                     public void onSuccess(ResponseInfo<File> responseInfo) {
                         LogUtils.i(TAG, name + "下载成功");
                         LogUtils.i(TAG, "Utils.getAppDir(name):" + AppliteUtils.getAppDir(name));
-                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_IMG_URL, AppliteUtils.getAppDir(name));
                     }
 
                     @Override
@@ -674,17 +681,24 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      */
     private void logoInitView() {
         mLogoIV = (ImageView) rootView.findViewById(R.id.logo_iv);
-        if (System.currentTimeMillis() / 1000 >= (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_START_SHOW_TIME, 0L) &&
-                System.currentTimeMillis() / 1000 <= (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, 0L)) {
-            if (!TextUtils.isEmpty((String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_URL, ""))) {
-                mLogoIV.setBackground(new BitmapDrawable(AppliteUtils.getLoacalBitmap(
-                        (String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_URL, ""))));
+        long time = System.currentTimeMillis();
+        long start_time = (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_START_SHOW_TIME, 0L);
+        long end_time = (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, 0L);
+        String path = (String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_URL, "");
+
+        LogUtils.i(TAG, "time:" + time);
+        LogUtils.i(TAG, "start_time:" + start_time);
+        LogUtils.i(TAG, "end_time:" + end_time);
+        LogUtils.i(TAG, "path:" + path);
+
+        if (time >= start_time && time <= end_time) {
+            if (!TextUtils.isEmpty(path)) {
+                mLogoIV.setBackground(new BitmapDrawable(AppliteUtils.getLoacalBitmap(path)));
             }
         }
         //判断在线LOGO的是否存在和显示时间，如果当前时间大于显示时间则删除LOGO图片
-        if (AppliteUtils.fileIsExists((String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_URL, "")) &&
-                System.currentTimeMillis() / 1000 > (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, 0L))
-            AppliteUtils.delFile((String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_URL, ""));
+        if (AppliteUtils.fileIsExists(path) && time > end_time)
+            AppliteUtils.delFile(path);
     }
 
     /**
@@ -698,19 +712,16 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
-                if (mShuttingdown) {
-                    return;
-                }
                 LogUtils.i(TAG, "LOGO网络请求成功，reuslt：" + responseInfo.result);
                 try {
                     JSONObject obj = new JSONObject(responseInfo.result);
                     int app_key = obj.getInt("app_key");
-                    long NextTime = obj.getLong("nexttime");
+                    long NextTime = obj.getLong("nexttime") * 1000;
                     long ShowTime = obj.getInt("i_staytime") * 1000;
                     String BigImgUrl = obj.getString("i_biglogourl");
                     String SmallImgUrl = obj.getString("i_smalllogourl");
-                    long StartTime = obj.getLong("limit_starttime");
-                    long EndTime = obj.getLong("limit_endtime");
+                    long StartTime = obj.getLong("limit_starttime") * 1000;
+                    long EndTime = obj.getLong("limit_endtime") * 1000;
                     AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_NEXT_TIME, NextTime);
                     AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_SHOW_TIME, ShowTime);
                     AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_START_SHOW_TIME, StartTime);
@@ -726,9 +737,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
 
             @Override
             public void onFailure(HttpException e, String s) {
-                if (mShuttingdown) {
-                    return;
-                }
                 LogUtils.e(TAG, "LOGO网络请求失败：" + s);
             }
         });
