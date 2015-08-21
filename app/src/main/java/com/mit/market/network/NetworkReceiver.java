@@ -141,7 +141,7 @@ public class NetworkReceiver extends BroadcastReceiver {
                 int time = Integer.parseInt(date.substring(0, 2)) * 60 * 60 + Integer.parseInt(date.substring(3, 5)) * 60 + Integer.parseInt(date.substring(6, 8));
                 int time_start = Integer.parseInt(wify_update_start.substring(0, 2)) * 60 * 60 + Integer.parseInt(wify_update_start.substring(3, 5)) * 60 + Integer.parseInt(wify_update_start.substring(6, 8));
                 int time_end = Integer.parseInt(wify_update_end.substring(0, 2)) * 60 * 60 + Integer.parseInt(wify_update_end.substring(3, 5)) * 60 + Integer.parseInt(wify_update_end.substring(6, 8));
-                LogUtils.i(TAG, "当前时间：" + time + "--------自动更新时段：" + time_start + "--" + time_end);
+                LogUtils.i(TAG, "当前时间：" + time + "--------自动更新时段：" + wify_update_start + "--" + wify_update_end);
                 if (time > time_start && time < time_end)
                     downloadAll();
             }
