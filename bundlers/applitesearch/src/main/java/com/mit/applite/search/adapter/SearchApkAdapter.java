@@ -115,11 +115,7 @@ public class SearchApkAdapter extends BaseAdapter {
                             break;
                     }
                 } else {
-                    try {
-                        mActivity.startActivity(implAgent.getActionIntent(vh.implInfo));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    implAgent.startActivity(vh.implInfo);
                 }
             }
         });

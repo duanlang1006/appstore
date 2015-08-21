@@ -563,7 +563,27 @@ public class ImplAgent extends Observable {
         return descText;
     }
 
-    public Intent getActionIntent(ImplInfo implInfo) {
+    public boolean startActivity(ImplInfo implInfo){
+        boolean ret = true;
+        Intent intent = getActionIntent(implInfo);
+        switch(getAction(implInfo)){
+            case ImplInfo.ACTION_INSTALL:
+                MitMobclickAgent.onEvent(mContext, "impl_startActivity_InstallApk");
+                break;
+            case ImplInfo.ACTION_OPEN:
+                MitMobclickAgent.onEvent(mContext, "impl_startActivity_OpenApk");
+                break;
+        }
+        try {
+            mContext.startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            ret = false;
+        }
+        return ret;
+    }
+
+    private Intent getActionIntent(ImplInfo implInfo) {
         Intent actionIntent = null;
         if (null == implInfo) {
             return actionIntent;

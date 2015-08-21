@@ -51,16 +51,12 @@ import com.mit.applite.search.utils.KeyBoardUtils;
 import com.mit.applite.search.utils.SearchUtils;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
-import com.umeng.analytics.MobclickAgent;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SearchFragment extends OSGIBaseFragment implements View.OnClickListener, SearchApkAdapter.UpdateInatsllButtonText, HotWordAdapter.ClickHotWordItemPostlistener {
 
@@ -188,7 +184,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
     }
 
     @Override
@@ -227,7 +222,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onResume() {
         super.onResume();
-        MobclickAgent.onPageStart("SearchFragment"); //统计页面
 
 //        getView().setFocusableInTouchMode(true);
 //        getView().requestFocus();
@@ -255,7 +249,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onPause() {
         super.onPause();
-        MobclickAgent.onPageEnd("SearchFragment");
         closeKeybord();
     }
 

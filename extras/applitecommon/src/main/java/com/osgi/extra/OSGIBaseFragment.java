@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mit.mitupdatesdk.MitMobclickAgent;
+
 /**
  * Created by hxd on 15-7-30.
  */
@@ -32,6 +34,45 @@ public class OSGIBaseFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        String className = this.getClass().getSimpleName();
+        if (!"HomePageFragment".equals(className)
+                && !"HomePageListFragment".equals(className)
+                && !"GuideFragment".equals(className)) {
+            MitMobclickAgent.onEvent(mActivity, className + "_onCreate");
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        String className = this.getClass().getSimpleName();
+        if (!"HomePageFragment".equals(className)
+                && !"HomePageListFragment".equals(className)
+                && !"GuideFragment".equals(className)) {
+            MitMobclickAgent.onPageStart(className);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        String className = this.getClass().getSimpleName();
+        if (!"HomePageFragment".equals(className)
+                && !"HomePageListFragment".equals(className)
+                && !"GuideFragment".equals(className)) {
+            MitMobclickAgent.onPageEnd(className);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        String className = this.getClass().getSimpleName();
+        if (!"HomePageFragment".equals(className)
+                && !"HomePageListFragment".equals(className)
+                && !"GuideFragment".equals(className)) {
+            MitMobclickAgent.onEvent(mActivity, className + "_onDestroy");
+        }
     }
 
     @Override

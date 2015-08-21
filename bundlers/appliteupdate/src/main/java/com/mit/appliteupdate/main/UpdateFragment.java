@@ -38,8 +38,6 @@ import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
-import com.umeng.analytics.MobclickAgent;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -87,7 +85,6 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHttpUtils = new HttpUtils();
-        MitMobclickAgent.onEvent(mActivity, "toUpdateFragment");
     }
 
     @Override
@@ -103,7 +100,6 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onResume() {
         super.onResume();
-        MobclickAgent.onPageStart("UpdateFragment"); //统计页面
 //        getView().setFocusableInTouchMode(true);
 //        getView().requestFocus();
 //        getView().setOnKeyListener(new View.OnKeyListener() {
@@ -122,7 +118,11 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onPause() {
         super.onPause();
-        MobclickAgent.onPageEnd("UpdateFragment");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
@@ -130,12 +130,11 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         super.onDetach();
     }
 
-
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.update_all_update) {
             if (!mDataContents.isEmpty()) {
-                MitMobclickAgent.onEvent(mActivity, "clickAllUpdate");
+                MitMobclickAgent.onEvent(mActivity, "onClickButtonAllUpdate");
                 DataBean data = null;
                 for (int i = 0; i < mDataContents.size(); i++) {
                     data = mDataContents.get(i);

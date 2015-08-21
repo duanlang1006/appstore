@@ -44,7 +44,6 @@ import com.google.gson.Gson;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
-import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
@@ -97,6 +96,28 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private boolean refreshflag;
     private String whichPage;
 
+    private ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
+        private int prePosition = -1;
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            if (prePosition != position) {
+                LogUtils.d(TAG,"onPageScrolled"+position);
+                prePosition = position;
+                MitMobclickAgent.onEvent(mActivity, HomePageListFragment.class.getSimpleName() + position + "_onScrolled");
+            }
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
+
     Runnable mRefreshRunnable = new Runnable() {
         @Override
         public void run() {
@@ -108,7 +129,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                     mViewPager.setVisibility(View.VISIBLE);
                     mSectionsPagerAdapter.notifyDataSetChanged();
                 }
-            mPagerSlidingTabStrip.setViewPager(mViewPager);
+                mPagerSlidingTabStrip.setViewPager(mViewPager);
+                mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
             }
         }
     };
@@ -134,12 +156,11 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         super.onCreate(savedInstanceState);
         LogUtils.d(TAG, "onCreate savedInstanceState : " + savedInstanceState);
         if (null == mCategory) {
-            MitMobclickAgent.onEvent(mActivity, "toMainFragment");
-            whichPage = "HomePageFragment";
+            whichPage = this.getClass().getSimpleName();
         }else{
-            MitMobclickAgent.onEvent(mActivity, "toMainFragment_"+mCategory);
-            whichPage = "HomePageFragment_"+mCategory;
+            whichPage = this.getClass().getSimpleName()+"_"+mCategory;
         }
+        MitMobclickAgent.onEvent(mActivity, whichPage+"_onCreate");
     }
 
     @Override
@@ -164,6 +185,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     public void onDestroy(){
         super.onDestroy();
         LogUtils.i(TAG, "onDestroy");
+        MitMobclickAgent.onEvent(mActivity, whichPage+"_onDestroy");
     }
 
     @Override
@@ -223,7 +245,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             mViewPager.setVisibility(View.VISIBLE);
         }
         mPagerSlidingTabStrip.setViewPager(mViewPager);
-
+        mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         popupWindowPost();
 
         return rootView;
@@ -232,8 +254,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onResume() {
         super.onResume();
-        MobclickAgent.onPageStart(whichPage); //统计页面
-
+        MitMobclickAgent.onPageStart(whichPage); //统计页面
         getView().setFocusableInTouchMode(true);
         getView().requestFocus();
         getView().setOnKeyListener(new View.OnKeyListener() {
@@ -252,7 +273,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onPause() {
         super.onPause();
-        MobclickAgent.onPageEnd(whichPage);
+        MitMobclickAgent.onPageEnd(whichPage);
     }
 
     @Override
@@ -460,7 +481,6 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             }
         }else if (item.getItemId() == R.id.action_search){
             ((OSGIServiceHost) mActivity).jumptoSearch(true);
-            MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
             return true;
         }else if (item.getItemId() == R.id.action_dm){
             ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
@@ -475,7 +495,6 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             ((OSGIServiceHost) mActivity).jumptoPersonal(true);
         }else if (v.getId() == R.id.action_search){
             ((OSGIServiceHost) mActivity).jumptoSearch(true);
-            MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
         }
     }
 
@@ -594,7 +613,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             OSGIServiceHost host = (OSGIServiceHost)mActivity;
             Fragment fg = host.newFragment(Constant.OSGI_SERVICE_MAIN_FRAGMENT,
                     HomePageListFragment.class.getName(),
-                    HomePageListFragment.newBundle(mPageData.get(position),false));
+                    HomePageListFragment.newBundle(mPageData.get(position),position,false));
             return fg;
         }
 
