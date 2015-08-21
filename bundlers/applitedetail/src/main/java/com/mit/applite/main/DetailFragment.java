@@ -157,19 +157,19 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onResume() {
         super.onResume();
         MobclickAgent.onPageStart("DetailFragment"); //统计页面
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-                    // handle back button
-                    getFragmentManager().popBackStackImmediate();
-                    return true;
-                }
-                return false;
-            }
-        });
+//        getView().setFocusableInTouchMode(true);
+//        getView().requestFocus();
+//        getView().setOnKeyListener(new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+//                    // handle back button
+//                    getFragmentManager().popBackStackImmediate();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
     }
 
     public void onPause() {

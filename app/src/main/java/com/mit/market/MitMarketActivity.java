@@ -175,7 +175,9 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     public boolean onKeyDown(int keyCode, KeyEvent event)  {
         if (keyCode == KeyEvent.KEYCODE_BACK) { //按下的如果是BACK，同时没有重复
             //do something here
-            exit();
+            if(!getSupportFragmentManager().popBackStackImmediate()){
+                exit();
+            }
             return true;
         }
 

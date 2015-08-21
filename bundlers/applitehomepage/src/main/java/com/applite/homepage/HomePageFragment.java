@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.internal.view.SupportMenu;
 import android.support.v4.internal.view.SupportMenuItem;
@@ -478,8 +479,6 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         }
     }
 
-
-
     private void initActionBar(){
         try {
 //            ViewGroup customView = (ViewGroup)mInflater.inflate(R.layout.actionbar_custom,new LinearLayout(mActivity),false);
@@ -572,7 +571,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         });
     }
 
-    class SectionsPagerAdapter extends FragmentStatePagerAdapter {
+    class SectionsPagerAdapter extends FragmentPagerAdapter {
         private static final String TAG = "homepage_adapter";
         private int mChildCount = 0;
 
