@@ -93,6 +93,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private Button mRetrybtn;
     private View offnetImg;
     private boolean refreshflag;
+    private String whichPage;
 
     Runnable mRefreshRunnable = new Runnable() {
         @Override
@@ -130,6 +131,13 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LogUtils.d(TAG, "onCreate savedInstanceState : " + savedInstanceState);
+        if (null == mCategory) {
+            MitMobclickAgent.onEvent(mActivity, "toMainFragment");
+            whichPage = "HomePageFragment";
+        }else{
+            MitMobclickAgent.onEvent(mActivity, "toMainFragment_"+mCategory);
+            whichPage = "HomePageFragment_"+mCategory;
+        }
     }
 
     @Override
@@ -222,13 +230,13 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onResume() {
         super.onResume();
-        MobclickAgent.onPageStart("HomePageFragment"); //统计页面
+        MobclickAgent.onPageStart(whichPage); //统计页面
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        MobclickAgent.onPageEnd("HomePageFragment");
+        MobclickAgent.onPageEnd(whichPage);
     }
 
     @Override
@@ -502,8 +510,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         LogUtils.i(TAG, "httpRequest");
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.put("packagename", "com.android.applite1.0");
-//        params.put("packagename", mActivity.getPackageName());
+//        params.put("packagename", "com.android.applite1.0");
+        params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
         if (null == mCategory) {
             params.put("type", "homepage");

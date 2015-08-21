@@ -57,8 +57,9 @@
     <ListView
         android:id="@+id/update_listview"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:background="@color/background_main"
+        android:divider="@color/transparent"
         android:visibility="gone"></ListView>
 
 
@@ -89,19 +90,19 @@
             android:textColor="#ff959595"
             android:textSize="16sp" />
 
-        <Button
+        <TextView
             android:id="@+id/update_post_button"
-            android:layout_width="80dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/no_network_text"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
-            android:background="@color/white"
+            android:background="@drawable/item_button_normal"
+            android:padding="8dp"
             android:text="点击重新请求"
             android:textColor="#ff585858"
             android:textSize="14sp" />
-        android:background="@drawable/item_button_normal" />
     </RelativeLayout>
 
 

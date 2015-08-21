@@ -6,10 +6,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
 import android.view.Window;
+import android.widget.Toast;
+
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
@@ -17,6 +20,7 @@ import com.applite.dm.DownloadPagerFragment;
 import com.applite.homepage.HomePageFragment;
 import com.applite.homepage.HomePageListFragment;
 import com.applite.homepage.PersonalFragment;
+import com.mit.applite.main.DetailFragment;
 import com.mit.applite.search.main.SearchFragment;
 import com.mit.appliteupdate.main.UpdateFragment;
 import com.applite.sharedpreferences.AppliteSPUtils;
@@ -28,16 +32,19 @@ import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceClient;
 import com.osgi.extra.OSGIServiceHost;
 import com.umeng.analytics.MobclickAgent;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public class MitMarketActivity extends ActionBarActivity implements OSGIServiceHost{
+public class MitMarketActivity extends ActionBarActivity implements OSGIServiceHost {
     private static final String TAG = "applite_MitMarketActivity";
 
     private boolean personal_flag = false;
+    Toast toast;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        LogUtils.d(TAG,"onCreate:"+savedInstanceState);
+        LogUtils.d(TAG, "onCreate:" + savedInstanceState);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mit_market);
 
@@ -48,20 +55,20 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         MobclickAgent.updateOnlineConfig(this);
         MitUpdateAgent.setDebug(true);
         MitUpdateAgent.update(this);
-        LogUtils.d(TAG,"onCreate take "+(System.currentTimeMillis()-current)+" ms");
+        LogUtils.d(TAG, "onCreate take " + (System.currentTimeMillis() - current) + " ms");
 
         registerClients();
 
         FragmentManager fgm = getSupportFragmentManager();
         Fragment fg = fgm.findFragmentById(R.id.container);
-        if (null == fg ){
+        if (null == fg) {
             Intent intent = getIntent();
-            if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))){
-                jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,null,
-                        GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,null),false);
-            }else {
-                jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,null,
-                        GuideFragment.newBundles(Constant.OSGI_SERVICE_MAIN_FRAGMENT,null,null),false);
+            if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))) {
+                jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null,
+                        GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, null, null, false, false), false);
+            } else {
+                jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null,
+                        GuideFragment.newBundles(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false, false), false);
             }
 //            fgm.beginTransaction()
 //                    .replace(R.id.container,fg,Constant.OSGI_SERVICE_LOGO_FRAGMENT)
@@ -134,12 +141,10 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        setIntent(intent);
-
-        FragmentManager fgm = getSupportFragmentManager();
-        if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))){
-            jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,null,
-                    GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,null,null),
+        if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))) {
+            LogUtils.i(TAG, "得到点击通知栏发过来的意图");
+            jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null,
+                    GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, null, null, false,true),
                     false);
         }
     }
@@ -147,7 +152,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        LogUtils.d(TAG,"onSaveInstanceState");
+        LogUtils.d(TAG, "onSaveInstanceState");
     }
 
     @Override
@@ -157,11 +162,36 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         IconCache.getInstance(this).flush();
     }
 
+//    @Override
+//    public void notify(Bundle params) {
+//        if (null != params){
+//            int number = params.getInt("number");
+//            UpdateNotification.getInstance().showNot(MitMarketActivity.this, String.valueOf(number));
+//        }
+//    }
+
+
     @Override
-    public void notify(Bundle params) {
-        if (null != params){
-            int number = params.getInt("number");
-            UpdateNotification.getInstance().showNot(MitMarketActivity.this, String.valueOf(number));
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) { //按下的如果是BACK，同时没有重复
+            //do something here
+            if (!getSupportFragmentManager().popBackStackImmediate()) {
+                exit();
+            }
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private long clickTime = 0; //记录第一次点击的时间
+
+    private void exit() {
+        if ((System.currentTimeMillis() - clickTime) > 2000) {
+            Toast.makeText(getApplicationContext(), "再按一次退出应用商店", Toast.LENGTH_SHORT).show();
+            clickTime = System.currentTimeMillis();
+        } else {
+            this.finish();
         }
     }
 
@@ -173,8 +203,8 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         FragmentManager fgmgr = getSupportFragmentManager();
         FragmentTransaction ft = fgmgr.beginTransaction();
 
-        boolean result = fgmgr.popBackStackImmediate(targetService,FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        LogUtils.d(TAG, "popBackStackImmediate("+targetService+") is "+result);
+        boolean result = fgmgr.popBackStackImmediate(targetService, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        LogUtils.d(TAG, "popBackStackImmediate(" + targetService + ") is " + result);
 
         OSGIBaseFragment newFragment = null;
 //        if (Constant.OSGI_SERVICE_LOGO_FRAGMENT == targetService){
@@ -186,11 +216,15 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 //        ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
         Fragment current = fgmgr.findFragmentById(R.id.container);
         if (null != current) {
-            ft.hide(current);
+            if (!addToBackStack) {
+                ft.remove(current);
+            } else {
+                ft.hide(current);
+            }
         }
         if (!newFragment.isAdded()) {
             ft.add(R.id.container, newFragment);
-        }else{
+        } else {
             ft.show(newFragment);
         }
         if (addToBackStack) {
@@ -201,29 +235,32 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     @Override
     public Fragment newFragment(String whichService, String whichFragment, Bundle params) {
-        return OSGIServiceClient.getInstance().newOSGIFragment(whichService,whichFragment,params);
+        return OSGIServiceClient.getInstance().newOSGIFragment(whichService, whichFragment, params);
     }
 
     @Override
-    public void jumptoHomepage(String category, String name,boolean addToBackstack) {
+    public void jumptoHomepage(String category, String name, boolean addToBackstack) {
         jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT + "#" + category,
                 HomePageFragment.class.getName(),
                 HomePageFragment.newBundle(category, name), addToBackstack);
     }
 
     @Override
-    public void jumptoDetail(String packageName,String name,String imgUrl,boolean addToBackstack) {
-
+    public void jumptoDetail(String packageName, String name, String imgUrl, boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
+                DetailFragment.class.getName(),
+                DetailFragment.newBundle(packageName, name, imgUrl),
+                true);
     }
 
     @Override
-    public void jumptoDetail(String httpUrl,boolean addToBackstack) {
-
+    public void jumptoDetail(String httpUrl, boolean addToBackstack) {
+        //TODO
     }
 
     @Override
-    public void jumptoTopic(String key,String name,int step,String datatype,boolean addToBackstack) {
-        jumpto(Constant.OSGI_SERVICE_TOPIC_FRAGMENT+"#"+key,
+    public void jumptoTopic(String key, String name, int step, String datatype, boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_TOPIC_FRAGMENT + "#" + key,
                 HomePageListFragment.class.getName(),
                 HomePageListFragment.newBundle(key, name, step, datatype),
                 addToBackstack);
@@ -233,34 +270,37 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     public void jumptoSearch(boolean addToBackstack) {
         jumpto(Constant.OSGI_SERVICE_SEARCH_FRAGMENT,
                 SearchFragment.class.getName(),
-                null,addToBackstack);
+                null, addToBackstack);
     }
 
     @Override
     public void jumptoPersonal(boolean addToBackstack) {
         jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT,
                 PersonalFragment.class.getName(),
-                null,addToBackstack);
+                null, addToBackstack);
     }
 
     @Override
     public void jumptoUpdate(boolean addToBackstack) {
         jumpto(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,
                 UpdateFragment.class.getName(),
-                null,addToBackstack);
+                null, addToBackstack);
     }
 
     @Override
     public void jumptoDownloadManager(boolean addToBackstack) {
         jumpto(Constant.OSGI_SERVICE_DM_FRAGMENT,
                 DownloadPagerFragment.class.getName(),
-                null,true);
+                null, true);
     }
 
     @Override
     public void jumptoMylife(boolean addToBackstack) {
         jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT,
-                GuideFragment.class.getName(),null,addToBackstack);
+                GuideFragment.class.getName(),
+                GuideFragment.newBundles(null, null, null, true, false),
+                addToBackstack);
+        MitMobclickAgent.onEvent(this, "clickOneDay");
     }
 
     private void setOverflowShowingAlways() {
@@ -274,7 +314,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         }
     }
 
-    private void registerClients(){
+    private void registerClients() {
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_MAIN_FRAGMENT, "com.applite.homepage.HomePageFragment");
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_TOPIC_FRAGMENT, "com.applite.homepage.HomePageListFragment");
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_DETAIL_FRAGMENT, "com.mit.applite.main.DetailFragment");
@@ -284,7 +324,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_LOGO_FRAGMENT, "com.mit.main.GuideFragment");
     }
 
-    private void unregisterClients(){
+    private void unregisterClients() {
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_MAIN_FRAGMENT);
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_TOPIC_FRAGMENT);
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_DETAIL_FRAGMENT);

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.google.gson.Gson;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
+import com.umeng.analytics.MobclickAgent;
 
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
@@ -58,6 +60,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     private boolean isend;
     private boolean sendhttpreq = true;
+    private String whichPage;
 
     public static Bundle newBundle(String s_key, String s_name, int step, String s_datatype){
         Bundle bundle = new Bundle();
@@ -105,6 +108,10 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                 mData.setSpecialtopic_data(null);
                 showBack = true;
             }
+        }
+        if (showBack && null != mData.getS_key()){
+            MitMobclickAgent.onEvent(mActivity, "toTopicFragment_"+mData.getS_key());
+            whichPage = "TopicFragment_"+mData.getS_key();
         }
     }
 
@@ -155,6 +162,22 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         super.onHiddenChanged(hidden);
         if (!hidden){
             initActionBar();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (null != whichPage && !TextUtils.isEmpty(whichPage)) {
+            MobclickAgent.onPageStart(whichPage); //统计页面
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (null != whichPage && !TextUtils.isEmpty(whichPage)) {
+            MobclickAgent.onPageEnd(whichPage);
         }
     }
 

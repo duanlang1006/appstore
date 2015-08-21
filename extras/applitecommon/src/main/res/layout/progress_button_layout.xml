@@ -6,7 +6,8 @@
     android:layout_height="40dp"
     app:progressButtonBackground="@color/progress_background"
     app:progressButtonForeground="@color/progress_foreground"
+    app:progressButtonText="@string/progress_button_text_install"
     app:progressButtonMax="100"
-    app:progressButtonProgress="0"
+    app:progressButtonProgress="100"
     app:progressButtonTextSize="20sp"
     app:progressButtonTextcolor="@color/progress_textcolor" />

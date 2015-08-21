@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -85,9 +86,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private BitmapUtils mBitmapUtil;
     private String mDownloadUrl;
     private LinearLayout mDataLayout;
-    private LinearLayout mLoadLayout;
-    private ImageView mLoadView;
-    private Animation LoadingAnimation;
+    //    private LinearLayout mLoadLayout;
+//    private ImageView mLoadView;
+//    private Animation LoadingAnimation;
     private TextView mUpdateLogView;
     private String mDescription;
     private String mUpdateLog;
@@ -104,20 +105,15 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private GridView mGridView;
     private BitmapUtils bitmapUtils;
     private List<View> mDetailImgList = new ArrayList<View>();
+    private LinearLayout mHorDefaultLayout;
 
-//    public static OSGIBaseFragment newInstance(OSGIServiceHost host,String packageName,String name,String imgUrl){
-//        Fragment fg = null;
-//        if (null != host){
-//            Bundle b = new Bundle();
-//            b.putString("packageName",packageName);
-//            b.putString("name",name);
-//            b.putString("imgUrl",imgUrl);
-//            fg = host.newFragment(
-//                    BundleContextFactory.getInstance().getBundleContext(),
-//                    Constant.OSGI_SERVICE_DETAIL_FRAGMENT,DetailFragment.class.getName(),b);
-//        }
-//        return fg;
-//    }
+    public static Bundle newBundle(String packageName, String name, String imgUrl) {
+        Bundle b = new Bundle();
+        b.putString("packageName", packageName);
+        b.putString("name", name);
+        b.putString("imgUrl", imgUrl);
+        return b;
+    }
 
     public DetailFragment() {
         super();
@@ -161,6 +157,21 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onResume() {
         super.onResume();
         MobclickAgent.onPageStart("DetailFragment"); //统计页面
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    // handle back button
+                    if (!getFragmentManager().popBackStackImmediate()){
+                        mActivity.finish();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     public void onPause() {
@@ -202,13 +213,13 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      */
     private void initView() {
         //加载中控件
-        mLoadLayout = (LinearLayout) rootView.findViewById(R.id.detail_loading_layout);
-        mLoadView = (ImageView) rootView.findViewById(R.id.detail_loading_img);
-        //旋转动画
-        LoadingAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.loading);
-        LinearInterpolator lin = new LinearInterpolator();
-        LoadingAnimation.setInterpolator(lin);
-        mLoadView.startAnimation(LoadingAnimation);
+//        mLoadLayout = (LinearLayout) rootView.findViewById(R.id.detail_loading_layout);
+//        mLoadView = (ImageView) rootView.findViewById(R.id.detail_loading_img);
+//        //旋转动画
+//        LoadingAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.loading);
+//        LinearInterpolator lin = new LinearInterpolator();
+//        LoadingAnimation.setInterpolator(lin);
+//        mLoadView.startAnimation(LoadingAnimation);
 
         //下载按钮
         LinearLayout mDownloadLayout = (LinearLayout) rootView.findViewById(R.id.detail_download_layout);
@@ -229,7 +240,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         mOpenUpdateLogView = (ImageView) rootView.findViewById(R.id.detail_open_update_log);
         mUpdateLogView = (TextView) rootView.findViewById(R.id.detail_update_log);
 
+        mHorDefaultLayout = (LinearLayout) rootView.findViewById(R.id.detail_hor_default_layout);
+
         mGridView = (GridView) rootView.findViewById(R.id.detail_gridview);
+        mGridView.setFocusable(false);
 
         mName1View.setText(mApkName);
 
@@ -282,8 +296,14 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main_detail, menu);
+        LogUtils.d(TAG,"onCreateOptionsMenu");
         MenuItem item = menu.findItem(R.id.action_search);
+        if (null != item){
+            return;
+        }
+
+        inflater.inflate(R.menu.menu_main_detail, menu);
+        item = menu.findItem(R.id.action_search);
         if (null != item) {
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
@@ -299,10 +319,16 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     @Override
+    public void onDestroyOptionsMenu() {
+        LogUtils.d(TAG,"onDestroyOptionsMenu");
+        super.onDestroyOptionsMenu();
+    }
+
+    @Override
     public void onClick(View v) {
         if (v.getId() == R.id.refresh_btn) {
             no_network.setVisibility(View.GONE);
-            mLoadLayout.setVisibility(View.VISIBLE);
+//            mLoadLayout.setVisibility(View.VISIBLE);
             post(mPackageName);
         } else if (v.getId() == R.id.detail_content || v.getId() == R.id.detail_open_introduce_content) {
             if (CONTENT_STATE == COLLAPSIBLE_STATE_SHRINKUP) {
@@ -354,7 +380,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             public void onFailure(HttpException e, String s) {
                 LogUtils.e(TAG, "应用详情网络请求失败:" + s);
                 // 这里设置没有网络时的图片
-                mLoadLayout.setVisibility(View.GONE);
+//                mLoadLayout.setVisibility(View.GONE);
                 mDataLayout.setVisibility(View.GONE);
                 no_network.setVisibility(View.VISIBLE);
             }
@@ -416,7 +442,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
                     mName1View.setText(mName);
                     mXingView.setRating(Float.parseFloat(xing) / 2.0f);
-                    mBitmapUtil.display(mApkImgView, mImgUrl);
+//                    mBitmapUtil.display(mApkImgView, mImgUrl);
                     mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size) + " | " + developer);
 
                     LogUtils.i(TAG, "应用介绍：" + mDescription);
@@ -491,6 +517,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             }
             mDetailImgList.clear();
         }
+        mHorDefaultLayout.setVisibility(View.GONE);
         for (int i = 0; i < mViewPagerUrlList.length; i++) {
             LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
             final View child = mActivity.getLayoutInflater().inflate(R.layout.item_detail_viewpager_img, container, false);
@@ -513,18 +540,19 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 }
             });
         }
-        mLoadLayout.setVisibility(View.GONE);
+//        mLoadLayout.setVisibility(View.GONE);
         mDataLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void refreshDetail(SimilarBean bean) {
-        mLoadLayout.setVisibility(View.VISIBLE);
-        mApkName = bean.getmName();
-        mPackageName = bean.getmPackageName();
-        mImgUrl = bean.getmImgUrl();
-        initActionBar();
-        post(bean.getmPackageName());
+//        mLoadLayout.setVisibility(View.VISIBLE);
+//        mApkName = bean.getmName();
+//        mPackageName = bean.getmPackageName();
+//        mImgUrl = bean.getmImgUrl();
+//        initActionBar();
+//        post(bean.getmPackageName());
+        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getmPackageName(), bean.getmName(), bean.getmImgUrl(), true);
     }
 
     class DetailImplCallback implements ImplChangeCallback {

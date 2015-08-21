@@ -15,6 +15,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +32,7 @@ import com.mit.impl.ImplLog;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
+import com.umeng.analytics.MobclickAgent;
 
 import java.lang.reflect.Field;
 import java.util.Observable;
@@ -51,7 +53,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     public void onAttach(Activity activity) {
         ImplLog.d(TAG, "onAttach," + this);
         super.onAttach(activity);
-        ImplAgent.getInstance(mActivity).addObserver(this);
     }
 
     @Override
@@ -73,21 +74,51 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 //        mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         initActionBar(mPagerSlidingTabStrip);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
+        ImplAgent.getInstance(mActivity).addObserver(this);
         return rootView;
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd("DownloadListFragment");
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        ImplLog.d(TAG, "onDetach,"+this);
-        ImplAgent.getInstance(mActivity).deleteObserver(this);
+        ImplLog.d(TAG, "onDetach," + this);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart("DownloadListFragment"); //统计页面
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    // handle back button
+                    if (!getFragmentManager().popBackStackImmediate()) {
+                        mActivity.finish();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         destoryView = true;
         ImplLog.d(TAG, "onDestroyView," + this + "," + destoryView);
+        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
     @Override
@@ -129,6 +160,9 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         super.onHiddenChanged(hidden);
         if (!hidden){
             initActionBar(mPagerSlidingTabStrip);
+            ImplAgent.getInstance(mActivity).addObserver(this);
+        }else{
+            ImplAgent.getInstance(mActivity).deleteObserver(this);
         }
     }
 
@@ -149,7 +183,9 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     @Override
     public void update(Observable observable, Object data) {
-//        ImplInfo info = (ImplInfo)data;
+        if (null == mViewPager || null == mViewPager.getAdapter()) {
+            return;
+        }
         LogUtils.d(TAG,"update");
         mViewPager.getAdapter().notifyDataSetChanged();
     }

@@ -17,4 +17,9 @@
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
 
+    <string name="downloading">Downloading</string>
+    <string name="to_home">To Home</string>
+    <string name="one_click_install">One Click Install</string>
+    <string name="apk_has_download">Application has been download</string>
+
 </resources>

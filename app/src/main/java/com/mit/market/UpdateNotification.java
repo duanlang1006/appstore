@@ -22,7 +22,6 @@ import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadFrom;
-import com.mit.applite.main.MainActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -85,8 +84,8 @@ public class UpdateNotification {
         if (null == mManager) {
             mManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         }
-        Intent mIntent = new Intent(context, context.getClass());
-        mIntent.putExtra(TAG, Constant.UPDATE_FRAGMENT_NOT);
+        Intent mIntent = new Intent(context, MitMarketActivity.class);
+        mIntent.putExtra("update", Constant.UPDATE_FRAGMENT_NOT);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, UUID.randomUUID().hashCode(), mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = new Notification();
         notification.icon = R.drawable.ic_launcher;
@@ -180,6 +179,7 @@ public class UpdateNotification {
             }
             notification.contentView.setTextViewText(R.id.not_text_etc, "…");
         }
+        notification.contentIntent = pendingIntent;
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
         mManager.notify(NOTIFICATION_ID, notification);
     }
