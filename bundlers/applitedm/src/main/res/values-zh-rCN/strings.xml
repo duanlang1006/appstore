@@ -7,4 +7,6 @@
     <string name="action_search">搜索</string>
     <string name="action_pause_all">全部暂停</string>
     <string name="action_download_all">全部开始</string>
+    <string name="cancel_btn">取消</string>
+    <string name="allpick_btn">全选</string>
 </resources>

@@ -7,4 +7,8 @@
     <color name="download_item_devider">#ee909990</color>
     <color name="download_button_pressed">#ff03db57</color>
     <color name="download_button_normal">#ff000000</color>
+    <color name="lightslategrey">#ff778899</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="darkorange">#FFFF8C00</color>
+    <color name="snow">#FFFFFAFA</color>
 </resources>

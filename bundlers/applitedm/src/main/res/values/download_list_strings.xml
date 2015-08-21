@@ -20,7 +20,7 @@
     <string name="delete_download">Delete</string>
     <string name="detail_download">Detail</string>
     <string name="apk_version">version:%1$s</string>
-    <string name="share_btn">分享选中应用</string>
-    <string name="delete_btn">删除下载记录</string>
+    <string name="share_btn">分享</string>
+    <string name="delete_btn">删除</string>
 </resources>
     

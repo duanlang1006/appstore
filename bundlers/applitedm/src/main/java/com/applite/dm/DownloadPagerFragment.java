@@ -21,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
@@ -37,12 +38,13 @@ import java.util.Observable;
 import java.util.Observer;
 
 
-public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener,Observer {
+public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener, Observer {
     final static String TAG = "applite_dm";
     private ViewPager mViewPager;
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
     private boolean destoryView = false;
     private LayoutInflater mInflater;
+//    private ActionBar actionBar; //声明ActionBar
 
     public DownloadPagerFragment() {
         super();
@@ -63,13 +65,14 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ImplLog.d(TAG, "onCreateView,"+this);
+        ImplLog.d(TAG, "onCreateView," + this);
+//        actionBar = mActivitygetActionBar(); //得到ActionBar
         destoryView = false;
         mInflater = inflater;
         View rootView = mInflater.inflate(R.layout.fragment_download_pager, container, false);
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
         mViewPager.setAdapter(new SectionsPagerAdapter(getChildFragmentManager()));
-        mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,container,false);
+        mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity, container, false);
 //        mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         initActionBar(mPagerSlidingTabStrip);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
@@ -79,7 +82,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onDetach() {
         super.onDetach();
-        ImplLog.d(TAG, "onDetach,"+this);
+        ImplLog.d(TAG, "onDetach," + this);
         ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
@@ -109,25 +112,28 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main_dm,menu);
+        inflater.inflate(R.menu.menu_main_dm, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.dm_action_pause_all) {
             ImplAgent.getInstance(mActivity.getApplicationContext()).pauseAll();
+            Toast.makeText(mActivity.getApplicationContext(), "dm_action_pause_all", Toast.LENGTH_SHORT).show();
             return true;
-        }else if (item.getItemId() == R.id.dm_action_resume_all){
+        } else if (item.getItemId() == R.id.dm_action_resume_all) {
+            Toast.makeText(mActivity.getApplicationContext(), "dm_action_resume_all", Toast.LENGTH_SHORT).show();
             ImplAgent.getInstance(mActivity.getApplicationContext()).resumeAll();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (!hidden){
+        if (!hidden) {
             initActionBar(mPagerSlidingTabStrip);
         }
     }
@@ -135,13 +141,13 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onClick(View v) {
         FragmentManager fgm = getFragmentManager();
-        if(v.getId() == R.id.action_back) {
+        if (v.getId() == R.id.action_back) {
             if (null != fgm.getFragments() && fgm.getFragments().size() > 0) {
                 fgm.popBackStack();
             } else {
                 mActivity.finish();
             }
-        }else if (v.getId() == R.id.action_more){
+        } else if (v.getId() == R.id.action_more) {
 
         }
 
@@ -150,11 +156,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void update(Observable observable, Object data) {
 //        ImplInfo info = (ImplInfo)data;
-        LogUtils.d(TAG,"update");
+        LogUtils.d(TAG, "update");
         mViewPager.getAdapter().notifyDataSetChanged();
     }
 
-    private void initActionBar(View tabStrip){
+    private void initActionBar(View tabStrip) {
         try {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
 //            actionBar.setBackgroundDrawable(res.getDrawable(R.drawable.action_bar_bg_light));
@@ -166,7 +172,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             actionBar.setDisplayShowCustomEnabled(true);
             actionBar.setCustomView(tabStrip);
             actionBar.show();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -174,7 +180,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
         int[] tabs = new int[2];
         int mChildCount = 0;
-        FragmentManager mFragmentManager ;
+        FragmentManager mFragmentManager;
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -185,13 +191,13 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            super.destroyItem(container,position,object);
+            super.destroyItem(container, position, object);
         }
 
         @Override
         public Fragment getItem(int position) {
             Fragment fg = null;
-            OSGIServiceHost host = (OSGIServiceHost)mActivity;
+            OSGIServiceHost host = (OSGIServiceHost) mActivity;
             int downloadFlag = Constant.STATUS_PENDING | Constant.STATUS_RUNNING | Constant.STATUS_PAUSED | Constant.STATUS_FAILED;
             if (null != host) {
                 if (R.string.dm_downloaded == tabs[position]) {
@@ -199,11 +205,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                             Constant.OSGI_SERVICE_DM_FRAGMENT,
                             DownloadListFragment.class.getName(),
                             DownloadListFragment.newBundle(~downloadFlag));
-                }else if (R.string.dm_downloading == tabs[position]){
+                } else if (R.string.dm_downloading == tabs[position]) {
                     fg = host.newFragment(
                             Constant.OSGI_SERVICE_DM_FRAGMENT,
                             DownloadListFragment.class.getName(),
-                            DownloadListFragment.newBundle( downloadFlag ));
+                            DownloadListFragment.newBundle(downloadFlag));
                 }
             }
             return fg;
@@ -219,7 +225,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             Resources res = mActivity.getResources();
             try {
                 res = mActivity.getResources();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return res.getString(tabs[position]);
@@ -233,11 +239,19 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
         @Override
         public int getItemPosition(Object object) {
-            if (mChildCount > 0){
-                mChildCount -- ;
+            if (mChildCount > 0) {
+                mChildCount--;
                 return POSITION_NONE;
             }
             return super.getItemPosition(object);
         }
     }
+
+//    private void showActionBar() {
+//        actionBar.show();
+//    }
+//
+//    private void hideActionBar() {
+//        actionBar.hide();
+//    }
 }

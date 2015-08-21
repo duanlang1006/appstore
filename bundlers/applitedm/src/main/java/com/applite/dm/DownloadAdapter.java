@@ -20,20 +20,23 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
+import com.applite.common.LogUtils;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
@@ -52,8 +55,10 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
 
     private BitmapUtils mBitmapHelper;
     private ImplAgent implAgent;
-    private boolean flag_showCheckBox;
+    private boolean flag_showCheckBox = false;
     private boolean[] status;
+    private Animation animaCheckBox;
+    private boolean oldFlag = false;
 
     public DownloadAdapter(Context context, int resource, List<ImplInfo> implInfoList, BitmapUtils bitmapHelper, boolean flag_showCheckBox) {
         super(context, resource, implInfoList);
@@ -62,6 +67,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         implAgent = ImplAgent.getInstance(context.getApplicationContext());
         this.mLayoutId = resource;
         this.flag_showCheckBox = flag_showCheckBox;
+        animaCheckBox = AnimationUtils.loadAnimation(context, R.anim.checkbox_in);
     }
 
     @Override
@@ -77,6 +83,17 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         if (flag_showCheckBox) {
             vh.deleteCheckBox.setVisibility(View.VISIBLE);
             vh.deleteCheckBox.setChecked(status[position]);
+            if (false == oldFlag && true == flag_showCheckBox) {
+                vh.deleteCheckBox.startAnimation(animaCheckBox);
+                if (position == getCount() - 1) {
+                    oldFlag = true;
+                }
+            }
+//            if (status[position]) {
+//                view.setBackgroundColor(Color.LTGRAY);
+//            } else {
+//                view.setBackgroundColor(Color.WHITE);
+//            }
             vh.actionBtn.setVisibility(View.GONE);
 
         } else {
@@ -87,11 +104,11 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
     }
 
     protected int getlen() {
-//        Toast.makeText(mContext, getCount() + "", Toast.LENGTH_SHORT).show();
         return getCount();
     }
 
     protected void resetFlag(boolean flag_showCheckBox) {
+        oldFlag = this.flag_showCheckBox;
         this.flag_showCheckBox = flag_showCheckBox;
     }
 
@@ -208,17 +225,8 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 mBitmapHelper.configDefaultLoadFailedImage(resBitmap);
                 mBitmapHelper.configDefaultLoadingImage(resBitmap);
                 mBitmapHelper.display(iconView, implInfo.getIconUrl());
-
-//                iconView.setImageBitmap(resBitmap);
             }
         }
-//        这里？？？
-//        else
-//
-//        {
-//            iconView.setImageBitmap(resBitmap);
-//        }
-//    }
 
         private void setProgress() {
             progressBar.setIndeterminate(false);

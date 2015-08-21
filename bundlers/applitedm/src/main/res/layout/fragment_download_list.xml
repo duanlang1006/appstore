@@ -9,12 +9,51 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/linear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:background="@color/snow"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/select_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@color/darkorange"
+                android:text="@string/cancel_btn"
+                android:textColor="@color/lightslategrey"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/total"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/select_allpick"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@color/darkorange"
+                android:text="@string/allpick_btn"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
+
         <ListView
             android:id="@android:id/list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/layout_button"
-            android:layout_alignParentTop="true"
+            android:layout_below="@id/linear"
             android:choiceMode="singleChoice"
             android:divider="@color/action_bar_tab_text_color_normal_light"
             android:dividerHeight="1dp" />
@@ -34,29 +73,6 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btnShare"
-                style="@style/DownloadOptButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/share_btn"
-                android:visibility="gone" />
-
-            <Button
-                android:id="@+id/btnNone"
-                android:layout_width="wrap_content"
-                android:layout_height="10dp"
-                android:visibility="gone" />
-
-            <Button
-                android:id="@+id/btnDelete"
-                style="@style/DownloadOptButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/delete_btn"
-                android:visibility="gone" />
-
         </LinearLayout>
     </RelativeLayout>
 </LinearLayout>
