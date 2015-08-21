@@ -1,18 +1,16 @@
 package com.mit.applite.search.main;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,16 +49,12 @@ import com.mit.applite.search.utils.KeyBoardUtils;
 import com.mit.applite.search.utils.SearchUtils;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
-import com.umeng.analytics.MobclickAgent;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SearchFragment extends OSGIBaseFragment implements View.OnClickListener, SearchApkAdapter.UpdateInatsllButtonText, HotWordAdapter.ClickHotWordItemPostlistener {
 
@@ -243,6 +237,15 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        MenuItem item = menu.findItem(R.id.action_search);
+        if (null != item){
+            item.setVisible(false);
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (android.R.id.home == item.getItemId()) {
             closeKeybord();
@@ -253,7 +256,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onPause() {
         super.onPause();
-        MobclickAgent.onPageEnd("SearchFragment");
         closeKeybord();
     }
 

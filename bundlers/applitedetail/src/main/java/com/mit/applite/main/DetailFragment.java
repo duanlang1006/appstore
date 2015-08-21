@@ -306,16 +306,16 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         LogUtils.d(TAG,"onCreateOptionsMenu");
-        MenuItem item = menu.findItem(R.id.action_search);
-        if (null != item){
-            return;
-        }
+//        MenuItem item = menu.findItem(R.id.action_search);
+//        if (null != item){
+//            return;
+//        }
 
-        inflater.inflate(R.menu.menu_main_detail, menu);
-        item = menu.findItem(R.id.action_search);
-        if (null != item) {
-            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        }
+//        inflater.inflate(R.menu.menu_main_detail, menu);
+//        item = menu.findItem(R.id.action_search);
+//        if (null != item) {
+//            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//        }
     }
 
     @Override

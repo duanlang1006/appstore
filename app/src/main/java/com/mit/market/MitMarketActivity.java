@@ -118,6 +118,10 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if (R.id.action_search == id){
+            jumptoSearch(true);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
