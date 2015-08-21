@@ -274,7 +274,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mInstallView.setOnClickListener(this);
         if ((Boolean) AppliteSPUtils.get(mActivity, "personal_flag", false)) {
             AppliteSPUtils.put(mActivity, AppliteSPUtils.ISGUIDE, false);
-            mToHomeView.setVisibility(View.INVISIBLE);
+            mToHomeView.setVisibility(View.GONE);
         }
     }
 

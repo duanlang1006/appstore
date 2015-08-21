@@ -104,21 +104,19 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     public void onResume() {
         super.onResume();
         MobclickAgent.onPageStart("UpdateFragment"); //统计页面
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-                    // handle back button
-                    if (!getFragmentManager().popBackStackImmediate()) {
-                        mActivity.finish();
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
+//        getView().setFocusableInTouchMode(true);
+//        getView().requestFocus();
+//        getView().setOnKeyListener(new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+//                    // handle back button
+//                    getFragmentManager().popBackStackImmediate();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
     }
 
     @Override
@@ -212,6 +210,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "update_management");
+        params.addBodyParameter("protocol_version", "1.0");
         params.addBodyParameter("update_info", AppliteUtils.getAllApkData(mActivity));
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override

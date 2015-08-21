@@ -157,21 +157,19 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onResume() {
         super.onResume();
         MobclickAgent.onPageStart("DetailFragment"); //统计页面
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-                    // handle back button
-                    if (!getFragmentManager().popBackStackImmediate()){
-                        mActivity.finish();
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
+//        getView().setFocusableInTouchMode(true);
+//        getView().requestFocus();
+//        getView().setOnKeyListener(new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+//                    // handle back button
+//                    getFragmentManager().popBackStackImmediate();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
     }
 
     public void onPause() {
@@ -367,6 +365,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "detail");
+        params.addBodyParameter("protocol_version", "1.0");
         params.addBodyParameter("name", mPackageName);
         HttpUtils mHttpUtils = new HttpUtils();
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {

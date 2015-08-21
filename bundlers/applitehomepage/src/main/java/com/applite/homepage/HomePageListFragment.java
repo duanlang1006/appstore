@@ -255,6 +255,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", "com.android.applite1.0");
+        params.put("protocol_version", "1.0");
         //params.put("packagename",Utils.getPackgeName(this));
         params.put("app", "applite");
         params.put("type", "hptab");
