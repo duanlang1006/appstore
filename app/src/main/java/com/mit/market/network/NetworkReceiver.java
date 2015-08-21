@@ -75,8 +75,8 @@ public class NetworkReceiver extends BroadcastReceiver {
                 //获取当前wifi名称
                 LogUtils.i(TAG, "连接到WIFI:" + wifiInfo.getSSID());
 
-                if (System.currentTimeMillis() > (long) AppliteSPUtils.get(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, 0L))
-                    post();
+//                if (System.currentTimeMillis() > (long) AppliteSPUtils.get(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, 0L))
+                post();
             } else {
                 LogUtils.i(TAG, "无网络连接");
             }
@@ -136,8 +136,9 @@ public class NetworkReceiver extends BroadcastReceiver {
                     bean.setmSize(obj.getLong("apkSize"));
                     mDataContents.add(bean);
                 }
-                if (array.length() != 0)
-                    UpdateNotification.getInstance().showNot(mContext, array.length() + "");
+                if (array.length() != 0){
+                    LogUtils.i("aaaa",array.toString());
+                    UpdateNotification.getInstance().showNot(mContext, array.length() + "", array);}
                 AppliteSPUtils.put(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, System.currentTimeMillis() + next_update_notify_times);
 
                 SimpleDateFormat sDateFormat = new SimpleDateFormat("hh:mm:ss");
