@@ -65,7 +65,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private RelativeLayout mStatsLayout;
     private ImageView mStatsImgView;
     private TextView mStatsTextView;
-    private Button mStatsButton;
+    private TextView mStatsButton;
     private boolean mPostStats = true;
     private ImplAgent implAgent;
     private HttpUtils mHttpUtils;
@@ -103,21 +103,19 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onResume() {
         super.onResume();
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-                    // handle back button
-                    if (!getFragmentManager().popBackStackImmediate()) {
-                        mActivity.finish();
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
+//        getView().setFocusableInTouchMode(true);
+//        getView().requestFocus();
+//        getView().setOnKeyListener(new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+//                    // handle back button
+//                    getFragmentManager().popBackStackImmediate();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
     }
 
     @Override
@@ -174,7 +172,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         mStatsLayout = (RelativeLayout) rootView.findViewById(R.id.update_stats);
         mStatsImgView = (ImageView) rootView.findViewById(R.id.update_stats_img);
         mStatsTextView = (TextView) rootView.findViewById(R.id.no_network_text);
-        mStatsButton = (Button) rootView.findViewById(R.id.update_post_button);
+        mStatsButton = (TextView) rootView.findViewById(R.id.update_post_button);
 
         //加载中控件
         mLoadLayout = (LinearLayout) rootView.findViewById(R.id.update_loading_layout);
@@ -214,6 +212,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "update_management");
+        params.addBodyParameter("protocol_version", "1.0");
         params.addBodyParameter("update_info", AppliteUtils.getAllApkData(mActivity));
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override

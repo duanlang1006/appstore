@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.internal.view.SupportMenu;
 import android.support.v4.internal.view.SupportMenuItem;
@@ -14,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -253,6 +255,19 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     public void onResume() {
         super.onResume();
         MitMobclickAgent.onPageStart(whichPage); //统计页面
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    // handle back button
+                    getFragmentManager().popBackStackImmediate();
+                    return false;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -483,8 +498,6 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         }
     }
 
-
-
     private void initActionBar(){
         try {
 //            ViewGroup customView = (ViewGroup)mInflater.inflate(R.layout.actionbar_custom,new LinearLayout(mActivity),false);
@@ -533,6 +546,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 //        params.put("packagename", "com.android.applite1.0");
         params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
+        params.put("protocol_version", "1.0");
         if (null == mCategory) {
             params.put("type", "homepage");
             params.put("tabTitle", "tabtitle");
@@ -576,7 +590,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         });
     }
 
-    class SectionsPagerAdapter extends FragmentStatePagerAdapter {
+    class SectionsPagerAdapter extends FragmentPagerAdapter {
         private static final String TAG = "homepage_adapter";
         private int mChildCount = 0;
 

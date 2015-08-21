@@ -46,22 +46,20 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onResume() {
         super.onResume();
-
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-                    // handle back button
-                    if (!getFragmentManager().popBackStackImmediate()) {
-                        mActivity.finish();
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
+//
+//        getView().setFocusableInTouchMode(true);
+//        getView().requestFocus();
+//        getView().setOnKeyListener(new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+//                    // handle back button
+//                    getFragmentManager().popBackStackImmediate();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
     }
 
     @Override

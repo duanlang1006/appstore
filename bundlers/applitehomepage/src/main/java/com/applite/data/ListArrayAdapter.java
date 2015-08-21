@@ -216,34 +216,38 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                     this.mAppSize.setText(mSize);
                 }
             }
-            if (null != this.mExtentIcon) {
-                String s = itemData.getBoxLabel();
-                switch (s){
-                    case "1":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type1);
-                        break;
-                    case "2":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type2);
-                        break;
-                    case "3":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type3);
-                        break;
-                    case "4":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type4);
-                        break;
-                    case "5":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type5);
-                        break;
-                    case "6":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type6);
-                        break;
-                    case "7":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type7);
-                        break;
-                    default:
-                        break;
-                }
+//            if (null != this.mExtentIcon) {
+//                String s = itemData.getBoxLabel();
+//                switch (s){
+//                    case "1":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type1);
+//                        break;
+//                    case "2":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type2);
+//                        break;
+//                    case "3":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type3);
+//                        break;
+//                    case "4":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type4);
+//                        break;
+//                    case "5":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type5);
+//                        break;
+//                    case "6":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type6);
+//                        break;
+//                    case "7":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type7);
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
+            if (null != this.mExtentIcon && null != itemData.getBoxLabel()){
+                mFinalBitmap.display(this.mExtentIcon, itemData.getBoxLabel());
             }
+
             if (null != this.mAppBrief){
                 if(!TextUtils.isEmpty(itemData.getBrief())){
                     this.mAppBrief.setText(itemData.getBrief());

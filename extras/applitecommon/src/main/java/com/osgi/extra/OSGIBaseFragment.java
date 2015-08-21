@@ -78,9 +78,7 @@ public class OSGIBaseFragment extends Fragment{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (android.R.id.home == item.getItemId()){
-            if (!getFragmentManager().popBackStackImmediate()){
-                mActivity.finish();
-            }
+            getFragmentManager().popBackStack();
             return true;
         }
         return super.onOptionsItemSelected(item);

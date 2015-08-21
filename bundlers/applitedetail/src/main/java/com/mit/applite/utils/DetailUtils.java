@@ -51,7 +51,6 @@ public class DetailUtils {
         Paint paint = new Paint();
         Canvas canvas = new Canvas(bm1);
         canvas.drawBitmap(bm, m, paint);
-        bm.recycle();
         return bm1;
     }
 
