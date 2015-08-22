@@ -89,13 +89,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                     oldFlag = true;
                 }
             }
-//            if (status[position]) {
-//                view.setBackgroundColor(Color.LTGRAY);
-//            } else {
-//                view.setBackgroundColor(Color.WHITE);
-//            }
             vh.actionBtn.setVisibility(View.GONE);
-
         } else {
             vh.actionBtn.setVisibility(View.VISIBLE);
             vh.deleteCheckBox.setVisibility(View.GONE);
