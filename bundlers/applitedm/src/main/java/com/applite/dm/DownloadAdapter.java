@@ -90,7 +90,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 }
             }
             vh.actionBtn.setVisibility(View.GONE);
-
         } else {
             vh.actionBtn.setVisibility(View.VISIBLE);
             vh.deleteCheckBox.setVisibility(View.GONE);

@@ -121,11 +121,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                         bottomBar.setVisibility(View.VISIBLE);//显示titleBar
                         btnShare.startAnimation(animaBt1);
                         btnDelete.startAnimation(animaBt2);
+                        getView().invalidate();
                     }
                     status[i] = !status[i];
                     setButtonStatus();
                     mAdapter.resetStatus(status);
-                    mAdapter.notifyDataSetChanged();
                 }
                 return false;
             }
