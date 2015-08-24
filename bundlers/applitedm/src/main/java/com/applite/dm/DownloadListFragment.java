@@ -176,31 +176,29 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     @Override
     public void onResume() {
         super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    // handle back button
+                    if (flag_showCheckBox) {
+                        refresh(true);
+                    }
+                    return false;
+                }
+                return true;
+            }
+        });
         MobclickAgent.onPageStart("DownloadListFragment"); //统计页面
         flag_showCheckBox = false;
     }
-
-//    @overdide
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        if (keyCode == KeyEvent.KEYCODE_BACK) {
-//            if (flag_showCheckBox) {
-//                Toast.makeText(mActivity.getApplicationContext(), "我取消了操作", Toast.LENGTH_SHORT).show();
-//                flag_showCheckBox = false;
-//                mAdapter.notifyDataSetChanged();
-//                btnDelete.setVisibility(View.INVISIBLE);
-//                Arrays.fill(status, false);
-//                return false;
-//            }
-//        }
-//        return mActivity.onKeyDown(keyCode, event);
-//    }
-
 
     @Override
     public void onPause() {
         super.onPause();
         MobclickAgent.onPageEnd("DownloadListFragment");
-//        titleBar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -338,18 +336,22 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                 flag = true;
                 Toast.makeText(mActivity.getApplicationContext(), "我取消了操作", Toast.LENGTH_SHORT).show();
             }
-            if (flag) {
-                titleBar.setVisibility(View.GONE);
-                bottomBar.setVisibility(View.GONE);
-                flag_showCheckBox = false;//标志位复位
-                mAdapter.resetFlag(flag_showCheckBox);
-                Arrays.fill(status, false);//删除后将status复位
-                mAdapter.resetStatus(status);
-//                mAdapter.notifyDataSetChanged();
-                mListview.setAdapter(mAdapter);//取消和分享不对item做改变，所以notifyDataSetChanged()不会更改listView
-            }
+            refresh(flag);
         }
     };
+
+    private void refresh(boolean b) {
+        if (b) {
+            titleBar.setVisibility(View.GONE);
+            bottomBar.setVisibility(View.GONE);
+            flag_showCheckBox = false;//标志位复位
+            mAdapter.resetFlag(flag_showCheckBox);
+            Arrays.fill(status, false);//删除后将status复位
+            mAdapter.resetStatus(status);
+//                mAdapter.notifyDataSetChanged();
+            mListview.setAdapter(mAdapter);//取消和分享不对item做改变，所以notifyDataSetChanged()不会更改listView
+        }
+    }
 
     private void deleteItem() {
         View childView;
