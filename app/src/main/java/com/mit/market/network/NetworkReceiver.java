@@ -72,8 +72,8 @@ public class NetworkReceiver extends BroadcastReceiver {
                 //获取当前wifi名称
                 LogUtils.i(TAG, "连接到WIFI:" + wifiInfo.getSSID());
 
-                if (System.currentTimeMillis() > (long) AppliteSPUtils.get(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, 0L))
-                    post();
+//                if (System.currentTimeMillis() > (long) AppliteSPUtils.get(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, 0L))
+                post();
             } else {
                 LogUtils.i(TAG, "无网络连接");
             }
@@ -88,6 +88,7 @@ public class NetworkReceiver extends BroadcastReceiver {
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mContext, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mContext.getPackageName());
         params.addBodyParameter("type", "update_management");
+        params.addBodyParameter("protocol_version", "1.0");
         params.addBodyParameter("update_info", AppliteUtils.getAllApkData(mContext));
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
@@ -132,8 +133,9 @@ public class NetworkReceiver extends BroadcastReceiver {
                     bean.setmSize(obj.getLong("apkSize"));
                     mDataContents.add(bean);
                 }
-                if (array.length() != 0)
-                    UpdateNotification.getInstance().showNot(mContext, array.length() + "");
+                if (array.length() != 0){
+                    LogUtils.i("aaaa",array.toString());
+                    UpdateNotification.getInstance().showNot(mContext, array.length() + "", array);}
                 AppliteSPUtils.put(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, System.currentTimeMillis() + next_update_notify_times);
 
                 SimpleDateFormat sDateFormat = new SimpleDateFormat("hh:mm:ss");
@@ -141,7 +143,7 @@ public class NetworkReceiver extends BroadcastReceiver {
                 int time = Integer.parseInt(date.substring(0, 2)) * 60 * 60 + Integer.parseInt(date.substring(3, 5)) * 60 + Integer.parseInt(date.substring(6, 8));
                 int time_start = Integer.parseInt(wify_update_start.substring(0, 2)) * 60 * 60 + Integer.parseInt(wify_update_start.substring(3, 5)) * 60 + Integer.parseInt(wify_update_start.substring(6, 8));
                 int time_end = Integer.parseInt(wify_update_end.substring(0, 2)) * 60 * 60 + Integer.parseInt(wify_update_end.substring(3, 5)) * 60 + Integer.parseInt(wify_update_end.substring(6, 8));
-                LogUtils.i(TAG, "当前时间：" + time + "--------自动更新时段：" + time_start + "--" + time_end);
+                LogUtils.i(TAG, "当前时间：" + time + "--------自动更新时段：" + wify_update_start + "--" + wify_update_end);
                 if (time > time_start && time < time_end)
                     downloadAll();
             }

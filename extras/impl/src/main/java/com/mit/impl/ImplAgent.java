@@ -124,13 +124,6 @@ public class ImplAgent extends Observable {
                 .setVersionCode(versionCode);
         mDownloader.fillImplInfo(implInfo);
         mInstaller.fillImplInfo(implInfo);
-//        if (implInfo.getDownloadId()>0){
-//            try {
-//                db.saveOrUpdate(implInfo);
-//            } catch (DbException e) {
-//                e.printStackTrace();
-//            }
-//        }
         return implInfo;
     }
 
@@ -200,16 +193,19 @@ public class ImplAgent extends Observable {
         mDownloader.addDownload(implInfo, publicDir, filename, mImplCallback);
         setChanged();
         notifyObservers();
+        MitMobclickAgent.onEvent(mContext, "impl_DownloadActionAdd");
     }
 
     public void pauseDownload(ImplInfo implInfo) {
         if (null == implInfo) {
             return;
         }
+        MitMobclickAgent.onEvent(mContext, "impl_DownloadActionPause");
         mDownloader.pause(implInfo);
     }
 
     public void pauseAll() {
+        MitMobclickAgent.onEvent(mContext, "impl_DownloadActionPauseAll");
         mDownloader.pauseAll(mImplList);
     }
 
@@ -217,11 +213,13 @@ public class ImplAgent extends Observable {
         if (null == implInfo) {
             return;
         }
+        MitMobclickAgent.onEvent(mContext, "impl_DownloadActionResume");
         setImplCallback(appCallback, implInfo);
         mDownloader.resume(implInfo, mImplCallback);
     }
 
     public void resumeAll() {
+        MitMobclickAgent.onEvent(mContext, "impl_DownloadActionResumeAll");
         mDownloader.resumeAll(mImplList, mImplCallback);
     }
 
@@ -229,23 +227,26 @@ public class ImplAgent extends Observable {
         if (null == implInfo) {
             return;
         }
+        MitMobclickAgent.onEvent(mContext, "impl_DownloadActionRemove");
+        mImplList.remove(implInfo);
+        mDownloader.remove(implInfo);
         try {
             db.delete(implInfo);
         } catch (DbException e) {
             e.printStackTrace();
         }
-        mImplList.remove(implInfo);
-        mDownloader.remove(implInfo);
         setChanged();
         notifyObservers();
     }
 
     public void install(ImplInfo implInfo, boolean silent, ImplChangeCallback appCallback) {
+        MitMobclickAgent.onEvent(mContext, "impl_InstallerActionInstall");
         setImplCallback(appCallback, implInfo);
         mInstaller.install(implInfo, silent, mImplCallback);
     }
 
     public void uninstall(ImplInfo implInfo, boolean silent, ImplChangeCallback appCallback) {
+        MitMobclickAgent.onEvent(mContext, "impl_InstallerActionUninstall");
         setImplCallback(appCallback, implInfo);
         mInstaller.uninstall(implInfo, silent, mImplCallback);
     }
@@ -562,7 +563,27 @@ public class ImplAgent extends Observable {
         return descText;
     }
 
-    public Intent getActionIntent(ImplInfo implInfo) {
+    public boolean startActivity(ImplInfo implInfo){
+        boolean ret = true;
+        Intent intent = getActionIntent(implInfo);
+        switch(getAction(implInfo)){
+            case ImplInfo.ACTION_INSTALL:
+                MitMobclickAgent.onEvent(mContext, "impl_startActivity_InstallApk");
+                break;
+            case ImplInfo.ACTION_OPEN:
+                MitMobclickAgent.onEvent(mContext, "impl_startActivity_OpenApk");
+                break;
+        }
+        try {
+            mContext.startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            ret = false;
+        }
+        return ret;
+    }
+
+    private Intent getActionIntent(ImplInfo implInfo) {
         Intent actionIntent = null;
         if (null == implInfo) {
             return actionIntent;
@@ -642,6 +663,7 @@ public class ImplAgent extends Observable {
         @Override
         public void onPending(final ImplInfo info) {
             super.onPending(info);
+            MitMobclickAgent.onEvent(mContext, "impl_DownloadPending");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -659,7 +681,7 @@ public class ImplAgent extends Observable {
         @Override
         public void onStart(final ImplInfo info) {
             super.onStart(info);
-            MitMobclickAgent.onEvent(mContext, "DownloadStart");
+            MitMobclickAgent.onEvent(mContext, "impl_DownloadStart");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -677,6 +699,7 @@ public class ImplAgent extends Observable {
         @Override
         public void onCancelled(final ImplInfo info) {
             super.onCancelled(info);
+            MitMobclickAgent.onEvent(mContext, "impl_DownloadPaused");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -711,7 +734,7 @@ public class ImplAgent extends Observable {
         @Override
         public void onSuccess(final ImplInfo info, final File file) {
             super.onSuccess(info, file);
-            MitMobclickAgent.onEvent(mContext, "DownloadSuccess");
+            MitMobclickAgent.onEvent(mContext, "impl_DownloadSuccess");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -737,7 +760,7 @@ public class ImplAgent extends Observable {
         @Override
         public void onFailure(final ImplInfo info, final Throwable t, final String msg) {
             super.onFailure(info, t, msg);
-            MitMobclickAgent.onEvent(mContext, "DownloadFailure");
+            MitMobclickAgent.onEvent(mContext, "impl_DownloadFailure");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -755,7 +778,7 @@ public class ImplAgent extends Observable {
         @Override
         public void onInstallSuccess(final ImplInfo info) {
             super.onInstallSuccess(info);
-            MitMobclickAgent.onEvent(mContext, "installSuccess");
+            MitMobclickAgent.onEvent(mContext, "impl_InstallSuccess");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -773,6 +796,7 @@ public class ImplAgent extends Observable {
         @Override
         public void onInstalling(final ImplInfo info) {
             super.onInstalling(info);
+            MitMobclickAgent.onEvent(mContext, "impl_Installing");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -790,7 +814,7 @@ public class ImplAgent extends Observable {
         @Override
         public void onInstallFailure(final ImplInfo info, final int errorCode) {
             super.onInstallFailure(info, errorCode);
-            MitMobclickAgent.onEvent(mContext, "installFailuer");
+            MitMobclickAgent.onEvent(mContext, "impl_InstallFailuer");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -808,7 +832,8 @@ public class ImplAgent extends Observable {
         @Override
         public void onUninstallSuccess(final ImplInfo info) {
             super.onUninstallSuccess(info);
-            MitMobclickAgent.onEvent(mContext, "uninstallSuccess");
+            info.setDownloadId(0);
+            MitMobclickAgent.onEvent(mContext, "impl_UninstallSuccess");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -826,6 +851,7 @@ public class ImplAgent extends Observable {
         @Override
         public void onUninstalling(final ImplInfo info) {
             super.onUninstalling(info);
+            MitMobclickAgent.onEvent(mContext, "impl_Uninstalling");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -843,7 +869,7 @@ public class ImplAgent extends Observable {
         @Override
         public void onUninstallFailure(final ImplInfo info, final int errorCode) {
             super.onUninstallFailure(info, errorCode);
-            MitMobclickAgent.onEvent(mContext, "uninstallFailure");
+            MitMobclickAgent.onEvent(mContext, "impl_UninstallFailure");
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {

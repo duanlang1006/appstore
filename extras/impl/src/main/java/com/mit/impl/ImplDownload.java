@@ -280,13 +280,15 @@ class ImplDownload  {
             if (null != file && file.exists()) {
                 implInfo.setLocalPath(file.getAbsolutePath());
                 implInfo.setStatus(Constant.STATUS_SUCCESSFUL);
+                if (null != baseCallback){
+                    baseCallback.onSuccess(implInfo,file);
+                }
             }else{
                 implInfo.setLocalPath(null);
                 implInfo.setStatus(Constant.STATUS_FAILED);
-            }
-
-            if (null != baseCallback){
-                baseCallback.onSuccess(implInfo,file);
+                if (null != baseCallback){
+                    baseCallback.onFailure(implInfo, null, "download file not exist");
+                }
             }
             LogUtils.d(TAG,implInfo.getTitle()+",onSuccess");
         }

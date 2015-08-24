@@ -24,6 +24,7 @@ import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplInfo;
 import com.applite.homepage.R;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
 import java.lang.reflect.Field;
@@ -93,7 +94,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         if (null != mData && null != mData.getData()) {
 
             HomePageApkData itemData = mData.getData().get(position);
-            viewHolder.initView(itemData,mData.getS_datatype());
+            viewHolder.initView(itemData,mData.getS_datatype(),position);
         }
         return convertView;
     }
@@ -104,6 +105,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             Object obj = v.getTag();
             if (obj instanceof ViewHolder) {
                 ViewHolder vh = (ViewHolder) obj;
+                MitMobclickAgent.onEvent(mContext,"onClickButton"+vh.getItemPosition());
                 if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
                     switch (vh.implInfo.getStatus()) {
                         case Constant.STATUS_PENDING:
@@ -112,30 +114,25 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                             implAgent.pauseDownload(vh.implInfo);
                             break;
                         case Constant.STATUS_PAUSED:
-                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
+                            implAgent.resumeDownload(vh.implInfo, vh);
                             break;
                         default:
                             implAgent.newDownload(vh.implInfo,
                                     Constant.extenStorageDirPath,
                                     vh.itemData.getName() + ".apk",
                                     true,
-                                    vh.implCallback);
+                                    vh);
                             break;
                     }
                 } else {
-                    try {
-                        mContext.startActivity(implAgent.getActionIntent(vh.implInfo));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    implAgent.startActivity(vh.implInfo);
                 }
             }
         }
     }
 
-
-
-    public class ViewHolder {
+    public class ViewHolder implements ImplChangeCallback{
+        //不变控件
         private ImageView mAppIcon;
         private TextView mAppName;
         private TextView mCategorySub;
@@ -146,11 +143,12 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private ImageView mCategoryListArrow;
         private ImageView mExtentIcon;
         private String layoutStr;
-        private ImplChangeCallback implCallback;
         private LinearLayout pullDownView;
 
-        ImplInfo implInfo;
-        HomePageApkData itemData;
+        //可变数据
+        private ImplInfo implInfo;
+        private HomePageApkData itemData;
+        private int position;
 
         ViewHolder(View mView){
             this.pullDownView = (LinearLayout)mView.findViewById(R.id.pullDownView);
@@ -163,7 +161,6 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             this.mCategoryListArrow = (ImageView) mView.findViewById(R.id.categoryListArrow);
             this.mExtentIcon = (ImageView) mView.findViewById(R.id.extentIcon);
             this.mAppBrief = (TextView) mView.findViewById(R.id.apkBrief);
-            this.implCallback = new ListImplCallback(this);
             if (null != mProgressButton ){
                 mProgressButton.setTag(this);
                 mProgressButton.setOnClickListener(ListArrayAdapter.this);
@@ -174,15 +171,16 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             initProgressButton();
         }
 
-        public void initView(HomePageApkData itemData,String layout){
+        public void initView(HomePageApkData itemData,String layout,int position){
             this.itemData = itemData;
             this.layoutStr = layout;
+            this.position = position;
             this.implInfo = implAgent.getImplInfo(itemData.getPackageName(), itemData.getPackageName(), itemData.getVersionCode());
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(itemData.getrDownloadUrl())
                         .setTitle(itemData.getName())
                         .setIconUrl(itemData.getIconUrl());
-                implAgent.setImplCallback(implCallback, implInfo);
+                implAgent.setImplCallback(this, implInfo);
             }
 
             if (null != this.mAppIcon && null != itemData.getIconUrl()){
@@ -202,34 +200,38 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                     this.mAppSize.setText(mSize);
                 }
             }
-            if (null != this.mExtentIcon) {
-                String s = itemData.getBoxLabel();
-                switch (s){
-                    case "1":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type1);
-                        break;
-                    case "2":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type2);
-                        break;
-                    case "3":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type3);
-                        break;
-                    case "4":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type4);
-                        break;
-                    case "5":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type5);
-                        break;
-                    case "6":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type6);
-                        break;
-                    case "7":
-                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type7);
-                        break;
-                    default:
-                        break;
-                }
+//            if (null != this.mExtentIcon) {
+//                String s = itemData.getBoxLabel();
+//                switch (s){
+//                    case "1":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type1);
+//                        break;
+//                    case "2":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type2);
+//                        break;
+//                    case "3":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type3);
+//                        break;
+//                    case "4":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type4);
+//                        break;
+//                    case "5":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type5);
+//                        break;
+//                    case "6":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type6);
+//                        break;
+//                    case "7":
+//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type7);
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
+            if (null != this.mExtentIcon && null != itemData.getBoxLabel()){
+                mFinalBitmap.display(this.mExtentIcon, itemData.getBoxLabel());
             }
+
             if (null != this.mAppBrief){
                 if(!TextUtils.isEmpty(itemData.getBrief())){
                     this.mAppBrief.setText(itemData.getBrief());
@@ -250,6 +252,11 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 mCategoryListArrow.setImageResource(R.drawable.back);
             }
             initProgressButton();
+        }
+
+        @Override
+        public void onChange(ImplInfo info) {
+            this.refresh();
         }
 
         void initProgressButton() {
@@ -284,20 +291,9 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         public HomePageApkData getItemData() {
             return itemData;
         }
-    }
 
-    class ListImplCallback implements ImplChangeCallback {
-        Object tag ;
-
-        ListImplCallback(Object tag) {
-            super();
-            this.tag = tag;
-        }
-
-        @Override
-        public void onChange(ImplInfo info) {
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
+        public int getItemPosition() {
+            return this.position;
         }
     }
 }

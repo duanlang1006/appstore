@@ -3,9 +3,9 @@ package com.applite.homepage;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +26,6 @@ import com.google.gson.Gson;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
-
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
@@ -58,6 +57,11 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     private boolean isend;
     private boolean sendhttpreq = true;
+    private String whichPage;
+    private int mPosition;
+
+    private static final String TOPICFRAGMENT = "TopicListFragment";
+    private static final String HOMEPAGELISTFRAGMENT = "HomepageListFragment";
 
     public static Bundle newBundle(String s_key, String s_name, int step, String s_datatype){
         Bundle bundle = new Bundle();
@@ -68,10 +72,11 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         return bundle;
     }
 
-    public static Bundle newBundle(SubjectData data,boolean showBack){
+    public static Bundle newBundle(SubjectData data,int position,boolean showBack){
         Bundle b = new Bundle();
         b.putParcelable("subject_data", data);
         b.putBoolean("show_home", showBack);
+        b.putInt("position",position);
         return b;
     }
 
@@ -83,7 +88,13 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LogUtils.i(TAG, "ListFragment.onCreate() ");
-        MitMobclickAgent.onEvent(mActivity, "toSpecialFragment");
+        if (showBack && null != mData.getS_key()) {
+            whichPage = TOPICFRAGMENT+"_"+mData.getS_key();
+            MitMobclickAgent.onEvent(mActivity, whichPage+"_onCreate");
+        }else{
+            whichPage = HOMEPAGELISTFRAGMENT + this.mPosition;
+        }
+
     }
 
     @Override
@@ -95,6 +106,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         if (null != params) {
             this.mData = params.getParcelable("subject_data");
             this.showBack = params.getBoolean("show_home");
+            this.mPosition = params.getInt("position");
             if (null == mData){
                 mData = new SubjectData();
                 mData.setS_key(params.getString("key"));
@@ -148,6 +160,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         }else if (viewHolder.getLayoutStr().equals("fragment_apklist")){
             ((OSGIServiceHost)mActivity).jumptoDetail(itemData.getPackageName(),itemData.getName(),itemData.getIconUrl(),true);
         }
+        MitMobclickAgent.onEvent(mActivity, "onItemClick" + viewHolder.getItemPosition());
     }
 
     @Override
@@ -155,6 +168,30 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         super.onHiddenChanged(hidden);
         if (!hidden){
             initActionBar();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (null != whichPage && !TextUtils.isEmpty(whichPage)) {
+            MitMobclickAgent.onPageStart(whichPage); //统计页面
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (null != whichPage && !TextUtils.isEmpty(whichPage)) {
+            MitMobclickAgent.onPageEnd(whichPage);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (showBack && null != mData.getS_key()) {
+            MitMobclickAgent.onEvent(mActivity, whichPage + "_onDestroy");
         }
     }
 
@@ -232,6 +269,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", "com.android.applite1.0");
+        params.put("protocol_version", "1.0");
         //params.put("packagename",Utils.getPackgeName(this));
         params.put("app", "applite");
         params.put("type", "hptab");
@@ -338,12 +376,13 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     class MySlideViewListener implements SlideShowView.OnSlideViewClickListener{
         @Override
         public void onClick(View v, int position){
-            MitMobclickAgent.onEvent(mActivity, "clickMainViewPager");
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
             LogUtils.i(TAG, "topicData = " + topicData);
             if(topicData.getT_skiptype() == 1){
-                ((OSGIServiceHost)mActivity).jumptoDetail(topicData.getTt_packageName(),topicData.getTt_name(),topicData.getTt_iconUrl(),true);
+                MitMobclickAgent.onEvent(mActivity, "onSlideViewClick_" + topicData.getTt_packageName());
+                ((OSGIServiceHost)mActivity).jumptoDetail(topicData.getTt_packageName(), topicData.getTt_name(), topicData.getTt_iconUrl(), true);
             }else{
+                MitMobclickAgent.onEvent(mActivity, "onSlideViewClick_" + topicData.t_key);
                 ((OSGIServiceHost)mActivity).jumptoTopic(topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype(),true);
             }
         }

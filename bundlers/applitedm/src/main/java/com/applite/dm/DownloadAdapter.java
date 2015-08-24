@@ -134,11 +134,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                         break;
                 }
             } else {
-                try {
-                    mContext.startActivity(implAgent.getActionIntent(vh.implInfo));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                implAgent.startActivity(vh.implInfo);
             }
         }
     }

@@ -70,7 +70,7 @@ public class UpdateAdapter extends BaseAdapter {
             viewholder = (ViewHolder) convertView.getTag();
         }
         final DataBean data = mDatas.get(position);
-        viewholder.initView(data);
+        viewholder.initView(data,position);
 
         viewholder.mName.setText(data.getmName());
         mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
@@ -81,6 +81,33 @@ public class UpdateAdapter extends BaseAdapter {
             e.printStackTrace();
         }
         viewholder.mApkSize.setText(AppliteUtils.bytes2kb(data.getmSize()));
+        viewholder.mBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewHolder vh = (ViewHolder) v.getTag();
+                MitMobclickAgent.onEvent(mActivity, "onClickButton" + vh.position);
+                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
+                    switch (vh.implInfo.getStatus()) {
+                        case Constant.STATUS_PENDING:
+                        case Constant.STATUS_RUNNING:
+                            implAgent.pauseDownload(vh.implInfo);
+                            break;
+                        case Constant.STATUS_PAUSED:
+                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
+                            break;
+                        default:
+                            implAgent.newDownload(vh.implInfo,
+                                    Constant.extenStorageDirPath,
+                                    vh.bean.getmName() + ".apk",
+                                    true,
+                                    vh.implCallback);
+                            break;
+                    }
+                } else {
+                    implAgent.startActivity(vh.implInfo);
+                }
+            }
+        });
         return convertView;
     }
 
@@ -93,6 +120,7 @@ public class UpdateAdapter extends BaseAdapter {
         private DataBean bean;
         private ImplInfo implInfo;
         private ListImplCallback implCallback;
+        private int position;
 
         public ViewHolder(View v) {
             this.mImg = (ImageView) v.findViewById(R.id.item_update_img);
@@ -101,42 +129,11 @@ public class UpdateAdapter extends BaseAdapter {
             this.mVersionName = (TextView) v.findViewById(R.id.item_update_versionname);
             this.mBt = (Button) v.findViewById(R.id.item_update_button);
             this.implCallback = new ListImplCallback(this);
-            mBt.setTag(this);
-            mBt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ViewHolder vh = (ViewHolder) v.getTag();
-                    if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-                        switch (vh.implInfo.getStatus()) {
-                            case Constant.STATUS_PENDING:
-                            case Constant.STATUS_RUNNING:
-                                implAgent.pauseDownload(vh.implInfo);
-                                break;
-                            case Constant.STATUS_PAUSED:
-                                implAgent.resumeDownload(vh.implInfo, vh.implCallback);
-                                break;
-                            default:
-                                implAgent.newDownload(vh.implInfo,
-                                        Constant.extenStorageDirPath,
-                                        vh.bean.getmName() + ".apk",
-                                        true,
-                                        vh.implCallback);
-                                MitMobclickAgent.onEvent(mActivity, "clickUpdate");
-                                break;
-                        }
-                    } else {
-                        try {
-                            mActivity.startActivity(implAgent.getActionIntent(vh.implInfo));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            });
         }
 
-        public void initView(DataBean bean) {
+        public void initView(DataBean bean,int position) {
             this.bean = bean;
+            this.position = position;
             this.implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl()).setTitle(bean.getmName());

@@ -13,4 +13,9 @@
     <string name="version">版本: </string>
     <string name="download">次下载</string>
 
+    <string name="downloading">正在下载</string>
+    <string name="to_home">进入首页</string>
+    <string name="one_click_install">一键安装</string>
+    <string name="apk_has_download">该应用已下载</string>
+
 </resources>

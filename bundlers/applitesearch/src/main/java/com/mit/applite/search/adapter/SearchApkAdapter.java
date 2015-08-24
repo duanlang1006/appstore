@@ -115,11 +115,7 @@ public class SearchApkAdapter extends BaseAdapter {
                             break;
                     }
                 } else {
-                    try {
-                        mActivity.startActivity(implAgent.getActionIntent(vh.implInfo));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    implAgent.startActivity(vh.implInfo);
                 }
             }
         });
@@ -155,7 +151,6 @@ public class SearchApkAdapter extends BaseAdapter {
         public void initView(SearchBean data) {
             this.bean = data;
             this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName(), data.getmVersionCode());
-            ;
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
                 implAgent.setImplCallback(implCallback, implInfo);

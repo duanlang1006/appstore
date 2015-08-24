@@ -15,6 +15,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,9 +30,9 @@ import com.applite.common.PagerSlidingTabStrip;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
-import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
+import com.umeng.analytics.MobclickAgent;
 
 import java.lang.reflect.Field;
 import java.util.Observable;
@@ -44,8 +45,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
     private boolean destoryView = false;
     private LayoutInflater mInflater;
-//    private ActionBar actionBar; //声明ActionBar
-
     public DownloadPagerFragment() {
         super();
     }
@@ -53,20 +52,17 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     public void onAttach(Activity activity) {
         ImplLog.d(TAG, "onAttach," + this);
         super.onAttach(activity);
-        ImplAgent.getInstance(mActivity).addObserver(this);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MitMobclickAgent.onEvent(mActivity, "toDownloadFragment");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ImplLog.d(TAG, "onCreateView," + this);
-//        actionBar = mActivitygetActionBar(); //得到ActionBar
         destoryView = false;
         mInflater = inflater;
         View rootView = mInflater.inflate(R.layout.fragment_download_pager, container, false);
@@ -76,21 +72,47 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 //        mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         initActionBar(mPagerSlidingTabStrip);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
+        ImplAgent.getInstance(mActivity).addObserver(this);
         return rootView;
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         ImplLog.d(TAG, "onDetach," + this);
-        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+//        getView().setFocusableInTouchMode(true);
+//        getView().requestFocus();
+//        getView().setOnKeyListener(new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+//                    // handle back button
+//                    getFragmentManager().popBackStackImmediate();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
+    }
+
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         destoryView = true;
         ImplLog.d(TAG, "onDestroyView," + this + "," + destoryView);
+        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
     @Override
@@ -135,6 +157,9 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         super.onHiddenChanged(hidden);
         if (!hidden) {
             initActionBar(mPagerSlidingTabStrip);
+            ImplAgent.getInstance(mActivity).addObserver(this);
+        }else{
+            ImplAgent.getInstance(mActivity).deleteObserver(this);
         }
     }
 
@@ -155,9 +180,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     @Override
     public void update(Observable observable, Object data) {
-//        ImplInfo info = (ImplInfo)data;
-        LogUtils.d(TAG, "update");
+        if (null == mViewPager || null == mViewPager.getAdapter()) {
+            return;
+        }
         mViewPager.getAdapter().notifyDataSetChanged();
+        LogUtils.d(TAG,"update");
     }
 
     private void initActionBar(View tabStrip) {

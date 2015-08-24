@@ -63,7 +63,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     private WindowManager.LayoutParams lp_bottom;
     private Animation animaBt1;
     private Animation animaBt2;
-    private static int backSpaceCount = 0;
 
 
     public static final Comparator<ImplInfo> IMPL_TIMESTAMP_COMPARATOR = new Comparator<ImplInfo>() {
@@ -121,11 +120,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                         bottomBar.setVisibility(View.VISIBLE);//显示titleBar
                         btnShare.startAnimation(animaBt1);
                         btnDelete.startAnimation(animaBt2);
-                        getView().invalidate();
                     }
                     status[i] = !status[i];
                     setButtonStatus();
                     mAdapter.resetStatus(status);
+                    mAdapter.notifyDataSetChanged();
                 }
                 return false;
             }
@@ -182,7 +181,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-                    // handle back button
                     if (flag_showCheckBox) {
                         refresh(true);
                     }
@@ -367,11 +365,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                 mImplList.remove(i);
             }
         }
-//        mAdapter.resetFlag(flag_showCheckBox);
         Toast.makeText(mActivity.getApplicationContext(), "成功删除了" + statistics() + "条下载", Toast.LENGTH_SHORT).show();
-//        Arrays.fill(status, false);//删除后将status复位
-//        mAdapter.resetStatus(status);
-//        mAdapter.notifyDataSetChanged();//并通知适配器
     }
 
     private int statistics() {
