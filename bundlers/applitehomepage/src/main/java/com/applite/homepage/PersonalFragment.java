@@ -70,11 +70,11 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main_homepage, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        if (null != item) {
-            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        }
+//        inflater.inflate(R.menu.menu_main_homepage, menu);
+//        MenuItem item = menu.findItem(R.id.action_search);
+//        if (null != item) {
+//            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//        }
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.mit.market.network;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +10,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 
 import com.applite.common.AppliteUtils;
@@ -22,6 +25,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.appliteupdate.bean.DataBean;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.market.UpdateNotification;
 import com.osgi.extra.OSGIServiceHost;
@@ -30,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,6 +43,7 @@ import java.util.List;
 public class NetworkReceiver extends BroadcastReceiver {
 
     private static final String TAG = "NetworkReceiver";
+    private static final String START_ALARM_INTENT = "app.start.update.alarm.intent";
     private Context mContext;
     private ImplAgent implAgent;
     private List<DataBean> mDataContents = new ArrayList<DataBean>();
@@ -54,12 +60,12 @@ public class NetworkReceiver extends BroadcastReceiver {
             int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, 0);
             switch (wifiState) {
                 case WifiManager.WIFI_STATE_DISABLED:
-                    LogUtils.i(TAG, "系统关闭wifi");
+                    LogUtils.d(TAG, "系统关闭wifi");
                     break;
                 case WifiManager.WIFI_STATE_DISABLING:
                     break;
                 case WifiManager.WIFI_STATE_ENABLED:
-                    LogUtils.i(TAG, "系统开启wifi");
+                    LogUtils.d(TAG, "系统开启wifi");
                     break;
             }
         }
@@ -70,14 +76,36 @@ public class NetworkReceiver extends BroadcastReceiver {
                 WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                 WifiInfo wifiInfo = wifiManager.getConnectionInfo();
                 //获取当前wifi名称
-                LogUtils.i(TAG, "连接到WIFI:" + wifiInfo.getSSID());
+                LogUtils.d(TAG, "连接到WIFI:" + wifiInfo.getSSID());
 
 //                if (System.currentTimeMillis() > (long) AppliteSPUtils.get(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, 0L))
                 post();
             } else {
-                LogUtils.i(TAG, "无网络连接");
+                LogUtils.d(TAG, "无网络连接");
             }
         }
+
+        if (START_ALARM_INTENT.equals(intent.getAction())) {
+            LogUtils.d(TAG, "接收定时闹钟通知");
+            AlarmManager am = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+            Intent updateTimeIntent = new Intent(START_ALARM_INTENT);
+            updateTimeIntent.setClass(mContext, NetworkReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, updateTimeIntent, 0);
+            am.cancel(pendingIntent);
+            if (isWifi(mContext))
+                post();
+        }
+
+    }
+
+    /**
+     * 判断是否是wifi连接
+     */
+    private boolean isWifi(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null)
+            return false;
+        return cm.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI;
 
     }
 
@@ -93,13 +121,13 @@ public class NetworkReceiver extends BroadcastReceiver {
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
-                LogUtils.i(TAG, "更新请求成功，resulit：" + responseInfo.result);
+                LogUtils.d(TAG, "更新请求成功，resulit：" + responseInfo.result);
                 resolve(responseInfo.result);
             }
 
             @Override
             public void onFailure(HttpException e, String s) {
-                LogUtils.i(TAG, "更新请求失败：" + s);
+                LogUtils.d(TAG, "更新请求失败：" + s);
             }
 
         });
@@ -133,9 +161,9 @@ public class NetworkReceiver extends BroadcastReceiver {
                     bean.setmSize(obj.getLong("apkSize"));
                     mDataContents.add(bean);
                 }
-                if (array.length() != 0){
-                    LogUtils.i("aaaa",array.toString());
-                    UpdateNotification.getInstance().showNot(mContext, array.length() + "", array);}
+                if (array.length() != 0) {
+                    UpdateNotification.getInstance().showNot(mContext, array.length() + "", array);
+                }
                 AppliteSPUtils.put(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, System.currentTimeMillis() + next_update_notify_times);
 
                 SimpleDateFormat sDateFormat = new SimpleDateFormat("hh:mm:ss");
@@ -143,13 +171,25 @@ public class NetworkReceiver extends BroadcastReceiver {
                 int time = Integer.parseInt(date.substring(0, 2)) * 60 * 60 + Integer.parseInt(date.substring(3, 5)) * 60 + Integer.parseInt(date.substring(6, 8));
                 int time_start = Integer.parseInt(wify_update_start.substring(0, 2)) * 60 * 60 + Integer.parseInt(wify_update_start.substring(3, 5)) * 60 + Integer.parseInt(wify_update_start.substring(6, 8));
                 int time_end = Integer.parseInt(wify_update_end.substring(0, 2)) * 60 * 60 + Integer.parseInt(wify_update_end.substring(3, 5)) * 60 + Integer.parseInt(wify_update_end.substring(6, 8));
-                LogUtils.i(TAG, "当前时间：" + time + "--------自动更新时段：" + wify_update_start + "--" + wify_update_end);
-                if (time > time_start && time < time_end)
+                LogUtils.d(TAG, "当前时间：" + time + "--------自动更新时段：" + wify_update_start + "--" + wify_update_end);
+                if (time_start > time_end)//如果开始时间大于结束时间，那么结束时间就是第二天的时间
+                    time_end = time_end + 24 * 60 * 60 * 1000;
+
+                if (time > time_start && time < time_end) {//当前时间正好在闲时
                     downloadAll();
+                } else if (time < time_start) {
+                    long startTime = time_start - time + System.currentTimeMillis();
+                    AlarmManager am = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+                    Intent updateTimeIntent = new Intent(START_ALARM_INTENT);
+                    updateTimeIntent.setClass(mContext, NetworkReceiver.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, updateTimeIntent, 0);
+                    am.set(AlarmManager.RTC, startTime, pendingIntent);
+                }
+
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            LogUtils.i(TAG, TAG + "返回的JSON解析失败");
+            LogUtils.d(TAG, TAG + "返回的JSON解析失败");
         }
     }
 
@@ -167,34 +207,46 @@ public class NetworkReceiver extends BroadcastReceiver {
     private void download(DataBean bean) {
         if (null == implAgent)
             implAgent = ImplAgent.getInstance(mContext.getApplicationContext());
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName()/*, bean.getmVersionCode()*/);
         if (null == implInfo) {
             return;
         }
-        implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());
-        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
-            switch (implInfo.getStatus()) {
-                case Constant.STATUS_PENDING:
-                case Constant.STATUS_RUNNING:
-                    break;
-                case Constant.STATUS_PAUSED:
-                    implAgent.resumeDownload(implInfo, null);
-                    break;
-                case Constant.STATUS_INSTALLED:
-                case Constant.STATUS_NORMAL_INSTALLING:
-                case Constant.STATUS_PRIVATE_INSTALLING:
-                    //正在安装或已安装
-//                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
-                    break;
-                default:
-                    implAgent.newDownload(implInfo,
-                            Constant.extenStorageDirPath,
-                            bean.getmName() + ".apk",
-                            true,
-                            null);
-                    break;
-            }
-        }
+        ImplHelper.updateImpl(mContext,
+                implInfo,
+                bean.getmUrl(),
+                bean.getmName(),
+                bean.getmImgUrl(),
+                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getmName() + ".apk",
+                null,
+                null);
+
+//        implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());
+//        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
+//            switch (implInfo.getStatus()) {
+//                case Constant.STATUS_PENDING:
+//                case Constant.STATUS_RUNNING:
+//                    break;
+//                case Constant.STATUS_PAUSED:
+//                    implAgent.resumeDownload(implInfo, null);
+//                    break;
+//                case Constant.STATUS_INSTALLED:
+//                case Constant.STATUS_NORMAL_INSTALLING:
+//                case Constant.STATUS_PRIVATE_INSTALLING:
+//                    //正在安装或已安装
+////                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
+//                    break;
+//                default:
+//                    implAgent.newDownload(implInfo,
+//                            bean.getmUrl(),
+//                            bean.getmName(),
+//                            bean.getmImgUrl(),
+//                            Constant.extenStorageDirPath,
+//                            bean.getmName() + ".apk",
+//                            true,
+//                            null);
+//                    break;
+//            }
+//        }
     }
 
 }

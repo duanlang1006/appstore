@@ -288,7 +288,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         if (!hidden) {
             LogUtils.i(TAG, "重新显示ActionBar");
             initActionBar();
-            mActivity.runOnUiThread(mRefreshRunnable);
+//            mActivity.runOnUiThread(mRefreshRunnable);
         } else {
             try {
                 ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
@@ -471,11 +471,16 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main_homepage, menu);
         MenuItem item = menu.findItem(R.id.action_search);
         if (null != item) {
-            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            item.setVisible(true);
         }
+
+//        inflater.inflate(R.menu.menu_main_homepage, menu);
+//        MenuItem item = menu.findItem(R.id.action_search);
+//        if (null != item){
+//            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+//        }
     }
 
     @Override

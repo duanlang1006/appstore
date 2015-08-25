@@ -1,21 +1,16 @@
 package com.applite.dm;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.res.Resources;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.internal.view.SupportMenu;
-import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,13 +23,9 @@ import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
 import com.mit.impl.ImplAgent;
-import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
-import com.umeng.analytics.MobclickAgent;
-
-import java.lang.reflect.Field;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -118,23 +109,27 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onDestroy() {
         super.onDestroy();
-        PagerAdapter adapter = mViewPager.getAdapter();
-        if (null != adapter) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            for (int i = 0; i < mViewPager.getAdapter().getCount(); i++) {
-                Fragment f = (Fragment) mViewPager.getAdapter().instantiateItem(mViewPager, i);
-                if (null != f) {
-                    ft.remove(f);
-                }
-            }
-            ft.commit();
-        }
+//        PagerAdapter adapter = mViewPager.getAdapter();
+//        if (null != adapter) {
+//            FragmentTransaction ft = getFragmentManager().beginTransaction();
+//            for (int i = 0; i < mViewPager.getAdapter().getCount(); i++) {
+//                Fragment f = (Fragment) mViewPager.getAdapter().instantiateItem(mViewPager, i);
+//                if (null != f) {
+//                    ft.remove(f);
+//                }
+//            }
+//            ft.commit();
+//        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main_dm, menu);
+        inflater.inflate(R.menu.menu_main_dm,menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        if (null != item){
+            item.setVisible(false);
+        }
     }
 
     @Override

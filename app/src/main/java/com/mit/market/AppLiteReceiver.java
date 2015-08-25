@@ -26,7 +26,7 @@ public class AppLiteReceiver extends BroadcastReceiver {
             setRemind(context,intent);
         }else{
 //            MyIntentService.startByOriginIntent(context,intent);
-            ImplAgent.getInstance(context.getApplicationContext()).onReceive(context,intent);
+//            ImplAgent.getInstance(context.getApplicationContext()).onReceive(context,intent);
         }
     }
 

@@ -6,13 +6,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.Window;
 import android.widget.Toast;
 
+import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
@@ -20,10 +23,15 @@ import com.applite.dm.DownloadPagerFragment;
 import com.applite.homepage.HomePageFragment;
 import com.applite.homepage.HomePageListFragment;
 import com.applite.homepage.PersonalFragment;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.applite.main.DetailFragment;
 import com.mit.applite.search.main.SearchFragment;
 import com.mit.appliteupdate.main.UpdateFragment;
-import com.applite.sharedpreferences.AppliteSPUtils;
 import com.mit.main.GuideFragment;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
@@ -31,6 +39,7 @@ import com.applite.android.R;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceClient;
 import com.osgi.extra.OSGIServiceHost;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -39,6 +48,8 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     private boolean personal_flag = false;
     Toast toast;
+
+    private String mUpdateData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +72,11 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         Fragment fg = fgm.findFragmentById(R.id.container);
         if (null == fg) {
             Intent intent = getIntent();
+            LogUtils.i(TAG, "onCreate得到点击通知栏发过来的意图:" + "intent:" + intent +
+                    "-----intent.getStringExtra:" + intent.getStringExtra("update"));
             if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))) {
                 jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null,
-                        GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, null, null, false, false), false);
+                        GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, null, null, false, true), false);
             } else {
                 jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null,
                         GuideFragment.newBundles(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false, false), false);
@@ -72,6 +85,31 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 //                    .replace(R.id.container,fg,Constant.OSGI_SERVICE_LOGO_FRAGMENT)
 //                    .commit();
         }
+
+        post();
+    }
+
+    private void post() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(this, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", this.getPackageName());
+        params.addBodyParameter("type", "update_management");
+        params.addBodyParameter("protocol_version", "1.0");
+        params.addBodyParameter("update_info", AppliteUtils.getAllApkData(this));
+        HttpUtils mHttpUtils = new HttpUtils();
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+            @Override
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                LogUtils.i(TAG, "首页更新请求成功，resulit：" + responseInfo.result);
+                mUpdateData = responseInfo.result;
+            }
+
+            @Override
+            public void onFailure(HttpException e, String s) {
+                LogUtils.i(TAG, "首页更新请求失败：" + s);
+            }
+
+        });
     }
 
     @Override
@@ -118,6 +156,10 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if (R.id.action_search == id){
+            jumptoSearch(true);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -140,9 +182,9 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))) {
-            LogUtils.i(TAG, "得到点击通知栏发过来的意图");
+            LogUtils.i(TAG, "onNewIntent得到点击通知栏发过来的意图");
             jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null,
-                    GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, null, null, false,true),
+                    GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, null, null, false, true),
                     false);
         }
     }
@@ -280,9 +322,11 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     @Override
     public void jumptoUpdate(boolean addToBackstack) {
+        Bundle bundle = new Bundle();
+        bundle.putString("data", mUpdateData);
         jumpto(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,
                 UpdateFragment.class.getName(),
-                null, addToBackstack);
+                bundle, addToBackstack);
     }
 
     @Override
