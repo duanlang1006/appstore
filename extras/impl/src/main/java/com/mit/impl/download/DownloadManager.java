@@ -120,24 +120,43 @@ public class DownloadManager {
 
     public void removeDownload(DownloadInfo downloadInfo) throws DbException {
         HttpHandler<File> handler = downloadInfo.getHandler();
-        if (handler != null && !handler.isCancelled()) {
-            handler.cancel();
+        if (handler != null) {
+            if (!handler.isCancelled()) {
+                handler.cancel();
+            }else{
+                RequestCallBack callback = handler.getRequestCallBack();
+                if (null != callback){
+                    callback.onCancelled();
+                }
+            }
         }
         downloadInfoList.remove(downloadInfo);
         db.delete(downloadInfo);
     }
 
-    public void stopDownload(int index) throws DbException {
+    public void stopDownload(int index,final RequestCallBack<File> baseCallback) throws DbException {
         DownloadInfo downloadInfo = downloadInfoList.get(index);
-        stopDownload(downloadInfo);
+        stopDownload(downloadInfo,baseCallback);
     }
 
-    public void stopDownload(DownloadInfo downloadInfo) throws DbException {
+    public void stopDownload(DownloadInfo downloadInfo,final RequestCallBack<File> baseCallback) throws DbException {
         HttpHandler<File> handler = downloadInfo.getHandler();
-        if (handler != null && !handler.isCancelled()) {
-            handler.cancel();
+        if (handler != null) {
+            if (!handler.isCancelled()) {
+                handler.cancel();
+            }else{
+                RequestCallBack callback = handler.getRequestCallBack();
+                if (null != callback){
+                    callback.onCancelled();
+                }else if (null != baseCallback){
+                    baseCallback.onCancelled();
+                }
+            }
         } else {
             downloadInfo.setState(HttpHandler.State.CANCELLED);
+            if (null != baseCallback){
+                baseCallback.onCancelled();
+            }
         }
         db.saveOrUpdate(downloadInfo);
     }
@@ -145,8 +164,15 @@ public class DownloadManager {
     public void stopAllDownload() throws DbException {
         for (DownloadInfo downloadInfo : downloadInfoList) {
             HttpHandler<File> handler = downloadInfo.getHandler();
-            if (handler != null && !handler.isCancelled()) {
-                handler.cancel();
+            if (handler != null) {
+                if (!handler.isCancelled()) {
+                    handler.cancel();
+                }else{
+                    RequestCallBack callback = handler.getRequestCallBack();
+                    if (null != callback){
+                        callback.onCancelled();
+                    }
+                }
             } else {
                 downloadInfo.setState(HttpHandler.State.CANCELLED);
             }

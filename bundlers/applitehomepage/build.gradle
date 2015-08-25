@@ -5,7 +5,10 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
+        minSdkVersion 10
+        targetSdkVersion 21
     }
+
 
     lintOptions {
         abortOnError false
@@ -52,14 +55,13 @@ android {
 }
 
 dependencies {
-    provided 'com.umeng.analytics:analytics:latest.integration'
     provided files('../../app/libs/afinal_0.5.1_bin.jar')
     provided files('../../app/reflibs/android-support-v4.jar')
-    provided files('../../app/reflibs/android-support-v7-appcompat.jar')
     provided files('../../extras/applitecommon/applite-common-v1.0.jar')
     provided files('../../extras/impl/applite-impl-v1.1.jar')
     provided files('../../extras/mitUpdateSDK/mit-update-v1.0.jar')
     provided files('../../app/reflibs/gson-2.2.4.jar')
+    compile 'com.android.support:appcompat-v7:21.0.3'
     compile project(':extras:mittheme')
 }
 
