@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.applite.common.Constant;
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
 import com.lidroid.xutils.exception.DbException;
@@ -80,7 +82,6 @@ public class ImplAgent extends Observable {
         if (mImplList == null) {
             mImplList = new ArrayList<ImplInfo>();
         }
-        ImplReceiver.initNetwork(mContext);
 
         mImplCallback = new ImplAgentCallback();
         mWeakCallbackMap = Collections.synchronizedMap(new HashMap());
@@ -88,8 +89,11 @@ public class ImplAgent extends Observable {
         mDownloader = ImplDownload.getInstance(mContext);
         mInstaller = ImplPackageManager.getInstance(mContext);
 
+        ImplReceiver.initNetwork(mContext);
+
         //重新载始下载
         mDownloader.kickDownload(mImplList,mImplCallback);
+        mDownloader.onNetworkChanged(mImplList,mImplCallback);
 //        for (ImplInfo implInfo : mImplList) {
 //            if (mDownloader.needKick(implInfo)) {
 //                mDownloader.resume(implInfo, mImplCallback);
@@ -97,7 +101,7 @@ public class ImplAgent extends Observable {
 //        }
     }
 
-    public ImplInfo getImplInfo(String key, String packageName, int versionCode) {
+    public ImplInfo getImplInfo(String key, String packageName/*, int versionCode*/) {
         if (null == key || null == packageName || TextUtils.isEmpty(key) || TextUtils.isEmpty(packageName)) {
             return null;
         }
@@ -113,8 +117,7 @@ public class ImplAgent extends Observable {
             implInfo.setKey(key);
             mImplList.add(implInfo);
         }
-        implInfo.setPackageName(packageName)
-                .setVersionCode(versionCode);
+        implInfo.setPackageName(packageName)/*.setVersionCode(versionCode)*/;
         mDownloader.fillImplInfo(implInfo);
         mInstaller.fillImplInfo(implInfo);
         return implInfo;
@@ -211,12 +214,12 @@ public class ImplAgent extends Observable {
             return;
         }
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionPause");
-        mDownloader.pause(implInfo);
+        mDownloader.pause(implInfo,mImplCallback);
     }
 
     public void pauseAll() {
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionPauseAll");
-        mDownloader.pauseAll(mImplList);
+        mDownloader.pauseAll(mImplList,mImplCallback);
     }
 
     public void resumeDownload(ImplInfo implInfo, ImplChangeCallback appCallback) {
@@ -285,7 +288,7 @@ public class ImplAgent extends Observable {
         if (null != appCallback && null != implInfo) {
             synchronized (mWeakCallbackMap) {
                 mWeakCallbackMap.put(implInfo, new WeakReference<ImplChangeCallback>(appCallback));
-                ImplLog.d(TAG,"setImplCallback:"+implInfo.getTitle()+","+implInfo+"->"+appCallback);
+//                ImplLog.d(TAG,"setImplCallback:"+implInfo.getTitle()+","+implInfo+"->"+appCallback);
             }
         }
     }
@@ -311,6 +314,7 @@ public class ImplAgent extends Observable {
         public void onPending(final ImplInfo info) {
             super.onPending(info);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadPending");
+            info.setStatus(Constant.STATUS_PENDING);
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {

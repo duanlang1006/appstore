@@ -110,17 +110,17 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onDestroy() {
         super.onDestroy();
-        PagerAdapter adapter = mViewPager.getAdapter();
-        if (null != adapter) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            for (int i = 0; i < mViewPager.getAdapter().getCount(); i++) {
-                Fragment f = (Fragment) mViewPager.getAdapter().instantiateItem(mViewPager, i);
-                if (null != f) {
-                    ft.remove(f);
-                }
-            }
-            ft.commit();
-        }
+//        PagerAdapter adapter = mViewPager.getAdapter();
+//        if (null != adapter) {
+//            FragmentTransaction ft = getFragmentManager().beginTransaction();
+//            for (int i = 0; i < mViewPager.getAdapter().getCount(); i++) {
+//                Fragment f = (Fragment) mViewPager.getAdapter().instantiateItem(mViewPager, i);
+//                if (null != f) {
+//                    ft.remove(f);
+//                }
+//            }
+//            ft.commit();
+//        }
     }
 
     @Override

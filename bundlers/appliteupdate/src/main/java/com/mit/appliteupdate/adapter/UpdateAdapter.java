@@ -147,7 +147,7 @@ public class UpdateAdapter extends BaseAdapter {
         public void initView(DataBean bean,int position) {
             this.bean = bean;
             this.position = position;
-            this.implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
+            this.implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName()/*, bean.getmVersionCode()*/);
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl()).setTitle(bean.getmName());
                 implAgent.setImplCallback(this, implInfo);

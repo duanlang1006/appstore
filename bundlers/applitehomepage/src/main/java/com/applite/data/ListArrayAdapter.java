@@ -191,7 +191,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             this.itemData = itemData;
             this.layoutStr = layout;
             this.position = position;
-            this.implInfo = implAgent.getImplInfo(itemData.getPackageName(), itemData.getPackageName(), itemData.getVersionCode());
+            this.implInfo = implAgent.getImplInfo(itemData.getPackageName(), itemData.getPackageName()/*, itemData.getVersionCode()*/);
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(itemData.getrDownloadUrl())
                         .setTitle(itemData.getName())

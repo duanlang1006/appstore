@@ -119,9 +119,9 @@
     <orderEntry type="module" module-name="applitedm" exported="" />
     <orderEntry type="module" module-name="appliteupdate" exported="" />
     <orderEntry type="module" module-name="applitehomepage" exported="" />
-    <orderEntry type="module" module-name="applitelogo" exported="" />
-    <orderEntry type="module" module-name="mitUpdateSDK" exported="" />
     <orderEntry type="module" module-name="applitecommon" exported="" />
+    <orderEntry type="module" module-name="mitUpdateSDK" exported="" />
+    <orderEntry type="module" module-name="applitelogo" exported="" />
     <orderEntry type="module" module-name="impl" exported="" />
     <orderEntry type="module" module-name="applitedetail" exported="" />
     <orderEntry type="module" module-name="applitesearch" exported="" />

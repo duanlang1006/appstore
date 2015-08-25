@@ -13,6 +13,7 @@ import android.os.HandlerThread;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.applite.common.Constant;
 import com.lidroid.xutils.DbUtils;
@@ -23,7 +24,10 @@ import com.lidroid.xutils.util.MimeTypeUtils;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.lang.ref.WeakReference;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,11 +87,11 @@ public class ImplHelper{
                 try {
                     PackageInfo installPkg = context.getPackageManager()
                             .getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
-                    if (implInfo.getVersionCode() <= installPkg.versionCode) {
+//                    if (implInfo.getVersionCode() <= installPkg.versionCode) {
                         action = ImplInfo.ACTION_OPEN;
-                    }else{
-                        action = ImplInfo.ACTION_DOWNLOAD;
-                    }
+//                    }else{
+//                        action = ImplInfo.ACTION_DOWNLOAD;
+//                    }
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                     action = ImplInfo.ACTION_DOWNLOAD;
@@ -177,11 +181,11 @@ public class ImplHelper{
                 try {
                     PackageInfo installPkg = context.getPackageManager()
                             .getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
-                    if (implInfo.getVersionCode() <= installPkg.versionCode) {
+//                    if (implInfo.getVersionCode() <= installPkg.versionCode) {
                         actionText = mResources.getString(R.string.action_open);
-                    } else {
-                        actionText = mResources.getString(R.string.action_upgrade);
-                    }
+//                    } else {
+//                        actionText = mResources.getString(R.string.action_upgrade);
+//                    }
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                     actionText = mResources.getString(R.string.action_retry);
@@ -481,7 +485,11 @@ public class ImplHelper{
                     implAgent.pauseDownload(implInfo);
                     break;
                 case Constant.STATUS_PAUSED:
-                    implAgent.resumeDownload(implInfo, callback);
+                    if (Constant.CAUSE_PAUSED_BY_NETWORK == implInfo.getCause()){
+                        Toast.makeText(context,R.string.network_disable_toast,Toast.LENGTH_SHORT).show();
+                    }else {
+                        implAgent.resumeDownload(implInfo, callback);
+                    }
                     break;
                 default:
                     implAgent.newDownload(implInfo,
@@ -571,5 +579,28 @@ public class ImplHelper{
                     break;
             }
         }
+    }
+
+    public static String getFileMD5(File file) {
+        if (!file.isFile()) {
+            return null;
+        }
+        MessageDigest digest = null;
+        FileInputStream in = null;
+        byte buffer[] = new byte[1024];
+        int len;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+            in = new FileInputStream(file);
+            while ((len = in.read(buffer, 0, 1024)) != -1) {
+                digest.update(buffer, 0, len);
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        BigInteger bigInt = new BigInteger(1, digest.digest());
+        return bigInt.toString(16);
     }
 }

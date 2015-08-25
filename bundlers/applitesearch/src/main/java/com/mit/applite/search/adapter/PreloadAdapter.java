@@ -165,7 +165,7 @@ public class PreloadAdapter extends BaseAdapter {
         public void initView(SearchBean data, int position) {
             this.bean = data;
             this.mPosition = position;
-            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName(), data.getmVersionCode());
+            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName()/*, data.getmVersionCode()*/);
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
                 implAgent.setImplCallback(this, implInfo);

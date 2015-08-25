@@ -22,7 +22,7 @@ public class ImplInfo {
     private String title;
     private String description;
     private long lastMod;
-    private int versionCode;
+//    private int versionCode;
     private String localPath;
     private String mimeType;
     private boolean autoLaunch;  //下载完成后自动启动安装
@@ -40,7 +40,7 @@ public class ImplInfo {
         title = null;
         description = null;
         lastMod = 0;
-        versionCode = 0;
+//        versionCode = 0;
         localPath = null;
         mimeType = null;
         autoLaunch = false;
@@ -92,9 +92,9 @@ public class ImplInfo {
         return lastMod;
     }
 
-    public int getVersionCode() {
-        return versionCode;
-    }
+//    public int getVersionCode() {
+//        return versionCode;
+//    }
 
     public String getLocalPath() {
         return localPath;
@@ -171,10 +171,10 @@ public class ImplInfo {
         return this;
     }
 
-    public ImplInfo setVersionCode(int versionCode) {
-        this.versionCode = versionCode;
-        return this;
-    }
+//    public ImplInfo setVersionCode(int versionCode) {
+//        this.versionCode = versionCode;
+//        return this;
+//    }
 
     public ImplInfo setLocalPath(String localPath) {
         this.localPath = localPath;

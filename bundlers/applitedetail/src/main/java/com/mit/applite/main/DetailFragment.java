@@ -492,7 +492,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 setPreViewImg();
             }
 
-            ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName, mVersionCode);
+            ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName/*, mVersionCode*/);
             if (null != implinfo) {
                 implAgent.setImplCallback(implCallback, implinfo);
                 implinfo.setDownloadUrl(mDownloadUrl).setIconUrl(mImgUrl).setTitle(mName);

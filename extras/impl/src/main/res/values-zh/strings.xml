@@ -25,4 +25,5 @@
     <string name="install_status_failed" >安装失败</string>
     <string name="install_status_installing" >正在安装</string>
     <string name="install_status_upgrade" >发现更新</string>
+    <string name="network_disable_toast" >没有网络连接，请重新检查网络后再试</string>
 </resources>
