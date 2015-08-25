@@ -3,6 +3,7 @@ package com.mit.market.network;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -30,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -94,7 +96,11 @@ public class NetworkReceiver extends BroadcastReceiver {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 LogUtils.i(TAG, "更新请求成功，resulit：" + responseInfo.result);
-                resolve(responseInfo.result);
+                try {
+                    resolve(responseInfo.result);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -110,7 +116,7 @@ public class NetworkReceiver extends BroadcastReceiver {
      *
      * @param resulit
      */
-    private void resolve(String resulit) {
+    private void resolve(String resulit) throws PackageManager.NameNotFoundException {
         try {
             JSONObject object = new JSONObject(resulit);
             int app_key = object.getInt("app_key");
@@ -135,7 +141,9 @@ public class NetworkReceiver extends BroadcastReceiver {
                 }
                 if (array.length() != 0){
                     LogUtils.i("aaaa",array.toString());
-                    UpdateNotification.getInstance().showNot(mContext, array.length() + "", array);}
+UpdateNotification.getInstance().showNot(mContext, array.length() + "", array);
+
+                }
                 AppliteSPUtils.put(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, System.currentTimeMillis() + next_update_notify_times);
 
                 SimpleDateFormat sDateFormat = new SimpleDateFormat("hh:mm:ss");
@@ -150,6 +158,8 @@ public class NetworkReceiver extends BroadcastReceiver {
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.i(TAG, TAG + "返回的JSON解析失败");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         }
     }
 
