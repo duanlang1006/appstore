@@ -100,6 +100,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private int HINT_UPDATE_TIME = 2000;
     private int HINT_SHOW_NUMBER = 0;
 
+    private boolean switch_hint = false;
+
     private Runnable mNotifyRunnable = new Runnable() {
         @Override
         public void run() {
@@ -205,36 +207,25 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         if (hidden) {
             LogUtils.i(TAG, "隐藏搜索页面");
             mEtViewText = mEtView.getText().toString();
-            closeKeybord();
+            closeKeyboard();
         } else {
             LogUtils.i(TAG, "显示搜索页面");
             initActionBar();
+            closeKeyboard();
+            startConvenientSearch();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-//        getView().setFocusableInTouchMode(true);
-//        getView().requestFocus();
-//        getView().setOnKeyListener(new View.OnKeyListener() {
-//            @Override
-//            public boolean onKey(View v, int keyCode, KeyEvent event) {
-//                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-//                    // handle back button
-//                    getFragmentManager().popBackStackImmediate();
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         MenuItem item = menu.findItem(R.id.action_search);
-        if (null != item){
+        if (null != item) {
             item.setVisible(false);
         }
     }
@@ -242,7 +233,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (android.R.id.home == item.getItemId()) {
-            closeKeybord();
+            closeKeyboard();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -250,7 +241,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onPause() {
         super.onPause();
-        closeKeybord();
+        closeKeyboard();
     }
 
     @Override
@@ -260,6 +251,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 
     private void initActionBar() {
         try {
+            LogUtils.i(TAG, "initActionBar");
             if (null == customView) {
                 customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_search, null);
                 mBackView = (ImageView) customView.findViewById(R.id.search_back);
@@ -269,11 +261,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mSearchView.setOnClickListener(this);
                 mDeleteView = (ImageView) customView.findViewById(R.id.search_delete);
                 mDeleteView.setOnClickListener(this);
-                LogUtils.i(TAG, "设置输入框焦点");
-                mEtView.setFocusable(true);
-                mEtView.setFocusableInTouchMode(true);
-                mEtView.requestFocus();
-                KeyBoardUtils.openKeybord(mEtView, mActivity);
+                getfocuable();
+                openKeyboard();
             }
             if (null != mEtViewText) {
                 isShowPreload = false;
@@ -332,6 +321,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 
         mEtView.addTextChangedListener(mTextWatcher);
 
+        mEtView.setOnClickListener(this);
         mHotChangeView.setOnClickListener(this);
         refresh.setOnClickListener(this);
     }
@@ -397,9 +387,14 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             mListView.setVisibility(View.GONE);
             mEtView.setText(null);
             isHotWordLayoutVisibility(View.VISIBLE);
-            KeyBoardUtils.openKeybord(mEtView, mActivity);
+            getfocuable();
+            openKeyboard();
+            stopConvenientSearch();
         } else if (v.getId() == R.id.search_search) {
             MitMobclickAgent.onEvent(mActivity, "clickSearch");
+            getfocuable();
+            openKeyboard();
+            stopConvenientSearch();
             no_network.setVisibility(View.GONE);
             mPreloadListView.setVisibility(View.GONE);
             if (TextUtils.isEmpty(mEtView.getText())) {
@@ -420,17 +415,57 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             }
         } else if (v.getId() == R.id.hot_word_change) {
             MitMobclickAgent.onEvent(mActivity, "clickHotWordChange");
-            if (mChangeNumbew >= mHotWordPage)
-                mChangeNumbew = 0;
-            mShowHotData.clear();
-            setHotWordShowData(mChangeNumbew);
-            mChangeNumbew = mChangeNumbew + 1;
+            losefocuable();
+            closeKeyboard();
+            changeHotWord();
+            startConvenientSearch();
         } else if (v.getId() == R.id.refresh_btn) {
             no_network.setVisibility(View.GONE);
             postSearch(mEtView.getText().toString());
         } else if (v.getId() == R.id.search_et) {
-            LogUtils.i("duanlang", "search_et");
+            getfocuable();
+            openKeyboard();
+            stopConvenientSearch();
         }
+    }
+
+    private void losefocuable() {
+        mEtView.setFocusable(false);
+    }
+
+    private void getfocuable() {
+        LogUtils.i(TAG, "getfocuable");
+        mEtView.setFocusable(true);
+        mEtView.setFocusableInTouchMode(true);
+        mEtView.requestFocus();
+    }
+
+    private void changeHotWord() {
+        if (mChangeNumbew >= mHotWordPage)
+            mChangeNumbew = 0;
+        mShowHotData.clear();
+        setHotWordShowData(mChangeNumbew);
+        mChangeNumbew = mChangeNumbew + 1;
+    }
+
+    private void stopConvenientSearch() {
+        switch_hint = false;
+        mHandler.removeCallbacks(mRunnable);
+    }
+
+    private void startConvenientSearch() {
+        if (!switch_hint) {
+            switch_hint = true;
+            mHandler.postDelayed(mRunnable, 0);
+        }
+    }
+
+    private void openKeyboard() {
+        KeyBoardUtils.openKeyboard(mEtView, mActivity);
+    }
+
+    private void closeKeyboard() {
+        KeyBoardUtils.closeKeyboard(mEtView, mActivity);
     }
 
     /**
@@ -439,9 +474,13 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private void mEtViewModifyPostSearch(String searchName, boolean showPreload) {
         isShowPreload = showPreload;
         if (!showPreload) {
-            closeKeybord();
+            closeKeyboard();
             mEtView.setText(searchName);
-            mEtView.setSelection(searchName.length());
+            if (searchName.length() < 21) {
+                mEtView.setSelection(searchName.length());
+            } else {
+                mEtView.setSelection(20);
+            }
         }
         if (ISPOSTSEARCH) {
             ISTOEND = false;
@@ -449,10 +488,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             mSearchPostPage = 0;
             postSearch(mEtView.getText().toString());
         }
-    }
-
-    public void closeKeybord() {
-        KeyBoardUtils.closeKeybord(mEtView, mActivity);
     }
 
     /**
@@ -706,7 +741,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 String hint = hint_obj.getString("searchscroll");
                 mHint[i] = hint;
             }
-            mHandler.postDelayed(mRunnable, 0);
+            //mHandler.postDelayed(mRunnable, 0);
+            mEtView.setHint(mHint[0]);
 
             JSONArray hotword_json = new JSONArray(hotword_info);
             for (int i = 0; i < hotword_json.length(); i++) {
