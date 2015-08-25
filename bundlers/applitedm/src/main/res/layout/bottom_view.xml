@@ -19,8 +19,10 @@
         android:layout_weight="1"
         android:background="@color/snow"
         android:drawableTop="@drawable/sharebutton_selector"
+        android:enabled="false"
         android:text="@string/share_btn"
-        android:textColor="@color/black" />
+        android:textColor="@color/lightgrey"
+        android:textSize="14dp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -57,7 +59,8 @@
         android:background="@color/snow"
         android:drawableTop="@drawable/deletebutton_selector"
         android:text="@string/delete_btn"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:textSize="14dp" />
 
     <TextView
         android:id="@+id/tvNone5"

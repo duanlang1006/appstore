@@ -5,17 +5,17 @@
     android:background="@drawable/action_bar_bg_light"
     android:gravity="bottom"
     android:orientation="horizontal"
-    android:paddingBottom="5dp">
+    android:paddingBottom="2dp">
 
     <Button
         android:id="@+id/select_cancel"
         android:layout_width="56dp"
         android:layout_height="30dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="10dp"
         android:background="@drawable/btn_cancel_selector"
         android:paddingBottom="1dp"
-        android:paddingLeft="2dp"
-        android:paddingRight="2dp"
+        android:paddingLeft="1dp"
+        android:paddingRight="1dp"
         android:paddingTop="1dp"
         android:text="@string/cancel_btn"
         android:textColor="@color/black"
@@ -28,14 +28,14 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
-        android:textSize="12dp"
+        android:textSize="16dp"
         android:textStyle="bold" />
 
     <Button
         android:id="@+id/select_allpick"
         android:layout_width="56dp"
         android:layout_height="30dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginRight="10dp"
         android:background="@drawable/btn_allpick_selector"
         android:paddingBottom="1dp"
         android:paddingLeft="2dp"

@@ -17,10 +17,8 @@
 package com.applite.dm;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,24 +27,18 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
-import com.applite.common.IconCache;
-import com.applite.common.LogUtils;
 import com.lidroid.xutils.BitmapUtils;
-import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
-import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
-import com.lidroid.xutils.bitmap.callback.BitmapLoadFrom;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplLog;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class DownloadAdapter extends ArrayAdapter implements View.OnClickListener {
@@ -55,18 +47,22 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
 
     private BitmapUtils mBitmapHelper;
     private ImplAgent implAgent;
-    private boolean flag_showCheckBox = false;
-    private boolean[] status;
     private Animation animaCheckBox;
     private boolean oldFlag = false;
+    private DownloadListener mListener;
 
-    public DownloadAdapter(Context context, int resource, List<ImplInfo> implInfoList, BitmapUtils bitmapHelper, boolean flag_showCheckBox) {
+    public DownloadAdapter(Context context,
+                           int resource,
+                           List<ImplInfo> implInfoList,
+                           BitmapUtils bitmapHelper,
+                           DownloadListener listener
+                           ) {
         super(context, resource, implInfoList);
         mContext = context;
         mBitmapHelper = bitmapHelper;
+        mListener = listener;
         implAgent = ImplAgent.getInstance(context.getApplicationContext());
         this.mLayoutId = resource;
-        this.flag_showCheckBox = flag_showCheckBox;
         animaCheckBox = AnimationUtils.loadAnimation(context, R.anim.checkbox_in);
     }
 
@@ -80,10 +76,10 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         ViewHolder vh = (ViewHolder) view.getTag();
         vh.initView((ImplInfo) getItem(position));
         vh.actionBtn.setOnClickListener(this);
-        if (flag_showCheckBox) {
+        if (mListener.getFlag()) {
             vh.deleteCheckBox.setVisibility(View.VISIBLE);
-            vh.deleteCheckBox.setChecked(status[position]);
-            if (false == oldFlag && true == flag_showCheckBox) {
+            vh.deleteCheckBox.setChecked(mListener.getStatus(position));
+            if (false == oldFlag && true == mListener.getFlag()) {
                 vh.deleteCheckBox.startAnimation(animaCheckBox);
                 if (position == getCount() - 1) {
                     oldFlag = true;
@@ -97,19 +93,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         return view;
     }
 
-    protected int getlen() {
-        return getCount();
-    }
-
-    protected void resetFlag(boolean flag_showCheckBox) {
-        oldFlag = this.flag_showCheckBox;
-        this.flag_showCheckBox = flag_showCheckBox;
-    }
-
-
-    protected void resetStatus(boolean status[]) {
-        this.status = status;
-    }
 
     @Override
     public void onClick(View v) {
@@ -145,6 +128,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         TextView descView;
         TextView statusView;
         TextView actionBtn;
+        ImageButton customImBtn;
         CheckBox deleteCheckBox;
         ImageView iconView;
         ImplInfo implInfo;
@@ -152,6 +136,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
 
         ViewHolder(View view) {
             actionBtn = (TextView) view.findViewById(R.id.button_op);
+//            customImBtn = (ImageButton) view.findViewById(R.id.cpb);
             deleteCheckBox = (CheckBox) view.findViewById(R.id.delete_checkBox);
             progressBar = (ProgressBar) view.findViewById(android.R.id.progress);
             descView = (TextView) view.findViewById(R.id.size_text);
