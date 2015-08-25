@@ -150,6 +150,8 @@ public class UpdateAdapter extends BaseAdapter {
         void initProgressButton() {
             if (null != mBt && null != this.implInfo) {
                 switch (implInfo.getStatus()) {
+                    case Constant.STATUS_INIT:
+                        mBt.setText(mActivity.getResources().getString(R.string.update));
                     case Constant.STATUS_PENDING:
                         mBt.setText(implAgent.getActionText(implInfo));
                         break;

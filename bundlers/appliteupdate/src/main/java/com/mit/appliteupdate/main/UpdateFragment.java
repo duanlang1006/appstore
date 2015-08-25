@@ -38,6 +38,7 @@ import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,6 +70,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private LinearLayout mLoadLayout;
     private ImageView mLoadView;
     private Animation LoadingAnimation;
+    private String mUpdateData;
 
     public UpdateFragment() {
         super();
@@ -79,6 +81,11 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         super.onAttach(activity);
         initActionBar();
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
+        Bundle bundle = getArguments();
+        if (null != bundle) {
+            mUpdateData = bundle.getString("data");
+            LogUtils.d(TAG, "onAttach,mUpdateData:" + mUpdateData);
+        }
     }
 
     @Override
@@ -92,8 +99,11 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_update, container, false);
         initView();
-        post();
-
+        if (TextUtils.isEmpty(mUpdateData)) {
+            post();
+        } else {
+            resolve(mUpdateData);
+        }
         return rootView;
     }
 
@@ -240,6 +250,8 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
      * @param resulit
      */
     private void resolve(String resulit) {
+        if (!TextUtils.isEmpty(mUpdateData))
+            setLoadLayoutVisibility(View.GONE);
         try {
             JSONObject object = new JSONObject(resulit);
             int app_key = object.getInt("app_key");
@@ -257,9 +269,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                     bean.setmPackageName(obj.getString("packageName"));
                     bean.setmUrl(obj.getString("rDownloadUrl"));
                     bean.setmSize(obj.getLong("apkSize"));
-
-//                    bean.setmShowText(AppliteUtils.getString(mContext, R.string.install));
-
+                    bean.setmUrl(obj.getString("apkMd5"));
                     mDataContents.add(bean);
                 }
                 if (array.length() == 0) {

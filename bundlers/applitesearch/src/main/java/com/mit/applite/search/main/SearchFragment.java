@@ -51,6 +51,7 @@ import com.mit.applite.search.utils.KeyBoardUtils;
 import com.mit.applite.search.utils.SearchUtils;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -208,13 +209,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             closeKeybord();
         } else {
             LogUtils.i(TAG, "显示搜索页面");
-            if (mListView.getVisibility() == View.GONE) {
-                LogUtils.i(TAG, "设置输入框焦点");
-                mEtView.setFocusable(true);
-                mEtView.setFocusableInTouchMode(true);
-                mEtView.requestFocus();
-                KeyBoardUtils.openKeybord(mEtView, mActivity);
-            }
             initActionBar();
         }
     }
@@ -259,23 +253,25 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 
     private void initActionBar() {
         try {
-            if (null == customView)
+            if (null == customView) {
                 customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_search, null);
-            mBackView = (ImageView) customView.findViewById(R.id.search_back);
-            mBackView.setOnClickListener(this);
-            mEtView = (EditText) customView.findViewById(R.id.search_et);
-            mEtView.setFocusable(true);
-            mEtView.setFocusableInTouchMode(true);
-            mEtView.requestFocus();
-            KeyBoardUtils.openKeybord(mEtView, mActivity);
+                mBackView = (ImageView) customView.findViewById(R.id.search_back);
+                mBackView.setOnClickListener(this);
+                mEtView = (EditText) customView.findViewById(R.id.search_et);
+                mSearchView = (ImageView) customView.findViewById(R.id.search_search);
+                mSearchView.setOnClickListener(this);
+                mDeleteView = (ImageView) customView.findViewById(R.id.search_delete);
+                mDeleteView.setOnClickListener(this);
+                LogUtils.i(TAG, "设置输入框焦点");
+                mEtView.setFocusable(true);
+                mEtView.setFocusableInTouchMode(true);
+                mEtView.requestFocus();
+                KeyBoardUtils.openKeybord(mEtView, mActivity);
+            }
             if (null != mEtViewText) {
                 isShowPreload = false;
                 mEtView.setText(mEtViewText);
             }
-            mSearchView = (ImageView) customView.findViewById(R.id.search_search);
-            mSearchView.setOnClickListener(this);
-            mDeleteView = (ImageView) customView.findViewById(R.id.search_delete);
-            mDeleteView.setOnClickListener(this);
 
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -394,6 +390,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             mListView.setVisibility(View.GONE);
             mEtView.setText(null);
             isHotWordLayoutVisibility(View.VISIBLE);
+            KeyBoardUtils.openKeybord(mEtView, mActivity);
         } else if (v.getId() == R.id.search_search) {
             MitMobclickAgent.onEvent(mActivity, "clickSearch");
             no_network.setVisibility(View.GONE);
@@ -424,7 +421,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         } else if (v.getId() == R.id.refresh_btn) {
             no_network.setVisibility(View.GONE);
             postSearch(mEtView.getText().toString());
-        } else if (v.getId() == R.id.search_et){
+        } else if (v.getId() == R.id.search_et) {
             LogUtils.i("duanlang", "search_et");
         }
     }
