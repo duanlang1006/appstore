@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -34,7 +35,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
+import java.net.MalformedURLException;
+
 import java.io.File;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -163,29 +168,29 @@ public class NetworkReceiver extends BroadcastReceiver {
                 }
                 if (array.length() != 0) {
                     UpdateNotification.getInstance().showNot(mContext, array.length() + "", array);
+                    AppliteSPUtils.put(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, System.currentTimeMillis() + next_update_notify_times);
+
+                    SimpleDateFormat sDateFormat = new SimpleDateFormat("hh:mm:ss");
+                    String date = sDateFormat.format(new Date());
+                    int time = Integer.parseInt(date.substring(0, 2)) * 60 * 60 + Integer.parseInt(date.substring(3, 5)) * 60 + Integer.parseInt(date.substring(6, 8));
+                    int time_start = Integer.parseInt(wify_update_start.substring(0, 2)) * 60 * 60 + Integer.parseInt(wify_update_start.substring(3, 5)) * 60 + Integer.parseInt(wify_update_start.substring(6, 8));
+                    int time_end = Integer.parseInt(wify_update_end.substring(0, 2)) * 60 * 60 + Integer.parseInt(wify_update_end.substring(3, 5)) * 60 + Integer.parseInt(wify_update_end.substring(6, 8));
+                    LogUtils.d(TAG, "当前时间：" + time + "--------自动更新时段：" + wify_update_start + "--" + wify_update_end);
+                    if (time_start > time_end)//如果开始时间大于结束时间，那么结束时间就是第二天的时间
+                        time_end = time_end + 24 * 60 * 60 * 1000;
+
+                    if (time > time_start && time < time_end) {//当前时间正好在闲时
+                        downloadAll();
+                    } else if (time < time_start) {
+                        long startTime = time_start - time + System.currentTimeMillis();
+                        AlarmManager am = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+                        Intent updateTimeIntent = new Intent(START_ALARM_INTENT);
+                        updateTimeIntent.setClass(mContext, NetworkReceiver.class);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, updateTimeIntent, 0);
+                        am.set(AlarmManager.RTC, startTime, pendingIntent);
+                    }
+
                 }
-                AppliteSPUtils.put(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, System.currentTimeMillis() + next_update_notify_times);
-
-                SimpleDateFormat sDateFormat = new SimpleDateFormat("hh:mm:ss");
-                String date = sDateFormat.format(new Date());
-                int time = Integer.parseInt(date.substring(0, 2)) * 60 * 60 + Integer.parseInt(date.substring(3, 5)) * 60 + Integer.parseInt(date.substring(6, 8));
-                int time_start = Integer.parseInt(wify_update_start.substring(0, 2)) * 60 * 60 + Integer.parseInt(wify_update_start.substring(3, 5)) * 60 + Integer.parseInt(wify_update_start.substring(6, 8));
-                int time_end = Integer.parseInt(wify_update_end.substring(0, 2)) * 60 * 60 + Integer.parseInt(wify_update_end.substring(3, 5)) * 60 + Integer.parseInt(wify_update_end.substring(6, 8));
-                LogUtils.d(TAG, "当前时间：" + time + "--------自动更新时段：" + wify_update_start + "--" + wify_update_end);
-                if (time_start > time_end)//如果开始时间大于结束时间，那么结束时间就是第二天的时间
-                    time_end = time_end + 24 * 60 * 60 * 1000;
-
-                if (time > time_start && time < time_end) {//当前时间正好在闲时
-                    downloadAll();
-                } else if (time < time_start) {
-                    long startTime = time_start - time + System.currentTimeMillis();
-                    AlarmManager am = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-                    Intent updateTimeIntent = new Intent(START_ALARM_INTENT);
-                    updateTimeIntent.setClass(mContext, NetworkReceiver.class);
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, updateTimeIntent, 0);
-                    am.set(AlarmManager.RTC, startTime, pendingIntent);
-                }
-
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -196,6 +201,7 @@ public class NetworkReceiver extends BroadcastReceiver {
     /**
      * 下载所有需要更新的APK更新包
      */
+
     private void downloadAll() {
         DataBean data = null;
         for (int i = 0; i < mDataContents.size(); i++) {

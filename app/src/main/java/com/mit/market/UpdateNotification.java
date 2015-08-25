@@ -5,8 +5,16 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,14 +30,25 @@ import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadFrom;
+import com.mit.market.network.Info;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 
 /**
  * Created by LSY on 15-7-3.
@@ -43,7 +62,7 @@ public class UpdateNotification {
     public static final String UPDATE_NOT = "update_not";
     private List<String> mUrlList = new ArrayList<>();
     private BitmapUtils mBitmapUtils;
-    private LinearLayout ll;
+    private ImageView image1;
 
     private static synchronized UpdateNotification init() {
         if (null == mInstance) {
@@ -96,7 +115,7 @@ public class UpdateNotification {
         mManager.notify(NOTIFICATION_ID, notification);
     }
 
-    public void showNot(Context context, String number, JSONArray array) throws JSONException {
+    public void showNot(Context context, String number, JSONArray array) {
         LogUtils.i(TAG, array.toString());
         mBitmapUtils = BitmapHelper.getBitmapUtils(context.getApplicationContext());
         if (null == mManager) {
@@ -111,77 +130,63 @@ public class UpdateNotification {
         notification.contentView = new RemoteViews(context.getPackageName(), R.layout.notification);
         notification.contentView.setImageViewResource(R.id.notification_large_icon, R.drawable.ic_launcher);
         notification.contentView.setTextViewText(R.id.notification_update, "您有" + number + "个应用可更新！");
-        LogUtils.i(TAG, array.toString());
-        View v2 = View.inflate(context, R.layout.notification, null);
-        if (array.length() < 6) {
-            for (int i = 0; i < array.length(); i++) {
-                LogUtils.i(TAG, array.toString());
-                JSONObject obj = new JSONObject(array.get(i).toString());
-                String icon_url = obj.getString("iconUrl");
-                LogUtils.i(TAG, icon_url);
-                mUrlList.add(icon_url);
-                final int l = i;
-                mBitmapUtils.display(v2, mUrlList.get(i), new BitmapLoadCallBack() {
-                    @Override
-                    public void onLoadCompleted(View view, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
-                        if (l == 0) {
-                            notification.contentView.setImageViewBitmap(R.id.not_img_tu1, bitmap);
-                        } else if (l == 1) {
-                            notification.contentView.setImageViewBitmap(R.id.not_img_tu2, bitmap);
-                        } else if (l == 2) {
-                            notification.contentView.setImageViewBitmap(R.id.not_img_tu3, bitmap);
-                        } else if (l == 3) {
-                            notification.contentView.setImageViewBitmap(R.id.not_img_tu4, bitmap);
-                        } else if (l == 4) {
-                            notification.contentView.setImageViewBitmap(R.id.not_img_tu5, bitmap);
-                        }
+        try {
+            if (array.length() < 6) {
+                for (int i = 0; i < array.length(); i++) {
+                    LogUtils.i(TAG, array.toString());
+                    JSONObject obj = new JSONObject(array.get(i).toString());
+                    String packageName = obj.getString("packageName");
+                    LogUtils.i(TAG, packageName);
+                    final int l = i;
+                    LogUtils.i(TAG, "l=" + l);
+                    if (0 == l) {
+                        notification.contentView.setImageViewBitmap(R.id.not_img_tu1, getBitmap(new Info(context).getAppIcon(packageName)));
+                    } else if (1 == l) {
+                        notification.contentView.setImageViewBitmap(R.id.not_img_tu2, getBitmap(new Info(context).getAppIcon(packageName)));
+                    } else if (2 == l) {
+                        notification.contentView.setImageViewBitmap(R.id.not_img_tu3, getBitmap(new Info(context).getAppIcon(packageName)));
+                    } else if (3 == l) {
+                        notification.contentView.setImageViewBitmap(R.id.not_img_tu4, getBitmap(new Info(context).getAppIcon(packageName)));
+                    } else if (4 == l) {
+                        notification.contentView.setImageViewBitmap(R.id.not_img_tu5, getBitmap(new Info(context).getAppIcon(packageName)));
                     }
-
-                    @Override
-                    public void onLoadFailed(View view, String s, Drawable drawable) {
-
+                }
+            } else {
+                for (int i = 0; i < 5; i++) {
+                    LogUtils.i(TAG, array.toString());
+                    JSONObject obj = new JSONObject(array.get(i).toString());
+                    String packageName = obj.getString("packageName");
+                    LogUtils.i(TAG, packageName);
+                    final int l = i;
+                    LogUtils.i(TAG, "l=" + l);
+                    if (0 == l) {
+                        notification.contentView.setImageViewBitmap(R.id.not_img_tu1, getBitmap(new Info(context).getAppIcon(packageName)));
+                    } else if (1 == l) {
+                        notification.contentView.setImageViewBitmap(R.id.not_img_tu2, getBitmap(new Info(context).getAppIcon(packageName)));
+                    } else if (2 == l) {
+                        notification.contentView.setImageViewBitmap(R.id.not_img_tu3, getBitmap(new Info(context).getAppIcon(packageName)));
+                    } else if (3 == l) {
+                        notification.contentView.setImageViewBitmap(R.id.not_img_tu4, getBitmap(new Info(context).getAppIcon(packageName)));
+                    } else if (4 == l) {
+                        notification.contentView.setImageViewBitmap(R.id.not_img_tu5, getBitmap(new Info(context).getAppIcon(packageName)));
                     }
-                });
-
+                }
+                notification.contentView.setTextViewText(R.id.not_text_etc, "…");
             }
-        } else {
-            for (int i = 0; i < 5; i++) {
-                LogUtils.i(TAG, array.toString());
-                JSONObject obj = new JSONObject(array.get(i).toString());
-                String icon_url = obj.getString("iconUrl");
-                LogUtils.i(TAG, icon_url);
-                mUrlList.add(icon_url);
-
-                final int l = i;
-                BitmapLoadCallBack bitmapLoadCallBack = new BitmapLoadCallBack() {
-                    @Override
-                    public void onLoadCompleted(View view, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
-                        if (l == 0) {
-                            notification.contentView.setImageViewBitmap(R.id.not_img_tu1, bitmap);
-                        } else if (l == 1) {
-                            notification.contentView.setImageViewBitmap(R.id.not_img_tu2, bitmap);
-                        } else if (l == 2) {
-                            notification.contentView.setImageViewBitmap(R.id.not_img_tu3, bitmap);
-                        } else if (l == 3) {
-                            notification.contentView.setImageViewBitmap(R.id.not_img_tu4, bitmap);
-                        } else if (l == 4) {
-                            notification.contentView.setImageViewBitmap(R.id.not_img_tu5, bitmap);
-                        }
-                    }
-
-                    @Override
-                    public void onLoadFailed(View view, String s, Drawable drawable) {
-
-                    }
-
-                };
-                mBitmapUtils.display(v2, mUrlList.get(i), bitmapLoadCallBack);
-            }
-            notification.contentView.setTextViewText(R.id.not_text_etc, "…");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         notification.contentIntent = pendingIntent;
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
         mManager.notify(NOTIFICATION_ID, notification);
     }
 
+
+    /*
+     *Drawable 转 Bitmap
+     */
+    private Bitmap getBitmap(Drawable db) {
+        BitmapDrawable bd = (BitmapDrawable) db;
+        return bd.getBitmap();
+    }
 }
