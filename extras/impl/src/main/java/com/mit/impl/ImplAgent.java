@@ -3,14 +3,10 @@ package com.mit.impl;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.net.Uri;
+import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.text.TextUtils;
-import android.text.format.Formatter;
 import android.util.Log;
 
 import com.applite.common.Constant;
@@ -18,19 +14,15 @@ import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
 import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.util.LogUtils;
-import com.lidroid.xutils.util.MimeTypeUtils;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Set;
@@ -90,21 +82,26 @@ public class ImplAgent extends Observable {
         if (mImplList == null) {
             mImplList = new ArrayList<ImplInfo>();
         }
+
         mImplCallback = new ImplAgentCallback();
         mWeakCallbackMap = Collections.synchronizedMap(new HashMap());
 
         mDownloader = ImplDownload.getInstance(mContext);
         mInstaller = ImplPackageManager.getInstance(mContext);
 
+        ImplReceiver.initNetwork(mContext);
+
         //重新载始下载
-        for (ImplInfo implInfo : mImplList) {
-            if (mDownloader.needKick(implInfo)) {
-                mDownloader.resume(implInfo, mImplCallback);
-            }
-        }
+        mDownloader.kickDownload(mImplList,mImplCallback);
+        mDownloader.onNetworkChanged(mImplList,mImplCallback);
+//        for (ImplInfo implInfo : mImplList) {
+//            if (mDownloader.needKick(implInfo)) {
+//                mDownloader.resume(implInfo, mImplCallback);
+//            }
+//        }
     }
 
-    public ImplInfo getImplInfo(String key, String packageName, int versionCode) {
+    public ImplInfo getImplInfo(String key, String packageName/*, int versionCode*/) {
         if (null == key || null == packageName || TextUtils.isEmpty(key) || TextUtils.isEmpty(packageName)) {
             return null;
         }
@@ -120,8 +117,7 @@ public class ImplAgent extends Observable {
             implInfo.setKey(key);
             mImplList.add(implInfo);
         }
-        implInfo.setPackageName(packageName)
-                .setVersionCode(versionCode);
+        implInfo.setPackageName(packageName)/*.setVersionCode(versionCode)*/;
         mDownloader.fillImplInfo(implInfo);
         mInstaller.fillImplInfo(implInfo);
         return implInfo;
@@ -168,29 +164,46 @@ public class ImplAgent extends Observable {
             }
         } else if (IMPL_ACTION_DOWNLOAD_COMPLETE.equals(action)) {
 //                    mDownloader.onDownloadComplete(intent);
+        }else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)){
+            mDownloader.onNetworkChanged(mImplList,mImplCallback);
         }
 //            }
 //        });
         return true;
     }
 
-    /**
-     * @param implInfo
-     * @param publicDir 下载存储路径
-     * @param filename  保存的文件名
-     */
     public void newDownload(ImplInfo implInfo,
-                            String publicDir,
-                            String filename,
+                            String downloadUrl,
+                            String title,
+                            String iconUrl,
+                            String fullname,
+                            String md5,
                             boolean autoLauncher,
                             ImplChangeCallback appCallback) {
         if (null == implInfo) {
             return;
         }
         setImplCallback(appCallback, implInfo);
+        if (null != downloadUrl) {
+            implInfo.setDownloadUrl(downloadUrl);
+        }
+        if (null != title){
+            implInfo.setTitle(title);
+        }else if (null == implInfo.getTitle()){
+            int index = fullname.lastIndexOf(File.separator);
+            if (index >= 0) {
+                implInfo.setTitle(fullname.substring(index));
+            }else{
+                implInfo.setTitle(fullname);
+            }
+        }
+        if (null != iconUrl){
+            implInfo.setIconUrl(iconUrl);
+        }
 //        implInfo.setMimeType(MimeTypeUtils.getMimeType(filename));
         implInfo.setAutoLaunch(autoLauncher);
-        mDownloader.addDownload(implInfo, publicDir, filename, mImplCallback);
+        mDownloader.addDownload(implInfo, fullname, md5, mImplCallback);
+
         setChanged();
         notifyObservers();
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionAdd");
@@ -201,12 +214,12 @@ public class ImplAgent extends Observable {
             return;
         }
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionPause");
-        mDownloader.pause(implInfo);
+        mDownloader.pause(implInfo,mImplCallback);
     }
 
     public void pauseAll() {
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionPauseAll");
-        mDownloader.pauseAll(mImplList);
+        mDownloader.pauseAll(mImplList,mImplCallback);
     }
 
     public void resumeDownload(ImplInfo implInfo, ImplChangeCallback appCallback) {
@@ -271,377 +284,14 @@ public class ImplAgent extends Observable {
         return count;
     }
 
-    public int getProgress(ImplInfo implInfo) {
-        return mDownloader.getProgress(implInfo);
-    }
-
     public void setImplCallback(ImplChangeCallback appCallback, ImplInfo implInfo) {
         if (null != appCallback && null != implInfo) {
             synchronized (mWeakCallbackMap) {
                 mWeakCallbackMap.put(implInfo, new WeakReference<ImplChangeCallback>(appCallback));
+//                ImplLog.d(TAG,"setImplCallback:"+implInfo.getTitle()+","+implInfo+"->"+appCallback);
             }
         }
     }
-
-    public int getAction(ImplInfo implInfo) {
-        int action = ImplInfo.ACTION_DOWNLOAD;
-        if (null == implInfo) {
-            return action;
-        }
-
-        switch (implInfo.getStatus()) {
-            case Constant.STATUS_INIT:
-            case Constant.STATUS_PENDING:
-            case Constant.STATUS_RUNNING:
-            case Constant.STATUS_FAILED:
-                action = ImplInfo.ACTION_DOWNLOAD;
-                break;
-
-            case Constant.STATUS_SUCCESSFUL:
-                String localPath = implInfo.getLocalPath();
-                if (null == localPath || TextUtils.isEmpty(localPath)) {
-                    localPath = mDownloader.getLocalPath(implInfo);
-                }
-                String mimeType = MimeTypeUtils.getMimeType(localPath);
-                action = ImplInfo.ACTION_OPEN;
-                //下载的是apk
-                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
-                    PackageInfo archivePkg = mContext.getPackageManager()
-                            .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
-                    if (null != archivePkg) {
-                        action = ImplInfo.ACTION_OPEN;
-                    } else {//下载apk解析错误
-                        action = ImplInfo.ACTION_DOWNLOAD;
-                    }
-                }
-                break;
-
-            case Constant.STATUS_INSTALLED:
-                try {
-                    PackageInfo installPkg = mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
-                    if (implInfo.getVersionCode() <= installPkg.versionCode) {
-                        action = ImplInfo.ACTION_OPEN;
-                    }else{
-                        action = ImplInfo.ACTION_DOWNLOAD;
-                    }
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                    action = ImplInfo.ACTION_DOWNLOAD;
-                }
-                break;
-
-//            case Constant.STATUS_UPGRADE:
-//                action = ImplInfo.ACTION_DOWNLOAD;
-//                break;
-
-            case Constant.STATUS_PRIVATE_INSTALLING:
-            case Constant.STATUS_NORMAL_INSTALLING:
-                action = ImplInfo.ACTION_INSTALL;
-                break;
-
-            case Constant.STATUS_PACKAGE_INVALID:
-            case Constant.STATUS_INSTALL_FAILED:
-                action = ImplInfo.ACTION_DOWNLOAD;
-                break;
-        }
-        return action;
-    }
-
-    public String getActionText(ImplInfo implInfo) {
-        Resources mResources = mContext.getResources();
-        String actionText = "";
-        if (null == implInfo) {
-            return actionText;
-        }
-
-        switch (implInfo.getStatus()) {
-            case Constant.STATUS_INIT:
-                actionText = mResources.getString(R.string.action_install);
-                break;
-
-            case Constant.STATUS_PENDING:
-                actionText = mResources.getString(R.string.action_waiting);
-                break;
-
-            case Constant.STATUS_RUNNING:
-                actionText = mResources.getString(R.string.action_pause);
-                break;
-
-            case Constant.STATUS_PAUSED:
-                actionText = mResources.getString(R.string.action_resume);
-                break;
-
-            case Constant.STATUS_FAILED:
-                actionText = mResources.getString(R.string.action_retry);
-                break;
-
-            case Constant.STATUS_SUCCESSFUL:
-                String localPath = implInfo.getLocalPath();
-                if (null == localPath || TextUtils.isEmpty(localPath)) {
-                    localPath = mDownloader.getLocalPath(implInfo);
-                }
-                String mimeType = MimeTypeUtils.getMimeType(localPath);
-                actionText = mResources.getString(R.string.action_open);
-                //下载的是apk
-                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
-                    PackageInfo archivePkg = mContext.getPackageManager()
-                            .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
-                    if (null != archivePkg) {
-                        Intent intent = getLaunchDownloadIntent(mContext, archivePkg.packageName);
-                        if (null == intent) {
-                            actionText = mResources.getString(R.string.action_open);
-                        } else {
-                            actionText = mResources.getString(R.string.action_open);
-                        }
-                    } else {//下载apk解析错误
-                        actionText = mResources.getString(R.string.action_retry);
-                    }
-                }
-                break;
-
-            case Constant.STATUS_INSTALLED:
-                try {
-                    PackageInfo installPkg = mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
-                    if (implInfo.getVersionCode() <= installPkg.versionCode) {
-                        actionText = mResources.getString(R.string.action_open);
-                    } else {
-                        actionText = mResources.getString(R.string.action_upgrade);
-                    }
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                    actionText = mResources.getString(R.string.action_retry);
-                }
-                break;
-
-//            case Constant.STATUS_UPGRADE:
-//                actionText = mResources.getString(R.string.action_upgrade);
-//                break;
-
-            case Constant.STATUS_PRIVATE_INSTALLING:
-            case Constant.STATUS_NORMAL_INSTALLING:
-                actionText = mResources.getString(R.string.action_open);
-                break;
-            case Constant.STATUS_PACKAGE_INVALID:
-            case Constant.STATUS_INSTALL_FAILED:
-                actionText = mResources.getString(R.string.action_retry);
-                break;
-        }
-        return actionText;
-    }
-
-    public String getStatusText(ImplInfo implInfo) {
-        Resources mResources = mContext.getResources();
-        String statusText = "";
-        if (null == implInfo) {
-            return statusText;
-        }
-        switch (implInfo.getStatus()) {
-            case Constant.STATUS_INIT:
-                statusText = "";
-                break;
-
-            case Constant.STATUS_PENDING:
-                statusText = mResources.getString(R.string.download_status_waiting);
-                break;
-
-            case Constant.STATUS_RUNNING:
-                statusText = mResources.getString(R.string.download_status_running);
-                break;
-
-            case Constant.STATUS_PAUSED:
-                statusText = mResources.getString(R.string.download_status_paused);
-                break;
-
-            case Constant.STATUS_FAILED:
-                statusText = mResources.getString(R.string.download_status_error);
-                break;
-
-            case Constant.STATUS_SUCCESSFUL:
-                String localPath = implInfo.getLocalPath();
-                if (null == localPath || TextUtils.isEmpty(localPath)) {
-                    localPath = mDownloader.getLocalPath(implInfo);
-                }
-                String mimeType = MimeTypeUtils.getMimeType(localPath);
-                statusText = mResources.getString(R.string.download_status_success);
-                //下载的是apk
-                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
-                    PackageInfo archivePkg = mContext.getPackageManager()
-                            .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
-                    if (null == archivePkg) {
-                        statusText = mResources.getString(R.string.download_status_invalid_package);
-                    }
-                }
-                break;
-
-            case Constant.STATUS_INSTALLED:
-                try {
-                    mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
-                    statusText = mResources.getString(R.string.install_status_success);
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                    statusText = mResources.getString(R.string.download_status_invalid_package);
-                }
-                break;
-
-//            case Constant.STATUS_UPGRADE:
-//                statusText = mResources.getString(R.string.install_status_upgrade);
-//                break;
-
-            case Constant.STATUS_PRIVATE_INSTALLING:
-            case Constant.STATUS_NORMAL_INSTALLING:
-                statusText = mResources.getString(R.string.install_status_installing);
-                break;
-
-            case Constant.STATUS_PACKAGE_INVALID:
-                statusText = mResources.getString(R.string.download_status_invalid_package);
-                break;
-            case Constant.STATUS_INSTALL_FAILED:
-                statusText = mResources.getString(R.string.install_status_failed);
-                break;
-        }
-        return statusText;
-    }
-
-    public String getDescText(ImplInfo implInfo) {
-        Resources mResources = mContext.getResources();
-        String descText = "";
-        if (null == implInfo) {
-            return descText;
-        }
-        ImplDownload implDownload = mDownloader;
-        switch (implInfo.getStatus()) {
-            case Constant.STATUS_INIT:
-            case Constant.STATUS_PENDING:
-            case Constant.STATUS_RUNNING:
-            case Constant.STATUS_PAUSED:
-            case Constant.STATUS_FAILED:
-                descText = getSizeText(mContext, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
-                break;
-
-            case Constant.STATUS_SUCCESSFUL:
-                String localPath = implInfo.getLocalPath();
-                if (null == localPath || TextUtils.isEmpty(localPath)) {
-                    localPath = mDownloader.getLocalPath(implInfo);
-                }
-                String mimeType = MimeTypeUtils.getMimeType(localPath);
-                descText = Formatter.formatFileSize(mContext, implDownload.getTotalBytes(implInfo));
-                //下载的是apk
-                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
-                    PackageInfo archivePkg = mContext.getPackageManager()
-                            .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
-                    if (null != archivePkg) {
-                        descText = (String.format(mResources.getString(R.string.apk_version), archivePkg.versionName));
-                    }
-                }
-                descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
-                break;
-
-            case Constant.STATUS_INSTALLED:
-                try {
-                    PackageInfo installPkg = mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
-                    descText = (String.format(mResources.getString(R.string.apk_version), installPkg.versionName));
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                    descText = Formatter.formatFileSize(mContext, implDownload.getTotalBytes(implInfo));
-                }
-                descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
-                break;
-
-//            case Constant.STATUS_UPGRADE:
-//                descText = mResources.getString(R.string.install_status_upgrade);
-//                descText += ("|" + millis2FormatString("yy-MM-dd",implInfo.getLastMod()));
-//                break;
-
-            case Constant.STATUS_PRIVATE_INSTALLING:
-            case Constant.STATUS_NORMAL_INSTALLING:
-            case Constant.STATUS_PACKAGE_INVALID:
-            case Constant.STATUS_INSTALL_FAILED:
-                descText = Formatter.formatFileSize(mContext, implDownload.getTotalBytes(implInfo));
-                descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
-                break;
-        }
-        return descText;
-    }
-
-    public boolean startActivity(ImplInfo implInfo){
-        boolean ret = true;
-        Intent intent = getActionIntent(implInfo);
-        switch(getAction(implInfo)){
-            case ImplInfo.ACTION_INSTALL:
-                MitMobclickAgent.onEvent(mContext, "impl_startActivity_InstallApk");
-                break;
-            case ImplInfo.ACTION_OPEN:
-                MitMobclickAgent.onEvent(mContext, "impl_startActivity_OpenApk");
-                break;
-        }
-        try {
-            mContext.startActivity(intent);
-        } catch (Exception e) {
-            e.printStackTrace();
-            ret = false;
-        }
-        return ret;
-    }
-
-    private Intent getActionIntent(ImplInfo implInfo) {
-        Intent actionIntent = null;
-        if (null == implInfo) {
-            return actionIntent;
-        }
-        switch (implInfo.getStatus()) {
-            case Constant.STATUS_INIT:
-            case Constant.STATUS_PENDING:
-            case Constant.STATUS_RUNNING:
-            case Constant.STATUS_PAUSED:
-            case Constant.STATUS_FAILED:
-                actionIntent = null;
-                break;
-
-            case Constant.STATUS_PRIVATE_INSTALLING:
-            case Constant.STATUS_NORMAL_INSTALLING:
-            case Constant.STATUS_SUCCESSFUL:
-                String localPath = implInfo.getLocalPath();
-                if (null == localPath || TextUtils.isEmpty(localPath)) {
-                    localPath = mDownloader.getLocalPath(implInfo);
-                }
-                String mimeType = MimeTypeUtils.getMimeType(localPath);
-                //下载的是apk
-                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
-                    PackageInfo archivePkg = mContext.getPackageManager()
-                            .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
-                    if (null != archivePkg) {
-                        actionIntent = getLaunchDownloadIntent(mContext, archivePkg.packageName);
-                    } else {//下载apk解析错误
-                        actionIntent = null;
-                    }
-                }
-                if (null == actionIntent) {
-                    actionIntent = getOpenDownloadIntent(localPath, mimeType);
-                }
-                break;
-
-            case Constant.STATUS_INSTALLED:
-                try {
-                    PackageInfo installPkg = mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
-                    actionIntent = getLaunchDownloadIntent(mContext, implInfo.getPackageName());
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                    actionIntent = null;
-                }
-                break;
-
-//            case Constant.STATUS_UPGRADE:
-//                actionIntent = null;
-//                break;
-
-            case Constant.STATUS_PACKAGE_INVALID:
-            case Constant.STATUS_INSTALL_FAILED:
-                actionIntent = null;
-                break;
-        }
-        return actionIntent;
-    }
-
 
     private ImplInfo findImplInfoByPackageName(String packageName) {
         ImplInfo implInfo = null;
@@ -656,14 +306,15 @@ public class ImplAgent extends Observable {
 
 
     private class ImplAgentCallback extends ImplListener {
+
         private ImplAgentCallback() {
             super();
         }
-
         @Override
         public void onPending(final ImplInfo info) {
             super.onPending(info);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadPending");
+            info.setStatus(Constant.STATUS_PENDING);
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -914,40 +565,421 @@ public class ImplAgent extends Observable {
             }
         }
     }
+//    public static String getSizeText(Context context, long currentBytes, long totalBytes) {
+//        StringBuffer sizeText = new StringBuffer();
+//        if (totalBytes >= 0) {
+//            sizeText.append(Formatter.formatFileSize(context, currentBytes));
+//            sizeText.append("/");
+//            sizeText.append(Formatter.formatFileSize(context, totalBytes));
+//        }
+//        return sizeText.toString();
+//    }
+//
+//    public static String millis2FormatString(String format, Long millis) {
+//        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
+//        return sdf.format(new Date(millis));
+//    }
+//
+//    public static Intent getOpenDownloadIntent(String localPath, String mediaType) {
+//        Uri localUri = Uri.fromFile(new File(localPath));
+//        if (null != localUri) {
+//            Intent intent = new Intent(Intent.ACTION_VIEW);
+//            intent.setDataAndType(localUri, mediaType);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//            return intent;
+//        }
+//        return null;
+//    }
+//
+//    public static Intent getLaunchDownloadIntent(Context context, String packageName) {
+//        Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+//        if (null != intent) {
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+//        }
+//        return intent;
+//    }
 
-    public static String getSizeText(Context context, long currentBytes, long totalBytes) {
-        StringBuffer sizeText = new StringBuffer();
-        if (totalBytes >= 0) {
-            sizeText.append(Formatter.formatFileSize(context, currentBytes));
-            sizeText.append("/");
-            sizeText.append(Formatter.formatFileSize(context, totalBytes));
-        }
-        return sizeText.toString();
-    }
-
-    public static String millis2FormatString(String format, Long millis) {
-        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.getDefault());
-        return sdf.format(new Date(millis));
-    }
-
-    public static Intent getOpenDownloadIntent(String localPath, String mediaType) {
-        Uri localUri = Uri.fromFile(new File(localPath));
-        if (null != localUri) {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(localUri, mediaType);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            return intent;
-        }
-        return null;
-    }
-
-    public static Intent getLaunchDownloadIntent(Context context, String packageName) {
-        Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
-        if (null != intent) {
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-        }
-        return intent;
-    }
-
+    //    public int getProgress(ImplInfo implInfo) {
+//        return mDownloader.getProgress(implInfo);
+//    }
+//
+//    public int getAction(ImplInfo implInfo) {
+//        int action = ImplInfo.ACTION_DOWNLOAD;
+//        if (null == implInfo) {
+//            return action;
+//        }
+//
+//        switch (implInfo.getStatus()) {
+//            case Constant.STATUS_INIT:
+//            case Constant.STATUS_PENDING:
+//            case Constant.STATUS_RUNNING:
+//            case Constant.STATUS_FAILED:
+//                action = ImplInfo.ACTION_DOWNLOAD;
+//                break;
+//
+//            case Constant.STATUS_SUCCESSFUL:
+//                String localPath = implInfo.getLocalPath();
+//                if (null == localPath || TextUtils.isEmpty(localPath)) {
+//                    localPath = mDownloader.getLocalPath(implInfo);
+//                }
+//                String mimeType = MimeTypeUtils.getMimeType(localPath);
+//                action = ImplInfo.ACTION_OPEN;
+//                //下载的是apk
+//                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
+//                    PackageInfo archivePkg = mContext.getPackageManager()
+//                            .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
+//                    if (null != archivePkg) {
+//                        action = ImplInfo.ACTION_OPEN;
+//                    } else {//下载apk解析错误
+//                        action = ImplInfo.ACTION_DOWNLOAD;
+//                    }
+//                }
+//                break;
+//
+//            case Constant.STATUS_INSTALLED:
+//                try {
+//                    PackageInfo installPkg = mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
+//                    if (implInfo.getVersionCode() <= installPkg.versionCode) {
+//                        action = ImplInfo.ACTION_OPEN;
+//                    }else{
+//                        action = ImplInfo.ACTION_DOWNLOAD;
+//                    }
+//                } catch (PackageManager.NameNotFoundException e) {
+//                    e.printStackTrace();
+//                    action = ImplInfo.ACTION_DOWNLOAD;
+//                }
+//                break;
+//
+////            case Constant.STATUS_UPGRADE:
+////                action = ImplInfo.ACTION_DOWNLOAD;
+////                break;
+//
+//            case Constant.STATUS_PRIVATE_INSTALLING:
+//            case Constant.STATUS_NORMAL_INSTALLING:
+//                action = ImplInfo.ACTION_INSTALL;
+//                break;
+//
+//            case Constant.STATUS_PACKAGE_INVALID:
+//            case Constant.STATUS_INSTALL_FAILED:
+//                action = ImplInfo.ACTION_DOWNLOAD;
+//                break;
+//        }
+//        return action;
+//    }
+//
+//    public String getActionText(ImplInfo implInfo) {
+//        Resources mResources = mContext.getResources();
+//        String actionText = "";
+//        if (null == implInfo) {
+//            return actionText;
+//        }
+//
+//        switch (implInfo.getStatus()) {
+//            case Constant.STATUS_INIT:
+//                actionText = mResources.getString(R.string.action_install);
+//                break;
+//
+//            case Constant.STATUS_PENDING:
+//                actionText = mResources.getString(R.string.action_waiting);
+//                break;
+//
+//            case Constant.STATUS_RUNNING:
+//                actionText = mResources.getString(R.string.action_pause);
+//                break;
+//
+//            case Constant.STATUS_PAUSED:
+//                actionText = mResources.getString(R.string.action_resume);
+////                switch(implInfo.getCause()){
+////                    case Constant.CAUSE_PAUSED_BY_APP:
+////                        actionText = mResources.getString(R.string.action_resume);
+////                        break;
+////                    case Constant.CAUSE_PAUSED_BY_NETWORK:
+////                    case Constant.CAUSE_PAUSED_BY_OVERSIZE:
+////                    default:
+////                        actionText = mResources.getString(R.string.action_pause);
+////                        break;
+////                }
+//                break;
+//
+//            case Constant.STATUS_FAILED:
+//                actionText = mResources.getString(R.string.action_retry);
+//                break;
+//
+//            case Constant.STATUS_SUCCESSFUL:
+//                String localPath = implInfo.getLocalPath();
+//                if (null == localPath || TextUtils.isEmpty(localPath)) {
+//                    localPath = mDownloader.getLocalPath(implInfo);
+//                }
+//                String mimeType = MimeTypeUtils.getMimeType(localPath);
+//                actionText = mResources.getString(R.string.action_open);
+//                //下载的是apk
+//                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
+//                    PackageInfo archivePkg = mContext.getPackageManager()
+//                            .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
+//                    if (null != archivePkg) {
+//                        Intent intent = getLaunchDownloadIntent(mContext, archivePkg.packageName);
+//                        if (null == intent) {
+//                            actionText = mResources.getString(R.string.action_open);
+//                        } else {
+//                            actionText = mResources.getString(R.string.action_open);
+//                        }
+//                    } else {//下载apk解析错误
+//                        actionText = mResources.getString(R.string.action_retry);
+//                    }
+//                }
+//                break;
+//
+//            case Constant.STATUS_INSTALLED:
+//                try {
+//                    PackageInfo installPkg = mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
+//                    if (implInfo.getVersionCode() <= installPkg.versionCode) {
+//                        actionText = mResources.getString(R.string.action_open);
+//                    } else {
+//                        actionText = mResources.getString(R.string.action_upgrade);
+//                    }
+//                } catch (PackageManager.NameNotFoundException e) {
+//                    e.printStackTrace();
+//                    actionText = mResources.getString(R.string.action_retry);
+//                }
+//                break;
+//
+////            case Constant.STATUS_UPGRADE:
+////                actionText = mResources.getString(R.string.action_upgrade);
+////                break;
+//
+//            case Constant.STATUS_PRIVATE_INSTALLING:
+//            case Constant.STATUS_NORMAL_INSTALLING:
+//                actionText = mResources.getString(R.string.action_open);
+//                break;
+//            case Constant.STATUS_PACKAGE_INVALID:
+//            case Constant.STATUS_INSTALL_FAILED:
+//                actionText = mResources.getString(R.string.action_retry);
+//                break;
+//        }
+//        return actionText;
+//    }
+//
+//    public String getStatusText(ImplInfo implInfo) {
+//        Resources mResources = mContext.getResources();
+//        String statusText = "";
+//        if (null == implInfo) {
+//            return statusText;
+//        }
+//        switch (implInfo.getStatus()) {
+//            case Constant.STATUS_INIT:
+//                statusText = "";
+//                break;
+//
+//            case Constant.STATUS_PENDING:
+//                statusText = mResources.getString(R.string.download_status_waiting);
+//                break;
+//
+//            case Constant.STATUS_RUNNING:
+//                statusText = mResources.getString(R.string.download_status_running);
+//                break;
+//
+//            case Constant.STATUS_PAUSED:
+//                switch(implInfo.getCause()){
+//                    case Constant.CAUSE_PAUSED_BY_APP:
+//                        statusText = mResources.getString(R.string.download_status_paused);
+//                        break;
+//                    case Constant.CAUSE_PAUSED_BY_NETWORK:
+//                        statusText = mResources.getString(R.string.download_status_waiting_network);
+//                        break;
+//                    case Constant.CAUSE_PAUSED_BY_OVERSIZE:
+//                        statusText = mResources.getString(R.string.download_status_waiting_wlan);
+//                        break;
+//                }
+//                break;
+//
+//            case Constant.STATUS_FAILED:
+//                statusText = mResources.getString(R.string.download_status_error);
+//                break;
+//
+//            case Constant.STATUS_SUCCESSFUL:
+//                String localPath = implInfo.getLocalPath();
+//                if (null == localPath || TextUtils.isEmpty(localPath)) {
+//                    localPath = mDownloader.getLocalPath(implInfo);
+//                }
+//                String mimeType = MimeTypeUtils.getMimeType(localPath);
+//                statusText = mResources.getString(R.string.download_status_success);
+//                //下载的是apk
+//                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
+//                    PackageInfo archivePkg = mContext.getPackageManager()
+//                            .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
+//                    if (null == archivePkg) {
+//                        statusText = mResources.getString(R.string.download_status_invalid_package);
+//                    }
+//                }
+//                break;
+//
+//            case Constant.STATUS_INSTALLED:
+//                try {
+//                    mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
+//                    statusText = mResources.getString(R.string.install_status_success);
+//                } catch (PackageManager.NameNotFoundException e) {
+//                    e.printStackTrace();
+//                    statusText = mResources.getString(R.string.download_status_invalid_package);
+//                }
+//                break;
+//
+////            case Constant.STATUS_UPGRADE:
+////                statusText = mResources.getString(R.string.install_status_upgrade);
+////                break;
+//
+//            case Constant.STATUS_PRIVATE_INSTALLING:
+//            case Constant.STATUS_NORMAL_INSTALLING:
+//                statusText = mResources.getString(R.string.install_status_installing);
+//                break;
+//
+//            case Constant.STATUS_PACKAGE_INVALID:
+//                statusText = mResources.getString(R.string.download_status_invalid_package);
+//                break;
+//            case Constant.STATUS_INSTALL_FAILED:
+//                statusText = mResources.getString(R.string.install_status_failed);
+//                break;
+//        }
+//        return statusText;
+//    }
+//
+//    public String getDescText(ImplInfo implInfo) {
+//        Resources mResources = mContext.getResources();
+//        String descText = "";
+//        if (null == implInfo) {
+//            return descText;
+//        }
+//        ImplDownload implDownload = mDownloader;
+//        switch (implInfo.getStatus()) {
+//            case Constant.STATUS_INIT:
+//            case Constant.STATUS_PENDING:
+//            case Constant.STATUS_RUNNING:
+//            case Constant.STATUS_PAUSED:
+//            case Constant.STATUS_FAILED:
+//                descText = getSizeText(mContext, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
+//                break;
+//
+//            case Constant.STATUS_SUCCESSFUL:
+//                String localPath = implInfo.getLocalPath();
+//                if (null == localPath || TextUtils.isEmpty(localPath)) {
+//                    localPath = mDownloader.getLocalPath(implInfo);
+//                }
+//                String mimeType = MimeTypeUtils.getMimeType(localPath);
+//                descText = Formatter.formatFileSize(mContext, implDownload.getTotalBytes(implInfo));
+//                //下载的是apk
+//                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
+//                    PackageInfo archivePkg = mContext.getPackageManager()
+//                            .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
+//                    if (null != archivePkg) {
+//                        descText = (String.format(mResources.getString(R.string.apk_version), archivePkg.versionName));
+//                    }
+//                }
+//                descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
+//                break;
+//
+//            case Constant.STATUS_INSTALLED:
+//                try {
+//                    PackageInfo installPkg = mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
+//                    descText = (String.format(mResources.getString(R.string.apk_version), installPkg.versionName));
+//                } catch (PackageManager.NameNotFoundException e) {
+//                    e.printStackTrace();
+//                    descText = Formatter.formatFileSize(mContext, implDownload.getTotalBytes(implInfo));
+//                }
+//                descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
+//                break;
+//
+////            case Constant.STATUS_UPGRADE:
+////                descText = mResources.getString(R.string.install_status_upgrade);
+////                descText += ("|" + millis2FormatString("yy-MM-dd",implInfo.getLastMod()));
+////                break;
+//
+//            case Constant.STATUS_PRIVATE_INSTALLING:
+//            case Constant.STATUS_NORMAL_INSTALLING:
+//            case Constant.STATUS_PACKAGE_INVALID:
+//            case Constant.STATUS_INSTALL_FAILED:
+//                descText = Formatter.formatFileSize(mContext, implDownload.getTotalBytes(implInfo));
+//                descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
+//                break;
+//        }
+//        return descText;
+//    }
+//
+//    public boolean startActivity(ImplInfo implInfo){
+//        boolean ret = true;
+//        Intent intent = getActionIntent(implInfo);
+//        switch(getAction(implInfo)){
+//            case ImplInfo.ACTION_INSTALL:
+//                MitMobclickAgent.onEvent(mContext, "impl_startActivity_InstallApk");
+//                break;
+//            case ImplInfo.ACTION_OPEN:
+//                MitMobclickAgent.onEvent(mContext, "impl_startActivity_OpenApk");
+//                break;
+//        }
+//        try {
+//            mContext.startActivity(intent);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            ret = false;
+//        }
+//        return ret;
+//    }
+//
+//    private Intent getActionIntent(ImplInfo implInfo) {
+//        Intent actionIntent = null;
+//        if (null == implInfo) {
+//            return actionIntent;
+//        }
+//        switch (implInfo.getStatus()) {
+//            case Constant.STATUS_INIT:
+//            case Constant.STATUS_PENDING:
+//            case Constant.STATUS_RUNNING:
+//            case Constant.STATUS_PAUSED:
+//            case Constant.STATUS_FAILED:
+//                actionIntent = null;
+//                break;
+//
+//            case Constant.STATUS_PRIVATE_INSTALLING:
+//            case Constant.STATUS_NORMAL_INSTALLING:
+//            case Constant.STATUS_SUCCESSFUL:
+//                String localPath = implInfo.getLocalPath();
+//                if (null == localPath || TextUtils.isEmpty(localPath)) {
+//                    localPath = mDownloader.getLocalPath(implInfo);
+//                }
+//                String mimeType = MimeTypeUtils.getMimeType(localPath);
+//                //下载的是apk
+//                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
+//                    PackageInfo archivePkg = mContext.getPackageManager()
+//                            .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
+//                    if (null != archivePkg) {
+//                        actionIntent = getLaunchDownloadIntent(mContext, archivePkg.packageName);
+//                    } else {//下载apk解析错误
+//                        actionIntent = null;
+//                    }
+//                }
+//                if (null == actionIntent) {
+//                    actionIntent = getOpenDownloadIntent(localPath, mimeType);
+//                }
+//                break;
+//
+//            case Constant.STATUS_INSTALLED:
+//                try {
+//                    PackageInfo installPkg = mContext.getPackageManager().getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
+//                    actionIntent = getLaunchDownloadIntent(mContext, implInfo.getPackageName());
+//                } catch (PackageManager.NameNotFoundException e) {
+//                    e.printStackTrace();
+//                    actionIntent = null;
+//                }
+//                break;
+//
+////            case Constant.STATUS_UPGRADE:
+////                actionIntent = null;
+////                break;
+//
+//            case Constant.STATUS_PACKAGE_INVALID:
+//            case Constant.STATUS_INSTALL_FAILED:
+//                actionIntent = null;
+//                break;
+//        }
+//        return actionIntent;
+//    }
 
 }

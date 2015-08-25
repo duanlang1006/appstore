@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +23,14 @@ import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
+import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.applite.homepage.R;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
+
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -106,27 +110,39 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             if (obj instanceof ViewHolder) {
                 ViewHolder vh = (ViewHolder) obj;
                 MitMobclickAgent.onEvent(mContext,"onClickButton"+vh.getItemPosition());
-                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-                    switch (vh.implInfo.getStatus()) {
-                        case Constant.STATUS_PENDING:
-                            break;
-                        case Constant.STATUS_RUNNING:
-                            implAgent.pauseDownload(vh.implInfo);
-                            break;
-                        case Constant.STATUS_PAUSED:
-                            implAgent.resumeDownload(vh.implInfo, vh);
-                            break;
-                        default:
-                            implAgent.newDownload(vh.implInfo,
-                                    Constant.extenStorageDirPath,
-                                    vh.itemData.getName() + ".apk",
-                                    true,
-                                    vh);
-                            break;
-                    }
-                } else {
-                    implAgent.startActivity(vh.implInfo);
-                }
+                ImplHelper.onClick(mContext,
+                        vh.implInfo,
+                        vh.itemData.getrDownloadUrl(),
+                        vh.itemData.getName(),
+                        vh.itemData.getIconUrl(),
+                        Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.itemData.getName() + ".apk",
+                        null,
+                        vh);
+
+//                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
+//                    switch (vh.implInfo.getStatus()) {
+//                        case Constant.STATUS_PENDING:
+//                            break;
+//                        case Constant.STATUS_RUNNING:
+//                            implAgent.pauseDownload(vh.implInfo);
+//                            break;
+//                        case Constant.STATUS_PAUSED:
+//                            implAgent.resumeDownload(vh.implInfo, vh);
+//                            break;
+//                        default:
+//                            implAgent.newDownload(vh.implInfo,
+//                                    vh.itemData.getrDownloadUrl(),
+//                                    vh.itemData.getName(),
+//                                    vh.itemData.getIconUrl(),
+//                                    Constant.extenStorageDirPath,
+//                                    vh.itemData.getName() + ".apk",
+//                                    true,
+//                                    vh);
+//                            break;
+//                    }
+//                } else {
+//                    implAgent.startActivity(vh.implInfo);
+//                }
             }
         }
     }
@@ -175,7 +191,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             this.itemData = itemData;
             this.layoutStr = layout;
             this.position = position;
-            this.implInfo = implAgent.getImplInfo(itemData.getPackageName(), itemData.getPackageName(), itemData.getVersionCode());
+            this.implInfo = implAgent.getImplInfo(itemData.getPackageName(), itemData.getPackageName()/*, itemData.getVersionCode()*/);
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(itemData.getrDownloadUrl())
                         .setTitle(itemData.getName())
@@ -261,24 +277,24 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
         void initProgressButton() {
             if (null != mProgressButton && null != this.implInfo){
-                LogUtils.d(TAG,implInfo.getTitle()+","+implInfo.getStatus()+","+implAgent.getActionText(implInfo));
+                LogUtils.d(TAG,implInfo.getTitle()+","+implInfo.getStatus()+","+ImplHelper.getActionText(mContext,implInfo));
                 mProgressButton.setEnabled(true);
                 switch (implInfo.getStatus()){
                     case Constant.STATUS_PENDING:
-                        mProgressButton.setText(implAgent.getActionText(implInfo));
+                        mProgressButton.setText(ImplHelper.getActionText(mContext,implInfo));
                         break;
                     case Constant.STATUS_RUNNING:
-                        mProgressButton.setText(implAgent.getProgress(implInfo)+"%");
+                        mProgressButton.setText(ImplHelper.getProgress(mContext,implInfo)+"%");
                         break;
                     case Constant.STATUS_PAUSED:
-                        mProgressButton.setText(implAgent.getStatusText(implInfo));
+                        mProgressButton.setText(ImplHelper.getStatusText(mContext,implInfo));
                         break;
                     case Constant.STATUS_PRIVATE_INSTALLING:
-                        mProgressButton.setText(implAgent.getStatusText(implInfo));
+                        mProgressButton.setText(ImplHelper.getStatusText(mContext,implInfo));
                         mProgressButton.setEnabled(false);
                         break;
                     default:
-                        mProgressButton.setText(implAgent.getActionText(implInfo));
+                        mProgressButton.setText(ImplHelper.getActionText(mContext,implInfo));
                         break;
                 }
             }

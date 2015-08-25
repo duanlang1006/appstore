@@ -168,6 +168,13 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         super.onHiddenChanged(hidden);
         if (!hidden){
             initActionBar();
+            if (null != mTopicView){
+                mTopicView.startPlay();
+            }
+        }else{
+            if (null != mTopicView){
+                mTopicView.stopPlay();
+            }
         }
     }
 
