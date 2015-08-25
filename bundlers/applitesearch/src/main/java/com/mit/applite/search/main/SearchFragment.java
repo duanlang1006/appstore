@@ -49,6 +49,7 @@ import com.mit.applite.search.utils.KeyBoardUtils;
 import com.mit.applite.search.utils.SearchUtils;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -224,7 +225,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         MenuItem item = menu.findItem(R.id.action_search);
-        if (null != item){
+        if (null != item) {
             item.setVisible(false);
         }
     }
@@ -251,21 +252,22 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private void initActionBar() {
         try {
             LogUtils.i(TAG, "initActionBar");
-            if (null == customView)
+            if (null == customView) {
                 customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_search, null);
-            mBackView = (ImageView) customView.findViewById(R.id.search_back);
-            mBackView.setOnClickListener(this);
-            mEtView = (EditText) customView.findViewById(R.id.search_et);
-            getfocuable();
-            openKeyboard();
+                mBackView = (ImageView) customView.findViewById(R.id.search_back);
+                mBackView.setOnClickListener(this);
+                mEtView = (EditText) customView.findViewById(R.id.search_et);
+                mSearchView = (ImageView) customView.findViewById(R.id.search_search);
+                mSearchView.setOnClickListener(this);
+                mDeleteView = (ImageView) customView.findViewById(R.id.search_delete);
+                mDeleteView.setOnClickListener(this);
+                getfocuable();
+                openKeyboard();
+            }
             if (null != mEtViewText) {
                 isShowPreload = false;
                 mEtView.setText(mEtViewText);
             }
-            mSearchView = (ImageView) customView.findViewById(R.id.search_search);
-            mSearchView.setOnClickListener(this);
-            mDeleteView = (ImageView) customView.findViewById(R.id.search_delete);
-            mDeleteView.setOnClickListener(this);
 
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -420,25 +422,25 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         } else if (v.getId() == R.id.refresh_btn) {
             no_network.setVisibility(View.GONE);
             postSearch(mEtView.getText().toString());
-        } else if (v.getId() == R.id.search_et){
+        } else if (v.getId() == R.id.search_et) {
             getfocuable();
             openKeyboard();
             stopConvenientSearch();
         }
     }
 
-    private void losefocuable(){
+    private void losefocuable() {
         mEtView.setFocusable(false);
     }
 
-    private void getfocuable(){
+    private void getfocuable() {
         LogUtils.i(TAG, "getfocuable");
         mEtView.setFocusable(true);
         mEtView.setFocusableInTouchMode(true);
         mEtView.requestFocus();
     }
 
-    private void changeHotWord(){
+    private void changeHotWord() {
         if (mChangeNumbew >= mHotWordPage)
             mChangeNumbew = 0;
         mShowHotData.clear();
@@ -446,13 +448,13 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         mChangeNumbew = mChangeNumbew + 1;
     }
 
-    private void stopConvenientSearch(){
+    private void stopConvenientSearch() {
         switch_hint = false;
         mHandler.removeCallbacks(mRunnable);
     }
 
-    private void startConvenientSearch(){
-        if(!switch_hint){
+    private void startConvenientSearch() {
+        if (!switch_hint) {
             switch_hint = true;
             mHandler.postDelayed(mRunnable, 0);
         }
@@ -474,9 +476,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         if (!showPreload) {
             closeKeyboard();
             mEtView.setText(searchName);
-            if(searchName.length()<21){
+            if (searchName.length() < 21) {
                 mEtView.setSelection(searchName.length());
-            }else{
+            } else {
                 mEtView.setSelection(20);
             }
         }
