@@ -27,6 +27,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,10 +46,12 @@ import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadFrom;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplLog;
 
+import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 
@@ -83,31 +86,43 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
     public void onClick(View v) {
         ViewHolder vh = (ViewHolder)v.getTag();
         if (R.id.button_op == v.getId()) {
-            if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-                switch (vh.implInfo.getStatus()) {
-                    case Constant.STATUS_PENDING:
-                        break;
-                    case Constant.STATUS_RUNNING:
-                        implAgent.pauseDownload(vh.implInfo);
-                        break;
-                    case Constant.STATUS_PAUSED:
-                        implAgent.resumeDownload(vh.implInfo, vh.implCallback);
-                        break;
-                    default:
-                        implAgent.newDownload(vh.implInfo,
-                                Constant.extenStorageDirPath,
-                                vh.implInfo.getTitle() + ".apk",
-                                true,
-                                vh.implCallback);
-                        break;
-                }
-            } else {
-                implAgent.startActivity(vh.implInfo);
-            }
+            ImplHelper.onClick(mContext,
+                    vh.implInfo,
+                    vh.implInfo.getDownloadUrl(),
+                    vh.implInfo.getTitle(),
+                    vh.implInfo.getIconUrl(),
+                    Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.implInfo.getTitle() + ".apk",
+                    null,
+                    vh);
+
+//            if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
+//                switch (vh.implInfo.getStatus()) {
+//                    case Constant.STATUS_PENDING:
+//                        break;
+//                    case Constant.STATUS_RUNNING:
+//                        implAgent.pauseDownload(vh.implInfo);
+//                        break;
+//                    case Constant.STATUS_PAUSED:
+//                        implAgent.resumeDownload(vh.implInfo, vh);
+//                        break;
+//                    default:
+//                        implAgent.newDownload(vh.implInfo,
+//                                vh.implInfo.getDownloadUrl(),
+//                                vh.implInfo.getTitle(),
+//                                vh.implInfo.getIconUrl(),
+//                                Constant.extenStorageDirPath,
+//                                vh.implInfo.getTitle() + ".apk",
+//                                true,
+//                                vh);
+//                        break;
+//                }
+//            } else {
+//                implAgent.startActivity(vh.implInfo);
+//            }
         }
     }
 
-    class ViewHolder {
+    class ViewHolder implements ImplChangeCallback{
         ProgressBar progressBar;
         TextView titleView;
         TextView descView;
@@ -115,7 +130,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         TextView actionBtn;
         ImageView iconView;
         ImplInfo implInfo;
-        ImplChangeCallback implCallback;
 
         ViewHolder(View view) {
             actionBtn = (TextView) view.findViewById(R.id.button_op);
@@ -126,7 +140,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             iconView = (ImageView) view.findViewById(R.id.download_icon);
             actionBtn.setTag(this);
             progressBar.setTag(this);
-            implCallback = new DownloadImplCallback(this);
         }
 
         void initView(ImplInfo info){
@@ -134,7 +147,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             if (null == this.implInfo){
                 return;
             }
-            implAgent.setImplCallback(implCallback,implInfo);
+            implAgent.setImplCallback(this,implInfo);
             String title = implInfo.getTitle();
             if(null == title || title.isEmpty()) {
                 title = mContext.getResources().getString(R.string.missing_title);
@@ -151,15 +164,15 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             actionBtn.setEnabled(true);
             switch (implInfo.getStatus()){
                 case Constant.STATUS_PRIVATE_INSTALLING:
-                    actionBtn.setText(implAgent.getStatusText(implInfo));
+                    actionBtn.setText(ImplHelper.getStatusText(mContext,implInfo));
                     actionBtn.setEnabled(false);
                     break;
                 default:
-                    actionBtn.setText(implAgent.getActionText(implInfo));
+                    actionBtn.setText(ImplHelper.getActionText(mContext, implInfo));
                     break;
             }
-            descView.setText(implAgent.getDescText(implInfo));
-            statusView.setText(implAgent.getStatusText(implInfo));
+            descView.setText(ImplHelper.getDescText(mContext,implInfo));
+            statusView.setText(ImplHelper.getStatusText(mContext,implInfo));
             setProgress();
         }
 
@@ -186,24 +199,13 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         private void setProgress(){
             progressBar.setIndeterminate(false);
             progressBar.setMax(100);
-            progressBar.setProgress(implAgent.getProgress(implInfo));
+            progressBar.setProgress(ImplHelper.getProgress(mContext,implInfo));
             progressBar.setVisibility(View.VISIBLE);
-        }
-    }
-
-
-    class DownloadImplCallback implements ImplChangeCallback {
-        Object tag ;
-
-        DownloadImplCallback(Object tag) {
-            this.tag = tag;
         }
 
         @Override
         public void onChange(ImplInfo info) {
-            ImplLog.d(this.getClass().getSimpleName(),"onChange,"+info.getTitle()+","+info.getStatus());
-            ViewHolder vh = (ViewHolder)tag;
-            vh.refresh();
+            refresh();
         }
     }
 }

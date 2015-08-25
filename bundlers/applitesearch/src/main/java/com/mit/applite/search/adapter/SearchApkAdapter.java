@@ -2,6 +2,7 @@ package com.mit.applite.search.adapter;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +21,12 @@ import com.mit.applite.search.R;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.SearchUtils;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 import com.osgi.extra.OSGIServiceHost;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -97,33 +100,44 @@ public class SearchApkAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 ViewHolder vh = (ViewHolder) v.getTag();
-                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-                    switch (vh.implInfo.getStatus()) {
-                        case Constant.STATUS_PENDING:
-                        case Constant.STATUS_RUNNING:
-                            implAgent.pauseDownload(vh.implInfo);
-                            break;
-                        case Constant.STATUS_PAUSED:
-                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
-                            break;
-                        default:
-                            implAgent.newDownload(vh.implInfo,
-                                    Constant.extenStorageDirPath,
-                                    vh.bean.getmName() + ".apk",
-                                    true,
-                                    vh.implCallback);
-                            break;
-                    }
-                } else {
-                    implAgent.startActivity(vh.implInfo);
-                }
+                ImplHelper.onClick(mActivity,
+                        vh.implInfo,
+                        vh.bean.getmDownloadUrl(),
+                        vh.bean.getmName(),
+                        vh.bean.getmImgUrl(),
+                        Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getmName() + ".apk",
+                        null,
+                        vh);
+//                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
+//                    switch (vh.implInfo.getStatus()) {
+//                        case Constant.STATUS_PENDING:
+//                        case Constant.STATUS_RUNNING:
+//                            implAgent.pauseDownload(vh.implInfo);
+//                            break;
+//                        case Constant.STATUS_PAUSED:
+//                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
+//                            break;
+//                        default:
+//                            implAgent.newDownload(vh.implInfo,
+//                                    vh.bean.getmDownloadUrl(),
+//                                    vh.bean.getmName(),
+//                                    vh.bean.getmImgUrl(),
+//                                    Constant.extenStorageDirPath,
+//                                    vh.bean.getmName() + ".apk",
+//                                    true,
+//                                    vh.implCallback);
+//                            break;
+//                    }
+//                } else {
+//                    implAgent.startActivity(vh.implInfo);
+//                }
             }
         });
         viewholder.mXing.setRating(Float.parseFloat(data.getmXing()) / 2.0f);
         return convertView;
     }
 
-    public class ViewHolder {
+    public class ViewHolder  implements ImplChangeCallback {
         public LinearLayout mToDetail;
         public ImageView mImg;
         public RatingBar mXing;
@@ -134,7 +148,6 @@ public class SearchApkAdapter extends BaseAdapter {
         public Button mBt;
         private ImplInfo implInfo;
         private SearchBean bean;
-        private ListImplCallback implCallback;
 
         public ViewHolder(View v) {
             this.mToDetail = (LinearLayout) v.findViewById(R.id.list_item_to_detail);
@@ -145,15 +158,14 @@ public class SearchApkAdapter extends BaseAdapter {
             this.mApkSize = (TextView) v.findViewById(R.id.list_item_size);
             this.mVersionName = (TextView) v.findViewById(R.id.list_item_versionname);
             this.mBt = (Button) v.findViewById(R.id.list_item_bt);
-            this.implCallback = new ListImplCallback(this);
         }
 
         public void initView(SearchBean data) {
             this.bean = data;
-            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName(), data.getmVersionCode());
+            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName()/*, data.getmVersionCode()*/);
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
-                implAgent.setImplCallback(implCallback, implInfo);
+                implAgent.setImplCallback(this, implInfo);
             }
             mBt.setTag(this);
             refresh();
@@ -167,33 +179,24 @@ public class SearchApkAdapter extends BaseAdapter {
             if (null != mBt && null != this.implInfo) {
                 switch (implInfo.getStatus()) {
                     case Constant.STATUS_PENDING:
-                        mBt.setText(implAgent.getActionText(implInfo));
+                        mBt.setText(ImplHelper.getActionText(mActivity,implInfo));
                         break;
                     case Constant.STATUS_RUNNING:
-                        mBt.setText(implAgent.getProgress(implInfo) + "%");
+                        mBt.setText(ImplHelper.getProgress(mActivity,implInfo) + "%");
                         break;
                     case Constant.STATUS_PAUSED:
-                        mBt.setText(implAgent.getStatusText(implInfo));
+                        mBt.setText(ImplHelper.getStatusText(mActivity,implInfo));
                         break;
                     default:
-                        mBt.setText(implAgent.getActionText(implInfo));
+                        mBt.setText(ImplHelper.getActionText(mActivity,implInfo));
                         break;
                 }
             }
         }
-    }
-
-    class ListImplCallback implements ImplChangeCallback {
-        Object tag;
-
-        ListImplCallback(Object tag) {
-            this.tag = tag;
-        }
 
         @Override
         public void onChange(ImplInfo info) {
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
+            refresh();
         }
     }
 }

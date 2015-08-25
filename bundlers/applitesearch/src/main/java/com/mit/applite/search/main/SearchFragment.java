@@ -1,18 +1,16 @@
 package com.mit.applite.search.main;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -185,6 +183,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
     }
 
     @Override
@@ -216,7 +215,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onResume() {
         super.onResume();
-
 //        getView().setFocusableInTouchMode(true);
 //        getView().requestFocus();
 //        getView().setOnKeyListener(new View.OnKeyListener() {
@@ -230,6 +228,15 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 //                return false;
 //            }
 //        });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        MenuItem item = menu.findItem(R.id.action_search);
+        if (null != item){
+            item.setVisible(false);
+        }
     }
 
     @Override

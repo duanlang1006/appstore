@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 
 import com.applite.common.AppliteUtils;
@@ -24,6 +25,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.appliteupdate.bean.DataBean;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.market.UpdateNotification;
 import com.osgi.extra.OSGIServiceHost;
@@ -32,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -204,34 +207,46 @@ public class NetworkReceiver extends BroadcastReceiver {
     private void download(DataBean bean) {
         if (null == implAgent)
             implAgent = ImplAgent.getInstance(mContext.getApplicationContext());
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName()/*, bean.getmVersionCode()*/);
         if (null == implInfo) {
             return;
         }
-        implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());
-        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
-            switch (implInfo.getStatus()) {
-                case Constant.STATUS_PENDING:
-                case Constant.STATUS_RUNNING:
-                    break;
-                case Constant.STATUS_PAUSED:
-                    implAgent.resumeDownload(implInfo, null);
-                    break;
-                case Constant.STATUS_INSTALLED:
-                case Constant.STATUS_NORMAL_INSTALLING:
-                case Constant.STATUS_PRIVATE_INSTALLING:
-                    //正在安装或已安装
-//                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
-                    break;
-                default:
-                    implAgent.newDownload(implInfo,
-                            Constant.extenStorageDirPath,
-                            bean.getmName() + ".apk",
-                            false,
-                            null);
-                    break;
-            }
-        }
+        ImplHelper.updateImpl(mContext,
+                implInfo,
+                bean.getmUrl(),
+                bean.getmName(),
+                bean.getmImgUrl(),
+                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getmName() + ".apk",
+                null,
+                null);
+
+//        implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());
+//        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
+//            switch (implInfo.getStatus()) {
+//                case Constant.STATUS_PENDING:
+//                case Constant.STATUS_RUNNING:
+//                    break;
+//                case Constant.STATUS_PAUSED:
+//                    implAgent.resumeDownload(implInfo, null);
+//                    break;
+//                case Constant.STATUS_INSTALLED:
+//                case Constant.STATUS_NORMAL_INSTALLING:
+//                case Constant.STATUS_PRIVATE_INSTALLING:
+//                    //正在安装或已安装
+////                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
+//                    break;
+//                default:
+//                    implAgent.newDownload(implInfo,
+//                            bean.getmUrl(),
+//                            bean.getmName(),
+//                            bean.getmImgUrl(),
+//                            Constant.extenStorageDirPath,
+//                            bean.getmName() + ".apk",
+//                            true,
+//                            null);
+//                    break;
+//            }
+//        }
     }
 
 }

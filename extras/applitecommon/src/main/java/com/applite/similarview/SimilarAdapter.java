@@ -1,6 +1,7 @@
 package com.applite.similarview;
 
 import android.content.Context;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,10 @@ import com.applite.common.R;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
+import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -83,53 +86,62 @@ public class SimilarAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 ViewHolder vh = (ViewHolder) v.getTag();
-                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-                    switch (vh.implInfo.getStatus()) {
-                        case Constant.STATUS_PENDING:
-                        case Constant.STATUS_RUNNING:
-                            implAgent.pauseDownload(vh.implInfo);
-                            break;
-                        case Constant.STATUS_PAUSED:
-                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
-                            break;
-                        default:
-                            implAgent.newDownload(vh.implInfo,
-                                    Constant.extenStorageDirPath,
-                                    vh.bean.getmName() + ".apk",
-                                    true,
-                                    vh.implCallback);
-                            break;
-                    }
-                } else {
-                    implAgent.startActivity(vh.implInfo);
-                }
+                ImplHelper.onClick(mContext,
+                        vh.implInfo,
+                        data.getmDownloadUrl(),
+                        data.getmName(),
+                        data.getmImgUrl(),
+                        Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + data.getmName() + ".apk",
+                        null,
+                        vh);
+//                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
+//                    switch (vh.implInfo.getStatus()) {
+//                        case Constant.STATUS_PENDING:
+//                        case Constant.STATUS_RUNNING:
+//                            implAgent.pauseDownload(vh.implInfo);
+//                            break;
+//                        case Constant.STATUS_PAUSED:
+//                            implAgent.resumeDownload(vh.implInfo, vh);
+//                            break;
+//                        default:
+//                            implAgent.newDownload(vh.implInfo,
+//                                    data.getmDownloadUrl(),
+//                                    data.getmName(),
+//                                    data.getmImgUrl(),
+//                                    Constant.extenStorageDirPath,
+//                                    vh.bean.getmName() + ".apk",
+//                                    true,
+//                                    vh);
+//                            break;
+//                    }
+//                } else {
+//                    implAgent.startActivity(vh.implInfo);
+//                }
             }
         });
         return convertView;
     }
 
-    class ViewHolder {
+    class ViewHolder implements ImplChangeCallback{
         private TextView mName;
         private ImageView mImg;
         private TextView mTv;
         private ImplInfo implInfo;
         private SimilarBean bean;
-        private ListImplCallback implCallback;
 
         public ViewHolder(View view) {
             this.mImg = (ImageView) view.findViewById(R.id.item_similar_img);
             this.mName = (TextView) view.findViewById(R.id.item_similar_name);
             this.mTv = (TextView) view.findViewById(R.id.item_similar_install_tv);
-            this.implCallback = new ListImplCallback(this);
         }
 
         public void initView(SimilarBean data) {
             this.bean = data;
-            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName(), data.getmVersionCode());
+            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName()/*, data.getmVersionCode()*/);
             ;
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
-                implAgent.setImplCallback(implCallback, implInfo);
+                implAgent.setImplCallback(this, implInfo);
             }
             mTv.setTag(this);
             refresh();
@@ -143,33 +155,24 @@ public class SimilarAdapter extends BaseAdapter {
             if (null != mTv && null != this.implInfo) {
                 switch (implInfo.getStatus()) {
                     case Constant.STATUS_PENDING:
-                        mTv.setText(implAgent.getActionText(implInfo));
+                        mTv.setText(ImplHelper.getActionText(mContext,implInfo));
                         break;
                     case Constant.STATUS_RUNNING:
-                        mTv.setText(implAgent.getProgress(implInfo) + "%");
+                        mTv.setText(ImplHelper.getProgress(mContext,implInfo) + "%");
                         break;
                     case Constant.STATUS_PAUSED:
-                        mTv.setText(implAgent.getStatusText(implInfo));
+                        mTv.setText(ImplHelper.getStatusText(mContext,implInfo));
                         break;
                     default:
-                        mTv.setText(implAgent.getActionText(implInfo));
+                        mTv.setText(ImplHelper.getActionText(mContext,implInfo));
                         break;
                 }
             }
         }
-    }
-
-    class ListImplCallback implements ImplChangeCallback {
-        Object tag;
-
-        ListImplCallback(Object tag) {
-            this.tag = tag;
-        }
 
         @Override
         public void onChange(ImplInfo info) {
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
+            refresh();
         }
     }
 }
