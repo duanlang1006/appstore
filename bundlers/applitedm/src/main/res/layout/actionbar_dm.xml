@@ -2,35 +2,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ff0000"
     android:orientation="horizontal"
-    tools:context="com.mit.homepage.TestActivity"
-    android:background="#ff0000">
+    tools:context="com.mit.homepage.TestActivity">
 
     <ImageView
+        android:id="@+id/action_back"
+        style="@style/ActionBarCustom.ActionBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/action_back"
-        android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
-        style="@style/ActionBarCustom.ActionBack"/>
+        android:layout_centerVertical="true" />
 
     <LinearLayout
         android:id="@+id/action_title"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
         android:layout_gravity="center"
+        android:layout_toEndOf="@+id/action_back"
         android:layout_toLeftOf="@+id/action_more"
         android:layout_toRightOf="@+id/action_back"
-        android:layout_toEndOf="@+id/action_back">
-    </LinearLayout>
+        android:gravity="center"
+        android:orientation="horizontal"></LinearLayout>
 
     <ImageView
+        android:id="@+id/action_more"
+        style="@style/ActionBarCustom.ActionMore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/action_more"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        style="@style/ActionBarCustom.ActionMore"/>
+        android:layout_centerVertical="true" />
 </RelativeLayout>
