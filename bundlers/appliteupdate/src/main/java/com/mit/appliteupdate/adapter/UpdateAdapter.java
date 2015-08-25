@@ -3,6 +3,7 @@ package com.mit.appliteupdate.adapter;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +15,17 @@ import android.widget.TextView;
 import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.bean.DataBean;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -70,48 +74,74 @@ public class UpdateAdapter extends BaseAdapter {
             viewholder = (ViewHolder) convertView.getTag();
         }
         final DataBean data = mDatas.get(position);
-        viewholder.initView(data,position);
+        viewholder.initView(data, position);
 
         viewholder.mName.setText(data.getmName());
         mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
         try {
-            PackageInfo mPackageInfo = mPackageManager.getPackageInfo(data.getmPackageName(), PackageManager.GET_ACTIVITIES);
+            final PackageInfo mPackageInfo = mPackageManager.getPackageInfo(data.getmPackageName(), PackageManager.GET_ACTIVITIES);
             viewholder.mVersionName.setText(mPackageInfo.versionName + " -> " + data.getmVersionName());
+
+            viewholder.mApkSize.setText(AppliteUtils.bytes2kb(data.getmSize()));
+            viewholder.mBt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ViewHolder vh = (ViewHolder) v.getTag();
+                    MitMobclickAgent.onEvent(mActivity, "onClickButton" + vh.position);
+
+                    if (vh.implInfo.getStatus() == Constant.STATUS_INSTALLED && mPackageInfo.versionCode < data.getmVersionCode()) {
+                        LogUtils.d("UpdateFragment", "更新");
+                        implAgent.newDownload(vh.implInfo,
+                                vh.bean.getmUrl(),
+                                vh.bean.getmName(),
+                                vh.bean.getmImgUrl(),
+                                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getmName() + ".apk",
+                                vh.bean.getmMD5(),
+                                true,
+                                vh);
+                    } else {
+                        LogUtils.d("UpdateFragment", "打开");
+                        ImplHelper.onClick(mActivity,
+                                vh.implInfo,
+                                vh.bean.getmUrl(),
+                                vh.bean.getmName(),
+                                vh.bean.getmImgUrl(),
+                                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getmName() + ".apk",
+                                null,
+                                vh);
+                    }
+//                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
+//                    switch (vh.implInfo.getStatus()) {
+//                        case Constant.STATUS_PENDING:
+//                        case Constant.STATUS_RUNNING:
+//                            implAgent.pauseDownload(vh.implInfo);
+//                            break;
+//                        case Constant.STATUS_PAUSED:
+//                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
+//                            break;
+//                        default:
+//                            implAgent.newDownload(vh.implInfo,
+//                                    vh.bean.getmUrl(),
+//                                    vh.bean.getmName(),
+//                                    vh.bean.getmImgUrl(),
+//                                    Constant.extenStorageDirPath,
+//                                    vh.bean.getmName() + ".apk",
+//                                    true,
+//                                    vh.implCallback);
+//                            break;
+//                    }
+//                } else {
+//                    implAgent.startActivity(vh.implInfo);
+//                }
+                }
+            });
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        viewholder.mApkSize.setText(AppliteUtils.bytes2kb(data.getmSize()));
-        viewholder.mBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ViewHolder vh = (ViewHolder) v.getTag();
-                MitMobclickAgent.onEvent(mActivity, "onClickButton" + vh.position);
-                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-                    switch (vh.implInfo.getStatus()) {
-                        case Constant.STATUS_PENDING:
-                        case Constant.STATUS_RUNNING:
-                            implAgent.pauseDownload(vh.implInfo);
-                            break;
-                        case Constant.STATUS_PAUSED:
-                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
-                            break;
-                        default:
-                            implAgent.newDownload(vh.implInfo,
-                                    Constant.extenStorageDirPath,
-                                    vh.bean.getmName() + ".apk",
-                                    true,
-                                    vh.implCallback);
-                            break;
-                    }
-                } else {
-                    implAgent.startActivity(vh.implInfo);
-                }
-            }
-        });
         return convertView;
     }
 
-    public class ViewHolder {
+    public class ViewHolder implements ImplChangeCallback {
         private ImageView mImg;
         private TextView mName;
         private TextView mApkSize;
@@ -119,8 +149,8 @@ public class UpdateAdapter extends BaseAdapter {
         private Button mBt;
         private DataBean bean;
         private ImplInfo implInfo;
-        private ListImplCallback implCallback;
         private int position;
+        private PackageInfo mPackageInfo;
 
         public ViewHolder(View v) {
             this.mImg = (ImageView) v.findViewById(R.id.item_update_img);
@@ -128,16 +158,15 @@ public class UpdateAdapter extends BaseAdapter {
             this.mApkSize = (TextView) v.findViewById(R.id.item_update_size);
             this.mVersionName = (TextView) v.findViewById(R.id.item_update_versionname);
             this.mBt = (Button) v.findViewById(R.id.item_update_button);
-            this.implCallback = new ListImplCallback(this);
         }
 
-        public void initView(DataBean bean,int position) {
+        public void initView(DataBean bean, int position) {
             this.bean = bean;
             this.position = position;
-            this.implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
+            this.implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName()/*, bean.getmVersionCode()*/);
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl()).setTitle(bean.getmName());
-                implAgent.setImplCallback(implCallback, implInfo);
+                implAgent.setImplCallback(this, implInfo);
             }
             mBt.setTag(this);
             refresh();
@@ -150,34 +179,40 @@ public class UpdateAdapter extends BaseAdapter {
         void initProgressButton() {
             if (null != mBt && null != this.implInfo) {
                 switch (implInfo.getStatus()) {
+                    case Constant.STATUS_INSTALLED:
+                        mBt.setText(mActivity.getResources().getString(R.string.update));
+                        break;
+                    case Constant.STATUS_SUCCESSFUL:
+                        try {
+                            mPackageInfo = mPackageManager.getPackageInfo(bean.getmPackageName(), PackageManager.GET_ACTIVITIES);
+                            if (mPackageInfo.versionCode == bean.getmVersionCode()) {
+                                LogUtils.d("UpdateFragment", "版本号一致，remove、notifyDataSetChanged");
+                                mDatas.remove(position);
+                                notifyDataSetChanged();
+                            }
+                        } catch (PackageManager.NameNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        break;
                     case Constant.STATUS_PENDING:
-                        mBt.setText(implAgent.getActionText(implInfo));
+                        mBt.setText(ImplHelper.getActionText(mActivity, implInfo));
                         break;
                     case Constant.STATUS_RUNNING:
-                        mBt.setText(implAgent.getProgress(implInfo) + "%");
+                        mBt.setText(ImplHelper.getProgress(mActivity, implInfo) + "%");
                         break;
                     case Constant.STATUS_PAUSED:
-                        mBt.setText(implAgent.getStatusText(implInfo));
+                        mBt.setText(ImplHelper.getStatusText(mActivity, implInfo));
                         break;
                     default:
-                        mBt.setText(implAgent.getActionText(implInfo));
+                        mBt.setText(ImplHelper.getActionText(mActivity, implInfo));
                         break;
                 }
             }
         }
-    }
-
-    class ListImplCallback implements ImplChangeCallback {
-        Object tag;
-
-        ListImplCallback(Object tag) {
-            this.tag = tag;
-        }
 
         @Override
         public void onChange(ImplInfo info) {
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
+            refresh();
         }
     }
 }

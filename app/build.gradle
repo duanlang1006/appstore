@@ -8,8 +8,8 @@ android {
         applicationId "com.shly.appstore"
         minSdkVersion 10
         targetSdkVersion 21
-        versionCode 33
-        versionName "2.0.033"
+        versionCode 34
+        versionName "2.0.034"
         multiDexEnabled true
         manifestPlaceholders = [UMENG_CHANNEL_VALUE: "leadexceed_buildin"]
     }
@@ -113,14 +113,14 @@ dependencies {
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.google.code.gson:gson:2.2.4'
+    compile project(':extras:impl')
+    compile project(':extras:applitecommon')
+    compile project(':extras:mitUpdateSDK')
     compile project(':bundlers:applitelogo')
     compile project(':bundlers:applitehomepage')
     compile project(':bundlers:applitedetail')
     compile project(':bundlers:applitedm')
     compile project(':bundlers:applitesearch')
     compile project(':bundlers:appliteupdate')
-    compile project(':extras:mitUpdateSDK')
-    compile project(':extras:impl')
-    compile project(':extras:applitecommon')
     compile 'com.jiechic.library:xUtils:2.6.14'
 }

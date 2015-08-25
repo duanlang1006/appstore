@@ -40,6 +40,11 @@ public class Constant {
     public final static int INSTALL_SUCCEEDED = 1;//ApplicationManager
     public final static int DELETE_SUCCEEDED = 1; //ApplicationManager
 
+    public final static int CAUSE_NONE = 0;                 //无原因
+    public final static int CAUSE_PAUSED_BY_APP = 1;        //用户主动暂停
+    public final static int CAUSE_PAUSED_BY_NETWORK = 2;    //没有网络暂停
+    public final static int CAUSE_PAUSED_BY_OVERSIZE = 3;   //数据网络，超过允许下载大小暂停
+
     public static final String META_DATA_MIT = "MIT_APPKEY";
     public static final String extenStorageDirPath = ".android/";//下载的APK保存文件夹
     public static final String PATH = "applite/";//下载的LOGO图片和插件保存的文件夹

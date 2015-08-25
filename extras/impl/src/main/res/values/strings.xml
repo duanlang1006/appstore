@@ -10,6 +10,8 @@
     <string name="download_status_queued">Queued</string>
     <string name="download_status_paused">Pausing</string>
     <string name="download_status_waiting">Waiting</string>
+    <string name="download_status_waiting_network">Waiting network</string>
+    <string name="download_status_waiting_wlan">Waiting WLAN</string>
 
     <string name="apk_version">version:%1$s</string>
 
@@ -25,4 +27,5 @@
     <string name="install_status_failed" >Install failed</string>
     <string name="install_status_installing" >Installing</string>
     <string name="install_status_upgrade" >Found to upgrade</string>
+    <string name="network_disable_toast" >Can\'t connect to the network.Check your data connection and try again.</string>
 </resources>

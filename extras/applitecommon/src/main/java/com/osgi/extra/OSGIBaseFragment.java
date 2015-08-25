@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.applite.common.LogUtils;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 
 /**
@@ -26,12 +27,14 @@ public class OSGIBaseFragment extends Fragment{
 
     @Override
     public void onAttach(Activity activity) {
+        LogUtils.d(this.getClass().getSimpleName(),"onAttach");
         super.onAttach(activity);
         mActivity = activity;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        LogUtils.d(this.getClass().getSimpleName(),"onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         String className = this.getClass().getSimpleName();
@@ -44,6 +47,7 @@ public class OSGIBaseFragment extends Fragment{
 
     @Override
     public void onResume() {
+        LogUtils.d(this.getClass().getSimpleName(),"onResume");
         super.onResume();
         String className = this.getClass().getSimpleName();
         if (!"HomePageFragment".equals(className)
@@ -54,7 +58,21 @@ public class OSGIBaseFragment extends Fragment{
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        LogUtils.d(this.getClass().getSimpleName(),"onCreateView");
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        LogUtils.d(this.getClass().getSimpleName(),"onDestroyView");
+    }
+
+
+    @Override
     public void onPause() {
+        LogUtils.d(this.getClass().getSimpleName(),"onPause");
         super.onPause();
         String className = this.getClass().getSimpleName();
         if (!"HomePageFragment".equals(className)
@@ -66,6 +84,7 @@ public class OSGIBaseFragment extends Fragment{
 
     @Override
     public void onDestroy() {
+        LogUtils.d(this.getClass().getSimpleName(),"onDestroy");
         super.onDestroy();
         String className = this.getClass().getSimpleName();
         if (!"HomePageFragment".equals(className)
@@ -73,6 +92,18 @@ public class OSGIBaseFragment extends Fragment{
                 && !"GuideFragment".equals(className)) {
             MitMobclickAgent.onEvent(mActivity, className + "_onDestroy");
         }
+    }
+
+    @Override
+    public void onDetach() {
+        LogUtils.d(this.getClass().getSimpleName(),"onDetach");
+        super.onDetach();
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        LogUtils.d(this.getClass().getSimpleName(),"onHiddenChanged,hidden="+hidden);
+        super.onHiddenChanged(hidden);
     }
 
     @Override
