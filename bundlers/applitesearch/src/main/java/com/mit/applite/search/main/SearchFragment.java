@@ -466,7 +466,11 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         if (!showPreload) {
             closeKeyboard();
             mEtView.setText(searchName);
-            mEtView.setSelection(searchName.length());
+            if(searchName.length()<21){
+                mEtView.setSelection(searchName.length());
+            }else{
+                mEtView.setSelection(20);
+            }
         }
         if (ISPOSTSEARCH) {
             ISTOEND = false;
