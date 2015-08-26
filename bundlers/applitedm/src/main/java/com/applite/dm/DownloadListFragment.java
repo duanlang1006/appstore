@@ -29,7 +29,6 @@ import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -175,14 +174,12 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                 return true;
             }
         });
-        MobclickAgent.onPageStart("DownloadListFragment"); //统计页面
         flagShowCheckBox = false;
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        MobclickAgent.onPageEnd("DownloadListFragment");
     }
 
     @Override

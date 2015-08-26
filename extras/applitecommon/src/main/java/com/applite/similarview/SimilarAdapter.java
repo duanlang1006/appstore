@@ -96,11 +96,11 @@ public class SimilarAdapter extends BaseAdapter {
                         vh);
 //                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
 //                    switch (vh.implInfo.getStatus()) {
-//                        case Constant.STATUS_PENDING:
-//                        case Constant.STATUS_RUNNING:
+//                        case ImplInfo.STATUS_PENDING:
+//                        case ImplInfo.STATUS_RUNNING:
 //                            implAgent.pauseDownload(vh.implInfo);
 //                            break;
-//                        case Constant.STATUS_PAUSED:
+//                        case ImplInfo.STATUS_PAUSED:
 //                            implAgent.resumeDownload(vh.implInfo, vh);
 //                            break;
 //                        default:
@@ -154,13 +154,13 @@ public class SimilarAdapter extends BaseAdapter {
         void initProgressButton() {
             if (null != mTv && null != this.implInfo) {
                 switch (implInfo.getStatus()) {
-                    case Constant.STATUS_PENDING:
+                    case ImplInfo.STATUS_PENDING:
                         mTv.setText(ImplHelper.getActionText(mContext,implInfo));
                         break;
-                    case Constant.STATUS_RUNNING:
+                    case ImplInfo.STATUS_RUNNING:
                         mTv.setText(ImplHelper.getProgress(mContext,implInfo) + "%");
                         break;
-                    case Constant.STATUS_PAUSED:
+                    case ImplInfo.STATUS_PAUSED:
                         mTv.setText(ImplHelper.getStatusText(mContext,implInfo));
                         break;
                     default:

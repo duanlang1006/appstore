@@ -121,12 +121,12 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
 //                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
 //                    switch (vh.implInfo.getStatus()) {
-//                        case Constant.STATUS_PENDING:
+//                        case ImplInfo.STATUS_PENDING:
 //                            break;
-//                        case Constant.STATUS_RUNNING:
+//                        case ImplInfo.STATUS_RUNNING:
 //                            implAgent.pauseDownload(vh.implInfo);
 //                            break;
-//                        case Constant.STATUS_PAUSED:
+//                        case ImplInfo.STATUS_PAUSED:
 //                            implAgent.resumeDownload(vh.implInfo, vh);
 //                            break;
 //                        default:
@@ -280,16 +280,16 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 LogUtils.d(TAG,implInfo.getTitle()+","+implInfo.getStatus()+","+ImplHelper.getActionText(mContext,implInfo));
                 mProgressButton.setEnabled(true);
                 switch (implInfo.getStatus()){
-                    case Constant.STATUS_PENDING:
+                    case ImplInfo.STATUS_PENDING:
                         mProgressButton.setText(ImplHelper.getActionText(mContext,implInfo));
                         break;
-                    case Constant.STATUS_RUNNING:
+                    case ImplInfo.STATUS_RUNNING:
                         mProgressButton.setText(ImplHelper.getProgress(mContext,implInfo)+"%");
                         break;
-                    case Constant.STATUS_PAUSED:
+                    case ImplInfo.STATUS_PAUSED:
                         mProgressButton.setText(ImplHelper.getStatusText(mContext,implInfo));
                         break;
-                    case Constant.STATUS_PRIVATE_INSTALLING:
+                    case ImplInfo.STATUS_PRIVATE_INSTALLING:
                         mProgressButton.setText(ImplHelper.getStatusText(mContext,implInfo));
                         mProgressButton.setEnabled(false);
                         break;

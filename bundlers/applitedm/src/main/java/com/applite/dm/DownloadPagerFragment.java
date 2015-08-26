@@ -23,6 +23,7 @@ import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
@@ -136,10 +137,8 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.dm_action_pause_all) {
             ImplAgent.getInstance(mActivity.getApplicationContext()).pauseAll();
-            Toast.makeText(mActivity.getApplicationContext(), "dm_action_pause_all", Toast.LENGTH_SHORT).show();
             return true;
         } else if (item.getItemId() == R.id.dm_action_resume_all) {
-            Toast.makeText(mActivity.getApplicationContext(), "dm_action_resume_all", Toast.LENGTH_SHORT).show();
             ImplAgent.getInstance(mActivity.getApplicationContext()).resumeAll();
             return true;
         }
@@ -179,7 +178,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             return;
         }
         mViewPager.getAdapter().notifyDataSetChanged();
-        LogUtils.d(TAG,"update");
     }
 
     private void initActionBar(View tabStrip) {
@@ -219,8 +217,8 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         @Override
         public Fragment getItem(int position) {
             Fragment fg = null;
-            OSGIServiceHost host = (OSGIServiceHost) mActivity;
-            int downloadFlag = Constant.STATUS_PENDING | Constant.STATUS_RUNNING | Constant.STATUS_PAUSED | Constant.STATUS_FAILED;
+            OSGIServiceHost host = (OSGIServiceHost)mActivity;
+            int downloadFlag = ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PAUSED | ImplInfo.STATUS_FAILED;
             if (null != host) {
                 if (R.string.dm_downloaded == tabs[position]) {
                     fg = host.newFragment(
@@ -268,12 +266,4 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             return super.getItemPosition(object);
         }
     }
-
-//    private void showActionBar() {
-//        actionBar.show();
-//    }
-//
-//    private void hideActionBar() {
-//        actionBar.hide();
-//    }
 }

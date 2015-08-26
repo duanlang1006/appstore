@@ -19,13 +19,7 @@ package com.applite.dm;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-<<<<<<< HEAD
-=======
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Bundle;
 import android.os.Environment;
->>>>>>> the_master/master
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,11 +41,8 @@ import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplLog;
 
-<<<<<<< HEAD
-=======
 import java.io.File;
 import java.util.Comparator;
->>>>>>> the_master/master
 import java.util.List;
 
 public class DownloadAdapter extends ArrayAdapter implements View.OnClickListener {
@@ -122,12 +113,12 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
 
 //            if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
 //                switch (vh.implInfo.getStatus()) {
-//                    case Constant.STATUS_PENDING:
+//                    case ImplInfo.STATUS_PENDING:
 //                        break;
-//                    case Constant.STATUS_RUNNING:
+//                    case ImplInfo.STATUS_RUNNING:
 //                        implAgent.pauseDownload(vh.implInfo);
 //                        break;
-//                    case Constant.STATUS_PAUSED:
+//                    case ImplInfo.STATUS_PAUSED:
 //                        implAgent.resumeDownload(vh.implInfo, vh);
 //                        break;
 //                    default:
@@ -194,8 +185,8 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 return;
             }
             actionBtn.setEnabled(true);
-            switch (implInfo.getStatus()) {
-                case Constant.STATUS_PRIVATE_INSTALLING:
+            switch (implInfo.getStatus()){
+                case ImplInfo.STATUS_PRIVATE_INSTALLING:
                     actionBtn.setText(ImplHelper.getStatusText(mContext,implInfo));
                     actionBtn.setEnabled(false);
                     break;
@@ -232,30 +223,10 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             progressBar.setProgress(ImplHelper.getProgress(mContext,implInfo));
             progressBar.setVisibility(View.VISIBLE);
         }
-<<<<<<< HEAD
-    }
-
-    //
-    class DownloadImplCallback implements ImplChangeCallback {
-        Object tag;
-
-        DownloadImplCallback(Object tag) {
-            this.tag = tag;
-        }
-
-        @Override
-        public void onChange(ImplInfo info) {
-            ImplLog.d(this.getClass().getSimpleName(), "onChange," + info.getTitle() + "," + info.getStatus());
-            ViewHolder vh = (ViewHolder) tag;
-            vh.refresh();
-=======
 
         @Override
         public void onChange(ImplInfo info) {
             refresh();
->>>>>>> the_master/master
         }
-
-
     }
 }
