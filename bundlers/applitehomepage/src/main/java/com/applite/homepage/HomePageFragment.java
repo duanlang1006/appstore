@@ -101,6 +101,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private boolean refreshflag;
     private String whichPage;
 
+    private HomePageListFragment mHomePageListFragment;
+
     private ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
         private int prePosition = -1;
 
@@ -285,16 +287,31 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
+        mHomePageListFragment = (HomePageListFragment) getChildFragmentManager().findFragmentById(R.id.pager);
         if (!hidden) {
             LogUtils.i(TAG, "重新显示ActionBar");
             initActionBar();
 //            mActivity.runOnUiThread(mRefreshRunnable);
+
+            if(mHomePageListFragment != null){
+                LogUtils.i(TAG, "mHomePageListFragment = "+mHomePageListFragment);
+                mHomePageListFragment.play(true);
+            }else{
+                LogUtils.i(TAG, "mHomePageListFragment = null");
+            }
+
         } else {
             try {
                 ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
                 actionBar.setHomeAsUpIndicator(mActivity.getResources().getDrawable(R.drawable.action_bar_back_light));
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+            if(mHomePageListFragment != null){
+                LogUtils.i(TAG, "mHomePageListFragment = "+mHomePageListFragment);
+                mHomePageListFragment.play(false);
+            }else{
+                LogUtils.i(TAG, "mHomePageListFragment = null");
             }
         }
     }

@@ -49,7 +49,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     private TextView mMoreTextView;
     private TextView mEndTextView;
     private View mEndView;
-    private SlideShowView mTopicView;
+    private static SlideShowView mTopicView;
     private ListArrayAdapter mListAdapter = null;
     private boolean showBack = false;
     private MySlideViewListener mSlideViewListener = new MySlideViewListener();
@@ -76,7 +76,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         Bundle b = new Bundle();
         b.putParcelable("subject_data", data);
         b.putBoolean("show_home", showBack);
-        b.putInt("position",position);
+        b.putInt("position", position);
         return b;
     }
 
@@ -147,6 +147,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        LogUtils.i(TAG, "onItemClick");
         ListArrayAdapter.ViewHolder viewHolder = (ListArrayAdapter.ViewHolder)view.getTag();
         if (null == viewHolder){
             return;
@@ -166,8 +167,22 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (!hidden){
-            initActionBar();
+        LogUtils.i(TAG, "HomePageListFragment onHiddenChanged  hidden = " + hidden);
+//        if (!hidden){
+//            initActionBar();
+//            if (null != mTopicView){
+//                mTopicView.startPlay();
+//            }
+//        }else{
+//            if (null != mTopicView){
+//                mTopicView.stopPlay();
+//            }
+//        }
+    }
+
+    public void play(boolean flag) {
+        LogUtils.i(TAG, "play = "+flag+" mTopicView = "+mTopicView);
+        if (flag){
             if (null != mTopicView){
                 mTopicView.startPlay();
             }
@@ -180,6 +195,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     @Override
     public void onResume() {
+        LogUtils.i(TAG, "onResume");
         super.onResume();
         if (null != whichPage && !TextUtils.isEmpty(whichPage)) {
             MitMobclickAgent.onPageStart(whichPage); //统计页面
@@ -188,6 +204,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     @Override
     public void onPause() {
+        LogUtils.i(TAG, "onPause");
         super.onPause();
         if (null != whichPage && !TextUtils.isEmpty(whichPage)) {
             MitMobclickAgent.onPageEnd(whichPage);
@@ -196,6 +213,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     @Override
     public void onDestroy() {
+        LogUtils.i(TAG, "onDestroy");
         super.onDestroy();
         if (showBack && null != mData.getS_key()) {
             MitMobclickAgent.onEvent(mActivity, whichPage + "_onDestroy");
@@ -203,6 +221,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     }
 
     private void initActionBar(){
+        LogUtils.i(TAG, "initActionBar");
         try {
             if (showBack) {
                 ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
@@ -384,7 +403,8 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         @Override
         public void onClick(View v, int position){
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
-            LogUtils.i(TAG, "topicData = " + topicData);
+            LogUtils.i(TAG, "topicData = " + topicData+" mTopicView = "+mTopicView);
+//            mTopicView.stopPlay();
             if(topicData.getT_skiptype() == 1){
                 MitMobclickAgent.onEvent(mActivity, "onSlideViewClick_" + topicData.getTt_packageName());
                 ((OSGIServiceHost)mActivity).jumptoDetail(topicData.getTt_packageName(), topicData.getTt_name(), topicData.getTt_iconUrl(), true);
