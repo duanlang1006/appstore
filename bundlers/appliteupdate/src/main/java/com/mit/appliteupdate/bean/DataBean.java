@@ -13,7 +13,16 @@ public class DataBean {
     private long mSize;
     private int mVersionCode;
     private String mVersionName;
+    private String mMD5;
 //    private String mShowText;
+
+    //    public String getmShowText() {
+//        return mShowText;
+//    }
+//
+//    public void setmShowText(String mShowText) {
+//        this.mShowText = mShowText;
+//    }
 
     @Override
     public String toString() {
@@ -25,16 +34,17 @@ public class DataBean {
                 ", mSize=" + mSize +
                 ", mVersionCode=" + mVersionCode +
                 ", mVersionName='" + mVersionName + '\'' +
+                ", mMD5='" + mMD5 + '\'' +
                 '}';
     }
 
-//    public String getmShowText() {
-//        return mShowText;
-//    }
-//
-//    public void setmShowText(String mShowText) {
-//        this.mShowText = mShowText;
-//    }
+    public String getmMD5() {
+        return mMD5;
+    }
+
+    public void setmMD5(String mMD5) {
+        this.mMD5 = mMD5;
+    }
 
     public String getmVersionName() {
         return mVersionName;

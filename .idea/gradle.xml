@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/extras/applitecommon" />
             <option value="$PROJECT_DIR$/extras/impl" />
             <option value="$PROJECT_DIR$/extras/mitUpdateSDK" />
+            <option value="$PROJECT_DIR$/extras/mittheme" />
           </set>
         </option>
       </GradleProjectSettings>

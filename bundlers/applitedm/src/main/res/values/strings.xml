@@ -7,4 +7,10 @@
     <string name="action_search">Search</string>
     <string name="action_pause_all">Pause all</string>
     <string name="action_download_all">Download all</string>
+    <string name="cancel_btn">Cancal</string>
+    <string name="allpick_btn">All Pick</string>
+    <string name="nonepick_btn">None Pick</string>
+    <string name="cancel_operator">Cancel</string>
+    <string name="delete_message1">You hava delete </string>
+    <string name="delete_message2"> Downloads</string>
 </resources>

@@ -53,10 +53,11 @@
 
         <Button
             android:id="@+id/item_update_button"
-            android:layout_width="wrap_content"
+            style="@style/apkListButton"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/apklist_btn_interval_distance"
             android:layout_marginRight="@dimen/apklist_btn_interval_distance"
-            style="@style/apkListButton" />
+            android:text="@string/update" />
     </LinearLayout>
 </LinearLayout>

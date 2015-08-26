@@ -124,6 +124,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         b.putBundle("params", params);
         b.putBoolean("isguide", isguide);
         b.putBoolean("isNotTo", mIsNotTo);
+        LogUtils.d(TAG, "newBundles,mIsNotTo:" + mIsNotTo);
         return b;
     }
 
@@ -143,6 +144,8 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
             mWhichFragment = arguments.getString("fragment");
             mParams = arguments.getBundle("params");
             misguide = arguments.getBoolean("isguide");
+            mIsNotTo = arguments.getBoolean("isNotTo");
+            LogUtils.d(TAG, "onAttach,mIsNotTo:" + mIsNotTo);
         }
     }
 
@@ -153,14 +156,14 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mBitmapUtil = new BitmapUtils(mActivity.getApplicationContext());
         mHttpUtils = new HttpUtils();
 
-        if (misguide){
+        if (misguide) {
             whichPage = "MyLifeFragment";
-        }else if ((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)) {
+        } else if ((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)) {
             whichPage = "GuideFragment";
-        }else{
+        } else {
             whichPage = "LogoFragment";
         }
-        MitMobclickAgent.onEvent(mActivity,whichPage+"_onCreate");
+        MitMobclickAgent.onEvent(mActivity, whichPage + "_onCreate");
     }
 
 
@@ -177,6 +180,8 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         }
         this.container = container;
 
+        LogUtils.d(TAG, "ISGUIDE:" + AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true)
+                + "-----misguide:" + misguide + "-----mIsNotTo:" + mIsNotTo);
         if (((Boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.ISGUIDE, true) || misguide) && !mIsNotTo) {
             rootView = mInflater.inflate(R.layout.fragment_guide, container, false);
             initView();
@@ -249,7 +254,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        MitMobclickAgent.onEvent(mActivity,whichPage+"_onDestroy");
+        MitMobclickAgent.onEvent(mActivity, whichPage + "_onDestroy");
     }
 
     @Override

@@ -7,4 +7,10 @@
     <string name="action_search">搜索</string>
     <string name="action_pause_all">全部暂停</string>
     <string name="action_download_all">全部开始</string>
+    <string name="cancel_btn">取消</string>
+    <string name="allpick_btn">全选</string>
+    <string name="nonepick_btn">全不选</string>
+    <string name="cancel_operator">取消操作</string>
+    <string name="delete_message1">成功删除了</string>
+    <string name="delete_message2">条下载</string>
 </resources>

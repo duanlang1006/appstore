@@ -1,4 +1,13 @@
-cd extras/impl
+cd extras/mitUpdateSDK
+../../gradlew makeJar
+if [ $? -eq 0 ];then
+    echo mitUpdateSDK ok!!!!!!!!!!!!!!!!!!!!!!!!
+else
+    echo mitUpdateSDK error!!!!!!!!!!!!!!!!!!!!!!!!
+    exit 0
+fi
+
+cd ../impl
 ../../gradlew makeJar
 if [ $? -eq 0 ];then
     echo impl ok!!!!!!!!!!!!!!!!!!!!!!!!
@@ -17,14 +26,7 @@ else
 fi
 
 
-cd ../mitUpdateSDK
-../../gradlew makeJar
-if [ $? -eq 0 ];then
-    echo mitUpdateSDK ok!!!!!!!!!!!!!!!!!!!!!!!!
-else
-    echo mitUpdateSDK error!!!!!!!!!!!!!!!!!!!!!!!!
-    exit 0
-fi
+
 
 cd ../../app
 if [ $# -lt 1 ]; then
