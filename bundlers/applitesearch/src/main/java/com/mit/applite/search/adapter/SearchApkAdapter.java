@@ -110,11 +110,11 @@ public class SearchApkAdapter extends BaseAdapter {
                         vh);
 //                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
 //                    switch (vh.implInfo.getStatus()) {
-//                        case Constant.STATUS_PENDING:
-//                        case Constant.STATUS_RUNNING:
+//                        case ImplInfo.STATUS_PENDING:
+//                        case ImplInfo.STATUS_RUNNING:
 //                            implAgent.pauseDownload(vh.implInfo);
 //                            break;
-//                        case Constant.STATUS_PAUSED:
+//                        case ImplInfo.STATUS_PAUSED:
 //                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
 //                            break;
 //                        default:
@@ -178,13 +178,13 @@ public class SearchApkAdapter extends BaseAdapter {
         void initProgressButton() {
             if (null != mBt && null != this.implInfo) {
                 switch (implInfo.getStatus()) {
-                    case Constant.STATUS_PENDING:
+                    case ImplInfo.STATUS_PENDING:
                         mBt.setText(ImplHelper.getActionText(mActivity,implInfo));
                         break;
-                    case Constant.STATUS_RUNNING:
+                    case ImplInfo.STATUS_RUNNING:
                         mBt.setText(ImplHelper.getProgress(mActivity,implInfo) + "%");
                         break;
-                    case Constant.STATUS_PAUSED:
+                    case ImplInfo.STATUS_PAUSED:
                         mBt.setText(ImplHelper.getStatusText(mActivity,implInfo));
                         break;
                     default:

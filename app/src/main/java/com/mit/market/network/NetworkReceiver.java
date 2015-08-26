@@ -186,15 +186,15 @@ public class NetworkReceiver extends BroadcastReceiver {
 //        implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());
 //        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
 //            switch (implInfo.getStatus()) {
-//                case Constant.STATUS_PENDING:
-//                case Constant.STATUS_RUNNING:
+//                case ImplInfo.STATUS_PENDING:
+//                case ImplInfo.STATUS_RUNNING:
 //                    break;
-//                case Constant.STATUS_PAUSED:
+//                case ImplInfo.STATUS_PAUSED:
 //                    implAgent.resumeDownload(implInfo, null);
 //                    break;
-//                case Constant.STATUS_INSTALLED:
-//                case Constant.STATUS_NORMAL_INSTALLING:
-//                case Constant.STATUS_PRIVATE_INSTALLING:
+//                case ImplInfo.STATUS_INSTALLED:
+//                case ImplInfo.STATUS_NORMAL_INSTALLING:
+//                case ImplInfo.STATUS_PRIVATE_INSTALLING:
 //                    //正在安装或已安装
 ////                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
 //                    break;

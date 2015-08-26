@@ -15,6 +15,7 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.util.LogUtils;
 import com.mit.impl.ImplDbHelper;
+import com.mit.impl.ImplDownload;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public class DownloadManager {
 
     public DownloadInfo addNewDownload(String url, String fileName, String target,
                                boolean autoResume, boolean autoRename,
-                               final RequestCallBack<File> callback) throws DbException {
+                               final ImplDownload.DownloadCallback<File> callback) throws DbException {
         final DownloadInfo downloadInfo = new DownloadInfo();
         downloadInfo.setDownloadUrl(url);
         downloadInfo.setAutoRename(autoRename);
@@ -89,17 +90,21 @@ public class DownloadManager {
         HttpHandler<File> handler = http.download(url, target, autoResume, autoRename, new ManagerCallBack(downloadInfo, callback));
         downloadInfo.setHandler(handler);
         downloadInfo.setState(handler.getState());
+        if (null != callback){
+            callback.onPending();
+        }
+
         downloadInfoList.add(downloadInfo);
         db.saveBindingId(downloadInfo);
         return downloadInfo;
     }
 
-    public void resumeDownload(int index, final RequestCallBack<File> callback) throws DbException {
+    public void resumeDownload(int index, final ImplDownload.DownloadCallback<File> callback) throws DbException {
         final DownloadInfo downloadInfo = downloadInfoList.get(index);
         resumeDownload(downloadInfo, callback);
     }
 
-    public void resumeDownload(DownloadInfo downloadInfo, final RequestCallBack<File> callback) throws DbException {
+    public void resumeDownload(DownloadInfo downloadInfo, final ImplDownload.DownloadCallback<File> callback) throws DbException {
         HttpUtils http = new HttpUtils();
         http.configRequestThreadPoolSize(maxDownloadThread);
         HttpHandler<File> handler = http.download(
@@ -110,6 +115,9 @@ public class DownloadManager {
                 new ManagerCallBack(downloadInfo, callback));
         downloadInfo.setHandler(handler);
         downloadInfo.setState(handler.getState());
+        if (null != callback ){
+            callback.onPending();
+        }
         db.saveOrUpdate(downloadInfo);
     }
 

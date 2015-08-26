@@ -97,12 +97,12 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
 
 //            if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
 //                switch (vh.implInfo.getStatus()) {
-//                    case Constant.STATUS_PENDING:
+//                    case ImplInfo.STATUS_PENDING:
 //                        break;
-//                    case Constant.STATUS_RUNNING:
+//                    case ImplInfo.STATUS_RUNNING:
 //                        implAgent.pauseDownload(vh.implInfo);
 //                        break;
-//                    case Constant.STATUS_PAUSED:
+//                    case ImplInfo.STATUS_PAUSED:
 //                        implAgent.resumeDownload(vh.implInfo, vh);
 //                        break;
 //                    default:
@@ -163,7 +163,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             }
             actionBtn.setEnabled(true);
             switch (implInfo.getStatus()){
-                case Constant.STATUS_PRIVATE_INSTALLING:
+                case ImplInfo.STATUS_PRIVATE_INSTALLING:
                     actionBtn.setText(ImplHelper.getStatusText(mContext,implInfo));
                     actionBtn.setEnabled(false);
                     break;

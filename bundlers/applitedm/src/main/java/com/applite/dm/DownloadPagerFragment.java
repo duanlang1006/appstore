@@ -22,6 +22,7 @@ import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
@@ -218,7 +219,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         public Fragment getItem(int position) {
             Fragment fg = null;
             OSGIServiceHost host = (OSGIServiceHost)mActivity;
-            int downloadFlag = Constant.STATUS_PENDING | Constant.STATUS_RUNNING | Constant.STATUS_PAUSED | Constant.STATUS_FAILED;
+            int downloadFlag = ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PAUSED | ImplInfo.STATUS_FAILED;
             if (null != host) {
                 if (R.string.dm_downloaded == tabs[position]) {
                     fg = host.newFragment(

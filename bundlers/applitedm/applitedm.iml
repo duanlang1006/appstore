@@ -96,6 +96,7 @@
     <orderEntry type="library" exported="" name="applite-impl-v1.1" level="project" />
     <orderEntry type="library" exported="" name="applite-common-v1.0" level="project" />
     <orderEntry type="module" module-name="mittheme" exported="" />
+    <orderEntry type="library" name="android-support-v7-appcompat" level="project" />
   </component>
 </module>
 

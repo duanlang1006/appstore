@@ -2,7 +2,6 @@ package com.mit.impl;
 
 import android.content.Context;
 import android.util.SparseArray;
-import com.applite.common.Constant;
 import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.HttpHandler;
@@ -15,7 +14,7 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.List;
 
-class ImplDownload  {
+public class ImplDownload  {
     private static final String TAG = "impl_download";
     private SparseArray<Method> mCmdList = new SparseArray<Method>();
     private DownloadManager dm;
@@ -52,22 +51,27 @@ class ImplDownload  {
         if (null != downloadInfo){
             switch(downloadInfo.getState()){
                 case WAITING:
-                    implInfo.setStatus(Constant.STATUS_PENDING);
+                    implInfo.setStatus(ImplInfo.STATUS_PENDING);
                     break;
                 case STARTED:
-                    implInfo.setStatus(Constant.STATUS_RUNNING);
+                    implInfo.setStatus(ImplInfo.STATUS_RUNNING);
                     break;
                 case LOADING:
-                    implInfo.setStatus(Constant.STATUS_RUNNING);
+                    implInfo.setStatus(ImplInfo.STATUS_RUNNING);
                     break;
                 case CANCELLED:
-                    implInfo.setStatus(Constant.STATUS_PAUSED);
+                    implInfo.setStatus(ImplInfo.STATUS_PAUSED);
                     break;
                 case SUCCESS:
-                    implInfo.setStatus(Constant.STATUS_SUCCESSFUL);
+                    implInfo.setStatus(ImplInfo.STATUS_SUCCESSFUL);
                     break;
                 case FAILURE:
-                    implInfo.setStatus(Constant.STATUS_FAILED);
+                    if (implInfo.getStatus() == ImplInfo.STATUS_PAUSED
+                            && implInfo.getCause() == ImplInfo.CAUSE_PAUSED_BY_NETWORK){
+                        //do nothing
+                    }else {
+                        implInfo.setStatus(ImplInfo.STATUS_FAILED);
+                    }
                     break;
                 default:
                     break;
@@ -108,10 +112,9 @@ class ImplDownload  {
                     true,
                     new DownloadCallback<File>(implInfo,callback));
             implInfo.setDownloadId(downloadInfo.getId());
-            implInfo.setStatus(Constant.STATUS_PENDING);
+            implInfo.setStatus(ImplInfo.STATUS_PENDING);
             implInfo.setLastMod(System.currentTimeMillis());
             downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
-            callback.onPending(implInfo);
         } catch (DbException e) {
             e.printStackTrace();
         }
@@ -121,7 +124,7 @@ class ImplDownload  {
         try {
             DownloadInfo downloadInfo = dm.getDownloadInfoById(implInfo.getDownloadId());
             if (null != downloadInfo) {
-                implInfo.setCause(Constant.CAUSE_PAUSED_BY_APP);
+                implInfo.setCause(ImplInfo.CAUSE_PAUSED_BY_APP);
                 dm.stopDownload(downloadInfo,new DownloadCallback<File>(implInfo, callback));
             }
         } catch (DbException e) {
@@ -135,9 +138,7 @@ class ImplDownload  {
             if (null != downloadInfo) {
                 implInfo.setUserContinue(true);
                 dm.resumeDownload(downloadInfo, new DownloadCallback<File>(implInfo, callback));
-//                implInfo.setCause(Constant.CAUSE_NONE);
                 downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
-                callback.onPending(implInfo);
             }
         } catch (DbException e) {
             e.printStackTrace();
@@ -152,7 +153,7 @@ class ImplDownload  {
                 if (null != handler && !handler.isCancelled() && !handler.isPaused()
                     && !downloadInfo.getState().equals(HttpHandler.State.SUCCESS)) {
                     try {
-                        implInfo.setCause(Constant.CAUSE_PAUSED_BY_APP);
+                        implInfo.setCause(ImplInfo.CAUSE_PAUSED_BY_APP);
                         dm.stopDownload(downloadInfo,new DownloadCallback<File>(implInfo, callback));
                     } catch (DbException e) {
                         e.printStackTrace();
@@ -172,9 +173,7 @@ class ImplDownload  {
                     try {
                         implInfo.setUserContinue(true);
                         dm.resumeDownload(downloadInfo, new DownloadCallback<File>(implInfo, callback));
-//                        implInfo.setCause(Constant.CAUSE_NONE);
                         downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
-                        callback.onPending(implInfo);
                     } catch (DbException e) {
                         e.printStackTrace();
                     }
@@ -216,12 +215,17 @@ class ImplDownload  {
             if (null == downloadInfo){
                 continue;
             }
-            if (implInfo.getStatus() == Constant.STATUS_PAUSED
-                    && implInfo.getCause() == Constant.CAUSE_PAUSED_BY_APP){
+            if (implInfo.getStatus() == ImplInfo.STATUS_PAUSED
+                    && implInfo.getCause() == ImplInfo.CAUSE_PAUSED_BY_APP){
                 continue;
             }
             if (needKick(downloadInfo)){
-                resume(implInfo,implCallback);
+                try {
+                    dm.resumeDownload(downloadInfo, new DownloadCallback<File>(implInfo, implCallback));
+                    downloadInfo.getHandler().getRequestCallBack().setRate(implCallback.getRate());
+                } catch (DbException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -239,13 +243,13 @@ class ImplDownload  {
                 return ret;
             }
 
-            if(Constant.STATUS_PENDING == implInfo.getStatus()
-                || Constant.STATUS_RUNNING == implInfo.getStatus()
-                || (Constant.STATUS_PAUSED == implInfo.getStatus()
-                        && Constant.CAUSE_PAUSED_BY_APP != implInfo.getCause()) ) {
+            if(ImplInfo.STATUS_PENDING == implInfo.getStatus()
+                || ImplInfo.STATUS_RUNNING == implInfo.getStatus()
+                || (ImplInfo.STATUS_PAUSED == implInfo.getStatus()
+                        && ImplInfo.CAUSE_PAUSED_BY_APP != implInfo.getCause()) ) {
                 try {
-                    implInfo.setStatus(Constant.STATUS_PAUSED);
-                    implInfo.setCause(Constant.CAUSE_PAUSED_BY_OVERSIZE);
+                    implInfo.setStatus(ImplInfo.STATUS_PAUSED);
+                    implInfo.setCause(ImplInfo.CAUSE_PAUSED_BY_OVERSIZE);
                     dm.stopDownload(downloadInfo,new DownloadCallback<File>(implInfo, callback));
                     ret = true;
                 } catch (DbException e) {
@@ -265,26 +269,29 @@ class ImplDownload  {
             if (null == downloadInfo){
                 continue;
             }
-            if ("none".equals(network)) {
-                if (Constant.STATUS_PAUSED == implInfo.getStatus()
-                        && Constant.CAUSE_PAUSED_BY_APP != implInfo.getCause()){
-                    implInfo.setCause(Constant.CAUSE_PAUSED_BY_NETWORK);
-                    if (null != callback){
-                        callback.onCancelled(implInfo);
+            switch(network){
+                case "none":
+                    if (ImplInfo.STATUS_PAUSED == implInfo.getStatus()
+                            && implInfo.getCause() != ImplInfo.CAUSE_PAUSED_BY_APP) {
+                        implInfo.setCause(ImplInfo.CAUSE_PAUSED_BY_NETWORK);
+                        if (null != callback) {
+                            callback.onCancelled(implInfo);
+                        }
                     }
-                }
-            }else if ("wifi".equals(network)) {
-                if (Constant.STATUS_PAUSED == implInfo.getStatus()
-                        && implInfo.getCause() != Constant.CAUSE_PAUSED_BY_APP){
-                    try {
-                        dm.resumeDownload(downloadInfo, new DownloadCallback<File>(implInfo, callback));
-//                        implInfo.setCause(Constant.CAUSE_NONE);
-                    } catch (DbException e) {
-                        e.printStackTrace();
+                    break;
+                case "wifi":
+                    if (ImplInfo.STATUS_PAUSED == implInfo.getStatus()
+                            && implInfo.getCause() != ImplInfo.CAUSE_PAUSED_BY_APP) {
+                        try {
+                            dm.resumeDownload(downloadInfo, new DownloadCallback<File>(implInfo, callback));
+                        } catch (DbException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            }else if ("mobile".equals(network)) {
-                overSizePause(implInfo,callback);
+                    break;
+                case "mobile":
+                    overSizePause(implInfo,callback);
+                    break;
             }
         }
     }
@@ -325,13 +332,20 @@ class ImplDownload  {
         return ret;
     }
 
-    class DownloadCallback<File> extends RequestCallBack<File> {
+    public class DownloadCallback<File> extends RequestCallBack<File> {
         private ImplInfo implInfo;
         private ImplListener baseCallback;
 
         DownloadCallback(ImplInfo implInfo,ImplListener callback) {
             this.implInfo = implInfo;
             this.baseCallback = callback;
+        }
+
+        public void onPending(){
+            implInfo.setStatus(ImplInfo.STATUS_PENDING);
+            if (null != baseCallback){
+                baseCallback.onPending(implInfo);
+            }
         }
 
         @Override
@@ -341,7 +355,7 @@ class ImplDownload  {
                 implInfo.setSize(total);
             }
             if (!overSizePause(implInfo,baseCallback)) {
-                implInfo.setStatus(Constant.STATUS_RUNNING);
+                implInfo.setStatus(ImplInfo.STATUS_RUNNING);
             }
 
             if (null != baseCallback){
@@ -353,7 +367,7 @@ class ImplDownload  {
         @Override
         public void onCancelled() {
             super.onCancelled();
-            implInfo.setStatus(Constant.STATUS_PAUSED);
+            implInfo.setStatus(ImplInfo.STATUS_PAUSED);
 
             if (null != baseCallback){
                 baseCallback.onCancelled(implInfo);
@@ -364,7 +378,7 @@ class ImplDownload  {
         @Override
         public void onStart() {
             super.onStart();
-            implInfo.setStatus(Constant.STATUS_RUNNING);
+            implInfo.setStatus(ImplInfo.STATUS_RUNNING);
 
             if (null != baseCallback){
                 baseCallback.onStart(implInfo);
@@ -377,13 +391,13 @@ class ImplDownload  {
             java.io.File file = (java.io.File)fileResponseInfo.result;
             if (null != file && file.exists()) {
                 implInfo.setLocalPath(file.getAbsolutePath());
-                implInfo.setStatus(Constant.STATUS_SUCCESSFUL);
+                implInfo.setStatus(ImplInfo.STATUS_SUCCESSFUL);
                 if (null != baseCallback){
                     baseCallback.onSuccess(implInfo,file);
                 }
             }else{
                 implInfo.setLocalPath(null);
-                implInfo.setStatus(Constant.STATUS_FAILED);
+                implInfo.setStatus(ImplInfo.STATUS_FAILED);
                 if (null != baseCallback){
                     baseCallback.onFailure(implInfo, null, "download file not exist");
                 }
@@ -395,18 +409,17 @@ class ImplDownload  {
         public void onFailure(HttpException e, String s) {
             ImplReceiver.initNetwork(mContext);
             if ("none".equals(ImplReceiver.getNetwork(mContext))){
-                implInfo.setStatus(Constant.STATUS_PAUSED);
-                implInfo.setCause(Constant.CAUSE_PAUSED_BY_NETWORK);
+                implInfo.setStatus(ImplInfo.STATUS_PAUSED);
+                implInfo.setCause(ImplInfo.CAUSE_PAUSED_BY_NETWORK);
                 if (null != baseCallback){
                     baseCallback.onCancelled(implInfo);
                 }
             }else {
-                implInfo.setStatus(Constant.STATUS_FAILED);
+                implInfo.setStatus(ImplInfo.STATUS_FAILED);
                 if (null != baseCallback){
                     baseCallback.onFailure(implInfo,e,s);
                 }
             }
-
             ImplLog.d(TAG,"onFailure,"+e.getCause()+","+e.getMessage()+","+e.getExceptionCode()+","+e.getClass());
         }
     }
