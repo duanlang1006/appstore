@@ -2,9 +2,12 @@ package com.mit.impl;
 
 import android.app.DownloadManager;
 
+import com.lidroid.xutils.db.annotation.Table;
+
 /**
  * Created by hxd on 15-6-11.
  */
+@Table(name=ImplDbHelper.TABLE_IMPLINFO)
 public class ImplInfo {
     public final static int ACTION_DOWNLOAD = 1;   //下载
     public final static int ACTION_INSTALL = 2;    //安装过程
@@ -153,7 +156,6 @@ public class ImplInfo {
 
     public ImplInfo setCause(int cause) {
         this.cause = cause;
-        ImplLog.d("impl_info","setCause:"+cause);
         return this;
     }
 

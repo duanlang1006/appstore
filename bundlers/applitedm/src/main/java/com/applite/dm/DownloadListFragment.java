@@ -153,7 +153,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         mImplAgent = ImplAgent.getInstance(activity.getApplicationContext());
         mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
         mBitmapHelper = new BitmapUtils(mActivity.getApplicationContext());
-        ImplLog.d(DownloadPagerFragment.TAG, "onAttach," + this);
+        ImplLog.d(DownloadPagerFragment.TAG, "onAttach," + this + "," + mImplList.size());
     }
 
     @Override

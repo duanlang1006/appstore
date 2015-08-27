@@ -21,6 +21,7 @@ public class ImplDownload  {
     private boolean inited = false;
     private Context mContext;
 
+
     private static ImplDownload mInstance = null;
     private static synchronized void initInstance(Context context){
         if (null == mInstance ){
@@ -79,45 +80,74 @@ public class ImplDownload  {
         }
     }
 
-    void addDownload(ImplInfo implInfo,String fullname,String md5,ImplListener callback){
-        try {
-//            String fullname = Environment.getExternalStorageDirectory() + File.separator + publicDir + filename;
+    private class AddDownlaodTask implements Runnable{
+        private static final int RESULT_MD5_MATCH = 0;
+        private static final int RESULT_ADD_DOWNLOAD = 1;
+        private static final int RESULT_ADD_DOWNLOAD_EXCEPTION = 2;
+
+        private String fullname;
+        private String md5;
+        private ImplListener callback;
+        private ImplInfo implInfo;
+
+        private AddDownlaodTask(ImplInfo implInfo,String fullname, String md5, ImplListener callback) {
+            this.fullname = fullname;
+            this.md5 = md5;
+            this.callback = callback;
+            this.implInfo = implInfo;
+        }
+
+        @Override
+        public void run() {
+            int result = RESULT_ADD_DOWNLOAD;
             File file = new File(fullname);
-            if (null != file){
-                String fileMd5 = ImplHelper.getFileMD5(file);
-                ImplLog.d(TAG,fullname+" md5:"+fileMd5+"="+md5);
-                if (null != fileMd5 && fileMd5.equals(md5)){
-                    if (null != callback) {
-                        callback.onSuccess(implInfo, file);
-                    }
-                }else {
+            if (file.exists()
+                    && null != md5 && !TextUtils.isEmpty(md5)
+                    && md5.equals(ImplHelper.getFileMD5(file))){
+                result = RESULT_MD5_MATCH;
+            }else {
+                if (file.exists()){
                     file.delete();
                 }
-            }
-            if (null == implInfo.getDownloadUrl()){
-                if (null != callback) {
-                    callback.onFailure(implInfo, null, "download url is null");
+                try {
+                    DownloadInfo downloadInfo = dm.getDownloadInfoById(implInfo.getDownloadId());
+                    if (null != downloadInfo) {
+                        dm.removeDownload(downloadInfo);
+                    }
+                    downloadInfo = dm.addNewDownload(implInfo.getDownloadUrl(),
+                            implInfo.getTitle(),
+                            fullname,
+                            true,
+                            true,
+                            new DownloadCallback<File>(implInfo, callback));
+                    downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
+                } catch (DbException e) {
+                    e.printStackTrace();
+                    result = RESULT_ADD_DOWNLOAD_EXCEPTION;
                 }
-                return;
             }
-            DownloadInfo downloadInfo = dm.getDownloadInfoById(implInfo.getDownloadId());
-            if (null != downloadInfo){
-                dm.removeDownload(downloadInfo);
+            ImplLog.d(TAG,"run,"+implInfo.getTitle()+","+implInfo.getStatus()+","+implInfo.getDownloadId()+","+result);
+            switch(result){
+                case RESULT_ADD_DOWNLOAD:
+                    break;
+                case RESULT_ADD_DOWNLOAD_EXCEPTION:
+                    callback.onFailure(implInfo, null, "add download exception");
+                    break;
+                case RESULT_MD5_MATCH:
+                    callback.onSuccess(this.implInfo,new File(fullname));
+                    break;
             }
-            implInfo.setUserContinue(false);
-            downloadInfo = dm.addNewDownload(implInfo.getDownloadUrl(),
-                    implInfo.getTitle(),
-                    fullname,
-                    true,
-                    true,
-                    new DownloadCallback<File>(implInfo,callback));
-            implInfo.setDownloadId(downloadInfo.getId());
-            implInfo.setStatus(ImplInfo.STATUS_PENDING);
-            implInfo.setLastMod(System.currentTimeMillis());
-            downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
-        } catch (DbException e) {
-            e.printStackTrace();
         }
+    }
+
+    void addDownload(ImplInfo implInfo,String fullname,String md5,ImplListener callback){
+        if (null == implInfo.getDownloadUrl()){
+            if (null != callback) {
+                callback.onFailure(implInfo, null, "download url is null");
+            }
+            return;
+        }
+        ImplAgent.mWorkHandler.post(new AddDownlaodTask(implInfo,fullname,md5,callback));
     }
 
     void pause(ImplInfo implInfo,ImplListener callback){
@@ -341,6 +371,16 @@ public class ImplDownload  {
             this.baseCallback = callback;
         }
 
+        public void onEnqued(long downloadId){
+            implInfo.setDownloadId(downloadId);
+            implInfo.setStatus(ImplInfo.STATUS_PENDING);
+            implInfo.setUserContinue(false);
+            implInfo.setLastMod(System.currentTimeMillis());
+            if (null != baseCallback){
+                baseCallback.onEnqued(implInfo);
+            }
+        }
+
         public void onPending(){
             implInfo.setStatus(ImplInfo.STATUS_PENDING);
             if (null != baseCallback){
@@ -361,7 +401,6 @@ public class ImplDownload  {
             if (null != baseCallback){
                 baseCallback.onLoading(implInfo, total, current, isUploading);
             }
-            ImplLog.d(TAG,implInfo.getTitle()+",onLoading,"+total+","+current);
         }
 
         @Override

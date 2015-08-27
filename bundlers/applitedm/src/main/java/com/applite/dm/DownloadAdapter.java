@@ -203,17 +203,19 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             Bitmap resBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.file_type_apk);
             String url = implInfo.getIconUrl();
             if (null != url && !TextUtils.isEmpty(url)) {
-            }
-            int width = (int) mContext.getResources().getDimension(R.dimen.list_item_icon_size);
-            int height = width;
-            mBitmapHelper.configDefaultBitmapMaxSize(width, height);
-            Bitmap cacheBitmap = mBitmapHelper.getBitmapFromMemCache(url, null);
-            if (null != cacheBitmap) {
-                iconView.setImageBitmap(cacheBitmap);
-            } else {
-                mBitmapHelper.configDefaultLoadFailedImage(resBitmap);
-                mBitmapHelper.configDefaultLoadingImage(resBitmap);
-                mBitmapHelper.display(iconView, implInfo.getIconUrl());
+                int width = (int) mContext.getResources().getDimension(R.dimen.list_item_icon_size);
+                int height = width;
+                mBitmapHelper.configDefaultBitmapMaxSize(width, height);
+                Bitmap cacheBitmap = mBitmapHelper.getBitmapFromMemCache(url, null);
+                if (null != cacheBitmap) {
+                    iconView.setImageBitmap(cacheBitmap);
+                } else {
+                    mBitmapHelper.configDefaultLoadFailedImage(resBitmap);
+                    mBitmapHelper.configDefaultLoadingImage(resBitmap);
+                    mBitmapHelper.display(iconView, implInfo.getIconUrl());
+                }
+            }else{
+                iconView.setImageBitmap(resBitmap);
             }
         }
 

@@ -1,7 +1,9 @@
 package com.mit.impl.download;
 
+import com.lidroid.xutils.db.annotation.Table;
 import com.lidroid.xutils.db.annotation.Transient;
 import com.lidroid.xutils.http.HttpHandler;
+import com.mit.impl.ImplDbHelper;
 
 import java.io.File;
 
@@ -10,6 +12,7 @@ import java.io.File;
  * Date: 13-11-10
  * Time: 下午8:11
  */
+@Table(name= ImplDbHelper.TABLE_DOWNLOADINFO)
 public class DownloadInfo {
 
     public DownloadInfo() {
