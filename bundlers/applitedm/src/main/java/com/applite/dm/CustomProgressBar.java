@@ -38,11 +38,12 @@ public class CustomProgressBar extends ImageButton {
         paint.setAntiAlias(true);// 设置是否抗锯齿
         paint.setFlags(Paint.ANTI_ALIAS_FLAG);// 帮助消除锯齿
         paint.setColor(Color.GRAY);// 设置画笔灰色
-        paint.setStrokeWidth(5);// 设置画笔宽度
+        paint.setStrokeWidth(2);// 设置画笔宽度
         paint.setStyle(Paint.Style.STROKE);// 设置中空的样式
-        canvas.drawCircle(40, 40, 35, paint);// 在中心为（60,60）的地方画个半径为50的圆，宽度为setStrokeWidth：10
+        canvas.drawCircle(40, 40, 30, paint);// 在中心为（60,60）的地方画个半径为45的圆，宽度为setStrokeWidth：2
+        paint.setStrokeWidth(4);// 设置画笔宽度
         paint.setColor(Color.GREEN);// 设置画笔为绿色
-        oval.set(5, 5, 75, 75);
+        oval.set(9, 9, 71, 71);
         canvas.drawArc(oval, -90, ((float) progress / max) * 360, false, paint);// 画圆弧，第二个参数为：起始角度，第三个为跨的角度，第四个为true的时候是实心，false的时候为空心
     }
 

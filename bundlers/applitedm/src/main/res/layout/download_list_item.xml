@@ -80,13 +80,13 @@
                 android:paddingLeft="8dip"
                 android:text="domain" />
 
-            <ProgressBar
-                android:id="@android:id/progress"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/domain" />
+            <!-- <ProgressBar
+                 android:id="@android:id/progress"
+                 style="?android:attr/progressBarStyleHorizontal"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_alignParentLeft="true"
+                 android:layout_below="@+id/domain" />-->
         </RelativeLayout>
 
         <Button
@@ -98,8 +98,15 @@
             android:layout_marginLeft="@dimen/interval_distance"
             android:layout_marginRight="@dimen/interval_distance"
             android:focusable="false"
+            android:focusableInTouchMode="true"
+            android:visibility="gone" />
 
-            android:focusableInTouchMode="true" />
+        <com.applite.dm.CustomProgressBar
+            android:id="@+id/cpb"
+            android:layout_width="80px"
+            android:layout_height="80px"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/progressbar_effect" />
 
         <CheckBox
             android:id="@+id/delete_checkBox"
@@ -109,8 +116,8 @@
             android:layout_marginLeft="5dp"
             android:background="@drawable/deletecheckbox_selector"
             android:button="@null"
-            android:focusable="false"
             android:clickable="false"
+            android:focusable="false"
             android:focusableInTouchMode="true"
             android:visibility="gone" />
     </LinearLayout>

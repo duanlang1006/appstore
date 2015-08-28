@@ -69,6 +69,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
             }
             return status[position];
         }
+
+        @Override
+        public Integer getStatusFlags() {
+            return mStatusFlags;
+        }
     };
 
 
@@ -148,7 +153,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         super.onAttach(activity);
         Bundle params = getArguments();
         if (null != params) {
-            mStatusFlags = params.getInt("statusFilter");
+            mStatusFlags = params.getInt("statusFilter");//
         }
         mImplAgent = ImplAgent.getInstance(activity.getApplicationContext());
         mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
@@ -176,6 +181,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         });
         flagShowCheckBox = false;
     }
+
 
     @Override
     public void onPause() {
@@ -295,37 +301,40 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     }
 
     private void initializeView(View view) {
-        actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();//得到ActionBar
+        if (null == actionBar) {
+            actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();//得到ActionBar
+            lp_top = new WindowManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    actionBar.getHeight(),
+                    WindowManager.LayoutParams.TYPE_APPLICATION,
+                    // 设置为无焦点状态
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, // 没有边界
+                    // 半透明效果
+                    PixelFormat.TRANSLUCENT);
+            lp_top.gravity = Gravity.TOP;
+            lp_top.windowAnimations = R.style.anim_view_top;
+            manager1 = (WindowManager) mActivity.getSystemService(Context.WINDOW_SERVICE);
+            manager1.addView(titleBar, lp_top);
+
+            titleBar.setVisibility(View.GONE);
+            btnCancel = (Button) titleBar.findViewById(R.id.select_cancel);
+            tvShowTotal = (TextView) titleBar.findViewById(R.id.total);
+            btnAllpick = (Button) titleBar.findViewById(R.id.select_allpick);
+
+            ll = (LinearLayout) view.findViewById(R.id.layout_button);
+            btnShare = (Button) view.findViewById(R.id.btnShare);
+            animaBt1 = AnimationUtils.loadAnimation(mActivity, R.anim.btn_share_in);
+            btnDelete = (Button) view.findViewById(R.id.btnDelete);
+            animaBt2 = AnimationUtils.loadAnimation(mActivity, R.anim.btn_delete_in);
+        }
+        btnCancel.setOnClickListener(this);
+        btnAllpick.setOnClickListener(this);
+        btnShare.setOnClickListener(this);
+        btnDelete.setOnClickListener(this);
         mListview.setAdapter(mAdapter);
 
-        lp_top = new WindowManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                actionBar.getHeight(),
-                WindowManager.LayoutParams.TYPE_APPLICATION,
-                // 设置为无焦点状态
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                        | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, // 没有边界
-                // 半透明效果
-                PixelFormat.TRANSLUCENT);
-        lp_top.gravity = Gravity.TOP;
-        lp_top.windowAnimations = R.style.anim_view_top;
-        manager1 = (WindowManager) mActivity.getSystemService(Context.WINDOW_SERVICE);
-        manager1.addView(titleBar, lp_top);
-
-        titleBar.setVisibility(View.GONE);
-        btnCancel = (Button) titleBar.findViewById(R.id.select_cancel);
-        btnCancel.setOnClickListener(this);
-        tvShowTotal = (TextView) titleBar.findViewById(R.id.total);
-        btnAllpick = (Button) titleBar.findViewById(R.id.select_allpick);
-        btnAllpick.setOnClickListener(this);
-
-        ll = (LinearLayout) view.findViewById(R.id.layout_button);
-        btnShare = (Button) view.findViewById(R.id.btnShare);
-        animaBt1 = AnimationUtils.loadAnimation(mActivity, R.anim.btn_share_in);
-        btnShare.setOnClickListener(this);
-        btnDelete = (Button) view.findViewById(R.id.btnDelete);
-        animaBt2 = AnimationUtils.loadAnimation(mActivity, R.anim.btn_delete_in);
-        btnDelete.setOnClickListener(this);
     }
+
 
     private void refresh(boolean b) {
         if (b) {
