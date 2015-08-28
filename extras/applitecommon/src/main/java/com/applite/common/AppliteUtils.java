@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -230,6 +231,17 @@ public class AppliteUtils {
         }
         path += filename;
         return path;
+    }
+
+    /**
+     * 判断APK包是否完整
+     *
+     * @param context
+     * @param path
+     * @return
+     */
+    public static boolean isPackageOk(Context context, String path) {
+        return context.getPackageManager().getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES) != null;
     }
 
     /**

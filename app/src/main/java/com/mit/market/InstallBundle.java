@@ -38,7 +38,7 @@
 //		// startlevel设置为2插件不会自启 isCheckVersion不检测插件版本覆盖更新
 //		File f1=null;
 //		try {
-//				InputStream in=context.getAssets().open(name);
+//				InputStream in=context.getAssets().setup_close(name);
 //				f1=new File(context.getFilesDir(),name);
 //				if(!DEBUG){
 //					//不是调试模式

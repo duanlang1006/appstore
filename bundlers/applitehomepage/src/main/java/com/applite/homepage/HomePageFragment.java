@@ -42,6 +42,7 @@ import com.applite.utils.SPUtils;
 import net.tsz.afinal.FinalBitmap;
 import com.google.gson.Gson;
 import com.mit.mitupdatesdk.MitMobclickAgent;
+import com.mit.mitupdatesdk.MitUpdateAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
@@ -161,6 +162,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             whichPage = this.getClass().getSimpleName()+"_"+mCategory;
         }
         MitMobclickAgent.onEvent(mActivity, whichPage+"_onCreate");
+        MitUpdateAgent.update(mActivity);
     }
 
     @Override
