@@ -14,8 +14,7 @@
             android:id="@+id/item_similar_img"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_margin="5dp"
-            android:background="@drawable/icon_defailt_img" />
+            android:layout_margin="5dp" />
 
         <TextView
             android:id="@+id/item_similar_name"
