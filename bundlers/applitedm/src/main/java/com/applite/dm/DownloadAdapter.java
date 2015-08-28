@@ -184,19 +184,20 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             if (null == this.implInfo) {
                 return;
             }
+            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext,implInfo);
             actionBtn.setEnabled(true);
             switch (implInfo.getStatus()){
                 case ImplInfo.STATUS_PRIVATE_INSTALLING:
-                    actionBtn.setText(ImplHelper.getStatusText(mContext,implInfo));
+                    actionBtn.setText(res.getStatusText());
                     actionBtn.setEnabled(false);
                     break;
                 default:
-                    actionBtn.setText(ImplHelper.getActionText(mContext, implInfo));
+                    actionBtn.setText(res.getActionText());
                     break;
             }
-            descView.setText(ImplHelper.getDescText(mContext,implInfo));
-            statusView.setText(ImplHelper.getStatusText(mContext,implInfo));
-            setProgress();
+            descView.setText(res.getDescText());
+            statusView.setText(res.getStatusText());
+            setProgress(res.getProgress());
         }
 
         private void setIcon() {
@@ -219,10 +220,10 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             }
         }
 
-        private void setProgress() {
+        private void setProgress(int progress) {
             progressBar.setIndeterminate(false);
             progressBar.setMax(100);
-            progressBar.setProgress(ImplHelper.getProgress(mContext,implInfo));
+            progressBar.setProgress(progress);
             progressBar.setVisibility(View.VISIBLE);
         }
 

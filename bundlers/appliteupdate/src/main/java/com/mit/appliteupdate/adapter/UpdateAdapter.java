@@ -107,7 +107,7 @@ public class UpdateAdapter extends BaseAdapter {
                                 vh.bean.getmName(),
                                 vh.bean.getmImgUrl(),
                                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getmName() + ".apk",
-                                null,
+                                vh.bean.getmMD5(),
                                 vh);
                     }
 //                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
@@ -163,7 +163,7 @@ public class UpdateAdapter extends BaseAdapter {
         public void initView(DataBean bean, int position) {
             this.bean = bean;
             this.position = position;
-            this.implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName()/*, bean.getmVersionCode()*/);
+            this.implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl()).setTitle(bean.getmName());
                 implAgent.setImplCallback(this, implInfo);
@@ -178,6 +178,7 @@ public class UpdateAdapter extends BaseAdapter {
 
         void initProgressButton() {
             if (null != mBt && null != this.implInfo) {
+                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity,implInfo);
                 switch (implInfo.getStatus()) {
                     case ImplInfo.STATUS_INSTALLED:
                         mBt.setText(mActivity.getResources().getString(R.string.update));
@@ -195,16 +196,16 @@ public class UpdateAdapter extends BaseAdapter {
                         }
                         break;
                     case ImplInfo.STATUS_PENDING:
-                        mBt.setText(ImplHelper.getActionText(mActivity, implInfo));
+                        mBt.setText(res.getActionText());
                         break;
                     case ImplInfo.STATUS_RUNNING:
-                        mBt.setText(ImplHelper.getProgress(mActivity, implInfo) + "%");
+                        mBt.setText(res.getProgress() + "%");
                         break;
                     case ImplInfo.STATUS_PAUSED:
-                        mBt.setText(ImplHelper.getStatusText(mActivity, implInfo));
+                        mBt.setText(res.getStatusText());
                         break;
                     default:
-                        mBt.setText(ImplHelper.getActionText(mActivity, implInfo));
+                        mBt.setText(res.getActionText());
                         break;
                 }
             }

@@ -79,7 +79,7 @@ public class ImplPackageManager{
                     pm.getPackageInfo("com.android.dbservices", 0);
                     installImpl(implInfo,silent);
                 }catch(Exception e1){
-                    e1.printStackTrace();
+//                    e1.printStackTrace();
                     installImpl(implInfo, false);
                 }
             }
@@ -100,7 +100,7 @@ public class ImplPackageManager{
             intent.putExtra("silent", silent);
             mContext.sendBroadcast(intent);
         }catch(Exception e1){
-            e1.printStackTrace();
+//            e1.printStackTrace();
             Intent intent = new Intent(Intent.ACTION_DELETE, Uri.parse("package:" + implInfo.getPackageName()));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(intent);
@@ -131,7 +131,7 @@ public class ImplPackageManager{
         try {
             new File(implInfo.getLocalPath()).delete();
         }catch(Exception e){
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         implInfo.setStatus(ImplInfo.STATUS_INSTALLED);
 //        implInfo.setLocalPath(null);

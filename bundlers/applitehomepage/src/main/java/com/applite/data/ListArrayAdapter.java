@@ -191,7 +191,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             this.itemData = itemData;
             this.layoutStr = layout;
             this.position = position;
-            this.implInfo = implAgent.getImplInfo(itemData.getPackageName(), itemData.getPackageName()/*, itemData.getVersionCode()*/);
+            this.implInfo = implAgent.getImplInfo(itemData.getPackageName(), itemData.getPackageName(), itemData.getVersionCode());
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(itemData.getrDownloadUrl())
                         .setTitle(itemData.getName())
@@ -277,24 +277,25 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
         void initProgressButton() {
             if (null != mProgressButton && null != this.implInfo){
-                LogUtils.d(TAG,implInfo.getTitle()+","+implInfo.getStatus()+","+ImplHelper.getActionText(mContext,implInfo));
+                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext,implInfo);
+                LogUtils.d(TAG,implInfo.getTitle()+","+implInfo.getStatus()+","+res.getActionText());
                 mProgressButton.setEnabled(true);
                 switch (implInfo.getStatus()){
                     case ImplInfo.STATUS_PENDING:
-                        mProgressButton.setText(ImplHelper.getActionText(mContext,implInfo));
+                        mProgressButton.setText(res.getActionText());
                         break;
                     case ImplInfo.STATUS_RUNNING:
-                        mProgressButton.setText(ImplHelper.getProgress(mContext,implInfo)+"%");
+                        mProgressButton.setText(res.getProgress()+"%");
                         break;
                     case ImplInfo.STATUS_PAUSED:
-                        mProgressButton.setText(ImplHelper.getStatusText(mContext,implInfo));
+                        mProgressButton.setText(res.getStatusText());
                         break;
                     case ImplInfo.STATUS_PRIVATE_INSTALLING:
-                        mProgressButton.setText(ImplHelper.getStatusText(mContext,implInfo));
+                        mProgressButton.setText(res.getStatusText());
                         mProgressButton.setEnabled(false);
                         break;
                     default:
-                        mProgressButton.setText(ImplHelper.getActionText(mContext,implInfo));
+                        mProgressButton.setText(res.getActionText());
                         break;
                 }
             }

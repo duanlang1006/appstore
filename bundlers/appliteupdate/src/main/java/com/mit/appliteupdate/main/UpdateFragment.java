@@ -330,7 +330,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     private void download(DataBean bean) {
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName()/*, bean.getmVersionCode()*/);
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
         if (null == implInfo) {
             return;
         }

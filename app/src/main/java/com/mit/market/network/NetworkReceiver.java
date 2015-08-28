@@ -213,7 +213,7 @@ public class NetworkReceiver extends BroadcastReceiver {
     private void download(DataBean bean) {
         if (null == implAgent)
             implAgent = ImplAgent.getInstance(mContext.getApplicationContext());
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName()/*, bean.getmVersionCode()*/);
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
         if (null == implInfo) {
             return;
         }

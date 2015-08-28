@@ -143,7 +143,7 @@ public class ImplAgent extends Observable {
         mPendingImplMap.clear();
     }
 
-    public ImplInfo getImplInfo(String key, String packageName/*, int versionCode*/) {
+    public ImplInfo getImplInfo(String key, String packageName, int versionCode) {
         if (null == key || null == packageName || TextUtils.isEmpty(key) || TextUtils.isEmpty(packageName)) {
             return null;
         }
@@ -170,7 +170,7 @@ public class ImplAgent extends Observable {
                 mPendingImplMap.put(key,implInfo);
             }
         }
-        implInfo.setPackageName(packageName)/*.setVersionCode(versionCode)*/;
+        implInfo.setPackageName(packageName).setVersionCode(versionCode);
         mDownloader.fillImplInfo(implInfo);
         mInstaller.fillImplInfo(implInfo);
         ImplLog.d(TAG,"getImplInfo,"+implInfo.getKey()+","+implInfo.getTitle()+","+implInfo.getStatus()+","+implInfo.getDownloadId());

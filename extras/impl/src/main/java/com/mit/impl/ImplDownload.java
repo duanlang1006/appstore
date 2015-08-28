@@ -1,18 +1,23 @@
 package com.mit.impl;
 
 import android.content.Context;
+import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.SparseArray;
 import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.HttpHandler;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.task.PriorityExecutor;
 import com.mit.impl.download.DownloadInfo;
 import com.mit.impl.download.DownloadManager;
 import com.mit.impl.download.DownloadService;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ImplDownload  {
     private static final String TAG = "impl_download";
@@ -20,6 +25,7 @@ public class ImplDownload  {
     private DownloadManager dm;
     private boolean inited = false;
     private Context mContext;
+    private final static ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
 
     private static ImplDownload mInstance = null;
@@ -80,7 +86,64 @@ public class ImplDownload  {
         }
     }
 
-    private class AddDownlaodTask implements Runnable{
+    private class AddDownloadAsync extends AsyncTask<Object,Object,File>{
+        private String fullname;
+        private String md5;
+        private ImplListener callback;
+        private ImplInfo implInfo;
+
+        private AddDownloadAsync(ImplInfo implInfo,String fullname, String md5, ImplListener callback) {
+            this.fullname = fullname;
+            this.md5 = md5;
+            this.callback = callback;
+            this.implInfo = implInfo;
+        }
+
+        @Override
+        protected File doInBackground(Object... params) {
+            File file = new File(fullname);
+            if (file.exists()
+                    && null != md5 && !TextUtils.isEmpty(md5)
+                    && md5.equals(ImplHelper.getFileMD5(file))){
+                return file;
+            }else if (file.exists()){
+                file.delete();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(File file) {
+            super.onPostExecute(file);
+            ImplLog.d(TAG,"run,"+implInfo.getTitle()+","+implInfo.getStatus()+","+implInfo.getDownloadId());
+            if (null != file){
+                implInfo.setLocalPath(file.getAbsolutePath());
+                implInfo.setStatus(ImplInfo.STATUS_SUCCESSFUL);
+                callback.onSuccess(this.implInfo,new File(fullname));
+            }else{
+                try {
+                    DownloadInfo downloadInfo = dm.getDownloadInfoById(implInfo.getDownloadId());
+                    if (null != downloadInfo) {
+                        dm.removeDownload(downloadInfo);
+                    }
+                    downloadInfo = dm.addNewDownload(implInfo.getDownloadUrl(),
+                            implInfo.getTitle(),
+                            fullname,
+                            true,
+                            true,
+                            new DownloadCallback<File>(implInfo, callback));
+                    downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
+                } catch (DbException e) {
+                    e.printStackTrace();
+                    implInfo.setLocalPath(null);
+                    implInfo.setStatus(ImplInfo.STATUS_FAILED);
+                    callback.onFailure(implInfo, null, "add download exception");
+                }
+            }
+        }
+    }
+
+    private class AddDownloadThread extends Thread {
         private static final int RESULT_MD5_MATCH = 0;
         private static final int RESULT_ADD_DOWNLOAD = 1;
         private static final int RESULT_ADD_DOWNLOAD_EXCEPTION = 2;
@@ -90,7 +153,72 @@ public class ImplDownload  {
         private ImplListener callback;
         private ImplInfo implInfo;
 
-        private AddDownlaodTask(ImplInfo implInfo,String fullname, String md5, ImplListener callback) {
+        private AddDownloadThread(ImplInfo implInfo,String fullname, String md5, ImplListener callback) {
+            this.fullname = fullname;
+            this.md5 = md5;
+            this.callback = callback;
+            this.implInfo = implInfo;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            int result = RESULT_ADD_DOWNLOAD;
+            File file = new File(fullname);
+            if (file.exists()
+                    && null != md5 && !TextUtils.isEmpty(md5)
+                    && md5.equals(ImplHelper.getFileMD5(file))){
+                result = RESULT_MD5_MATCH;
+            }else {
+                if (file.exists()){
+                    file.delete();
+                }
+                try {
+                    DownloadInfo downloadInfo = dm.getDownloadInfoById(implInfo.getDownloadId());
+                    if (null != downloadInfo) {
+                        dm.removeDownload(downloadInfo);
+                    }
+                    downloadInfo = dm.addNewDownload(implInfo.getDownloadUrl(),
+                            implInfo.getTitle(),
+                            fullname,
+                            true,
+                            true,
+                            new DownloadCallback<File>(implInfo, callback));
+                    downloadInfo.getHandler().getRequestCallBack().setRate(callback.getRate());
+                } catch (DbException e) {
+                    e.printStackTrace();
+                    result = RESULT_ADD_DOWNLOAD_EXCEPTION;
+                }
+            }
+            ImplLog.d(TAG,"run,"+implInfo.getTitle()+","+implInfo.getStatus()+","+implInfo.getDownloadId()+","+result);
+            switch(result){
+                case RESULT_ADD_DOWNLOAD:
+                    break;
+                case RESULT_ADD_DOWNLOAD_EXCEPTION:
+                    implInfo.setLocalPath(null);
+                    implInfo.setStatus(ImplInfo.STATUS_FAILED);
+                    callback.onFailure(implInfo, null, "add download exception");
+                    break;
+                case RESULT_MD5_MATCH:
+                    implInfo.setLocalPath(file.getAbsolutePath());
+                    implInfo.setStatus(ImplInfo.STATUS_SUCCESSFUL);
+                    callback.onSuccess(this.implInfo,new File(fullname));
+                    break;
+            }
+        }
+    }
+
+    private class AddDownloadTask implements Runnable{
+        private static final int RESULT_MD5_MATCH = 0;
+        private static final int RESULT_ADD_DOWNLOAD = 1;
+        private static final int RESULT_ADD_DOWNLOAD_EXCEPTION = 2;
+
+        private String fullname;
+        private String md5;
+        private ImplListener callback;
+        private ImplInfo implInfo;
+
+        private AddDownloadTask(ImplInfo implInfo,String fullname, String md5, ImplListener callback) {
             this.fullname = fullname;
             this.md5 = md5;
             this.callback = callback;
@@ -131,9 +259,13 @@ public class ImplDownload  {
                 case RESULT_ADD_DOWNLOAD:
                     break;
                 case RESULT_ADD_DOWNLOAD_EXCEPTION:
+                    implInfo.setLocalPath(null);
+                    implInfo.setStatus(ImplInfo.STATUS_FAILED);
                     callback.onFailure(implInfo, null, "add download exception");
                     break;
                 case RESULT_MD5_MATCH:
+                    implInfo.setLocalPath(file.getAbsolutePath());
+                    implInfo.setStatus(ImplInfo.STATUS_SUCCESSFUL);
                     callback.onSuccess(this.implInfo,new File(fullname));
                     break;
             }
@@ -143,11 +275,16 @@ public class ImplDownload  {
     void addDownload(ImplInfo implInfo,String fullname,String md5,ImplListener callback){
         if (null == implInfo.getDownloadUrl()){
             if (null != callback) {
+                implInfo.setLocalPath(null);
+                implInfo.setStatus(ImplInfo.STATUS_FAILED);
                 callback.onFailure(implInfo, null, "download url is null");
             }
             return;
         }
-        ImplAgent.mWorkHandler.post(new AddDownlaodTask(implInfo,fullname,md5,callback));
+//        ImplAgent.mWorkHandler.post(new AddDownloadTask(implInfo, fullname, md5, callback));
+//        new AddDownloadThread(implInfo, fullname, md5, callback).start();
+//        EXECUTOR.execute(new AddDownloadTask(implInfo, fullname, md5, callback));
+        new AddDownloadAsync(implInfo, fullname, md5, callback).execute();
     }
 
     void pause(ImplInfo implInfo,ImplListener callback){
