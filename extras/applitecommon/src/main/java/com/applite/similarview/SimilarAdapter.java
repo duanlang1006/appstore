@@ -137,8 +137,7 @@ public class SimilarAdapter extends BaseAdapter {
 
         public void initView(SimilarBean data) {
             this.bean = data;
-            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName()/*, data.getmVersionCode()*/);
-            ;
+            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName(), data.getmVersionCode());
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
                 implAgent.setImplCallback(this, implInfo);
@@ -153,18 +152,19 @@ public class SimilarAdapter extends BaseAdapter {
 
         void initProgressButton() {
             if (null != mTv && null != this.implInfo) {
+                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext,implInfo);
                 switch (implInfo.getStatus()) {
                     case ImplInfo.STATUS_PENDING:
-                        mTv.setText(ImplHelper.getActionText(mContext,implInfo));
+                        mTv.setText(res.getActionText());
                         break;
                     case ImplInfo.STATUS_RUNNING:
-                        mTv.setText(ImplHelper.getProgress(mContext,implInfo) + "%");
+                        mTv.setText(res.getProgress() + "%");
                         break;
                     case ImplInfo.STATUS_PAUSED:
-                        mTv.setText(ImplHelper.getStatusText(mContext,implInfo));
+                        mTv.setText(res.getStatusText());
                         break;
                     default:
-                        mTv.setText(ImplHelper.getActionText(mContext,implInfo));
+                        mTv.setText(res.getActionText());
                         break;
                 }
             }

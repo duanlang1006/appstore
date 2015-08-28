@@ -174,7 +174,7 @@ public class UpdateAdapter extends BaseAdapter {
         public void initView(DataBean bean, int position) {
             this.bean = bean;
             this.position = position;
-            this.implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName()/*, bean.getmVersionCode()*/);
+            this.implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl()).setTitle(bean.getmName());
                 implAgent.setImplCallback(this, implInfo);
@@ -188,38 +188,41 @@ public class UpdateAdapter extends BaseAdapter {
         }
 
         void initProgressButton() {
-            if (null != mBt && null != this.implInfo) switch (implInfo.getStatus()) {
-                case ImplInfo.STATUS_INSTALLED:
-                    String path = Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getmName() + ".apk";
-                    if (AppliteUtils.isPackageOk(mActivity, path)) {
-                        LogUtils.d("updateFragment", "已有更新包");
-                        mBt.setText(mActivity.getResources().getString(R.string.open));
-                    } else {
-                        mBt.setText(mActivity.getResources().getString(R.string.update));
-                    }
-                    try {
-                        mPackageInfo = mPackageManager.getPackageInfo(bean.getmPackageName(), PackageManager.GET_ACTIVITIES);
-                        if (mPackageInfo.versionCode == bean.getmVersionCode()) {
-                            LogUtils.d("updateFragment", "删除已更新的条目");
-                            mDatas.remove(position);
-                            notifyDataSetChanged();
+            if (null != mBt && null != this.implInfo) {
+                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity, implInfo);
+                switch (implInfo.getStatus()) {
+                    case ImplInfo.STATUS_INSTALLED:
+                        String path = Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getmName() + ".apk";
+                        if (AppliteUtils.isPackageOk(mActivity, path)) {
+                            LogUtils.d("updateFragment", "已有更新包");
+                            mBt.setText(mActivity.getResources().getString(R.string.open));
+                        } else {
+                            mBt.setText(mActivity.getResources().getString(R.string.update));
                         }
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case ImplInfo.STATUS_PENDING:
-                    mBt.setText(ImplHelper.getActionText(mActivity, implInfo));
-                    break;
-                case ImplInfo.STATUS_RUNNING:
-                    mBt.setText(ImplHelper.getProgress(mActivity, implInfo) + "%");
-                    break;
-                case ImplInfo.STATUS_PAUSED:
-                    mBt.setText(ImplHelper.getStatusText(mActivity, implInfo));
-                    break;
-                default:
-                    mBt.setText(ImplHelper.getActionText(mActivity, implInfo));
-                    break;
+                        try {
+                            mPackageInfo = mPackageManager.getPackageInfo(bean.getmPackageName(), PackageManager.GET_ACTIVITIES);
+                            if (mPackageInfo.versionCode == bean.getmVersionCode()) {
+                                LogUtils.d("updateFragment", "删除已更新的条目");
+                                mDatas.remove(position);
+                                notifyDataSetChanged();
+                            }
+                        } catch (PackageManager.NameNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case ImplInfo.STATUS_PENDING:
+                        mBt.setText(res.getActionText());
+                        break;
+                    case ImplInfo.STATUS_RUNNING:
+                        mBt.setText(res.getProgress() + "%");
+                        break;
+                    case ImplInfo.STATUS_PAUSED:
+                        mBt.setText(res.getStatusText());
+                        break;
+                    default:
+                        mBt.setText(res.getActionText());
+                        break;
+                }
             }
         }
 

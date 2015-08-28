@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import com.lidroid.xutils.DbUtils;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by hxd on 15-6-10.
@@ -39,7 +41,7 @@ public class ImplAgent extends Observable {
     private final static String IMPL_ACTION_SYSTEM_DELETE_RESULT = "com.installer.system.delete.result";
 
     private static final HandlerThread sWorkerThread = new HandlerThread("impl-worker");
-
+    private final static Handler mMainHandler = new Handler();
     static {
         sWorkerThread.start();
     }
@@ -63,68 +65,119 @@ public class ImplAgent extends Observable {
     private Context mContext;
     private ImplDownload mDownloader;
     private ImplPackageManager mInstaller;
+    private AtomicBoolean mInited;
 
     private List<ImplInfo> mImplList;
+    private Map<String,ImplInfo> mPendingImplMap;
     private DbUtils db;
     private ImplAgentCallback mImplCallback;
-    private Map<ImplInfo, WeakReference<ImplChangeCallback>> mWeakCallbackMap;
+    private final Map<ImplInfo, List<WeakReference<ImplChangeCallback>>> mWeakCallbackMap;
+    private UpdateObserverRunnable mUpdateTask;
 
     private ImplAgent(Context context) {
+        long current = System.currentTimeMillis();
         mContext = context;
-        db = ImplDbHelper.getDbUtils(mContext.getApplicationContext());
-        try {
-            mImplList = db.findAll(Selector.from(ImplInfo.class));
-        } catch (DbException e) {
-            LogUtils.e(e.getMessage(), e);
-        }
-        if (mImplList == null) {
-            mImplList = new ArrayList<ImplInfo>();
-        }
-        mImplCallback = new ImplAgentCallback();
-        mWeakCallbackMap = Collections.synchronizedMap(new HashMap());
-
         mDownloader = ImplDownload.getInstance(mContext);
         mInstaller = ImplPackageManager.getInstance(mContext);
-
-        for (int i = 0;i< mImplList.size();i++){
-            ImplInfo implInfo = mImplList.get(i);
-            mDownloader.fillImplInfo(implInfo);
-            mInstaller.fillImplInfo(implInfo);
-        }
+        mImplCallback = new ImplAgentCallback();
+        mWeakCallbackMap = Collections.synchronizedMap(new HashMap());
+        mImplList = new ArrayList<ImplInfo>();
+        mPendingImplMap = new HashMap<String,ImplInfo>();
+        mInited = new AtomicBoolean(false);
 
         ImplReceiver.initNetwork(mContext);
         //重新载始下载
-        mDownloader.kickDownload(mImplList,mImplCallback);
-        mDownloader.onNetworkChanged(mImplList,mImplCallback);
+        mWorkHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                db = ImplDbHelper.getDbUtils(mContext.getApplicationContext());
+                try {
+                    mImplList = db.findAll(Selector.from(ImplInfo.class));
+                } catch (DbException e) {
+                    LogUtils.e(e.getMessage(), e);
+                }
+                if (null == mImplList){
+                    mImplList = new ArrayList<ImplInfo>();
+                }
+                for (int i = 0;i< mImplList.size();i++){
+                    ImplInfo implInfo = mImplList.get(i);
+                    mDownloader.fillImplInfo(implInfo);
+                    mInstaller.fillImplInfo(implInfo);
+                }
+
+                mDownloader.kickDownload(mImplList,mImplCallback);
+                mDownloader.onNetworkChanged(mImplList,mImplCallback);
+                mUpdateTask = new UpdateObserverRunnable();
+                mInited.set(true);
+            }
+        });
+        ImplLog.d(TAG,"ImplAgent Constructor take " + (System.currentTimeMillis() - current) + "ms");
     }
 
-    public ImplInfo getImplInfo(String key, String packageName/*, int versionCode*/) {
+    private void mergePendingList(){
+        if (false == mInited.get()){
+            return ;
+        }
+
+        if (mPendingImplMap.size() == 0){
+            return;
+        }
+
+        ImplInfo implInfo = null;
+        for (int i = 0; i < mImplList.size(); i++ ){
+            implInfo = mImplList.get(i);
+            if (mPendingImplMap.containsKey(implInfo.getKey())){
+                mPendingImplMap.remove(implInfo.getKey());
+            }
+        }
+
+        if (mPendingImplMap.size() > 0) {
+            Iterator<ImplInfo> it = mPendingImplMap.values().iterator();
+            while(it.hasNext()){
+                implInfo = it.next();
+                mImplList.add(implInfo);
+                ImplLog.d(TAG,"mergeImplList,"+implInfo.getTitle());
+            }
+            notifyObserverUpdate("ImplListChanged");
+        }
+        mPendingImplMap.clear();
+    }
+
+    public ImplInfo getImplInfo(String key, String packageName, int versionCode) {
         if (null == key || null == packageName || TextUtils.isEmpty(key) || TextUtils.isEmpty(packageName)) {
             return null;
         }
+
         ImplInfo implInfo = null;
-        for (int i = 0; i < mImplList.size(); i++) {
-            if (mImplList.get(i).getKey().equals(key)) {
-                implInfo = mImplList.get(i);
-                break;
+        if (true == mInited.get()) {
+            mergePendingList();
+            for (int i = 0; i < mImplList.size(); i++) {
+                if (mImplList.get(i).getKey().equals(key)) {
+                    implInfo = mImplList.get(i);
+                    break;
+                }
+            }
+            if (null == implInfo) {
+                implInfo = new ImplInfo();
+                implInfo.setKey(key);
+                mImplList.add(implInfo);
+            }
+        }else{
+            implInfo = mPendingImplMap.get(key);
+            if (null == implInfo){
+                implInfo = new ImplInfo();
+                implInfo.setKey(key);
+                mPendingImplMap.put(key,implInfo);
             }
         }
-        if (null == implInfo) {
-            implInfo = new ImplInfo();
-            implInfo.setKey(key);
-            mImplList.add(implInfo);
-        }
-        implInfo.setPackageName(packageName)/*.setVersionCode(versionCode)*/;
+        implInfo.setPackageName(packageName).setVersionCode(versionCode);
         mDownloader.fillImplInfo(implInfo);
         mInstaller.fillImplInfo(implInfo);
-        ImplLog.d(TAG,"getImplInfo,"+implInfo.getTitle()+","+implInfo.getStatus());
+        ImplLog.d(TAG,"getImplInfo,"+implInfo.getKey()+","+implInfo.getTitle()+","+implInfo.getStatus()+","+implInfo.getDownloadId());
         return implInfo;
     }
 
-    public boolean onReceive(final Context context, final Intent intent) {
-//        mWorkHandler.post(new Runnable(){
-//            @Override
-//            public void run() {
+    public boolean onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         Log.d(TAG, "onReceive," + action);
         ImplInfo implInfo = null;
@@ -163,10 +216,13 @@ public class ImplAgent extends Observable {
         } else if (IMPL_ACTION_DOWNLOAD_COMPLETE.equals(action)) {
 //                    mDownloader.onDownloadComplete(intent);
         }else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)){
-            mDownloader.onNetworkChanged(mImplList,mImplCallback);
+            mWorkHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mDownloader.onNetworkChanged(mImplList, mImplCallback);
+                }
+            });
         }
-//            }
-//        });
         return true;
     }
 
@@ -181,7 +237,7 @@ public class ImplAgent extends Observable {
         if (null == implInfo) {
             return;
         }
-        ImplLog.d(TAG,"newDownload,"+implInfo.getTitle()+","+implInfo.getStatus());
+        ImplLog.d(TAG,"newDownload,"+title+","+implInfo.getStatus());
         setImplCallback(appCallback, implInfo);
         if (null != downloadUrl) {
             implInfo.setDownloadUrl(downloadUrl);
@@ -199,12 +255,8 @@ public class ImplAgent extends Observable {
         if (null != iconUrl){
             implInfo.setIconUrl(iconUrl);
         }
-//        implInfo.setMimeType(MimeTypeUtils.getMimeType(filename));
         implInfo.setAutoLaunch(autoLauncher);
         mDownloader.addDownload(implInfo, fullname, md5, mImplCallback);
-
-        setChanged();
-        notifyObservers();
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionAdd");
     }
 
@@ -243,17 +295,17 @@ public class ImplAgent extends Observable {
         if (null == implInfo) {
             return;
         }
-        ImplLog.d(TAG,"remove,"+implInfo.getTitle()+","+implInfo.getStatus());
+        ImplLog.d(TAG, "remove," + implInfo.getTitle() + "," + implInfo.getStatus());
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionRemove");
         mImplList.remove(implInfo);
+        notifyObserverUpdate("remove");
+
         mDownloader.remove(implInfo);
         try {
             db.delete(implInfo);
         } catch (DbException e) {
             e.printStackTrace();
         }
-        setChanged();
-        notifyObservers();
     }
 
     public void install(ImplInfo implInfo, boolean silent, ImplChangeCallback appCallback) {
@@ -281,18 +333,38 @@ public class ImplAgent extends Observable {
     public int getImplInfoCount(int statusFlag) {
         int count = 0;
         for (ImplInfo info : mImplList) {
-            if ((info.getStatus() & statusFlag) != 0) {
+            if ((info.getStatus() & statusFlag) != 0 && info.getDownloadId() > 0) {
                 count++;
             }
         }
         return count;
     }
 
+    private boolean findCallback(List<WeakReference<ImplChangeCallback>> list,ImplChangeCallback callback){
+        boolean ret = false;
+        if (null == list || list.size() == 0){
+            return ret;
+        }
+        for (int i = 0; i < list.size(); i++) {
+            ImplChangeCallback changeCallback = list.get(i).get();
+            if (changeCallback == callback){
+                ret = true;
+                break;
+            }
+        }
+        return ret;
+    }
     public void setImplCallback(ImplChangeCallback appCallback, ImplInfo implInfo) {
         if (null != appCallback && null != implInfo) {
             synchronized (mWeakCallbackMap) {
-                mWeakCallbackMap.put(implInfo, new WeakReference<ImplChangeCallback>(appCallback));
-//                ImplLog.d(TAG,"setImplCallback:"+implInfo.getTitle()+","+implInfo+"->"+appCallback);
+                List<WeakReference<ImplChangeCallback>> list = mWeakCallbackMap.get(implInfo);
+                if (null == list){
+                    list = new ArrayList<WeakReference<ImplChangeCallback>>();
+                    mWeakCallbackMap.put(implInfo,list);
+                }
+                if (!findCallback(list,appCallback)) {
+                    list.add(new WeakReference<ImplChangeCallback>(appCallback));
+                }
             }
         }
     }
@@ -308,244 +380,167 @@ public class ImplAgent extends Observable {
         return implInfo;
     }
 
+    private void notifyObserverUpdate(String event){
+        if (Looper.getMainLooper() == Looper.myLooper()) {
+            mUpdateTask.run();
+        }else{
+            mMainHandler.post(mUpdateTask);
+        }
+    }
 
     private class ImplAgentCallback extends ImplListener {
-
         private ImplAgentCallback() {
             super();
         }
+
         @Override
-        public void onPending(final ImplInfo info) {
+        public void onEnqued(ImplInfo info) {
+            super.onEnqued(info);
+            MitMobclickAgent.onEvent(mContext, "impl_DownloadEnqued");
+            callbackImpl(info);
+            saveImplInfo(info);
+            notifyObserverUpdate("onEnqued");
+            ImplLog.d(TAG, info.getTitle() + ",onEnqued,"+info.getDownloadId());
+        }
+
+        @Override
+        public void onPending(ImplInfo info) {
             super.onPending(info);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadPending");
-            mWorkHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        db.saveOrUpdate(info);
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            nofityChanged(info);
-            ImplLog.d(TAG, info.getTitle() + ",onPending");
+            callbackImpl(info);
+            saveImplInfo(info);
+            ImplLog.d(TAG, info.getTitle() + ",onPending,"+info.getDownloadId());
         }
 
         @Override
-        public void onStart(final ImplInfo info) {
+        public void onStart(ImplInfo info) {
             super.onStart(info);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadStart");
-            mWorkHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        db.saveOrUpdate(info);
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            nofityChanged(info);
-            ImplLog.d(TAG, info.getTitle() + ",onStart");
+            callbackImpl(info);
+            saveImplInfo(info);
+            ImplLog.d(TAG, info.getTitle() + ",onStart,"+info.getDownloadId());
         }
 
         @Override
-        public void onCancelled(final ImplInfo info) {
+        public void onCancelled(ImplInfo info) {
             super.onCancelled(info);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadPaused");
-            mWorkHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        db.saveOrUpdate(info);
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            nofityChanged(info);
+            callbackImpl(info);
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onCancelled");
         }
 
         @Override
-        public void onLoading(final ImplInfo info, final long total, final long current, final boolean isUploading) {
+        public void onLoading(ImplInfo info, long total, long current, boolean isUploading) {
             super.onLoading(info, total, current, isUploading);
-//            mWorkHandler.post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    try {
-//                        db.saveOrUpdate(info);
-//                    } catch (DbException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            });
-            nofityChanged(info);
-            ImplLog.d(TAG, info.getTitle() + ",onLoading," + ((total != 0) ? current * 100 / total : 0));
+            callbackImpl(info);
+//            ImplLog.d(TAG, info.getTitle() + ",onLoading," + ((total != 0) ? current * 100 / total : 0));
         }
 
         @Override
-        public void onSuccess(final ImplInfo info, final File file) {
+        public void onSuccess(ImplInfo info, File file) {
             super.onSuccess(info, file);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadSuccess");
-            mWorkHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        db.saveOrUpdate(info);
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
             if (info.isAutoLaunch()) {
                 //安装
                 mInstaller.install(info, true, this);
             }
-            nofityChanged(info);
-
-            setChanged();
-            notifyObservers();
+            callbackImpl(info);
+            notifyObserverUpdate("onSuccess");
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onSuccess");
         }
 
         @Override
-        public void onFailure(final ImplInfo info, final Throwable t, final String msg) {
+        public void onFailure(ImplInfo info, Throwable t, String msg) {
             super.onFailure(info, t, msg);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadFailure");
-            mWorkHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        db.saveOrUpdate(info);
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            nofityChanged(info);
+            callbackImpl(info);
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onFailure," + msg);
         }
 
         @Override
-        public void onInstallSuccess(final ImplInfo info) {
+        public void onInstallSuccess(ImplInfo info) {
             super.onInstallSuccess(info);
             MitMobclickAgent.onEvent(mContext, "impl_InstallSuccess");
-            mWorkHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        db.saveOrUpdate(info);
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            nofityChanged(info);
+            callbackImpl(info);
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onInstallSuccess");
         }
 
         @Override
-        public void onInstalling(final ImplInfo info) {
+        public void onInstalling(ImplInfo info) {
             super.onInstalling(info);
             MitMobclickAgent.onEvent(mContext, "impl_Installing");
-            mWorkHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        db.saveOrUpdate(info);
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            nofityChanged(info);
+            callbackImpl(info);
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onInstalling");
         }
 
         @Override
-        public void onInstallFailure(final ImplInfo info, final int errorCode) {
+        public void onInstallFailure(ImplInfo info, int errorCode) {
             super.onInstallFailure(info, errorCode);
             MitMobclickAgent.onEvent(mContext, "impl_InstallFailuer");
-            mWorkHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        db.saveOrUpdate(info);
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            nofityChanged(info);
+            callbackImpl(info);
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onInstallFailure,errorCode=" + errorCode);
         }
 
         @Override
-        public void onUninstallSuccess(final ImplInfo info) {
+        public void onUninstallSuccess(ImplInfo info) {
             super.onUninstallSuccess(info);
-            info.setDownloadId(0);
             MitMobclickAgent.onEvent(mContext, "impl_UninstallSuccess");
-            mWorkHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        db.saveOrUpdate(info);
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            nofityChanged(info);
+            callbackImpl(info);
+            remove(info);       //应用卸载掉，同时删除下载记录
             ImplLog.d(TAG, info.getTitle() + ",onUninstallSuccess");
         }
 
         @Override
-        public void onUninstalling(final ImplInfo info) {
+        public void onUninstalling(ImplInfo info) {
             super.onUninstalling(info);
             MitMobclickAgent.onEvent(mContext, "impl_Uninstalling");
-            mWorkHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        db.saveOrUpdate(info);
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            nofityChanged(info);
+            callbackImpl(info);
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onUninstalling");
         }
 
         @Override
-        public void onUninstallFailure(final ImplInfo info, final int errorCode) {
+        public void onUninstallFailure(ImplInfo info, int errorCode) {
             super.onUninstallFailure(info, errorCode);
             MitMobclickAgent.onEvent(mContext, "impl_UninstallFailure");
-            mWorkHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        db.saveOrUpdate(info);
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            nofityChanged(info);
+            callbackImpl(info);
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onUninstalling");
         }
 
-        private void nofityChanged(final ImplInfo info) {
+        private void saveImplInfo(ImplInfo implInfo){
+            try {
+                db.saveOrUpdate(implInfo);
+            } catch (DbException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void callbackImpl(ImplInfo info) {
             synchronized (mWeakCallbackMap) {
                 //回调
-                WeakReference<ImplChangeCallback> weakref = mWeakCallbackMap.get(info);
-                if (null != weakref) {
-                    ImplChangeCallback callback = weakref.get();
-                    if (null != callback) {
-                        callback.onChange(info);
+                List<WeakReference<ImplChangeCallback>> list = mWeakCallbackMap.get(info);
+                if (null != list){
+                    Iterator it = list.iterator();
+                    while(it.hasNext()){
+                        WeakReference<ImplChangeCallback> weakref = (WeakReference<ImplChangeCallback>)it.next();
+                        ImplChangeCallback callback = weakref.get();
+                        if (null != callback) {
+                            if (Looper.myLooper() != Looper.getMainLooper()) {
+                                mMainHandler.post(new CallbackRunnable(info, callback));
+                            }else{
+                                callback.onChange(info);
+                            }
+                        }else{
+                            it.remove();
+                            list.remove(weakref);
+                        }
                     }
                 }
 
@@ -557,15 +552,40 @@ public class ImplAgent extends Observable {
                 Iterator it = keyset.iterator();
                 while (it.hasNext()) {
                     ImplInfo implInfo = (ImplInfo) it.next();
-                    WeakReference<ImplChangeCallback> ref = mWeakCallbackMap.get(implInfo);
-                    if (null == ref.get()) {
-                        ImplLog.d(TAG, implInfo.getTitle() + ",callback is null,will be deleted");
+                    list = mWeakCallbackMap.get(implInfo);
+                    if (null == list || list.size() == 0) {
+//                        ImplLog.d(TAG, implInfo.getTitle() + ",callback is null,will be deleted");
                         it.remove();
                         mWeakCallbackMap.remove(implInfo);
                     }
                 }
-                ImplLog.d(TAG, "mWeakCallbackMap.size()=" + mWeakCallbackMap.size());
+//                ImplLog.d(TAG, "mWeakCallbackMap.size()=" + mWeakCallbackMap.size());
             }
+        }
+    }
+    private class CallbackRunnable implements Runnable{
+        private ImplInfo implInfo ;
+        private ImplChangeCallback callback;
+
+        private CallbackRunnable(ImplInfo implInfo, ImplChangeCallback callback) {
+            this.implInfo = implInfo;
+            this.callback = callback;
+        }
+
+        @Override
+        public void run() {
+            if (null != callback ){
+                callback.onChange(implInfo);
+//                  ImplLog.d(TAG, "onChanged," + info.getTitle()+","+callback);
+            }
+        }
+    }
+
+    private class UpdateObserverRunnable implements Runnable{
+        @Override
+        public void run() {
+            setChanged();
+            notifyObservers();
         }
     }
 }

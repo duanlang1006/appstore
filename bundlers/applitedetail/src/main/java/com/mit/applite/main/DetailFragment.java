@@ -506,12 +506,13 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 setApkTag(mApkTag);
             }
 
-            ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName/*, mVersionCode*/);
+            ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName, mVersionCode);
             if (null != implinfo) {
+                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity,implinfo);
                 implAgent.setImplCallback(implCallback, implinfo);
                 implinfo.setDownloadUrl(mDownloadUrl).setIconUrl(mImgUrl).setTitle(mName);
-                mProgressButton.setText(ImplHelper.getActionText(mActivity, implinfo));
-                mProgressButton.setProgress(ImplHelper.getProgress(mActivity, implinfo));
+                mProgressButton.setText(res.getActionText());
+                mProgressButton.setProgress(res.getProgress());
                 if (mProgressButton.getProgress() == 0) {
                     mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_foreground));
                 } else {
@@ -652,9 +653,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         }
 
         private void refresh(ImplInfo info) {
-            LogUtils.d(TAG, "refresh" + ImplHelper.getActionText(mActivity, info) + "," + info.getStatus());
-            mProgressButton.setText(ImplHelper.getActionText(mActivity, info));
-            mProgressButton.setProgress(ImplHelper.getProgress(mActivity, info));
+            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity,info);
+            LogUtils.d(TAG, "refresh" + res.getActionText() + "," + info.getStatus());
+            mProgressButton.setText(res.getActionText());
+            mProgressButton.setProgress(res.getProgress());
         }
     }
 }
