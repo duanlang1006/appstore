@@ -56,9 +56,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     private WindowManager.LayoutParams lp_top;
     private Animation animaBt1;
     private Animation animaBt2;
+    private boolean checkBoxAnima = true;
     private DownloadListener mDownloadListener = new DownloadListener() {
         @Override
-        public boolean getFlag() {
+        public boolean getFlag1() {
             return flagShowCheckBox;
         }
 
@@ -73,6 +74,16 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         @Override
         public Integer getStatusFlags() {
             return mStatusFlags;
+        }
+
+        @Override
+        public boolean getFlag2() {
+            return checkBoxAnima;
+        }
+
+        @Override
+        public void setFlag2(boolean b) {
+            checkBoxAnima = b;
         }
     };
 
@@ -118,7 +129,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         Arrays.fill(status, false);//全部填充为false(chechbox不选中)
         checkedCount = 0;
         titleBar = inflater.inflate(R.layout.cover_actionbar, null);//这里是添加的控件
-
+        initializeView(view);
         //这里是长按删除
         mListview.setOnItemLongClickListener(this);
         mListview.setOnScrollListener(new PauseOnScrollListener(mBitmapHelper, false, true));
@@ -249,7 +260,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 if (!flagShowCheckBox) {
                     if (titleBar.getVisibility() != View.VISIBLE) {
-                        initializeView(view);
                         flagShowCheckBox = true;
                         VibratorUtil.Vibrate(mActivity, 200);   //震动200ms
                         titleBar.setVisibility(View.VISIBLE);//显示titleBar
@@ -263,6 +273,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                     checkedCount = (status[position] == false) ? checkedCount - 1 : checkedCount + 1;
                     setButtonStatus();//titleBar里Button显示的文字
                     mAdapter.notifyDataSetChanged();
+//                    checkBoxAnima = false;
                 }
                 return false;
             }
@@ -348,6 +359,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
             flagShowCheckBox = false;//标志位复位
             Arrays.fill(status, false);//删除后将status复位
             mAdapter.notifyDataSetChanged();
+            checkBoxAnima = true;
             checkedCount = 0;
         }
     }

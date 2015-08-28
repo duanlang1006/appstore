@@ -57,7 +57,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
     private BitmapUtils mBitmapHelper;
     private ImplAgent implAgent;
 
-    private boolean oldFlag = false;
     private DownloadListener mListener;
 
     public DownloadAdapter(Context context,
@@ -85,25 +84,21 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         vh.initView((ImplInfo) getItem(position));
         vh.actionBtn.setOnClickListener(this);
         vh.custompb.setOnClickListener(this);
-        if (mListener.getFlag()) {//显示删除多选框
+        if (mListener.getFlag1()) {//显示删除多选框
             vh.deleteCheckBox.setVisibility(View.VISIBLE);
             vh.deleteCheckBox.setChecked(mListener.getStatus(position));
-            if (false == oldFlag && true == mListener.getFlag()) {
+            if (true == mListener.getFlag2()) {
                 vh.deleteCheckBox.startAnimation(vh.animaCheckBox);
-                if (position == getCount() - 1) {
-                    oldFlag = true;
-                }
+                mListener.setFlag2(false);
             }
             vh.actionBtn.setVisibility(View.GONE);
             vh.custompb.setVisibility(View.GONE);
         } else {//正常状态(没有删除的多选框)
             vh.deleteCheckBox.setVisibility(View.GONE);
             if (mListener.getStatusFlags() == 23) {
-//            if (vh.flagDownLoading == 1) {
                 vh.actionBtn.setVisibility(View.GONE);
                 vh.custompb.setVisibility(View.VISIBLE);
             } else if (mListener.getStatusFlags() == -24) {
-//            } else if (vh.flagDownLoading == 1) {
                 vh.actionBtn.setVisibility(View.VISIBLE);
                 vh.custompb.setVisibility(View.GONE);
             }
@@ -115,7 +110,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
     @Override
     public void onClick(View v) {
         ViewHolder vh = (ViewHolder) v.getTag();
-//        if (R.id.button_op == v.getId()) {
         ImplHelper.onClick(mContext,
                 vh.implInfo,
                 vh.implInfo.getDownloadUrl(),
