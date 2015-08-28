@@ -118,7 +118,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         Arrays.fill(status, false);//全部填充为false(chechbox不选中)
         checkedCount = 0;
         titleBar = inflater.inflate(R.layout.cover_actionbar, null);//这里是添加的控件
-        initializeView(view);
+
         //这里是长按删除
         mListview.setOnItemLongClickListener(this);
         mListview.setOnScrollListener(new PauseOnScrollListener(mBitmapHelper, false, true));
@@ -202,7 +202,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
 
     @Override
     public void onDestroy() {
-        manager1.removeView(titleBar);
+        if (manager1 != null) {
+            manager1.removeView(titleBar);
+        }
         super.onDestroy();
     }
 
@@ -247,6 +249,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 if (!flagShowCheckBox) {
                     if (titleBar.getVisibility() != View.VISIBLE) {
+                        initializeView(view);
                         flagShowCheckBox = true;
                         VibratorUtil.Vibrate(mActivity, 200);   //震动200ms
                         titleBar.setVisibility(View.VISIBLE);//显示titleBar
