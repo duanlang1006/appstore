@@ -99,7 +99,7 @@ public class UpdateAdapter extends BaseAdapter {
                         intent.setDataAndType(Uri.fromFile(new File(path)), "application/vnd.android.package-archive");
                         mActivity.startActivity(intent);
                     } else {
-                        if (vh.implInfo.getStatus() == Constant.STATUS_INSTALLED && mPackageInfo.versionCode < data.getmVersionCode()) {
+                        if (vh.implInfo.getStatus() == ImplInfo.STATUS_INSTALLED && mPackageInfo.versionCode < data.getmVersionCode()) {
                             LogUtils.d("UpdateFragment", "更新");
                             implAgent.newDownload(vh.implInfo,
                                     vh.bean.getmUrl(),
@@ -123,11 +123,11 @@ public class UpdateAdapter extends BaseAdapter {
                     }
 //                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
 //                    switch (vh.implInfo.getStatus()) {
-//                        case Constant.STATUS_PENDING:
-//                        case Constant.STATUS_RUNNING:
+//                        case ImplInfo.STATUS_PENDING:
+//                        case ImplInfo.STATUS_RUNNING:
 //                            implAgent.pauseDownload(vh.implInfo);
 //                            break;
-//                        case Constant.STATUS_PAUSED:
+//                        case ImplInfo.STATUS_PAUSED:
 //                            implAgent.resumeDownload(vh.implInfo, vh.implCallback);
 //                            break;
 //                        default:
@@ -189,7 +189,7 @@ public class UpdateAdapter extends BaseAdapter {
 
         void initProgressButton() {
             if (null != mBt && null != this.implInfo) switch (implInfo.getStatus()) {
-                case Constant.STATUS_INSTALLED:
+                case ImplInfo.STATUS_INSTALLED:
                     String path = Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getmName() + ".apk";
                     if (AppliteUtils.isPackageOk(mActivity, path)) {
                         LogUtils.d("updateFragment", "已有更新包");
@@ -208,13 +208,13 @@ public class UpdateAdapter extends BaseAdapter {
                         e.printStackTrace();
                     }
                     break;
-                case Constant.STATUS_PENDING:
+                case ImplInfo.STATUS_PENDING:
                     mBt.setText(ImplHelper.getActionText(mActivity, implInfo));
                     break;
-                case Constant.STATUS_RUNNING:
+                case ImplInfo.STATUS_RUNNING:
                     mBt.setText(ImplHelper.getProgress(mActivity, implInfo) + "%");
                     break;
-                case Constant.STATUS_PAUSED:
+                case ImplInfo.STATUS_PAUSED:
                     mBt.setText(ImplHelper.getStatusText(mActivity, implInfo));
                     break;
                 default:

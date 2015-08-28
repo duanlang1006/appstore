@@ -472,7 +472,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         if (null == implAgent || null == mInstallView || null == mActivity) {
             return;
         }
-        mDownloadQueueNumber = implAgent.getImplInfoCount(Constant.STATUS_RUNNING | Constant.STATUS_PENDING | Constant.STATUS_PAUSED);
+        mDownloadQueueNumber = implAgent.getImplInfoCount(ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PENDING | ImplInfo.STATUS_PAUSED);
         if (mDownloadQueueNumber == 0) {
             mInstallView.setText(mActivity.getResources().getText(R.string.one_click_install));
         } else {
@@ -532,15 +532,15 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
 //        implInfo.setTitle(bean.getName()).setDownloadUrl(bean.getUrl()).setIconUrl(bean.getImgurl());
 //        if (ImplInfo.ACTION_DOWNLOAD == ImplHelper.getAction(mActivity,implInfo)) {
 //            switch (implInfo.getStatus()) {
-//                case Constant.STATUS_PENDING:
-//                case Constant.STATUS_RUNNING:
+//                case ImplInfo.STATUS_PENDING:
+//                case ImplInfo.STATUS_RUNNING:
 //                    break;
-//                case Constant.STATUS_PAUSED:
+//                case ImplInfo.STATUS_PAUSED:
 //                    implAgent.resumeDownload(implInfo, null);
 //                    break;
-//                case Constant.STATUS_INSTALLED:
-//                case Constant.STATUS_NORMAL_INSTALLING:
-//                case Constant.STATUS_PRIVATE_INSTALLING:
+//                case ImplInfo.STATUS_INSTALLED:
+//                case ImplInfo.STATUS_NORMAL_INSTALLING:
+//                case ImplInfo.STATUS_PRIVATE_INSTALLING:
 //                    //正在安装或已安装
 ////                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
 //                    break;

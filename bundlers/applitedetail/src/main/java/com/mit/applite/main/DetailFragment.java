@@ -279,11 +279,11 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
 //                        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implinfo)) {
 //                            switch (implinfo.getStatus()) {
-//                                case Constant.STATUS_PENDING:
-//                                case Constant.STATUS_RUNNING:
+//                                case ImplInfo.STATUS_PENDING:
+//                                case ImplInfo.STATUS_RUNNING:
 //                                    implAgent.pauseDownload(implinfo);
 //                                    break;
-//                                case Constant.STATUS_PAUSED:
+//                                case ImplInfo.STATUS_PAUSED:
 //                                    implAgent.resumeDownload(implinfo, implCallback);
 //                                    break;
 //                                default:
