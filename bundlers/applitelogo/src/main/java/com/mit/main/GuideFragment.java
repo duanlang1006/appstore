@@ -436,7 +436,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                     LogUtils.i(TAG, "当前APK数据：" + bean);
                     if (mApkShowNumber[bean.getmShowPosition()] < MAX_APK_SHOW_NUMBER)
                         mGuideContents.remove(bean);
-                    mAppTV.setClickable(false);
+                    child.setClickable(false);
                     paowuxianAnimator(child, mApkMovePath[bean.getmShowPosition()]);
 
                     ISAPKADD[bean.getmShowPosition()] = true;
@@ -669,7 +669,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      * 下载文件
      */
     private void download(final String name, String url) {
-        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_IMG_URL, AppliteUtils.getAppDir(name));
+        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_IMG_SAVE_PATH, AppliteUtils.getAppDir(name));
         HttpHandler mHttpHandler = mHttpUtils.download(url, //这里是下载的路径
                 AppliteUtils.getAppDir(name), //这是保存到本地的路径
                 true,//true:断点续传 false:不断点续传（全新下载）
@@ -702,7 +702,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         long time = System.currentTimeMillis();
         long start_time = (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_START_SHOW_TIME, 0L);
         long end_time = (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, 0L);
-        String path = (String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_URL, "");
+        String path = (String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_SAVE_PATH, "");
 
         LogUtils.i(TAG, "time:" + time);
         LogUtils.i(TAG, "start_time:" + start_time);
@@ -740,13 +740,19 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                     String SmallImgUrl = obj.getString("i_smalllogourl");
                     long StartTime = obj.getLong("limit_starttime") * 1000;
                     long EndTime = obj.getLong("limit_endtime") * 1000;
+
+                    LogUtils.d(TAG, "BigImgUrl:" + BigImgUrl);
+                    LogUtils.d(TAG, "LOGO_IMG_DOWNLOAD_URL:" + AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, ""));
+                    if (!BigImgUrl.equals(AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, ""))) {
+                        AppliteUtils.delFile((String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_SAVE_PATH, ""));
+                        download(Constant.LOGO_IMG_NAME, BigImgUrl);
+                    }
+
                     AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_NEXT_TIME, NextTime);
                     AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_SHOW_TIME, ShowTime);
                     AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_START_SHOW_TIME, StartTime);
                     AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, EndTime);
-                    if (!TextUtils.isEmpty(BigImgUrl)) {
-                        download(Constant.LOGO_IMG_NAME, BigImgUrl);
-                    }
+                    AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, BigImgUrl);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     LogUtils.e(TAG, "LOGO,JSON解析异常");

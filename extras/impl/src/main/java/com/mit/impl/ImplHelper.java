@@ -336,8 +336,8 @@ public class ImplHelper{
 
     public static boolean startActivity(Context context,ImplInfo implInfo){
         boolean ret = true;
-        Intent intent = getActionIntent(context,implInfo);
-        switch(getAction(context,implInfo)){
+        Intent intent = getActionIntent(context, implInfo);
+        switch(getAction(context, implInfo)){
             case ImplInfo.ACTION_INSTALL:
                 MitMobclickAgent.onEvent(context, "impl_startActivity_InstallApk");
                 break;
@@ -532,32 +532,30 @@ public class ImplHelper{
                                     String fullname,
                                     String md5,
                                     ImplChangeCallback callback){
-        if (ImplInfo.ACTION_DOWNLOAD == getAction(context,implInfo)) {
-            ImplAgent implAgent = ImplAgent.getInstance(context.getApplicationContext());
-            switch (implInfo.getStatus()) {
-                case ImplInfo.STATUS_PENDING:
-                case ImplInfo.STATUS_RUNNING:
-                    break;
-                case ImplInfo.STATUS_PAUSED:
-                    implAgent.resumeDownload(implInfo, null);
-                    break;
-                case ImplInfo.STATUS_NORMAL_INSTALLING:
-                case ImplInfo.STATUS_PRIVATE_INSTALLING:
-                    //正在安装或已安装
+        ImplAgent implAgent = ImplAgent.getInstance(context.getApplicationContext());
+        switch (implInfo.getStatus()) {
+            case ImplInfo.STATUS_PENDING:
+            case ImplInfo.STATUS_RUNNING:
+                break;
+            case ImplInfo.STATUS_PAUSED:
+                implAgent.resumeDownload(implInfo, null);
+                break;
+            case ImplInfo.STATUS_NORMAL_INSTALLING:
+            case ImplInfo.STATUS_PRIVATE_INSTALLING:
+                //正在安装或已安装
 //                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
-                    break;
-                case ImplInfo.STATUS_INSTALLED:
-                default:
-                    implAgent.newDownload(implInfo,
-                            downloadUrl,
-                            name,
-                            iconUrl,
-                            fullname,
-                            md5,
-                            true,
-                            null);
-                    break;
-            }
+                break;
+            case ImplInfo.STATUS_INSTALLED:
+            default:
+                implAgent.newDownload(implInfo,
+                        downloadUrl,
+                        name,
+                        iconUrl,
+                        fullname,
+                        md5,
+                        true,
+                        null);
+                break;
         }
     }
 

@@ -27,7 +27,8 @@ public class AppliteSPUtils {
     public static final String LOGO_SHOW_TIME = "logo_show_time";
     public static final String LOGO_START_SHOW_TIME = "logo_start_show_time";
     public static final String LOGO_END_SHOW_TIME = "logo_end_show_time";
-    public static final String LOGO_IMG_URL = "logo_img_url";
+    public static final String LOGO_IMG_SAVE_PATH = "logo_img_save_path";
+    public static final String LOGO_IMG_DOWNLOAD_URL = "logo_img_download_url";
 
     /**
      * 通知显示时间
@@ -38,6 +39,11 @@ public class AppliteSPUtils {
      */
     public static final String WIFI_UPDATE_START = "wifi_update_start";
     public static final String WIFI_UPDATE_END = "wifi_update_end";
+
+    /**
+     * WIFI自动更新开关
+     */
+    public static final String WIFI_UPDATE_SWITCH = "wifi_update_switch";
 
     /**
      * 保存数据的方法，我们需要拿到保存数据的具体类型，然后根据类型调用不同的保存方法
