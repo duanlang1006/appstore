@@ -128,6 +128,7 @@ public class UpdateNotification {
         Intent mIntent = new Intent(context, MitMarketActivity.class);
         mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mIntent.putExtra("update", Constant.UPDATE_FRAGMENT_NOT);
+        mIntent.putExtra("update_data", array.toString());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, UUID.randomUUID().hashCode(), mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = new Notification();
         notification.icon = R.drawable.ic_launcher;

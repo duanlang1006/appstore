@@ -83,8 +83,12 @@ public class NetworkReceiver extends BroadcastReceiver {
                 //获取当前wifi名称
                 LogUtils.d(TAG, "连接到WIFI:" + wifiInfo.getSSID());
 
-//                if (System.currentTimeMillis() > (long) AppliteSPUtils.get(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, 0L))
-                post();
+                LogUtils.d(TAG, "零流量更新状态:" + AppliteSPUtils.get(mContext, AppliteSPUtils.WIFI_UPDATE_SWITCH, true));
+                LogUtils.d(TAG, "当前时间:" + System.currentTimeMillis());
+                LogUtils.d(TAG, "下次请求时间:" + AppliteSPUtils.get(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, 0L));
+                if ((boolean) AppliteSPUtils.get(mContext, AppliteSPUtils.WIFI_UPDATE_SWITCH, true))
+                    if (System.currentTimeMillis() > (long) AppliteSPUtils.get(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, 0L))
+                        post();
             } else {
                 LogUtils.d(TAG, "无网络连接");
             }
@@ -216,7 +220,7 @@ public class NetworkReceiver extends BroadcastReceiver {
     private void download(DataBean bean) {
         if (null == implAgent)
             implAgent = ImplAgent.getInstance(mContext.getApplicationContext());
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName()/*, bean.getmVersionCode()*/);
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
         if (null == implInfo) {
             return;
         }

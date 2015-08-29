@@ -63,7 +63,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         MitMobclickAgent.openActivityDurationTrack(false);//禁止默认的页面统计方式
         MitMobclickAgent.updateOnlineConfig(this);
         MitUpdateAgent.setDebug(true);
-        MitUpdateAgent.update(this);
+
         LogUtils.d(TAG, "onCreate take " + (System.currentTimeMillis() - current) + " ms");
 
         registerClients();
@@ -75,8 +75,9 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
             LogUtils.i(TAG, "onCreate得到点击通知栏发过来的意图:" + "intent:" + intent +
                     "-----intent.getStringExtra:" + intent.getStringExtra("update"));
             if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))) {
-                jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null,
-                        GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, null, null, false, true), false);
+                Bundle bundle = GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, null, null, false, true);
+                bundle.putString("update_data", intent.getStringExtra("update_data"));
+                jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null, bundle, false);
             } else {
                 jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null,
                         GuideFragment.newBundles(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false, false), false);
@@ -85,7 +86,6 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 //                    .replace(R.id.container,fg,Constant.OSGI_SERVICE_LOGO_FRAGMENT)
 //                    .commit();
         }
-
         post();
     }
 
@@ -156,7 +156,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (R.id.action_search == id){
+        if (R.id.action_search == id) {
             jumptoSearch(true);
             return true;
         }
@@ -183,9 +183,9 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         super.onNewIntent(intent);
         if (null != intent && Constant.UPDATE_FRAGMENT_NOT.equals(intent.getStringExtra("update"))) {
             LogUtils.i(TAG, "onNewIntent得到点击通知栏发过来的意图");
-            jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null,
-                    GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, null, null, false, true),
-                    false);
+            Bundle bundle = GuideFragment.newBundles(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, null, null, false, true);
+            bundle.putString("update_data", intent.getStringExtra("update_data"));
+            jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null, bundle, false);
         }
     }
 
@@ -323,7 +323,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     @Override
     public void jumptoUpdate(boolean addToBackstack) {
         Bundle bundle = new Bundle();
-        bundle.putString("data", mUpdateData);
+        bundle.putString("update_data", mUpdateData);
         jumpto(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,
                 UpdateFragment.class.getName(),
                 bundle, addToBackstack);

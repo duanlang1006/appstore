@@ -2,19 +2,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#ffFFFFFF"
+    android:orientation="vertical"
     tools:context=".PersonalFragment">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="36dp"
-        android:gravity="center_vertical"
         android:layout_marginLeft="18dp"
         android:background="#ffFFFFFF"
+        android:gravity="center_vertical"
         android:text="@string/manager_catergory_title"
         android:textColor="@color/category_title"
-        android:textSize="14sp"/>
+        android:textSize="14sp" />
 
     <ImageView
         android:layout_width="fill_parent"
@@ -24,33 +24,36 @@
         android:background="@color/dividing_line" />
 
     <RelativeLayout
+        android:id="@+id/action_upgrade"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/action_upgrade">
+        android:layout_height="wrap_content">
+
         <ImageView
             android:id="@+id/upgrade_img"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:gravity="center_vertical"
             android:layout_marginLeft="18dp"
+            android:gravity="center_vertical"
             android:src="@drawable/icon_update" />
+
         <TextView
+            style="@style/personalListText"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:gravity="center_vertical"
-            android:background="#ffFFFFFF"
-            android:text="@string/upgrade_manager"
-            android:layout_toRightOf="@+id/upgrade_img"
             android:layout_marginRight="2dp"
-            style="@style/personalListText"/>
+            android:layout_toRightOf="@+id/upgrade_img"
+            android:background="#ffFFFFFF"
+            android:gravity="center_vertical"
+            android:text="@string/upgrade_manager" />
+
         <ImageView
+            style="@style/personalListText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="visible"
-            android:background="@drawable/back"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            style="@style/personalListText" />
+            android:layout_centerVertical="true"
+            android:background="@drawable/back"
+            android:visibility="visible" />
     </RelativeLayout>
 
     <ImageView
@@ -61,9 +64,10 @@
         android:background="@color/dividing_line" />
 
     <RelativeLayout
+        android:id="@+id/action_dm"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/action_dm">
+        android:layout_height="wrap_content">
+
         <ImageView
             android:id="@+id/download_img"
             android:layout_width="wrap_content"
@@ -71,22 +75,63 @@
             android:layout_marginLeft="18dp"
             android:gravity="center_vertical"
             android:src="@drawable/icon_download_list" />
+
         <TextView
+            style="@style/personalListText"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:gravity="center_vertical"
-            android:text="@string/download_manager"
-            android:layout_toRightOf="@+id/download_img"
             android:layout_marginRight="2dp"
-            style="@style/personalListText"/>
+            android:layout_toRightOf="@+id/download_img"
+            android:gravity="center_vertical"
+            android:text="@string/download_manager" />
+
         <ImageView
+            style="@style/personalListText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="visible"
-            android:background="@drawable/back"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            style="@style/personalListText" />
+            android:layout_centerVertical="true"
+            android:background="@drawable/back"
+            android:visibility="visible" />
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="0.3dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="12dp"
+        android:background="@color/dividing_line" />
+
+    <RelativeLayout
+        android:id="@+id/action_logo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/logo_img"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginLeft="18dp"
+            android:gravity="center_vertical"
+            android:src="@drawable/icon_download_list" />
+
+        <TextView
+            style="@style/personalListText"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginRight="2dp"
+            android:layout_toRightOf="@+id/logo_img"
+            android:gravity="center_vertical"
+            android:text="@string/logo_manager" />
+
+        <ImageView
+            style="@style/personalListText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/back"
+            android:visibility="visible" />
     </RelativeLayout>
 
     <ImageView
@@ -98,31 +143,33 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/action_logo">
+        android:layout_height="wrap_content">
+
         <ImageView
-            android:id="@+id/logo_img"
+            android:id="@+id/wifi_update_img"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_marginLeft="18dp"
             android:gravity="center_vertical"
             android:src="@drawable/icon_download_list" />
+
         <TextView
+            style="@style/personalListText"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:gravity="center_vertical"
-            android:text="@string/logo_manager"
-            android:layout_toRightOf="@+id/logo_img"
             android:layout_marginRight="2dp"
-            style="@style/personalListText"/>
+            android:layout_toRightOf="@+id/wifi_update_img"
+            android:gravity="center_vertical"
+            android:text="@string/zero_flow_update" />
+
         <ImageView
+            android:id="@+id/zero_flow_update"
+            style="@style/personalListText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="visible"
-            android:background="@drawable/back"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            style="@style/personalListText" />
+            android:layout_centerVertical="true"
+            android:background="@drawable/setup_wifi_click_bg" />
     </RelativeLayout>
 
     <ImageView
