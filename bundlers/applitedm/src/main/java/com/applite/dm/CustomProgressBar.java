@@ -1,9 +1,13 @@
 package com.applite.dm;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.widget.ImageButton;
@@ -35,16 +39,28 @@ public class CustomProgressBar extends ImageButton {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        Bitmap background = BitmapFactory.decodeResource(getResources(),
+                R.drawable.download_progress_background);
+        Bitmap mask = BitmapFactory.decodeResource(getResources(),
+                R.drawable.download_progress_running);
         paint.setAntiAlias(true);// 设置是否抗锯齿
         paint.setFlags(Paint.ANTI_ALIAS_FLAG);// 帮助消除锯齿
-        paint.setColor(Color.GRAY);// 设置画笔灰色
+        canvas.drawBitmap(background, 0, 0, null);
+        paint.setFilterBitmap(false);
+        int x = 0;
+        int y = 0;
+        int sc = canvas.saveLayer(x, y, x + background.getWidth(), y + background.getHeight(), null,
+                Canvas.MATRIX_SAVE_FLAG | Canvas.CLIP_SAVE_FLAG
+                        | Canvas.HAS_ALPHA_LAYER_SAVE_FLAG
+                        | Canvas.FULL_COLOR_LAYER_SAVE_FLAG
+                        | Canvas.CLIP_TO_LAYER_SAVE_FLAG);
+        oval.set(-1, -1, mask.getWidth()+1, mask.getHeight()+1);
         paint.setStrokeWidth(2);// 设置画笔宽度
-        paint.setStyle(Paint.Style.STROKE);// 设置中空的样式
-        canvas.drawCircle(40, 40, 30, paint);// 在中心为（60,60）的地方画个半径为45的圆，宽度为setStrokeWidth：2
-        paint.setStrokeWidth(4);// 设置画笔宽度
-        paint.setColor(Color.GREEN);// 设置画笔为绿色
-        oval.set(9, 9, 71, 71);
-        canvas.drawArc(oval, -90, ((float) progress / max) * 360, false, paint);// 画圆弧，第二个参数为：起始角度，第三个为跨的角度，第四个为true的时候是实心，false的时候为空心
+        canvas.drawArc(oval, -90, ((float) progress / max) * 360, true, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(mask, 0f, 0f, paint);
+        paint.setXfermode(null);
+        canvas.restoreToCount(sc);
     }
 
 }

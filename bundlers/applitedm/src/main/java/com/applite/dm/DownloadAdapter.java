@@ -183,7 +183,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                     custompb.setImageResource(R.drawable.download_status_retry);
                     break;
                 default:
-                    Toast.makeText(mContext, "其他", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(mContext, "其他", Toast.LENGTH_SHORT).show();
                     break;
             }
             statusView.setText(ImplHelper.getImplRes(mContext, implInfo).getStatusText());

@@ -105,8 +105,8 @@
 
         <com.applite.dm.CustomProgressBar
             android:id="@+id/cpb"
-            android:layout_width="80px"
-            android:layout_height="80px"
+            android:layout_width="60px"
+            android:layout_height="60px"
             android:layout_gravity="center_vertical"
             android:background="@drawable/button_noeffect" />
 
