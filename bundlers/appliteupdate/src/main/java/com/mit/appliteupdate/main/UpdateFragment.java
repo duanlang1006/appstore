@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +16,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
-import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -29,6 +27,8 @@ import android.widget.Toast;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.applite.recommendview.RecommendAdapter;
+import com.applite.recommendview.RecommendBean;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
@@ -43,6 +43,7 @@ import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,13 +53,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UpdateFragment extends OSGIBaseFragment implements View.OnClickListener {
+public class UpdateFragment extends OSGIBaseFragment implements View.OnClickListener, RecommendAdapter.RecommendAPKDetailListener {
 
     private static final String TAG = "UpdateFragment";
     private View rootView;
     private TextView mAllUpdateView;
     private ListView mListView;
     private List<DataBean> mDataContents = new ArrayList<DataBean>();
+    private List<RecommendBean> mRecommendData = new ArrayList<RecommendBean>();
     private UpdateAdapter mAdapter;
     private Runnable mNotifyRunnable = new Runnable() {
         @Override
@@ -77,6 +79,8 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private ImageView mLoadView;
     private Animation LoadingAnimation;
     private String mUpdateData;
+    private View footer;
+    private GridView mGridView;
 
     public UpdateFragment() {
         super();
@@ -183,6 +187,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
     }
 
+    /**
+     * 设置ActionBar
+     */
     private void initActionBar() {
         try {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
@@ -196,6 +203,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
     }
 
+    /**
+     * 关联控件及监听
+     */
     private void initView() {
         mAllUpdateView = (TextView) rootView.findViewById(R.id.update_all_update);
         mListView = (ListView) rootView.findViewById(R.id.update_listview);
@@ -235,6 +245,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
     }
 
+    /**
+     * 发送更新请求
+     */
     private void post() {
         setLoadLayoutVisibility(View.VISIBLE);
         mPostStats = false;
@@ -295,7 +308,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                     bean.setmMD5(obj.getString("apkMd5"));
                     mDataContents.add(bean);
                 }
-                if (array.length() == 0) {
+                if (0 == array.length()) {
                     setStatsLayoutVisibility(View.VISIBLE, mActivity.getResources().getDrawable(R.drawable.no_update));
                     mStatsTextView.setVisibility(View.GONE);
                     mStatsButton.setVisibility(View.GONE);
@@ -305,6 +318,14 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 mAdapter = new UpdateAdapter(mActivity, mDataContents);
                 mListView.setAdapter(mAdapter);
                 mListView.setVisibility(View.VISIBLE);
+                if (null != mRecommendData) {
+                    LayoutInflater inflater = LayoutInflater.from(mActivity);
+                    footer = inflater.inflate(R.layout.footerview_recommend, null);
+                    mGridView = (GridView) footer.findViewById(R.id.update_recommend_gridview);
+                    RecommendAdapter mRecommendAdapter = new RecommendAdapter(mActivity, mRecommendData, this);
+                    mGridView.setAdapter(mRecommendAdapter);
+                    mListView.addFooterView(footer);
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -369,6 +390,11 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 //                    break;
 //            }
 //        }
+    }
+
+    @Override
+    public void refreshDetail(RecommendBean bean) {
+        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getmPackageName(), bean.getmName(), bean.getmImgUrl(), true);
     }
 
 }
