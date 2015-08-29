@@ -64,7 +64,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/download_title"
+                android:ellipsize="marquee"
                 android:maxLines="1"
+                android:maxWidth="150dp"
                 android:text="size_text" />
 
             <TextView
@@ -106,7 +108,7 @@
             android:layout_width="80px"
             android:layout_height="80px"
             android:layout_gravity="center_vertical"
-            android:background="@drawable/progressbar_effect" />
+            android:background="@drawable/button_noeffect" />
 
         <CheckBox
             android:id="@+id/delete_checkBox"

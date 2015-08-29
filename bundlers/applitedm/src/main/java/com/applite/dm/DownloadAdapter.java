@@ -20,20 +20,15 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,10 +39,8 @@ import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
-import com.mit.impl.ImplLog;
 
 import java.io.File;
-import java.util.Comparator;
 import java.util.List;
 
 public class DownloadAdapter extends ArrayAdapter implements View.OnClickListener {
@@ -121,8 +114,8 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         vh.refresh();
     }
 
+
     class ViewHolder implements ImplChangeCallback {
-        //        ProgressBar progressBar;
         CustomProgressBar custompb;
         TextView titleView;
         TextView descView;
@@ -132,26 +125,19 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         ImageView iconView;
         ImplInfo implInfo;
         Animation animaCheckBox;
-        int progress = 0;
-        ProgressThread progressThread = new ProgressThread();
         int flagDownLoading = 0;//1 下载中;2 下载完成
-
 
         ViewHolder(View view) {
             actionBtn = (TextView) view.findViewById(R.id.button_op);
             custompb = (CustomProgressBar) view.findViewById(R.id.cpb);
             deleteCheckBox = (CheckBox) view.findViewById(R.id.delete_checkBox);
-//            progressBar = (ProgressBar) view.findViewById(android.R.id.progress);
             descView = (TextView) view.findViewById(R.id.size_text);
             titleView = (TextView) view.findViewById(R.id.download_title);
             statusView = (TextView) view.findViewById(R.id.domain);
             iconView = (ImageView) view.findViewById(R.id.download_icon);
             actionBtn.setTag(this);
             deleteCheckBox.setTag(this);
-//            progressBar.setTag(this);
             custompb.setTag(this);
-
-
         }
 
         void initView(ImplInfo info) {
@@ -170,15 +156,14 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             setIcon();
             refresh();
             animaCheckBox = AnimationUtils.loadAnimation(mContext, R.anim.checkbox_in);
-//            progressBar.setIndeterminate(false);
-//            progressBar.setMax(100);
         }
 
         void refresh() {
             if (null == this.implInfo) {
                 return;
             }
-            actionBtn.setText(ImplHelper.getStatusText(mContext, implInfo));
+            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext, implInfo);
+            actionBtn.setText(ImplHelper.getImplRes(mContext, implInfo).getStatusText());
             actionBtn.setEnabled(true);
             switch (implInfo.getStatus()) {
                 case ImplInfo.STATUS_PRIVATE_INSTALLING://静默安装
@@ -188,21 +173,18 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                     custompb.setVisibility(View.GONE);
                     break;
                 case ImplInfo.ACTION_DOWNLOAD://下载
-//                    LogUtils.d("wanghc", "下载");
                     actionBtn.setVisibility(View.GONE);
                     custompb.setVisibility(View.VISIBLE);
-                    custompb.setImageResource(R.drawable.action_button_update_normal_light);
+                    custompb.setImageResource(R.drawable.download_status_pause);
                     flagDownLoading = 1;
                     break;
                 case ImplInfo.ACTION_INSTALL://安装过程   ------->这里有时下载也会显示安装过程!
-//                    LogUtils.d("wanghc", "安装过程");
                     actionBtn.setVisibility(View.GONE);
                     custompb.setVisibility(View.VISIBLE);
-                    custompb.setImageResource(R.drawable.action_button_update_normal_light);
+                    custompb.setImageResource(R.drawable.download_status_pause);
                     flagDownLoading = 1;
                     break;
                 case ImplInfo.ACTION_OPEN://打开下载文件或者运行应用程序
-//                    LogUtils.d("wanghc", "打开/运行");
                     Toast.makeText(mContext, "打开/运行", Toast.LENGTH_SHORT).show();
                     break;
 //                        case ImplInfo.STATUS_PENDING://下载等待中
@@ -212,15 +194,13 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
 //                Toast.makeText(mContext, implInfo.getStatus() + "", Toast.LENGTH_SHORT).show();
 //                            break;
                 case ImplInfo.STATUS_PAUSED://下载暂停
-//                    LogUtils.d("wanghc", "下载暂停");
                     actionBtn.setVisibility(View.GONE);
                     custompb.setVisibility(View.VISIBLE);
-                    custompb.setImageResource(R.drawable.action_button_pause_normal_light);
+                    custompb.setImageResource(R.drawable.download_status_running);
                     flagDownLoading = 1;
                     break;
                 case ImplInfo.STATUS_FAILED://下载失败
-//                    LogUtils.d("wanghc", "下载失败");
-                    Toast.makeText(mContext, "下载失败", Toast.LENGTH_SHORT).show();
+                    custompb.setImageResource(R.drawable.download_status_retry);
                     break;
                 case ImplInfo.STATUS_NORMAL_INSTALLING://普通安装
                     LogUtils.d("wanghc", "普通安装");
@@ -234,19 +214,16 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                     custompb.setVisibility(View.GONE);
                     break;
                 case ImplInfo.STATUS_INSTALLED: //已安装
-//                    LogUtils.d("wanghc", "已安装");
                     Toast.makeText(mContext, "已安装", Toast.LENGTH_SHORT).show();
                     break;
                 case ImplInfo.STATUS_INSTALL_FAILED: //安装失败
-//                    LogUtils.d("wanghc", "安装失败");
-                    Toast.makeText(mContext, "安装失败", Toast.LENGTH_SHORT).show();
+                    custompb.setImageResource(R.drawable.download_status_retry);
                     break;
                 default:
-//                    LogUtils.d("wanghc", "其他");
                     Toast.makeText(mContext, "其他", Toast.LENGTH_SHORT).show();
                     break;
             }
-            statusView.setText(ImplHelper.getStatusText(mContext, implInfo));
+            statusView.setText(res.getStatusText());
             setProgress();
         }
 
@@ -254,61 +231,33 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             Bitmap resBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.file_type_apk);
             String url = implInfo.getIconUrl();
             if (null != url && !TextUtils.isEmpty(url)) {
-            }
-            int width = (int) mContext.getResources().getDimension(R.dimen.list_item_icon_size);
-            int height = width;
-            mBitmapHelper.configDefaultBitmapMaxSize(width, height);
-            Bitmap cacheBitmap = mBitmapHelper.getBitmapFromMemCache(url, null);
-            if (null != cacheBitmap) {
-                iconView.setImageBitmap(cacheBitmap);
+                int width = (int) mContext.getResources().getDimension(R.dimen.list_item_icon_size);
+                int height = width;
+                mBitmapHelper.configDefaultBitmapMaxSize(width, height);
+                Bitmap cacheBitmap = mBitmapHelper.getBitmapFromMemCache(url, null);
+                if (null != cacheBitmap) {
+                    iconView.setImageBitmap(cacheBitmap);
+                } else {
+                    mBitmapHelper.configDefaultLoadFailedImage(resBitmap);
+                    mBitmapHelper.configDefaultLoadingImage(resBitmap);
+                    mBitmapHelper.display(iconView, implInfo.getIconUrl());
+                }
             } else {
-                mBitmapHelper.configDefaultLoadFailedImage(resBitmap);
-                mBitmapHelper.configDefaultLoadingImage(resBitmap);
-                mBitmapHelper.display(iconView, implInfo.getIconUrl());
+                iconView.setImageBitmap(resBitmap);
             }
         }
 
+
         private void setProgress() {
-//            progressBar.setProgress(ImplHelper.getProgress(mContext, implInfo));
-//            progressBar.setVisibility(View.VISIBLE);
-//            custompb.setProgress(ImplHelper.getProgress(mContext, implInfo));
             custompb.setVisibility(View.VISIBLE);
-            if (!progressThread.isAlive() && 0 == progress) {
-                progressThread.start();
-            }
+            custompb.setProgress(ImplHelper.getImplRes(mContext, implInfo).getProgress());
+            descView.setText(ImplHelper.getImplRes(mContext, implInfo).getDescText());
+//            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void onChange(ImplInfo info) {
             refresh();
         }
-
-        private Handler handler = new Handler() {
-            public void handleMessage(android.os.Message msg) {
-                // 进度
-//                progressBar.setProgress(msg.what);
-                custompb.setProgress(msg.what);
-                descView.setText(ImplHelper.getDescText(mContext, implInfo));
-            }
-        };
-
-        private class ProgressThread extends Thread {
-            @Override
-            public void run() {
-//                super.run();
-                while (100 != progress) {//这里应该是下载等待和下载中
-                    Message msg = new Message();
-                    progress = ImplHelper.getProgress(mContext, implInfo);
-                    msg.what = progress;
-                    handler.sendMessage(msg);
-                    try {
-                        sleep(300);
-                    } catch (Exception e) {
-                    }
-                }
-            }
-        }
     }
-
-
 }

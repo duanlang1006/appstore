@@ -5,7 +5,7 @@ abstract class ImplListener {
     private int rate;
 
     protected ImplListener() {
-        rate = 500;
+        rate = 1000;
     }
 
     protected ImplListener(int rate) {
@@ -23,6 +23,7 @@ abstract class ImplListener {
         this.rate = rate;
     }
 
+    public void onEnqued(ImplInfo info){};
     public void onPending(ImplInfo info){};
     public void onStart(ImplInfo info){};
     public void onCancelled(ImplInfo info){};

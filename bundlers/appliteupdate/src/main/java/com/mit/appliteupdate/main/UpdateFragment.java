@@ -89,7 +89,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
         Bundle bundle = getArguments();
         if (null != bundle) {
-            mUpdateData = bundle.getString("data");
+            mUpdateData = bundle.getString("update_data");
             LogUtils.d(TAG, "onAttach,mUpdateData:" + mUpdateData);
         }
     }
@@ -330,18 +330,20 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     private void download(DataBean bean) {
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName()/*, bean.getmVersionCode()*/);
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
         if (null == implInfo) {
             return;
         }
-        ImplHelper.updateImpl(mActivity,
-                implInfo,
-                bean.getmUrl(),
-                bean.getmName(),
-                bean.getmImgUrl(),
-                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getmName() + ".apk",
-                null,
-                null);
+        String path = Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getmName() + ".apk";
+        if (!AppliteUtils.isPackageOk(mActivity, path))
+            ImplHelper.updateImpl(mActivity,
+                    implInfo,
+                    bean.getmUrl(),
+                    bean.getmName(),
+                    bean.getmImgUrl(),
+                    path,
+                    null,
+                    null);
 //        implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());
 //        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
 //            switch (implInfo.getStatus()) {
