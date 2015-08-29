@@ -56,8 +56,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                            int resource,
                            List<ImplInfo> implInfoList,
                            BitmapUtils bitmapHelper,
-                           DownloadListener listener
-    ) {
+                           DownloadListener listener) {
         super(context, resource, implInfoList);
         mContext = context;
         mBitmapHelper = bitmapHelper;
@@ -125,7 +124,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         ImageView iconView;
         ImplInfo implInfo;
         Animation animaCheckBox;
-        int flagDownLoading = 0;//1 下载中;2 下载完成
 
         ViewHolder(View view) {
             actionBtn = (TextView) view.findViewById(R.id.button_op);
@@ -162,59 +160,24 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             if (null == this.implInfo) {
                 return;
             }
-            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext, implInfo);
+//            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext, implInfo);
             actionBtn.setText(ImplHelper.getImplRes(mContext, implInfo).getStatusText());
             actionBtn.setEnabled(true);
             switch (implInfo.getStatus()) {
                 case ImplInfo.STATUS_PRIVATE_INSTALLING://静默安装
 //                    actionBtn.setEnabled(false);
-                    flagDownLoading = 2;
-                    actionBtn.setVisibility(View.VISIBLE);
-                    custompb.setVisibility(View.GONE);
                     break;
                 case ImplInfo.ACTION_DOWNLOAD://下载
-                    actionBtn.setVisibility(View.GONE);
-                    custompb.setVisibility(View.VISIBLE);
                     custompb.setImageResource(R.drawable.download_status_pause);
-                    flagDownLoading = 1;
                     break;
                 case ImplInfo.ACTION_INSTALL://安装过程   ------->这里有时下载也会显示安装过程!
-                    actionBtn.setVisibility(View.GONE);
-                    custompb.setVisibility(View.VISIBLE);
                     custompb.setImageResource(R.drawable.download_status_pause);
-                    flagDownLoading = 1;
                     break;
-                case ImplInfo.ACTION_OPEN://打开下载文件或者运行应用程序
-                    Toast.makeText(mContext, "打开/运行", Toast.LENGTH_SHORT).show();
-                    break;
-//                        case ImplInfo.STATUS_PENDING://下载等待中
-//                Toast.makeText(mContext, implInfo.getStatus() + "", Toast.LENGTH_SHORT).show();
-//                            break;
-//                        case ImplInfo.STATUS_RUNNING://下载进行中
-//                Toast.makeText(mContext, implInfo.getStatus() + "", Toast.LENGTH_SHORT).show();
-//                            break;
                 case ImplInfo.STATUS_PAUSED://下载暂停
-                    actionBtn.setVisibility(View.GONE);
-                    custompb.setVisibility(View.VISIBLE);
                     custompb.setImageResource(R.drawable.download_status_running);
-                    flagDownLoading = 1;
                     break;
                 case ImplInfo.STATUS_FAILED://下载失败
                     custompb.setImageResource(R.drawable.download_status_retry);
-                    break;
-                case ImplInfo.STATUS_NORMAL_INSTALLING://普通安装
-                    LogUtils.d("wanghc", "普通安装");
-                    flagDownLoading = 2;
-                    actionBtn.setVisibility(View.VISIBLE);
-                    custompb.setVisibility(View.GONE);
-                    break;
-                case ImplInfo.STATUS_SUCCESSFUL://下载成功
-                    flagDownLoading = 2;
-                    actionBtn.setVisibility(View.VISIBLE);
-                    custompb.setVisibility(View.GONE);
-                    break;
-                case ImplInfo.STATUS_INSTALLED: //已安装
-                    Toast.makeText(mContext, "已安装", Toast.LENGTH_SHORT).show();
                     break;
                 case ImplInfo.STATUS_INSTALL_FAILED: //安装失败
                     custompb.setImageResource(R.drawable.download_status_retry);
@@ -223,7 +186,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                     Toast.makeText(mContext, "其他", Toast.LENGTH_SHORT).show();
                     break;
             }
-            statusView.setText(res.getStatusText());
+            statusView.setText(ImplHelper.getImplRes(mContext, implInfo).getStatusText());
             setProgress();
         }
 
