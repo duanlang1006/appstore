@@ -88,7 +88,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.action_search == item.getItemId()){
-            ((OSGIServiceHost) mActivity).jumptoSearch(true);
+            ((OSGIServiceHost) mActivity).jumptoSearch(true, null, null);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -115,6 +115,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setTitle(mActivity.getResources().getString(R.string.personal));
             actionBar.setDisplayShowCustomEnabled(false);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             actionBar.show();
         } catch (Exception e) {
             e.printStackTrace();

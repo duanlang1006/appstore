@@ -203,6 +203,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             actionBar.setDisplayShowCustomEnabled(false);
             actionBar.setTitle(mApkName);
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             actionBar.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -306,10 +307,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         LogUtils.d(TAG,"onCreateOptionsMenu");
-//        MenuItem item = menu.findItem(R.id.action_search);
-//        if (null != item){
-//            return;
-//        }
+        MenuItem item = menu.findItem(R.id.action_search);
+        if (null != item){
+            return;
+        }
 
 //        inflater.inflate(R.menu.menu_main_detail, menu);
 //        item = menu.findItem(R.id.action_search);
@@ -321,7 +322,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.action_search == item.getItemId()) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(true);
+            ((OSGIServiceHost) mActivity).jumptoSearch(true, null, null);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -376,7 +377,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "detail");
-        params.addBodyParameter("protocol_version", "1.0");
+        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
         params.addBodyParameter("name", mPackageName);
         HttpUtils mHttpUtils = new HttpUtils();
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {

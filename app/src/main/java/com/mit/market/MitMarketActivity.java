@@ -94,7 +94,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(this, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", this.getPackageName());
         params.addBodyParameter("type", "update_management");
-        params.addBodyParameter("protocol_version", "1.0");
+        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
         params.addBodyParameter("update_info", AppliteUtils.getAllApkData(this));
         HttpUtils mHttpUtils = new HttpUtils();
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
@@ -157,7 +157,10 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (R.id.action_search == id){
-            jumptoSearch(true);
+            jumptoSearch(true, null, null);
+            return true;
+        } else if(R.id.action_dm == id){
+            jumptoDownloadManager(true);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -307,10 +310,11 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     }
 
     @Override
-    public void jumptoSearch(boolean addToBackstack) {
+    public void jumptoSearch(boolean addToBackstack, String info, String keyword) {
         jumpto(Constant.OSGI_SERVICE_SEARCH_FRAGMENT,
                 SearchFragment.class.getName(),
-                null, addToBackstack);
+                SearchFragment.newBundle(info, keyword),
+                addToBackstack);
     }
 
     @Override

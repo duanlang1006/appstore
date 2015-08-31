@@ -147,6 +147,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             }
         }
     };
+
+    private String mInfo;
+    private String mKeyword;
     private TextView mMoreText;
     private ProgressBar mMoreProgressBar;
     private LayoutInflater mInflater;
@@ -176,10 +179,23 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         super();
     }
 
+    public static Bundle newBundle(String info, String keyword) {
+        Bundle b = new Bundle();
+        b.putString("info", info);
+        b.putString("keyword", keyword);
+        return b;
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mHttpUtils = new HttpUtils();
+        Bundle params = getArguments();
+        if (null != params) {
+            this.mInfo = params.getString("info");
+            this.mKeyword = params.getString("keyword");
+            LogUtils.i(TAG, "mKeyword = "+mKeyword+" mInfo = "+mInfo);
+        }
     }
 
     @Override
@@ -195,9 +211,14 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         rootView = mInflater.inflate(R.layout.fragment_search, container, false);
         moreView = mInflater.inflate(R.layout.load, null);
         initView();
-        if (mHotWordBeans.size() == 0)
+//        if (mHotWordBeans.size() == 0)
+        if(TextUtils.isEmpty(mInfo))
             postHotWord();
+        else
+            resolve(mInfo);
 
+        if(!TextUtils.isEmpty(mKeyword))
+            mEtViewModifyPostSearch(mKeyword, false);
         return rootView;
     }
 
@@ -227,6 +248,10 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         MenuItem item = menu.findItem(R.id.action_search);
         if (null != item) {
             item.setVisible(false);
+        }
+        MenuItem item_dm = menu.findItem(R.id.action_dm);
+        if(null != item_dm){
+            item_dm.setVisible(false);
         }
     }
 
@@ -273,6 +298,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             actionBar.setCustomView(customView);
             actionBar.show();
         } catch (Exception e) {
@@ -475,6 +501,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         isShowPreload = showPreload;
         if (!showPreload) {
             closeKeyboard();
+            LogUtils.i(TAG, "searchName = "+searchName);
             mEtView.setText(searchName);
             if (searchName.length() < 21) {
                 mEtView.setSelection(searchName.length());
@@ -618,7 +645,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "search");
-        params.addBodyParameter("protocol_version", "1.0");
+        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
         params.addBodyParameter("key", name);
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
@@ -699,6 +726,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "hot_word");
+        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {

@@ -23,6 +23,7 @@ public class Constant {
     public static final String CONFIG_BUNDLES_INFO = "bundles_info";
     public static final String KEY_BUNDLES = "bundles";
 
+    public static final String PROTOCOL_VERSION = "1.0";
 
     public static final String META_DATA_MIT = "MIT_APPKEY";
     public static final String extenStorageDirPath = ".android/";//下载的APK保存文件夹
