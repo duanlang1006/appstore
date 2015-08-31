@@ -51,6 +51,8 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
     private ImplAgent implAgent;
 
     private DownloadListener mListener;
+    private ImplInfo implInfo;
+    private int isDownloaded = ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PAUSED | ImplInfo.STATUS_FAILED;
 
     public DownloadAdapter(Context context,
                            int resource,
@@ -87,10 +89,10 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             vh.custompb.setVisibility(View.GONE);
         } else {//正常状态(没有删除的多选框)
             vh.deleteCheckBox.setVisibility(View.GONE);
-            if (mListener.getStatusFlags() == 23) {
+            if (mListener.getStatusFlags() == isDownloaded) {
                 vh.actionBtn.setVisibility(View.GONE);
                 vh.custompb.setVisibility(View.VISIBLE);
-            } else if (mListener.getStatusFlags() == -24) {
+            } else if (mListener.getStatusFlags() == ~isDownloaded) {
                 vh.actionBtn.setVisibility(View.VISIBLE);
                 vh.custompb.setVisibility(View.GONE);
             }
@@ -110,7 +112,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.implInfo.getTitle() + ".apk",
                 null,
                 vh);
-        vh.refresh();
     }
 
 
@@ -124,6 +125,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         ImageView iconView;
         ImplInfo implInfo;
         Animation animaCheckBox;
+
 
         ViewHolder(View view) {
             actionBtn = (TextView) view.findViewById(R.id.button_op);
@@ -160,8 +162,8 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             if (null == this.implInfo) {
                 return;
             }
-//            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext, implInfo);
-            actionBtn.setText(ImplHelper.getImplRes(mContext, implInfo).getStatusText());
+            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext, implInfo);
+            actionBtn.setText(res.getStatusText());
             actionBtn.setEnabled(true);
             switch (implInfo.getStatus()) {
                 case ImplInfo.STATUS_PRIVATE_INSTALLING://静默安装
@@ -186,7 +188,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
 //                    Toast.makeText(mContext, "其他", Toast.LENGTH_SHORT).show();
                     break;
             }
-            statusView.setText(ImplHelper.getImplRes(mContext, implInfo).getStatusText());
+            statusView.setText(res.getStatusText());
             setProgress();
         }
 
@@ -212,9 +214,10 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
 
 
         private void setProgress() {
+            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext, implInfo);
             custompb.setVisibility(View.VISIBLE);
-            custompb.setProgress(ImplHelper.getImplRes(mContext, implInfo).getProgress());
-            descView.setText(ImplHelper.getImplRes(mContext, implInfo).getDescText());
+            custompb.setProgress(res.getProgress());
+            descView.setText(res.getDescText());
 //            progressBar.setVisibility(View.VISIBLE);
         }
 

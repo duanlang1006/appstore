@@ -20,6 +20,10 @@ public class CustomProgressBar extends ImageButton {
     private int max = 100;
     private Paint paint;
     private RectF oval;
+    private Bitmap background = BitmapFactory.decodeResource(getResources(),
+            R.drawable.download_progress_background);
+    private Bitmap mask = BitmapFactory.decodeResource(getResources(),
+            R.drawable.download_progress_running);
 
     public int getProgress() {
         return progress;
@@ -39,10 +43,7 @@ public class CustomProgressBar extends ImageButton {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Bitmap background = BitmapFactory.decodeResource(getResources(),
-                R.drawable.download_progress_background);
-        Bitmap mask = BitmapFactory.decodeResource(getResources(),
-                R.drawable.download_progress_running);
+
         paint.setAntiAlias(true);// 设置是否抗锯齿
         paint.setFlags(Paint.ANTI_ALIAS_FLAG);// 帮助消除锯齿
         canvas.drawBitmap(background, 0, 0, null);
