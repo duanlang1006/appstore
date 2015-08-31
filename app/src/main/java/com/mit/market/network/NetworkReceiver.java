@@ -161,13 +161,14 @@ public class NetworkReceiver extends BroadcastReceiver {
                 for (int i = 0; i < array.length(); i++) {
                     bean = new DataBean();
                     JSONObject obj = new JSONObject(array.get(i).toString());
-                    bean.setmName(obj.getString("name"));
-                    bean.setmVersionCode(obj.getInt("versionCode"));
-                    bean.setmVersionName(obj.getString("versionName"));
-                    bean.setmImgUrl(obj.getString("iconUrl"));
-                    bean.setmPackageName(obj.getString("packageName"));
-                    bean.setmUrl(obj.getString("rDownloadUrl"));
-                    bean.setmSize(obj.getLong("apkSize"));
+                    bean.setName(obj.getString("name"));
+                    bean.setVersionCode(obj.getInt("versionCode"));
+                    bean.setVersionName(obj.getString("versionName"));
+                    bean.setIconUrl(obj.getString("iconUrl"));
+                    bean.setPackageName(obj.getString("packageName"));
+                    bean.setrDownloadUrl(obj.getString("rDownloadUrl"));
+                    bean.setApkSize(obj.getLong("apkSize"));
+                    bean.setApkMd5(obj.getString("apkMd5"));
                     mDataContents.add(bean);
                 }
                 if (array.length() != 0) {
@@ -217,16 +218,16 @@ public class NetworkReceiver extends BroadcastReceiver {
     private void download(DataBean bean) {
         if (null == implAgent)
             implAgent = ImplAgent.getInstance(mContext.getApplicationContext());
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getPackageName(), bean.getPackageName(), bean.getVersionCode());
         if (null == implInfo) {
             return;
         }
         ImplHelper.updateImpl(mContext,
                 implInfo,
-                bean.getmUrl(),
-                bean.getmName(),
-                bean.getmImgUrl(),
-                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getmName() + ".apk",
+                bean.getrDownloadUrl(),
+                bean.getName(),
+                bean.getIconUrl(),
+                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
                 null,
                 null);
 

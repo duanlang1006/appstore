@@ -285,14 +285,14 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 for (int i = 0; i < array.length(); i++) {
                     bean = new DataBean();
                     JSONObject obj = new JSONObject(array.get(i).toString());
-                    bean.setmName(obj.getString("name"));
-                    bean.setmVersionCode(obj.getInt("versionCode"));
-                    bean.setmVersionName(obj.getString("versionName"));
-                    bean.setmImgUrl(obj.getString("iconUrl"));
-                    bean.setmPackageName(obj.getString("packageName"));
-                    bean.setmUrl(obj.getString("rDownloadUrl"));
-                    bean.setmSize(obj.getLong("apkSize"));
-                    bean.setmMD5(obj.getString("apkMd5"));
+                    bean.setName(obj.getString("name"));
+                    bean.setVersionCode(obj.getInt("versionCode"));
+                    bean.setVersionName(obj.getString("versionName"));
+                    bean.setIconUrl(obj.getString("iconUrl"));
+                    bean.setPackageName(obj.getString("packageName"));
+                    bean.setrDownloadUrl(obj.getString("rDownloadUrl"));
+                    bean.setApkSize(obj.getLong("apkSize"));
+                    bean.setApkMd5(obj.getString("apkMd5"));
                     mDataContents.add(bean);
                 }
                 if (array.length() == 0) {
@@ -330,17 +330,17 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     private void download(DataBean bean) {
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getPackageName(), bean.getPackageName(), bean.getVersionCode());
         if (null == implInfo) {
             return;
         }
-        String path = Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getmName() + ".apk";
+        String path = Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk";
         if (!AppliteUtils.isPackageOk(mActivity, path))
             ImplHelper.updateImpl(mActivity,
                     implInfo,
-                    bean.getmUrl(),
-                    bean.getmName(),
-                    bean.getmImgUrl(),
+                    bean.getrDownloadUrl(),
+                    bean.getName(),
+                    bean.getIconUrl(),
                     path,
                     null,
                     null);

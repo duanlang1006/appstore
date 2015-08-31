@@ -6,14 +6,14 @@ import com.mit.impl.ImplInfo;
  * Created by LSY on 15-6-23.
  */
 public class DataBean {
-    private String mName;
-    private String mImgUrl;
-    private String mPackageName;
-    private String mUrl;
-    private long mSize;
-    private int mVersionCode;
-    private String mVersionName;
-    private String mMD5;
+    private String name;
+    private String iconUrl;
+    private String packageName;
+    private String rDownloadUrl;
+    private long apkSize;
+    private int versionCode;
+    private String versionName;
+    private String apkMd5;
 //    private String mShowText;
 
     //    public String getmShowText() {
@@ -27,78 +27,78 @@ public class DataBean {
     @Override
     public String toString() {
         return "DataBean{" +
-                "mName='" + mName + '\'' +
-                ", mImgUrl='" + mImgUrl + '\'' +
-                ", mPackageName='" + mPackageName + '\'' +
-                ", mUrl='" + mUrl + '\'' +
-                ", mSize=" + mSize +
-                ", mVersionCode=" + mVersionCode +
-                ", mVersionName='" + mVersionName + '\'' +
-                ", mMD5='" + mMD5 + '\'' +
+                "mName='" + name + '\'' +
+                ", mImgUrl='" + iconUrl + '\'' +
+                ", mPackageName='" + packageName + '\'' +
+                ", mUrl='" + rDownloadUrl + '\'' +
+                ", mSize=" + apkSize +
+                ", mVersionCode=" + versionCode +
+                ", mVersionName='" + versionName + '\'' +
+                ", mMD5='" + apkMd5 + '\'' +
                 '}';
     }
 
-    public String getmMD5() {
-        return mMD5;
+    public String getName() {
+        return name;
     }
 
-    public void setmMD5(String mMD5) {
-        this.mMD5 = mMD5;
+    public String getIconUrl() {
+        return iconUrl;
     }
 
-    public String getmVersionName() {
-        return mVersionName;
+    public String getPackageName() {
+        return packageName;
     }
 
-    public void setmVersionName(String mVersionName) {
-        this.mVersionName = mVersionName;
+    public String getrDownloadUrl() {
+        return rDownloadUrl;
     }
 
-    public String getmName() {
-        return mName;
+    public long getApkSize() {
+        return apkSize;
     }
 
-    public void setmName(String mName) {
-        this.mName = mName;
+    public int getVersionCode() {
+        return versionCode;
     }
 
-    public String getmImgUrl() {
-        return mImgUrl;
+    public String getVersionName() {
+        return versionName;
     }
 
-    public void setmImgUrl(String mImgUrl) {
-        this.mImgUrl = mImgUrl;
+    public String getApkMd5() {
+        return apkMd5;
     }
 
-    public String getmPackageName() {
-        return mPackageName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setmPackageName(String mPackageName) {
-        this.mPackageName = mPackageName;
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
     }
 
-    public String getmUrl() {
-        return mUrl;
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 
-    public void setmUrl(String mUrl) {
-        this.mUrl = mUrl;
+    public void setrDownloadUrl(String rDownloadUrl) {
+        this.rDownloadUrl = rDownloadUrl;
     }
 
-    public long getmSize() {
-        return mSize;
+    public void setApkSize(long apkSize) {
+        this.apkSize = apkSize;
     }
 
-    public void setmSize(long mSize) {
-        this.mSize = mSize;
+    public void setVersionCode(int versionCode) {
+        this.versionCode = versionCode;
     }
 
-    public int getmVersionCode() {
-        return mVersionCode;
+    public void setVersionName(String versionName) {
+        this.versionName = versionName;
     }
 
-    public void setmVersionCode(int mVersionCode) {
-        this.mVersionCode = mVersionCode;
+    public void setApkMd5(String apkMd5) {
+        this.apkMd5 = apkMd5;
     }
 }
