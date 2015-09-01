@@ -1,4 +1,4 @@
-package com.applite.similarview;
+package com.applite.recommendview;
 
 import android.content.Context;
 import android.os.Environment;
@@ -9,9 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.applite.common.R;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
-import com.applite.common.R;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
@@ -22,47 +22,46 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Created by LSY on 15-8-12.
+ * Created by caijian on 15-8-28.
  */
-public class SimilarAdapter extends BaseAdapter {
-
+public class RecommendAdapter extends BaseAdapter {
     private final Context mContext;
-    private final List<SimilarBean> mSimilarBeans;
+    private final List<RecommendBean> mRecommendBeans;
     private final BitmapUtils mBitmapUtil;
     private final ImplAgent implAgent;
-    private final SimilarAPKDetailListener mSimilarAPKDetailListener;
+    private final RecommendAdapter.RecommendAPKDetailListener mRecommendAPKDetailListener;
 
-    public interface SimilarAPKDetailListener {
-        void refreshDetail(SimilarBean bean);
+    public interface RecommendAPKDetailListener {
+        void refreshDetail(RecommendBean bean);
     }
 
-    public SimilarAdapter(Context context, List<SimilarBean> data, SimilarAPKDetailListener listener) {
-        mContext = context;
-        mSimilarBeans = data;
-        mSimilarAPKDetailListener = listener;
-        mBitmapUtil = BitmapHelper.getBitmapUtils(mContext.getApplicationContext());
-        implAgent = ImplAgent.getInstance(mContext.getApplicationContext());
+    public RecommendAdapter(Context context, List<RecommendBean> data, RecommendAdapter.RecommendAPKDetailListener listener) {
+        this.mContext = context;
+        this.mRecommendBeans = data;
+        this.mRecommendAPKDetailListener = listener;
+        this.mBitmapUtil = BitmapHelper.getBitmapUtils(this.mContext.getApplicationContext());
+        this.implAgent = ImplAgent.getInstance(this.mContext.getApplicationContext());
     }
 
     @Override
     public int getCount() {
-        return mSimilarBeans.size();
+        return this.mRecommendBeans.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mSimilarBeans.get(position);
+        return this.mRecommendBeans.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return (long) position;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewholder;
-        if (convertView == null) {
+        if (null == convertView) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.item_similar, parent, false);
             viewholder = new ViewHolder(convertView);
@@ -70,7 +69,7 @@ public class SimilarAdapter extends BaseAdapter {
         } else {
             viewholder = (ViewHolder) convertView.getTag();
         }
-        final SimilarBean data = mSimilarBeans.get(position);
+        final RecommendBean data = mRecommendBeans.get(position);
 
         viewholder.initView(data);
         mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
@@ -78,7 +77,7 @@ public class SimilarAdapter extends BaseAdapter {
         viewholder.mImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSimilarAPKDetailListener.refreshDetail(data);
+                mRecommendAPKDetailListener.refreshDetail(data);
             }
         });
         viewholder.mTv.setOnClickListener(new View.OnClickListener() {
@@ -127,7 +126,7 @@ public class SimilarAdapter extends BaseAdapter {
         private ImageView mImg;
         private TextView mTv;
         private ImplInfo implInfo;
-        private SimilarBean bean;
+        private RecommendBean bean;
 
         public ViewHolder(View view) {
             this.mImg = (ImageView) view.findViewById(R.id.item_similar_img);
@@ -135,9 +134,10 @@ public class SimilarAdapter extends BaseAdapter {
             this.mTv = (TextView) view.findViewById(R.id.item_similar_install_tv);
         }
 
-        public void initView(SimilarBean data) {
+        public void initView(RecommendBean data) {
             this.bean = data;
-            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName(), data.getmVersionCode());
+            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName()/*, data.getmVersionCode()*/);
+            ;
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
                 implAgent.setImplCallback(this, implInfo);
@@ -152,7 +152,6 @@ public class SimilarAdapter extends BaseAdapter {
 
         void initProgressButton() {
             if (null != mTv && null != this.implInfo) {
-                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext,implInfo);
                 switch (implInfo.getStatus()) {
                     case ImplInfo.STATUS_PENDING:
                         mTv.setText(ImplHelper.getActionText(mContext, implInfo));
