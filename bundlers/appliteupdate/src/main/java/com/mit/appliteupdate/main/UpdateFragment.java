@@ -27,8 +27,11 @@ import android.widget.Toast;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
-import com.applite.recommendview.RecommendAdapter;
-import com.applite.recommendview.RecommendBean;
+import com.applite.similarview.SimilarAdapter;
+import com.applite.similarview.SimilarBean;
+import com.applite.similarview.SimilarView;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
@@ -37,7 +40,8 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.adapter.UpdateAdapter;
-import com.mit.appliteupdate.bean.DataBean;
+import com.mit.appliteupdate.bean.ApkData;
+import com.mit.appliteupdate.bean.UpdateData;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
@@ -50,20 +54,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UpdateFragment extends OSGIBaseFragment implements View.OnClickListener, RecommendAdapter.RecommendAPKDetailListener {
+public class UpdateFragment extends OSGIBaseFragment implements View.OnClickListener, SimilarAdapter.SimilarAPKDetailListener {
 
     private static final String TAG = "UpdateFragment";
     private View rootView;
     private TextView mAllUpdateView;
     private ListView mListView;
-    private List<DataBean> mDataContents = new ArrayList<DataBean>();
-    private List<RecommendBean> mRecommendData = new ArrayList<RecommendBean>();
+    private List<ApkData> mUpdateApkList;
+    private SimilarView mSimilarView;
+    private List<SimilarBean> mSimilarDataList;
     private UpdateAdapter mAdapter;
     private Runnable mNotifyRunnable = new Runnable() {
-        @Override
         public void run() {
             mAdapter.notifyDataSetChanged();
         }
@@ -79,8 +84,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private ImageView mLoadView;
     private Animation LoadingAnimation;
     private String mUpdateData;
-    private View footer;
-    private GridView mGridView;
+    private Gson mGson = new Gson();
 
     public UpdateFragment() {
         super();
@@ -108,6 +112,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_update, container, false);
+        mSimilarView = (SimilarView)View.inflate(mActivity,R.layout.similar_view,null);
         initView();
         if (TextUtils.isEmpty(mUpdateData)) {
             post();
@@ -170,11 +175,11 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.update_all_update) {
-            if (!mDataContents.isEmpty()) {
+            if (null != mUpdateApkList && !mUpdateApkList.isEmpty()) {
                 MitMobclickAgent.onEvent(mActivity, "onClickButtonAllUpdate");
-                DataBean data = null;
-                for (int i = 0; i < mDataContents.size(); i++) {
-                    data = mDataContents.get(i);
+                ApkData data = null;
+                for (int i = 0; i < mUpdateApkList.size(); i++) {
+                    data = mUpdateApkList.get(i);
                     download(data);
                 }
                 mAdapter.notifyDataSetChanged();
@@ -209,6 +214,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private void initView() {
         mAllUpdateView = (TextView) rootView.findViewById(R.id.update_all_update);
         mListView = (ListView) rootView.findViewById(R.id.update_listview);
+        mListView.addFooterView(mSimilarView);
         mStatsLayout = (RelativeLayout) rootView.findViewById(R.id.update_stats);
         mStatsImgView = (ImageView) rootView.findViewById(R.id.update_stats_img);
         mStatsTextView = (TextView) rootView.findViewById(R.id.no_network_text);
@@ -283,51 +289,30 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     /**
      * 解析返回的数据
      *
-     * @param resulit
+     * @param result
      */
-    private void resolve(String resulit) {
+    private void resolve(String result) {
         if (!TextUtils.isEmpty(mUpdateData))
             setLoadLayoutVisibility(View.GONE);
         try {
-            JSONObject object = new JSONObject(resulit);
-            int app_key = object.getInt("app_key");
-            String installed_update_list = object.getString("installed_update_list");
-            DataBean bean = null;
-            if (!TextUtils.isEmpty(installed_update_list)) {
-                JSONArray array = new JSONArray(installed_update_list);
-                for (int i = 0; i < array.length(); i++) {
-                    bean = new DataBean();
-                    JSONObject obj = new JSONObject(array.get(i).toString());
-                    bean.setName(obj.getString("name"));
-                    bean.setVersionCode(obj.getInt("versionCode"));
-                    bean.setVersionName(obj.getString("versionName"));
-                    bean.setIconUrl(obj.getString("iconUrl"));
-                    bean.setPackageName(obj.getString("packageName"));
-                    bean.setrDownloadUrl(obj.getString("rDownloadUrl"));
-                    bean.setApkSize(obj.getLong("apkSize"));
-                    bean.setApkMd5(obj.getString("apkMd5"));
-                    mDataContents.add(bean);
-                }
-                if (0 == array.length()) {
-                    setStatsLayoutVisibility(View.VISIBLE, mActivity.getResources().getDrawable(R.drawable.no_update));
-                    mStatsTextView.setVisibility(View.GONE);
-                    mStatsButton.setVisibility(View.GONE);
-                } else {
-                    setStatsLayoutVisibility(View.GONE, null);
-                }
-                mAdapter = new UpdateAdapter(mActivity, mDataContents);
-                mListView.setAdapter(mAdapter);
-                mListView.setVisibility(View.VISIBLE);
-                if (null != mRecommendData) {
-                    LayoutInflater inflater = LayoutInflater.from(mActivity);
-                    footer = inflater.inflate(R.layout.footerview_recommend, null);
-                    mGridView = (GridView) footer.findViewById(R.id.update_recommend_gridview);
-                    RecommendAdapter mRecommendAdapter = new RecommendAdapter(mActivity, mRecommendData, this);
-                    mGridView.setAdapter(mRecommendAdapter);
-                    mListView.addFooterView(footer);
-                }
+            UpdateData updateData = mGson.fromJson(result,UpdateData.class);
+            if (null != updateData){
+                mUpdateApkList = updateData.getInstalled_update_list();
+                mSimilarDataList = updateData.getSimilar_info();
             }
-        } catch (JSONException e) {
+            if (null == mUpdateApkList || 0 == mUpdateApkList.size()) {
+                setStatsLayoutVisibility(View.VISIBLE, mActivity.getResources().getDrawable(R.drawable.no_update));
+                mStatsTextView.setVisibility(View.GONE);
+                mStatsButton.setVisibility(View.GONE);
+            } else {
+                setStatsLayoutVisibility(View.GONE, null);
+            }
+            mSimilarView.setData(mSimilarDataList,this);
+            mAdapter = new UpdateAdapter(mActivity, mUpdateApkList);
+            mListView.setAdapter(mAdapter);
+            mListView.setVisibility(View.VISIBLE);
+
+        } catch (Exception e) {
             e.printStackTrace();
             LogUtils.i(TAG, "更新管理返回的JSON解析失败");
         }
@@ -350,7 +335,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
     }
 
-    private void download(DataBean bean) {
+    private void download(ApkData bean) {
         ImplInfo implInfo = implAgent.getImplInfo(bean.getPackageName(), bean.getPackageName(), bean.getVersionCode());
         if (null == implInfo) {
             return;
@@ -395,8 +380,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     @Override
-    public void refreshDetail(RecommendBean bean) {
-        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getmPackageName(), bean.getmName(), bean.getmImgUrl(), true);
+    public void refreshDetail(SimilarBean similarBean) {
+        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), true);
     }
-
 }

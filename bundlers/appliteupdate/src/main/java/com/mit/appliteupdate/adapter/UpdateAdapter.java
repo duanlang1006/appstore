@@ -20,7 +20,7 @@ import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.appliteupdate.R;
-import com.mit.appliteupdate.bean.DataBean;
+import com.mit.appliteupdate.bean.ApkData;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
@@ -38,10 +38,10 @@ public class UpdateAdapter extends BaseAdapter {
     private final BitmapUtils mBitmapUtil;
     private final PackageManager mPackageManager;
     private Context mActivity;
-    private List<DataBean> mDatas;
+    private List<ApkData> mDatas;
     private ImplAgent implAgent;
 
-    public UpdateAdapter(Context context, List<DataBean> mDatas) {
+    public UpdateAdapter(Context context, List<ApkData> mDatas) {
         this.mDatas = mDatas;
         mActivity = context;
         mPackageManager = mActivity.getPackageManager();
@@ -75,7 +75,7 @@ public class UpdateAdapter extends BaseAdapter {
         } else {
             viewholder = (ViewHolder) convertView.getTag();
         }
-        final DataBean data = mDatas.get(position);
+        final ApkData data = mDatas.get(position);
         viewholder.initView(data, position);
 
         viewholder.mName.setText(data.getName());
@@ -158,7 +158,7 @@ public class UpdateAdapter extends BaseAdapter {
         private TextView mApkSize;
         private TextView mVersionName;
         private Button mBt;
-        private DataBean bean;
+        private ApkData bean;
         private ImplInfo implInfo;
         private int position;
         private PackageInfo mPackageInfo;
@@ -171,7 +171,7 @@ public class UpdateAdapter extends BaseAdapter {
             this.mBt = (Button) v.findViewById(R.id.item_update_button);
         }
 
-        public void initView(DataBean bean, int position) {
+        public void initView(ApkData bean, int position) {
             this.bean = bean;
             this.position = position;
             this.implInfo = implAgent.getImplInfo(bean.getPackageName(), bean.getPackageName(), bean.getVersionCode());
@@ -202,9 +202,9 @@ public class UpdateAdapter extends BaseAdapter {
                         try {
                             mPackageInfo = mPackageManager.getPackageInfo(bean.getPackageName(), PackageManager.GET_ACTIVITIES);
                             if (mPackageInfo.versionCode == bean.getVersionCode()) {
-                                LogUtils.d("updateFragment", "删除已更新的条目");
-                                mDatas.remove(position);
-                                notifyDataSetChanged();
+//                                LogUtils.d("updateFragment", "删除已更新的条目");
+//                                mDatas.remove(position);
+//                                notifyDataSetChanged();
                             }
                         } catch (PackageManager.NameNotFoundException e) {
                             e.printStackTrace();

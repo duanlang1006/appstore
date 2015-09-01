@@ -1,11 +1,10 @@
 package com.mit.appliteupdate.bean;
 
-import com.mit.impl.ImplInfo;
 
 /**
  * Created by LSY on 15-6-23.
  */
-public class DataBean {
+public class ApkData {
     private String name;
     private String iconUrl;
     private String packageName;

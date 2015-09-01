@@ -20,7 +20,7 @@ import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
-import com.mit.appliteupdate.bean.DataBean;
+import com.mit.appliteupdate.bean.ApkData;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
@@ -99,11 +99,11 @@ public class UpdateReceiver extends BroadcastReceiver {
                     try {
                         JSONObject object = new JSONObject(responseInfo.result);
                         String installed_update_list = object.getString("installed_update_list");
-                        Type listType = new TypeToken<List<DataBean>>(){}.getType();
-                        List<DataBean> beans = new Gson().fromJson(installed_update_list, listType);
+                        Type listType = new TypeToken<List<ApkData>>(){}.getType();
+                        List<ApkData> beans = new Gson().fromJson(installed_update_list, listType);
                         if (null != beans && beans.size() > 0){
                             for (int i = 0;i < beans.size(); i++) {
-                                DataBean bean = beans.get(i);
+                                ApkData bean = beans.get(i);
                                 if (packageName.equals(bean.getPackageName()) && !md5.equals(bean.getApkMd5())) {
                                     ImplAgent.getInstance(mContext.getApplicationContext()).newDownload(
                                             implInfo,

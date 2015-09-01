@@ -5,12 +5,10 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
 
@@ -24,19 +22,16 @@ import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
-import com.mit.appliteupdate.bean.DataBean;
+import com.mit.appliteupdate.bean.ApkData;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.market.UpdateNotification;
-import com.osgi.extra.OSGIServiceHost;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
-import java.net.MalformedURLException;
 
 import java.io.File;
 
@@ -51,7 +46,7 @@ public class NetworkReceiver extends BroadcastReceiver {
     private static final String START_ALARM_INTENT = "app.start.update.alarm.intent";
     private Context mContext;
     private ImplAgent implAgent;
-    private List<DataBean> mDataContents = new ArrayList<DataBean>();
+    private List<ApkData> mDataContents = new ArrayList<ApkData>();
     private HttpUtils mHttpUtils;
 
     public NetworkReceiver() {
@@ -155,11 +150,11 @@ public class NetworkReceiver extends BroadcastReceiver {
             String wify_update_start = object.getString("installed_wify_automatic_update_start");
             String wify_update_end = object.getString("installed_wify_automatic_update_end");
             String installed_update_list = object.getString("installed_update_list");
-            DataBean bean = null;
+            ApkData bean = null;
             if (!TextUtils.isEmpty(installed_update_list)) {
                 JSONArray array = new JSONArray(installed_update_list);
                 for (int i = 0; i < array.length(); i++) {
-                    bean = new DataBean();
+                    bean = new ApkData();
                     JSONObject obj = new JSONObject(array.get(i).toString());
                     bean.setName(obj.getString("name"));
                     bean.setVersionCode(obj.getInt("versionCode"));
@@ -211,14 +206,14 @@ public class NetworkReceiver extends BroadcastReceiver {
      */
 
     private void downloadAll() {
-        DataBean data = null;
+        ApkData data = null;
         for (int i = 0; i < mDataContents.size(); i++) {
             data = mDataContents.get(i);
             download(data);
         }
     }
 
-    private void download(DataBean bean) {
+    private void download(ApkData bean) {
         if (null == implAgent)
             implAgent = ImplAgent.getInstance(mContext.getApplicationContext());
         ImplInfo implInfo = implAgent.getImplInfo(bean.getPackageName(), bean.getPackageName(), bean.getVersionCode());

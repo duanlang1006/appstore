@@ -273,37 +273,44 @@
                             android:background="@color/open_line" />
                     </LinearLayout>
 
-                    <LinearLayout
+                    <!--<LinearLayout-->
+                        <!--android:layout_width="fill_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_marginLeft="10dp"-->
+                        <!--android:layout_marginTop="10dp"-->
+                        <!--android:orientation="vertical">-->
+
+                        <!--<TextView-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_marginBottom="5dp"-->
+                            <!--android:text="猜你喜欢"-->
+                            <!--android:textColor="@color/black"-->
+                            <!--android:textSize="16sp"-->
+                            <!--android:textStyle="bold" />-->
+
+                        <!--<GridView-->
+                            <!--android:id="@+id/detail_gridview"-->
+                            <!--android:layout_width="fill_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:horizontalSpacing="1dp"-->
+                            <!--android:listSelector="@color/transparent"-->
+                            <!--android:numColumns="4"-->
+                            <!--android:verticalSpacing="1dp"></GridView>-->
+
+                        <!--<View-->
+                            <!--android:layout_width="fill_parent"-->
+                            <!--android:layout_height="0.5dp"-->
+                            <!--android:layout_marginTop="5dp"-->
+                            <!--android:background="@color/open_line" />-->
+                    <!--</LinearLayout>-->
+                    <include
+                        android:id="@+id/similar_view"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
                         android:layout_marginTop="10dp"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="5dp"
-                            android:text="猜你喜欢"
-                            android:textColor="@color/black"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <GridView
-                            android:id="@+id/detail_gridview"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:horizontalSpacing="1dp"
-                            android:listSelector="@color/transparent"
-                            android:numColumns="4"
-                            android:verticalSpacing="1dp"></GridView>
-
-                        <View
-                            android:layout_width="fill_parent"
-                            android:layout_height="0.5dp"
-                            android:layout_marginTop="5dp"
-                            android:background="@color/open_line" />
-                    </LinearLayout>
+                        layout="@layout/similar_view" />
 
                     <!--标签-->
                     <LinearLayout
