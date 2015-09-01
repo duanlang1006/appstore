@@ -184,43 +184,46 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             if (null == this.implInfo) {
                 return;
             }
+            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext,implInfo);
             actionBtn.setEnabled(true);
             switch (implInfo.getStatus()){
                 case ImplInfo.STATUS_PRIVATE_INSTALLING:
-                    actionBtn.setText(ImplHelper.getStatusText(mContext,implInfo));
+                    actionBtn.setText(res.getStatusText());
                     actionBtn.setEnabled(false);
                     break;
                 default:
-                    actionBtn.setText(ImplHelper.getActionText(mContext, implInfo));
+                    actionBtn.setText(res.getActionText());
                     break;
             }
-            descView.setText(ImplHelper.getDescText(mContext,implInfo));
-            statusView.setText(ImplHelper.getStatusText(mContext,implInfo));
-            setProgress();
+            descView.setText(res.getDescText());
+            statusView.setText(res.getStatusText());
+            setProgress(res.getProgress());
         }
 
         private void setIcon() {
             Bitmap resBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.file_type_apk);
             String url = implInfo.getIconUrl();
             if (null != url && !TextUtils.isEmpty(url)) {
-            }
-            int width = (int) mContext.getResources().getDimension(R.dimen.list_item_icon_size);
-            int height = width;
-            mBitmapHelper.configDefaultBitmapMaxSize(width, height);
-            Bitmap cacheBitmap = mBitmapHelper.getBitmapFromMemCache(url, null);
-            if (null != cacheBitmap) {
-                iconView.setImageBitmap(cacheBitmap);
-            } else {
-                mBitmapHelper.configDefaultLoadFailedImage(resBitmap);
-                mBitmapHelper.configDefaultLoadingImage(resBitmap);
-                mBitmapHelper.display(iconView, implInfo.getIconUrl());
+                int width = (int) mContext.getResources().getDimension(R.dimen.list_item_icon_size);
+                int height = width;
+                mBitmapHelper.configDefaultBitmapMaxSize(width, height);
+                Bitmap cacheBitmap = mBitmapHelper.getBitmapFromMemCache(url, null);
+                if (null != cacheBitmap) {
+                    iconView.setImageBitmap(cacheBitmap);
+                } else {
+                    mBitmapHelper.configDefaultLoadFailedImage(resBitmap);
+                    mBitmapHelper.configDefaultLoadingImage(resBitmap);
+                    mBitmapHelper.display(iconView, implInfo.getIconUrl());
+                }
+            }else{
+                iconView.setImageBitmap(resBitmap);
             }
         }
 
-        private void setProgress() {
+        private void setProgress(int progress) {
             progressBar.setIndeterminate(false);
             progressBar.setMax(100);
-            progressBar.setProgress(ImplHelper.getProgress(mContext,implInfo));
+            progressBar.setProgress(progress);
             progressBar.setVisibility(View.VISIBLE);
         }
 

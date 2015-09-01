@@ -1,8 +1,10 @@
 package com.mit.appliteupdate.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,26 +91,35 @@ public class UpdateAdapter extends BaseAdapter {
                     ViewHolder vh = (ViewHolder) v.getTag();
                     MitMobclickAgent.onEvent(mActivity, "onClickButton" + vh.position);
 
-                    if (vh.implInfo.getStatus() == ImplInfo.STATUS_INSTALLED && mPackageInfo.versionCode < data.getmVersionCode()) {
-                        LogUtils.d("UpdateFragment", "更新");
-                        implAgent.newDownload(vh.implInfo,
-                                vh.bean.getmUrl(),
-                                vh.bean.getmName(),
-                                vh.bean.getmImgUrl(),
-                                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getmName() + ".apk",
-                                vh.bean.getmMD5(),
-                                true,
-                                vh);
+                    String path = Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getmName() + ".apk";
+                    LogUtils.d("UpdateFragment", "APK路径," + path);
+                    if (AppliteUtils.isPackageOk(mActivity, path)) {
+                        LogUtils.d("UpdateFragment", "已有完善的更新包,安装已下载的APK," + vh.bean.getmName());
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(Uri.fromFile(new File(path)), "application/vnd.android.package-archive");
+                        mActivity.startActivity(intent);
                     } else {
-                        LogUtils.d("UpdateFragment", "打开");
-                        ImplHelper.onClick(mActivity,
-                                vh.implInfo,
-                                vh.bean.getmUrl(),
-                                vh.bean.getmName(),
-                                vh.bean.getmImgUrl(),
-                                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getmName() + ".apk",
-                                null,
-                                vh);
+                        if (vh.implInfo.getStatus() == ImplInfo.STATUS_INSTALLED && mPackageInfo.versionCode < data.getmVersionCode()) {
+                            LogUtils.d("UpdateFragment", "更新");
+                            implAgent.newDownload(vh.implInfo,
+                                    vh.bean.getmUrl(),
+                                    vh.bean.getmName(),
+                                    vh.bean.getmImgUrl(),
+                                    path,
+                                    vh.bean.getmMD5(),
+                                    true,
+                                    vh);
+                        } else {
+                            LogUtils.d("UpdateFragment", "打开");
+                            ImplHelper.onClick(mActivity,
+                                    vh.implInfo,
+                                    vh.bean.getmUrl(),
+                                    vh.bean.getmName(),
+                                    vh.bean.getmImgUrl(),
+                                    path,
+                                    null,
+                                    vh);
+                        }
                     }
 //                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
 //                    switch (vh.implInfo.getStatus()) {
@@ -163,7 +174,7 @@ public class UpdateAdapter extends BaseAdapter {
         public void initView(DataBean bean, int position) {
             this.bean = bean;
             this.position = position;
-            this.implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName()/*, bean.getmVersionCode()*/);
+            this.implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl()).setTitle(bean.getmName());
                 implAgent.setImplCallback(this, implInfo);
@@ -178,15 +189,20 @@ public class UpdateAdapter extends BaseAdapter {
 
         void initProgressButton() {
             if (null != mBt && null != this.implInfo) {
+                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity, implInfo);
                 switch (implInfo.getStatus()) {
                     case ImplInfo.STATUS_INSTALLED:
-                        mBt.setText(mActivity.getResources().getString(R.string.update));
-                        break;
-                    case ImplInfo.STATUS_SUCCESSFUL:
+                        String path = Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getmName() + ".apk";
+                        if (AppliteUtils.isPackageOk(mActivity, path)) {
+                            LogUtils.d("updateFragment", "已有更新包");
+                            mBt.setText(mActivity.getResources().getString(R.string.open));
+                        } else {
+                            mBt.setText(mActivity.getResources().getString(R.string.update));
+                        }
                         try {
                             mPackageInfo = mPackageManager.getPackageInfo(bean.getmPackageName(), PackageManager.GET_ACTIVITIES);
                             if (mPackageInfo.versionCode == bean.getmVersionCode()) {
-                                LogUtils.d("UpdateFragment", "版本号一致，remove、notifyDataSetChanged");
+                                LogUtils.d("updateFragment", "删除已更新的条目");
                                 mDatas.remove(position);
                                 notifyDataSetChanged();
                             }
@@ -195,16 +211,16 @@ public class UpdateAdapter extends BaseAdapter {
                         }
                         break;
                     case ImplInfo.STATUS_PENDING:
-                        mBt.setText(ImplHelper.getActionText(mActivity, implInfo));
+                        mBt.setText(res.getActionText());
                         break;
                     case ImplInfo.STATUS_RUNNING:
-                        mBt.setText(ImplHelper.getProgress(mActivity, implInfo) + "%");
+                        mBt.setText(res.getProgress() + "%");
                         break;
                     case ImplInfo.STATUS_PAUSED:
-                        mBt.setText(ImplHelper.getStatusText(mActivity, implInfo));
+                        mBt.setText(res.getStatusText());
                         break;
                     default:
-                        mBt.setText(ImplHelper.getActionText(mActivity, implInfo));
+                        mBt.setText(res.getActionText());
                         break;
                 }
             }

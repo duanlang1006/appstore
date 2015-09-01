@@ -411,17 +411,18 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         } else if (v.getId() == R.id.search_delete) {
             mPreloadListView.setVisibility(View.GONE);
             mListView.setVisibility(View.GONE);
-            mEtView.setText(null);
+            mLoadingLayout.setVisibility(View.GONE);
+            no_network.setVisibility(View.GONE);
             isHotWordLayoutVisibility(View.VISIBLE);
+            mEtView.setText(null);
             getfocuable();
             openKeyboard();
             stopConvenientSearch();
         } else if (v.getId() == R.id.search_search) {
             MitMobclickAgent.onEvent(mActivity, "clickSearch");
             getfocuable();
-            openKeyboard();
+            closeKeyboard();
             stopConvenientSearch();
-            no_network.setVisibility(View.GONE);
             mPreloadListView.setVisibility(View.GONE);
             if (TextUtils.isEmpty(mEtView.getText())) {
                 if (TextUtils.isEmpty(mEtView.getHint())) {
@@ -543,17 +544,19 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 mLoadingLayout.setVisibility(View.GONE);
                 LogUtils.i(TAG, "搜索网络请求成功，result:" + responseInfo.result);
-                setSearchData(responseInfo.result);
+                if (!TextUtils.isEmpty(mEtView.getText().toString())) {
+                    setSearchData(responseInfo.result);
 
-                mSearchText = finalName;
-                ISPOSTSEARCH = true;//请求结束后，才可以继续请求
-                mSearchPostPage = mSearchPostPage + 1;//请求成功后，请求的页数加1
+                    mSearchText = finalName;
+                    ISPOSTSEARCH = true;//请求结束后，才可以继续请求
+                    mSearchPostPage = mSearchPostPage + 1;//请求成功后，请求的页数加1
+                }
             }
 
             @Override
             public void onFailure(HttpException e, String s) {
                 mLoadingLayout.setVisibility(View.GONE);
-                if (mListView.getVisibility() == View.GONE)
+                if (mListView.getVisibility() == View.GONE && mPreloadListView.getVisibility() == View.GONE && mHotWordLL.getVisibility() == View.GONE)
                     no_network.setVisibility(View.VISIBLE);
                 ISPOSTSEARCH = true;
                 mListView.removeFooterView(moreView);
@@ -731,7 +734,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 LogUtils.i(TAG, "在线热词请求成功，reuslt:" + responseInfo.result);
-                resolve(responseInfo.result);
+                if (mHotWordBeans.isEmpty())
+                    resolve(responseInfo.result);
             }
 
             @Override
@@ -747,13 +751,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      * @param data
      */
     private void resolve(String data) {
-        if (!mHotWordBeans.isEmpty()) {
-            mHotWordBeans.clear();
-            if (null != mGvAdapter) {
-                mGvAdapter.notifyDataSetChanged();
-            }
-            mHotWordLL.setVisibility(View.GONE);
-        }
         HotWordBean bean = null;
         try {
             JSONObject obj = new JSONObject(data);

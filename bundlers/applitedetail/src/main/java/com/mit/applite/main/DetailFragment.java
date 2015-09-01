@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -72,7 +73,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private TextView mApkContentView;
     private RatingBar mXingView;
     private ImageView mApkImgView;
-    private String mViewPagerUrlList[] = null;
     private ViewGroup container;
     private LinearLayout mImgLl;
     private String mPackageName;
@@ -107,6 +107,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private BitmapUtils bitmapUtils;
     private List<View> mDetailImgList = new ArrayList<View>();
     private LinearLayout mHorDefaultLayout;
+    private LinearLayout mTagStateLayout;
+    private LinearLayout mTagLayout1;
+    private TextView mTagTitleView;
+    private LinearLayout mTagLayout2;
 
     public static Bundle newBundle(String packageName, String name, String imgUrl) {
         Bundle b = new Bundle();
@@ -247,6 +251,11 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         mGridView = (GridView) rootView.findViewById(R.id.detail_gridview);
         mGridView.setFocusable(false);
 
+        mTagStateLayout = (LinearLayout) rootView.findViewById(R.id.detail_state_tag_layout);
+        mTagTitleView = (TextView) rootView.findViewById(R.id.detail_tag_title);
+        mTagLayout1 = (LinearLayout) rootView.findViewById(R.id.detail_tag_layout1);
+        mTagLayout2 = (LinearLayout) rootView.findViewById(R.id.detail_tag_layout2);
+
         mName1View.setText(mApkName);
 
         mBitmapUtil.configDefaultLoadingImage(mActivity.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
@@ -306,6 +315,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+
         LogUtils.d(TAG,"onCreateOptionsMenu");
         MenuItem item = menu.findItem(R.id.action_search);
         if (null != item){
@@ -330,7 +340,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     @Override
     public void onDestroyOptionsMenu() {
-        LogUtils.d(TAG,"onDestroyOptionsMenu");
+        LogUtils.d(TAG, "onDestroyOptionsMenu");
         super.onDestroyOptionsMenu();
     }
 
@@ -338,12 +348,13 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onClick(View v) {
         if (v.getId() == R.id.refresh_btn) {
             no_network.setVisibility(View.GONE);
+            mDataLayout.setVisibility(View.VISIBLE);
 //            mLoadLayout.setVisibility(View.VISIBLE);
             post(mPackageName);
         } else if (v.getId() == R.id.detail_content || v.getId() == R.id.detail_open_introduce_content) {
             if (CONTENT_STATE == COLLAPSIBLE_STATE_SHRINKUP) {
                 LogUtils.i(TAG, "应用介绍展开");
-                mApkContentView.setMaxLines(50);
+                mApkContentView.setMaxLines(Integer.MAX_VALUE);
                 CONTENT_STATE = COLLAPSIBLE_STATE_SPREAD;
                 mOpenIntroduceView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_less));
             } else if (CONTENT_STATE == COLLAPSIBLE_STATE_SPREAD) {
@@ -405,7 +416,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      */
     private void setData(String data) {
         try {
-            String mViewPagerUrl = null;
             JSONObject object = new JSONObject(data);
             String app_key = object.getString("app_key");
             String detail_info = object.getString("detail_info");
@@ -433,6 +443,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 mGridView.setAdapter(mSimilarAdapter);
             }
 
+            String mViewPagerUrl = null;
+            String mApkTag = null;
             JSONArray json = new JSONArray(detail_info);
             if (json.length() != 0 && json != null) {
                 for (int i = 0; i < json.length(); i++) {
@@ -450,55 +462,59 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     mViewPagerUrl = obj.getString("screenshotsUrl");
                     String developer = obj.getString("developer");
                     mUpdateLog = obj.getString("updateInfo");
+                    mApkTag = obj.getString("tag");
 
                     mName1View.setText(mName);
                     mXingView.setRating(Float.parseFloat(xing) / 2.0f);
 //                    mBitmapUtil.display(mApkImgView, mImgUrl);
                     mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size) + " | " + developer);
-
-                    LogUtils.i(TAG, "应用介绍：" + mDescription);
-                    mApkContentView.setText(mDescription);
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mApkContentView.getLineCount() <= DEFAULT_MAX_LINE_COUNT) {
-                                mOpenIntroduceView.setVisibility(View.GONE);
-                            } else {
-                                mApkContentView.setLines(DEFAULT_MAX_LINE_COUNT);
-                                CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
-                            }
-                        }
-                    }, 500);
-
-                    LogUtils.i(TAG, "更新日志：" + mDescription);
-                    if (TextUtils.isEmpty(mUpdateLog)) {
-                        mUpdateLogView.setText(mActivity.getResources().getText(R.string.no_update_log));
-                    } else {
-                        mUpdateLogView.setText(mUpdateLog);
-                    }
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mUpdateLogView.getLineCount() <= DEFAULT_MAX_LINE_COUNT) {
-                                mOpenUpdateLogView.setVisibility(View.GONE);
-                            } else {
-                                mUpdateLogView.setLines(DEFAULT_MAX_LINE_COUNT);
-                                UPDATE_LOG_STATE = COLLAPSIBLE_STATE_SHRINKUP;
-                            }
-                        }
-                    }, 500);
                 }
-                mViewPagerUrlList = null;
-                mViewPagerUrlList = mViewPagerUrl.split(",");
-                setPreViewImg();
+                LogUtils.i(TAG, "应用介绍：" + mDescription);
+                mApkContentView.setText(mDescription);
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mApkContentView.getLineCount() <= DEFAULT_MAX_LINE_COUNT) {
+                            mOpenIntroduceView.setVisibility(View.GONE);
+                        } else {
+                            mApkContentView.setLines(DEFAULT_MAX_LINE_COUNT);
+                            CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
+                        }
+                    }
+                }, 500);
+
+                LogUtils.i(TAG, "更新日志：" + mDescription);
+                if (TextUtils.isEmpty(mUpdateLog)) {
+                    mUpdateLogView.setText(mActivity.getResources().getText(R.string.no_update_log));
+                } else {
+                    mUpdateLogView.setText(mUpdateLog);
+                }
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mUpdateLogView.getLineCount() <= DEFAULT_MAX_LINE_COUNT) {
+                            mOpenUpdateLogView.setVisibility(View.GONE);
+                        } else {
+                            mUpdateLogView.setLines(DEFAULT_MAX_LINE_COUNT);
+                            UPDATE_LOG_STATE = COLLAPSIBLE_STATE_SHRINKUP;
+                        }
+                    }
+                }, 500);
+
+                //应用图片介绍
+                setPreViewImg(mViewPagerUrl);
+
+                //标签
+                setApkTag(mApkTag);
             }
 
-            ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName/*, mVersionCode*/);
+            ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName, mVersionCode);
             if (null != implinfo) {
+                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity,implinfo);
                 implAgent.setImplCallback(implCallback, implinfo);
                 implinfo.setDownloadUrl(mDownloadUrl).setIconUrl(mImgUrl).setTitle(mName);
-                mProgressButton.setText(ImplHelper.getActionText(mActivity,implinfo));
-                mProgressButton.setProgress(ImplHelper.getProgress(mActivity,implinfo));
+                mProgressButton.setText(res.getActionText());
+                mProgressButton.setProgress(res.getProgress());
                 if (mProgressButton.getProgress() == 0) {
                     mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_foreground));
                 } else {
@@ -514,20 +530,86 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     /**
+     * 设置标签
+     */
+    private void setApkTag(String apkTag) {
+        for (int i = 0; i < mTagLayout1.getChildCount(); i++) {
+            mTagLayout1.removeView(mTagLayout1.getChildAt(1));// 删除view
+        }
+        for (int i = 0; i < mTagLayout2.getChildCount(); i++) {
+            mTagLayout2.removeView(mTagLayout2.getChildAt(1));// 删除view
+        }
+
+        LogUtils.d(TAG, "Tag：" + apkTag);
+        if (TextUtils.isEmpty(apkTag)) {
+            mTagStateLayout.setVisibility(View.GONE);
+        } else {
+            mTagStateLayout.setVisibility(View.VISIBLE);
+            String[] mApkTagList = apkTag.split(",");
+
+            DisplayMetrics mDisplayMetrics = new DisplayMetrics();
+            mActivity.getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
+            int W = mDisplayMetrics.widthPixels;//屏幕宽度
+
+            int mTagLayoutWidth = W - 20;
+            LogUtils.d(TAG, "mTagLayoutWidth：" + mTagLayoutWidth);
+
+            int[] mTagWidthList = new int[mApkTagList.length];//标签的宽度
+            int mTagLayout1Number = 0;
+            for (int i = 0; i < mApkTagList.length; i++) {
+                final View child = mActivity.getLayoutInflater().inflate(R.layout.item_apk_tag_layout, container, false);
+                final TextView mTagView = (TextView) child.findViewById(R.id.item_tag_tv);
+                mTagView.setText(mApkTagList[i]);
+                mTagView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+
+                mTagWidthList[i] = AppliteUtils.getWidth(child);
+                LogUtils.d(TAG, "mTagWidthList[i]：" + mTagWidthList[i]);
+
+                int mTagLayout1Width = 0;
+                for (int j = 0; j < mTagWidthList.length; j++) {
+                    mTagLayout1Width += mTagWidthList[j];
+                }
+                LogUtils.d(TAG, "mTagLayout1Width：" + mTagLayout1Width);
+
+                if (mTagLayout1Width <= mTagLayoutWidth) {//标签加入第一行
+                    mTagLayout1.addView(child);
+                    mTagLayout1Number = i;
+                } else {
+                    int mTagLayout2Width = 0;
+                    for (int w = mTagLayout1Number + 1; w < mTagWidthList.length; w++) {
+                        mTagLayout2Width += mTagWidthList[w];
+                    }
+                    LogUtils.d(TAG, "mTagLayout2Width：" + mTagLayout2Width);
+                    if (mTagLayout2Width <= mTagLayoutWidth)
+                        mTagLayout2.addView(child);
+                }
+            }
+        }
+    }
+
+    /**
      * 设置应用介绍的图片
      */
-    private void setPreViewImg() {
-        if (null == bitmapUtils)
+    private void setPreViewImg(String mViewPagerUrl) {
+        if (null == bitmapUtils) {
             bitmapUtils = new BitmapUtils(mActivity);
+        }
         if (!mDetailImgList.isEmpty()) {
             LogUtils.i(TAG, "删除原来的详情介绍图片");
             for (int i = 0; i < mDetailImgList.size(); i++) {
                 ViewGroup parent = (ViewGroup) mDetailImgList.get(i).getParent();
-                if (parent != null)
+                if (parent != null) {
                     parent.removeView(mDetailImgList.get(i));// 删除点击了的view
+                }
             }
             mDetailImgList.clear();
         }
+        String[] mViewPagerUrlList = mViewPagerUrl.split(",");
         mHorDefaultLayout.setVisibility(View.GONE);
         for (int i = 0; i < mViewPagerUrlList.length; i++) {
             LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
@@ -573,9 +655,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         }
 
         private void refresh(ImplInfo info) {
-            LogUtils.d(TAG, "refresh" + ImplHelper.getActionText(mActivity,info) + "," + info.getStatus());
-            mProgressButton.setText(ImplHelper.getActionText(mActivity,info));
-            mProgressButton.setProgress(ImplHelper.getProgress(mActivity,info));
+            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity,info);
+            LogUtils.d(TAG, "refresh" + res.getActionText() + "," + info.getStatus());
+            mProgressButton.setText(res.getActionText());
+            mProgressButton.setProgress(res.getProgress());
         }
     }
 }
