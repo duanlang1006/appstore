@@ -28,21 +28,19 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.applite.common.Constant;
+import com.applite.common.LogUtils;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
-import com.mit.impl.ImplLog;
 
 import java.io.File;
-import java.util.Comparator;
 import java.util.List;
 
 public class DownloadAdapter extends ArrayAdapter implements View.OnClickListener {
@@ -51,23 +49,22 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
 
     private BitmapUtils mBitmapHelper;
     private ImplAgent implAgent;
-    private Animation animaCheckBox;
-    private boolean oldFlag = false;
+
     private DownloadListener mListener;
+    private ImplInfo implInfo;
+    private int isDownloaded = ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PAUSED | ImplInfo.STATUS_FAILED;
 
     public DownloadAdapter(Context context,
                            int resource,
                            List<ImplInfo> implInfoList,
                            BitmapUtils bitmapHelper,
-                           DownloadListener listener
-                           ) {
+                           DownloadListener listener) {
         super(context, resource, implInfoList);
         mContext = context;
         mBitmapHelper = bitmapHelper;
         mListener = listener;
         implAgent = ImplAgent.getInstance(context.getApplicationContext());
         this.mLayoutId = resource;
-        animaCheckBox = AnimationUtils.loadAnimation(context, R.anim.checkbox_in);
     }
 
     @Override
@@ -80,87 +77,67 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         ViewHolder vh = (ViewHolder) view.getTag();
         vh.initView((ImplInfo) getItem(position));
         vh.actionBtn.setOnClickListener(this);
-        if (mListener.getFlag()) {
+        vh.custompb.setOnClickListener(this);
+        if (mListener.getFlag1()) {//显示删除多选框
             vh.deleteCheckBox.setVisibility(View.VISIBLE);
             vh.deleteCheckBox.setChecked(mListener.getStatus(position));
-            if (false == oldFlag && true == mListener.getFlag()) {
-                vh.deleteCheckBox.startAnimation(animaCheckBox);
-                if (position == getCount() - 1) {
-                    oldFlag = true;
-                }
+            if (true == mListener.getFlag2()) {
+                vh.deleteCheckBox.startAnimation(vh.animaCheckBox);
+                mListener.setFlag2(false);
             }
             vh.actionBtn.setVisibility(View.GONE);
-        } else {
-            vh.actionBtn.setVisibility(View.VISIBLE);
+            vh.custompb.setVisibility(View.GONE);
+        } else {//正常状态(没有删除的多选框)
+            vh.deleteCheckBox.setVisibility(View.GONE);
+            if (mListener.getStatusFlags() == isDownloaded) {
+                vh.actionBtn.setVisibility(View.GONE);
+                vh.custompb.setVisibility(View.VISIBLE);
+            } else if (mListener.getStatusFlags() == ~isDownloaded) {
+                vh.actionBtn.setVisibility(View.VISIBLE);
+                vh.custompb.setVisibility(View.GONE);
+            }
             vh.deleteCheckBox.setVisibility(View.GONE);
         }
         return view;
     }
 
-
     @Override
     public void onClick(View v) {
         ViewHolder vh = (ViewHolder) v.getTag();
-        if (R.id.button_op == v.getId()) {
-            ImplHelper.onClick(mContext,
-                    vh.implInfo,
-                    vh.implInfo.getDownloadUrl(),
-                    vh.implInfo.getTitle(),
-                    vh.implInfo.getIconUrl(),
-                    Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.implInfo.getTitle() + ".apk",
-                    null,
-                    vh);
-
-//            if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-//                switch (vh.implInfo.getStatus()) {
-//                    case ImplInfo.STATUS_PENDING:
-//                        break;
-//                    case ImplInfo.STATUS_RUNNING:
-//                        implAgent.pauseDownload(vh.implInfo);
-//                        break;
-//                    case ImplInfo.STATUS_PAUSED:
-//                        implAgent.resumeDownload(vh.implInfo, vh);
-//                        break;
-//                    default:
-//                        implAgent.newDownload(vh.implInfo,
-//                                vh.implInfo.getDownloadUrl(),
-//                                vh.implInfo.getTitle(),
-//                                vh.implInfo.getIconUrl(),
-//                                Constant.extenStorageDirPath,
-//                                vh.implInfo.getTitle() + ".apk",
-//                                true,
-//                                vh);
-//                        break;
-//                }
-//            } else {
-//                implAgent.startActivity(vh.implInfo);
-//            }
-        }
+        ImplHelper.onClick(mContext,
+                vh.implInfo,
+                vh.implInfo.getDownloadUrl(),
+                vh.implInfo.getTitle(),
+                vh.implInfo.getIconUrl(),
+                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.implInfo.getTitle() + ".apk",
+                null,
+                vh);
     }
 
-    class ViewHolder implements ImplChangeCallback{
-        ProgressBar progressBar;
+
+    class ViewHolder implements ImplChangeCallback {
+        CustomProgressBar custompb;
         TextView titleView;
         TextView descView;
         TextView statusView;
         TextView actionBtn;
-        ImageButton customImBtn;
         CheckBox deleteCheckBox;
         ImageView iconView;
         ImplInfo implInfo;
+        Animation animaCheckBox;
+
 
         ViewHolder(View view) {
             actionBtn = (TextView) view.findViewById(R.id.button_op);
-//            customImBtn = (ImageButton) view.findViewById(R.id.cpb);
+            custompb = (CustomProgressBar) view.findViewById(R.id.cpb);
             deleteCheckBox = (CheckBox) view.findViewById(R.id.delete_checkBox);
-            progressBar = (ProgressBar) view.findViewById(android.R.id.progress);
             descView = (TextView) view.findViewById(R.id.size_text);
             titleView = (TextView) view.findViewById(R.id.download_title);
             statusView = (TextView) view.findViewById(R.id.domain);
             iconView = (ImageView) view.findViewById(R.id.download_icon);
             actionBtn.setTag(this);
             deleteCheckBox.setTag(this);
-            progressBar.setTag(this);
+            custompb.setTag(this);
         }
 
         void initView(ImplInfo info) {
@@ -170,7 +147,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             }
 //            actionBtn.setText(implAgent.getActionText(implInfo));//??
 //            descView.setText(implAgent.getDescText(implInfo));//??
-            implAgent.setImplCallback(this,implInfo);
+            implAgent.setImplCallback(this, implInfo);
             String title = implInfo.getTitle();
             if (null == title || title.isEmpty()) {
                 title = mContext.getResources().getString(R.string.missing_title);
@@ -178,26 +155,41 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             titleView.setText(title);
             setIcon();
             refresh();
+            animaCheckBox = AnimationUtils.loadAnimation(mContext, R.anim.checkbox_in);
         }
 
         void refresh() {
             if (null == this.implInfo) {
                 return;
             }
-            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext,implInfo);
+            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext, implInfo);
+            actionBtn.setText(res.getStatusText());
             actionBtn.setEnabled(true);
-            switch (implInfo.getStatus()){
-                case ImplInfo.STATUS_PRIVATE_INSTALLING:
-                    actionBtn.setText(res.getStatusText());
-                    actionBtn.setEnabled(false);
+            switch (implInfo.getStatus()) {
+                case ImplInfo.STATUS_PRIVATE_INSTALLING://静默安装
+//                    actionBtn.setEnabled(false);
+                    break;
+                case ImplInfo.ACTION_DOWNLOAD://下载
+                    custompb.setImageResource(R.drawable.download_status_pause);
+                    break;
+                case ImplInfo.ACTION_INSTALL://安装过程   ------->这里有时下载也会显示安装过程!
+                    custompb.setImageResource(R.drawable.download_status_pause);
+                    break;
+                case ImplInfo.STATUS_PAUSED://下载暂停
+                    custompb.setImageResource(R.drawable.download_status_running);
+                    break;
+                case ImplInfo.STATUS_FAILED://下载失败
+                    custompb.setImageResource(R.drawable.download_status_retry);
+                    break;
+                case ImplInfo.STATUS_INSTALL_FAILED: //安装失败
+                    custompb.setImageResource(R.drawable.download_status_retry);
                     break;
                 default:
-                    actionBtn.setText(res.getActionText());
+//                    Toast.makeText(mContext, "其他", Toast.LENGTH_SHORT).show();
                     break;
             }
-            descView.setText(res.getDescText());
             statusView.setText(res.getStatusText());
-            setProgress(res.getProgress());
+            setProgress();
         }
 
         private void setIcon() {
@@ -215,16 +207,18 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                     mBitmapHelper.configDefaultLoadingImage(resBitmap);
                     mBitmapHelper.display(iconView, implInfo.getIconUrl());
                 }
-            }else{
+            } else {
                 iconView.setImageBitmap(resBitmap);
             }
         }
 
-        private void setProgress(int progress) {
-            progressBar.setIndeterminate(false);
-            progressBar.setMax(100);
-            progressBar.setProgress(progress);
-            progressBar.setVisibility(View.VISIBLE);
+
+        private void setProgress() {
+            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext, implInfo);
+            custompb.setVisibility(View.VISIBLE);
+            custompb.setProgress(res.getProgress());
+            descView.setText(res.getDescText());
+//            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override

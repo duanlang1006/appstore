@@ -44,4 +44,11 @@
         <item name="@android:windowExitAnimation">@anim/bottom_out</item>
     </style>
 
+    <style name="CustomDownLoadButton">
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:minHeight">@dimen/download_btn_min_height</item>
+        <item name="android:minWidth">@dimen/download_btn_min_width</item>
+    </style>
+
 </resources>
