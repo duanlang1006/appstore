@@ -291,7 +291,6 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                     ActionBar.Tab t = actionBar.getTabAt(0);
                     t.setCustomView(R.layout.actionbar_tab);
                     TextView title = (TextView)t.getCustomView().findViewById(R.id.tab_title);
-                    title.setBackgroundResource(R.drawable.edittext_bg);
                     title.setText(mData.getS_name());
                 }
                 actionBar.show();
