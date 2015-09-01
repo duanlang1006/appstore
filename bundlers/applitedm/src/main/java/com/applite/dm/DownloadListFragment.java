@@ -56,9 +56,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     private WindowManager.LayoutParams lp_top;
     private Animation animaBt1;
     private Animation animaBt2;
+    private boolean checkBoxAnima = true;
     private DownloadListener mDownloadListener = new DownloadListener() {
         @Override
-        public boolean getFlag() {
+        public boolean getFlag1() {
             return flagShowCheckBox;
         }
 
@@ -68,6 +69,21 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                 return false;
             }
             return status[position];
+        }
+
+        @Override
+        public Integer getStatusFlags() {
+            return mStatusFlags;
+        }
+
+        @Override
+        public boolean getFlag2() {
+            return checkBoxAnima;
+        }
+
+        @Override
+        public void setFlag2(boolean b) {
+            checkBoxAnima = b;
         }
     };
 
@@ -148,7 +164,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         super.onAttach(activity);
         Bundle params = getArguments();
         if (null != params) {
-            mStatusFlags = params.getInt("statusFilter");
+            mStatusFlags = params.getInt("statusFilter");//
         }
         mImplAgent = ImplAgent.getInstance(activity.getApplicationContext());
         mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
@@ -177,6 +193,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         flagShowCheckBox = false;
     }
 
+
     @Override
     public void onPause() {
         super.onPause();
@@ -196,7 +213,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
 
     @Override
     public void onDestroy() {
-        manager1.removeView(titleBar);
+        if (manager1 != null) {
+            manager1.removeView(titleBar);
+        }
         super.onDestroy();
     }
 
@@ -254,6 +273,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                     checkedCount = (status[position] == false) ? checkedCount - 1 : checkedCount + 1;
                     setButtonStatus();//titleBar里Button显示的文字
                     mAdapter.notifyDataSetChanged();
+//                    checkBoxAnima = false;
                 }
                 return false;
             }
@@ -295,37 +315,40 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     }
 
     private void initializeView(View view) {
-        actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();//得到ActionBar
+        if (null == actionBar) {
+            actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();//得到ActionBar
+            lp_top = new WindowManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    actionBar.getHeight(),
+                    WindowManager.LayoutParams.TYPE_APPLICATION,
+                    // 设置为无焦点状态
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, // 没有边界
+                    // 半透明效果
+                    PixelFormat.TRANSLUCENT);
+            lp_top.gravity = Gravity.TOP;
+            lp_top.windowAnimations = R.style.anim_view_top;
+            manager1 = (WindowManager) mActivity.getSystemService(Context.WINDOW_SERVICE);
+            manager1.addView(titleBar, lp_top);
+
+            titleBar.setVisibility(View.GONE);
+            btnCancel = (Button) titleBar.findViewById(R.id.select_cancel);
+            tvShowTotal = (TextView) titleBar.findViewById(R.id.total);
+            btnAllpick = (Button) titleBar.findViewById(R.id.select_allpick);
+
+            ll = (LinearLayout) view.findViewById(R.id.layout_button);
+            btnShare = (Button) view.findViewById(R.id.btnShare);
+            animaBt1 = AnimationUtils.loadAnimation(mActivity, R.anim.btn_share_in);
+            btnDelete = (Button) view.findViewById(R.id.btnDelete);
+            animaBt2 = AnimationUtils.loadAnimation(mActivity, R.anim.btn_delete_in);
+        }
+        btnCancel.setOnClickListener(this);
+        btnAllpick.setOnClickListener(this);
+        btnShare.setOnClickListener(this);
+        btnDelete.setOnClickListener(this);
         mListview.setAdapter(mAdapter);
 
-        lp_top = new WindowManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                actionBar.getHeight(),
-                WindowManager.LayoutParams.TYPE_APPLICATION,
-                // 设置为无焦点状态
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                        | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, // 没有边界
-                // 半透明效果
-                PixelFormat.TRANSLUCENT);
-        lp_top.gravity = Gravity.TOP;
-        lp_top.windowAnimations = R.style.anim_view_top;
-        manager1 = (WindowManager) mActivity.getSystemService(Context.WINDOW_SERVICE);
-        manager1.addView(titleBar, lp_top);
-
-        titleBar.setVisibility(View.GONE);
-        btnCancel = (Button) titleBar.findViewById(R.id.select_cancel);
-        btnCancel.setOnClickListener(this);
-        tvShowTotal = (TextView) titleBar.findViewById(R.id.total);
-        btnAllpick = (Button) titleBar.findViewById(R.id.select_allpick);
-        btnAllpick.setOnClickListener(this);
-
-        ll = (LinearLayout) view.findViewById(R.id.layout_button);
-        btnShare = (Button) view.findViewById(R.id.btnShare);
-        animaBt1 = AnimationUtils.loadAnimation(mActivity, R.anim.btn_share_in);
-        btnShare.setOnClickListener(this);
-        btnDelete = (Button) view.findViewById(R.id.btnDelete);
-        animaBt2 = AnimationUtils.loadAnimation(mActivity, R.anim.btn_delete_in);
-        btnDelete.setOnClickListener(this);
     }
+
 
     private void refresh(boolean b) {
         if (b) {
@@ -336,6 +359,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
             flagShowCheckBox = false;//标志位复位
             Arrays.fill(status, false);//删除后将status复位
             mAdapter.notifyDataSetChanged();
+            checkBoxAnima = true;
             checkedCount = 0;
         }
     }
@@ -353,6 +377,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                 mImplList.remove(i);
             }
         }
-        Toast.makeText(mActivity.getApplicationContext(), R.string.delete_message1 + checkedCount + R.string.delete_message2, Toast.LENGTH_SHORT).show();
+        String temp = mActivity.getResources().getString(R.string.delete_message1) + checkedCount + mActivity.getResources().getString(R.string.delete_message2);
+        Toast.makeText(mActivity.getApplicationContext(), temp, Toast.LENGTH_LONG).show();
     }
 }
