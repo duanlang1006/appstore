@@ -131,6 +131,10 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         if (null != item){
             item.setVisible(false);
         }
+        MenuItem item_dm = menu.findItem(R.id.action_dm);
+        if(null != item_dm){
+            item_dm.setVisible(false);
+        }
     }
 
     @Override
@@ -190,6 +194,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             actionBar.setCustomView(tabStrip);
             actionBar.show();
         } catch (Exception e) {

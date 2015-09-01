@@ -22,6 +22,7 @@ import com.applite.common.LogUtils;
 import com.applite.dm.DownloadPagerFragment;
 import com.applite.homepage.HomePageFragment;
 import com.applite.homepage.HomePageListFragment;
+import com.applite.homepage.LuckyFragment;
 import com.applite.homepage.PersonalFragment;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -94,7 +95,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(this, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", this.getPackageName());
         params.addBodyParameter("type", "update_management");
-        params.addBodyParameter("protocol_version", "1.0");
+        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
         params.addBodyParameter("update_info", AppliteUtils.getAllApkData(this));
         HttpUtils mHttpUtils = new HttpUtils();
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
@@ -156,8 +157,12 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (R.id.action_search == id) {
-            jumptoSearch(true);
+
+        if (R.id.action_search == id){
+            jumptoSearch(true, null, null);
+            return true;
+        } else if(R.id.action_dm == id){
+            jumptoDownloadManager(true);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -307,10 +312,11 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     }
 
     @Override
-    public void jumptoSearch(boolean addToBackstack) {
+    public void jumptoSearch(boolean addToBackstack, String info, String keyword) {
         jumpto(Constant.OSGI_SERVICE_SEARCH_FRAGMENT,
                 SearchFragment.class.getName(),
-                null, addToBackstack);
+                SearchFragment.newBundle(info, keyword),
+                addToBackstack);
     }
 
     @Override
@@ -344,6 +350,13 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
                 addToBackstack);
     }
 
+    @Override
+    public void jumptoLucky(boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_LUCKY_FRAGMENT,
+                LuckyFragment.class.getName(),
+                null, addToBackstack);
+    }
+
     private void setOverflowShowingAlways() {
         try {
             ViewConfiguration config = ViewConfiguration.get(this);
@@ -363,6 +376,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_UPDATE_FRAGMENT, "com.mit.appliteupdate.main.UpdateFragment");
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_DM_FRAGMENT, "com.applite.dm.DownloadPagerFragment");
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_LOGO_FRAGMENT, "com.mit.main.GuideFragment");
+        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_LUCKY_FRAGMENT, "com.applite.homepage.LuckyFragment");
     }
 
     private void unregisterClients() {
@@ -373,5 +387,6 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_UPDATE_FRAGMENT);
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_DM_FRAGMENT);
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_LOGO_FRAGMENT);
+        OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_LUCKY_FRAGMENT);
     }
 }

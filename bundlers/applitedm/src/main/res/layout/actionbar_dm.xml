@@ -14,17 +14,6 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true" />
 
-    <LinearLayout
-        android:id="@+id/action_title"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:layout_toEndOf="@+id/action_back"
-        android:layout_toLeftOf="@+id/action_more"
-        android:layout_toRightOf="@+id/action_back"
-        android:gravity="center"
-        android:orientation="horizontal"></LinearLayout>
-
     <ImageView
         android:id="@+id/action_more"
         style="@style/ActionBarCustom.ActionMore"

@@ -202,6 +202,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             actionBar.setDisplayShowCustomEnabled(false);
             actionBar.setTitle("应用升级");
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             actionBar.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -261,7 +262,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "update_management");
-        params.addBodyParameter("protocol_version", "1.0");
+        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
         params.addBodyParameter("update_info", AppliteUtils.getAllApkData(mActivity));
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
