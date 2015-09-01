@@ -17,6 +17,7 @@ public interface OSGIServiceHost {
     public void jumptoTopic(String key,String name,int step,String datatype,boolean addToBackstack);
     public void jumptoSearch(boolean addToBackstack, String info, String keyword);
     public void jumptoPersonal(boolean addToBackstack);
+    public void jumptoLucky(boolean addToBackstack);
     public void jumptoUpdate(boolean addToBackstack);
     public void jumptoDownloadManager(boolean addToBackstack);
     public void jumptoMylife(boolean addToBackstack);

@@ -10,6 +10,7 @@
     <string name="upgrade_manager">Upgrade manager</string>
     <string name="logo_manager">Logo manager</string>
     <string name="zero_flow_update">Zero flow update</string>
+    <string name="lucky_draw">Lucky draw</string>
     <string name="load_end">ending...</string>
 
     <string name="install">Install</string>

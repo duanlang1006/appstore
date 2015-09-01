@@ -7,6 +7,7 @@
     <string name="upgrade_manager">应用升级</string>
     <string name="logo_manager">我的一天</string>
     <string name="zero_flow_update">零流量更新</string>
+    <string name="lucky_draw">幸运抽奖</string>
     <string name="manager_catergory_title">管理</string>
     <string name="install">安装</string>
 </resources>
