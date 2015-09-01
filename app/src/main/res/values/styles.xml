@@ -29,6 +29,7 @@
         <item name="searchViewStyle">@style/MySearchViewStyle</item>
         <item name="actionBarStyle">@style/MyActionBarStyle</item>
         <item name="actionOverflowButtonStyle">@style/MyActionBarOverflow</item>
+        <item name="actionBarTabStyle">@style/MyActionBarTabStyle</item>
         <!--<item name="android:buttonStyle">@style/App.ButtonStyle</item>-->
         <!--<item name="actionButtonStyle">@style/MyActionButtonStyle</item>-->
     </style>
@@ -47,11 +48,11 @@
     </style>
     <style name="MySearchViewStyle" parent="Widget.AppCompat.Light.SearchView"></style>
 
-    <style name="MyActionBarStyle" parent="Widget.AppCompat.Light.ActionBar">
+    <style name="MyActionBarStyle" parent="Widget.AppCompat.Light.ActionBar.Solid">
         <item name="background">@drawable/action_bar_bg_light</item>
     </style>
 
-    <style name="MyActionBarTabStyle" parent="Widget.AppCompat.Light.ActionBar.TabBar">
+    <style name="MyActionBarTabStyle" parent="Widget.AppCompat.Light.ActionBar.TabView">
         <item name="background">@drawable/action_bar_bg_light</item>
     </style>
 
