@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.applite.similarview.SimilarView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_marginLeft="10dp"
+    android:layout_marginTop="10dp"
+    android:layout_gravity="center"
+    android:layout_height="match_parent">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/similar_title"
+        android:layout_marginBottom="5dp"
+        android:text="猜你喜欢"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <GridView
+        android:id="@+id/similar_grid"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:horizontalSpacing="1dp"
+        android:listSelector="@color/transparent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:numColumns="4"
+        android:verticalSpacing="1dp"/>
+</com.applite.similarview.SimilarView>

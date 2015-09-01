@@ -7,7 +7,7 @@
     tools:context="com.mit.appliteupdate.main.UpdateFragment">
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -34,7 +34,7 @@
     <LinearLayout
         android:id="@+id/update_loading_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <ImageView
@@ -56,12 +56,11 @@
 
     <ListView
         android:id="@+id/update_listview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/background_main"
         android:divider="@color/transparent"
         android:visibility="gone"></ListView>
-
 
     <RelativeLayout
         android:id="@+id/update_stats"
@@ -104,6 +103,5 @@
             android:textColor="#ff585858"
             android:textSize="14sp" />
     </RelativeLayout>
-
 
 </LinearLayout>

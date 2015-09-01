@@ -144,6 +144,28 @@ public class AppliteUtils {
     }
 
     /**
+     * @param infos
+     * @return
+     */
+    public static String encodePackages(List<PackageInfo> infos) {
+        JSONArray array = new JSONArray();
+        for (PackageInfo pi : infos) {
+            try {
+                JSONObject object = new JSONObject();
+                String pi_packageName = pi.packageName;
+                int pi_versionCode = pi.versionCode;
+                object.put("apk_packagename", pi_packageName);
+                object.put("apk_versioncode", pi_versionCode);
+                array.put(object);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return array.toString();
+    }
+
+
+    /**
      * 设置文字
      *
      * @param mContext

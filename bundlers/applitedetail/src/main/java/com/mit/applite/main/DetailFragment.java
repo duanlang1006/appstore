@@ -36,6 +36,7 @@ import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.similarview.SimilarAdapter;
 import com.applite.similarview.SimilarBean;
+import com.applite.similarview.SimilarView;
 import com.applite.view.ProgressButton;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
@@ -102,8 +103,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private int CONTENT_STATE = COLLAPSIBLE_STATE_NONE;
     private int UPDATE_LOG_STATE = COLLAPSIBLE_STATE_NONE;
     private Handler mHandler = new Handler();
-    private List<SimilarBean> mSimilarData = new ArrayList<SimilarBean>();
-    private GridView mGridView;
     private BitmapUtils bitmapUtils;
     private List<View> mDetailImgList = new ArrayList<View>();
     private LinearLayout mHorDefaultLayout;
@@ -111,6 +110,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private LinearLayout mTagLayout1;
     private TextView mTagTitleView;
     private LinearLayout mTagLayout2;
+
+    private List<SimilarBean> mSimilarData = new ArrayList<SimilarBean>();
+    private SimilarView mSimilarView;
 
     public static Bundle newBundle(String packageName, String name, String imgUrl) {
         Bundle b = new Bundle();
@@ -247,8 +249,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
         mHorDefaultLayout = (LinearLayout) rootView.findViewById(R.id.detail_hor_default_layout);
 
-        mGridView = (GridView) rootView.findViewById(R.id.detail_gridview);
-        mGridView.setFocusable(false);
+        mSimilarView = (SimilarView) rootView.findViewById(R.id.similar_view);
 
         mTagStateLayout = (LinearLayout) rootView.findViewById(R.id.detail_state_tag_layout);
         mTagTitleView = (TextView) rootView.findViewById(R.id.detail_tag_title);
@@ -424,22 +425,21 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
             if (!mSimilarData.isEmpty())
                 mSimilarData.clear();
-            JSONArray similar_json = new JSONArray(similar_info);
-            SimilarBean similarBean = null;
-            if (similar_json.length() != 0 && similar_json != null) {
-                for (int i = 0; i < 4; i++) {
-                    similarBean = new SimilarBean();
-                    JSONObject obj = new JSONObject(similar_json.get(i).toString());
-                    similarBean.setmName(obj.getString("name"));
-                    similarBean.setmPackageName(obj.getString("packageName"));
-                    similarBean.setmImgUrl(obj.getString("iconUrl"));
-                    similarBean.setmDownloadUrl(obj.getString("rDownloadUrl"));
-                    similarBean.setmVersionCode(obj.getInt("versionCode"));
-                    mSimilarData.add(similarBean);
+                JSONArray similar_json = new JSONArray(similar_info);
+                SimilarBean similarBean = null;
+                if (similar_json.length() != 0 && similar_json != null) {
+                    for (int i = 0; i < 4; i++) {
+                        similarBean = new SimilarBean();
+                        JSONObject obj = new JSONObject(similar_json.get(i).toString());
+                        similarBean.setName(obj.getString("name"));
+                        similarBean.setPackageName(obj.getString("packageName"));
+                        similarBean.setIconUrl(obj.getString("iconUrl"));
+                        similarBean.setrDownloadUrl(obj.getString("rDownloadUrl"));
+                        similarBean.setVersionCode(obj.getInt("versionCode"));
+                        mSimilarData.add(similarBean);
+                    }
+                    mSimilarView.setData(mSimilarData,this);
                 }
-                SimilarAdapter mSimilarAdapter = new SimilarAdapter(mActivity, mSimilarData, this);
-                mGridView.setAdapter(mSimilarAdapter);
-            }
 
             String mViewPagerUrl = null;
             String mApkTag = null;
@@ -643,7 +643,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 //        mImgUrl = bean.getmImgUrl();
 //        initActionBar();
 //        post(bean.getmPackageName());
-        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getmPackageName(), bean.getmName(), bean.getmImgUrl(), true);
+        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getPackageName(), bean.getName(), bean.getIconUrl(), true);
     }
 
     class DetailImplCallback implements ImplChangeCallback {

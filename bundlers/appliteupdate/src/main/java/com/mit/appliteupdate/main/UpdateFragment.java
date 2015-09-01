@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +16,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
-import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -29,6 +27,11 @@ import android.widget.Toast;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.applite.similarview.SimilarAdapter;
+import com.applite.similarview.SimilarBean;
+import com.applite.similarview.SimilarView;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
@@ -37,31 +40,35 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.adapter.UpdateAdapter;
-import com.mit.appliteupdate.bean.DataBean;
+import com.mit.appliteupdate.bean.ApkData;
+import com.mit.appliteupdate.bean.UpdateData;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UpdateFragment extends OSGIBaseFragment implements View.OnClickListener {
+public class UpdateFragment extends OSGIBaseFragment implements View.OnClickListener, SimilarAdapter.SimilarAPKDetailListener {
 
     private static final String TAG = "UpdateFragment";
     private View rootView;
     private TextView mAllUpdateView;
     private ListView mListView;
-    private List<DataBean> mDataContents = new ArrayList<DataBean>();
+    private List<ApkData> mUpdateApkList;
+    private SimilarView mSimilarView;
+    private List<SimilarBean> mSimilarDataList;
     private UpdateAdapter mAdapter;
     private Runnable mNotifyRunnable = new Runnable() {
-        @Override
         public void run() {
             mAdapter.notifyDataSetChanged();
         }
@@ -77,6 +84,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private ImageView mLoadView;
     private Animation LoadingAnimation;
     private String mUpdateData;
+    private Gson mGson = new Gson();
 
     public UpdateFragment() {
         super();
@@ -104,6 +112,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_update, container, false);
+        mSimilarView = (SimilarView)View.inflate(mActivity,R.layout.similar_view,null);
         initView();
         if (TextUtils.isEmpty(mUpdateData)) {
             post();
@@ -166,11 +175,11 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.update_all_update) {
-            if (!mDataContents.isEmpty()) {
+            if (null != mUpdateApkList && !mUpdateApkList.isEmpty()) {
                 MitMobclickAgent.onEvent(mActivity, "onClickButtonAllUpdate");
-                DataBean data = null;
-                for (int i = 0; i < mDataContents.size(); i++) {
-                    data = mDataContents.get(i);
+                ApkData data = null;
+                for (int i = 0; i < mUpdateApkList.size(); i++) {
+                    data = mUpdateApkList.get(i);
                     download(data);
                 }
                 mAdapter.notifyDataSetChanged();
@@ -183,6 +192,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
     }
 
+    /**
+     * 设置ActionBar
+     */
     private void initActionBar() {
         try {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
@@ -196,9 +208,13 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
     }
 
+    /**
+     * 关联控件及监听
+     */
     private void initView() {
         mAllUpdateView = (TextView) rootView.findViewById(R.id.update_all_update);
         mListView = (ListView) rootView.findViewById(R.id.update_listview);
+        mListView.addFooterView(mSimilarView);
         mStatsLayout = (RelativeLayout) rootView.findViewById(R.id.update_stats);
         mStatsImgView = (ImageView) rootView.findViewById(R.id.update_stats_img);
         mStatsTextView = (TextView) rootView.findViewById(R.id.no_network_text);
@@ -235,6 +251,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
     }
 
+    /**
+     * 发送更新请求
+     */
     private void post() {
         setLoadLayoutVisibility(View.VISIBLE);
         mPostStats = false;
@@ -270,43 +289,30 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     /**
      * 解析返回的数据
      *
-     * @param resulit
+     * @param result
      */
-    private void resolve(String resulit) {
+    private void resolve(String result) {
         if (!TextUtils.isEmpty(mUpdateData))
             setLoadLayoutVisibility(View.GONE);
         try {
-            JSONObject object = new JSONObject(resulit);
-            int app_key = object.getInt("app_key");
-            String installed_update_list = object.getString("installed_update_list");
-            DataBean bean = null;
-            if (!TextUtils.isEmpty(installed_update_list)) {
-                JSONArray array = new JSONArray(installed_update_list);
-                for (int i = 0; i < array.length(); i++) {
-                    bean = new DataBean();
-                    JSONObject obj = new JSONObject(array.get(i).toString());
-                    bean.setmName(obj.getString("name"));
-                    bean.setmVersionCode(obj.getInt("versionCode"));
-                    bean.setmVersionName(obj.getString("versionName"));
-                    bean.setmImgUrl(obj.getString("iconUrl"));
-                    bean.setmPackageName(obj.getString("packageName"));
-                    bean.setmUrl(obj.getString("rDownloadUrl"));
-                    bean.setmSize(obj.getLong("apkSize"));
-                    bean.setmMD5(obj.getString("apkMd5"));
-                    mDataContents.add(bean);
-                }
-                if (array.length() == 0) {
-                    setStatsLayoutVisibility(View.VISIBLE, mActivity.getResources().getDrawable(R.drawable.no_update));
-                    mStatsTextView.setVisibility(View.GONE);
-                    mStatsButton.setVisibility(View.GONE);
-                } else {
-                    setStatsLayoutVisibility(View.GONE, null);
-                }
-                mAdapter = new UpdateAdapter(mActivity, mDataContents);
-                mListView.setAdapter(mAdapter);
-                mListView.setVisibility(View.VISIBLE);
+            UpdateData updateData = mGson.fromJson(result,UpdateData.class);
+            if (null != updateData){
+                mUpdateApkList = updateData.getInstalled_update_list();
+                mSimilarDataList = updateData.getSimilar_info();
             }
-        } catch (JSONException e) {
+            if (null == mUpdateApkList || 0 == mUpdateApkList.size()) {
+                setStatsLayoutVisibility(View.VISIBLE, mActivity.getResources().getDrawable(R.drawable.no_update));
+                mStatsTextView.setVisibility(View.GONE);
+                mStatsButton.setVisibility(View.GONE);
+            } else {
+                setStatsLayoutVisibility(View.GONE, null);
+            }
+            mSimilarView.setData(mSimilarDataList,this);
+            mAdapter = new UpdateAdapter(mActivity, mUpdateApkList);
+            mListView.setAdapter(mAdapter);
+            mListView.setVisibility(View.VISIBLE);
+
+        } catch (Exception e) {
             e.printStackTrace();
             LogUtils.i(TAG, "更新管理返回的JSON解析失败");
         }
@@ -329,18 +335,18 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
     }
 
-    private void download(DataBean bean) {
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getmPackageName(), bean.getmPackageName(), bean.getmVersionCode());
+    private void download(ApkData bean) {
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getPackageName(), bean.getPackageName(), bean.getVersionCode());
         if (null == implInfo) {
             return;
         }
-        String path = Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getmName() + ".apk";
+        String path = Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk";
         if (!AppliteUtils.isPackageOk(mActivity, path))
             ImplHelper.updateImpl(mActivity,
                     implInfo,
-                    bean.getmUrl(),
-                    bean.getmName(),
-                    bean.getmImgUrl(),
+                    bean.getrDownloadUrl(),
+                    bean.getName(),
+                    bean.getIconUrl(),
                     path,
                     null,
                     null);
@@ -373,4 +379,8 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 //        }
     }
 
+    @Override
+    public void refreshDetail(SimilarBean similarBean) {
+        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), true);
+    }
 }

@@ -25,6 +25,7 @@ import java.util.Locale;
  */
 public class ImplHelper{
     private final static String TAG = "impl_helper";
+    private static ImplHelperRes sHelperRes = new ImplHelperRes();
 
 //    public static int getProgress(Context context,ImplInfo implInfo) {
 //        return ImplDownload.getInstance(context.getApplicationContext()).getProgress(implInfo);
@@ -629,91 +630,109 @@ public class ImplHelper{
         return bigInt.toString(16);
     }
 
+    public static boolean packageInstalled(Context context,String packageName){
+        boolean ret = false;
+        PackageManager pm = context.getPackageManager();
+        try {
+            pm.getPackageInfo(packageName, 0);
+            ret = true;
+        } catch (PackageManager.NameNotFoundException e) {
+        }
+        return ret;
+    }
+
+
     public static ImplHelperRes getImplRes(Context context,ImplInfo implInfo){
         ImplDownload implDownload = ImplDownload.getInstance(context.getApplicationContext());
         Resources mResources = context.getResources();
-        ImplHelperRes res = new ImplHelperRes();
+        sHelperRes.reset();
         if (null == implInfo){
-            return res;
+            return sHelperRes;
         }
+        String localPath = implInfo.getLocalPath();
+        String mimeType = "";
 
+        sHelperRes.progress = implDownload.getProgress(implInfo);
         switch (implInfo.getStatus()) {
             case ImplInfo.STATUS_INIT:
-                res.action = ImplInfo.ACTION_DOWNLOAD;
-                res.actionText = mResources.getString(R.string.action_install);
-                res.statusText = "";
-                res.descText = getSizeText(context, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
+                sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
+                sHelperRes.actionText = mResources.getString(R.string.action_install);
+                sHelperRes.statusText = "";
+                sHelperRes.descText = getSizeText(context, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
                 break;
             case ImplInfo.STATUS_PENDING:
-                res.action = ImplInfo.ACTION_DOWNLOAD;
-                res.actionText = mResources.getString(R.string.action_waiting);
-                res.statusText = mResources.getString(R.string.download_status_waiting);
-                res.descText = getSizeText(context, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
+                sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
+                sHelperRes.actionText = mResources.getString(R.string.action_waiting);
+                sHelperRes.statusText = mResources.getString(R.string.download_status_waiting);
+                sHelperRes.descText = getSizeText(context, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
                 break;
             case ImplInfo.STATUS_RUNNING:
-                res.action = ImplInfo.ACTION_DOWNLOAD;
-                res.actionText = mResources.getString(R.string.action_pause);
-                res.statusText = mResources.getString(R.string.download_status_running);
-                res.descText = getSizeText(context, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
-                res.progress = implDownload.getProgress(implInfo);
+                sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
+                sHelperRes.actionText = mResources.getString(R.string.action_pause);
+                sHelperRes.statusText = mResources.getString(R.string.download_status_running);
+                sHelperRes.descText = getSizeText(context, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
                 break;
             case ImplInfo.STATUS_PAUSED:
-                res.action = ImplInfo.ACTION_DOWNLOAD;
-                res.actionText = mResources.getString(R.string.action_resume);
+                sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
+                sHelperRes.actionText = mResources.getString(R.string.action_resume);
                 switch(implInfo.getCause()){
                     case ImplInfo.CAUSE_PAUSED_BY_NETWORK:
-                        res.statusText = mResources.getString(R.string.download_status_waiting_network);
+                        sHelperRes.statusText = mResources.getString(R.string.download_status_waiting_network);
                         break;
                     case ImplInfo.CAUSE_PAUSED_BY_OVERSIZE:
-                        res.statusText = mResources.getString(R.string.download_status_waiting_wlan);
+                        sHelperRes.statusText = mResources.getString(R.string.download_status_waiting_wlan);
                         break;
                     case ImplInfo.CAUSE_PAUSED_BY_APP:
                     default:
-                        res.statusText = mResources.getString(R.string.download_status_paused);
+                        sHelperRes.statusText = mResources.getString(R.string.download_status_paused);
                         break;
                 }
-                res.descText = getSizeText(context, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
+                sHelperRes.descText = getSizeText(context, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
                 break;
             case ImplInfo.STATUS_FAILED:
-                res.action = ImplInfo.ACTION_DOWNLOAD;
-                res.actionText = mResources.getString(R.string.action_retry);
-                res.statusText = mResources.getString(R.string.download_status_error);
-                res.descText = getSizeText(context, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
+                sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
+                sHelperRes.actionText = mResources.getString(R.string.action_retry);
+                sHelperRes.statusText = mResources.getString(R.string.download_status_error);
+                sHelperRes.descText = getSizeText(context, implDownload.getCurrentBytes(implInfo), implDownload.getTotalBytes(implInfo));
                 break;
 
             case ImplInfo.STATUS_SUCCESSFUL:
-                String localPath = implInfo.getLocalPath();
+                localPath = implInfo.getLocalPath();
                 if (null == localPath || TextUtils.isEmpty(localPath)) {
-                    localPath = ImplDownload.getInstance(context.getApplicationContext()).getLocalPath(implInfo);
+                    localPath = implDownload.getLocalPath(implInfo);
                 }
-                String mimeType = MimeTypeUtils.getMimeType(localPath);
-                res.action = ImplInfo.ACTION_OPEN;
-                res.actionText = mResources.getString(R.string.action_open);
-                res.statusText = mResources.getString(R.string.download_status_success);
-                res.descText = Formatter.formatFileSize(context, implDownload.getTotalBytes(implInfo));
+                if (null != localPath){
+                    mimeType = MimeTypeUtils.getMimeType(localPath);
+                }
+
+                sHelperRes.action = ImplInfo.ACTION_OPEN;
+                sHelperRes.actionText = mResources.getString(R.string.action_open);
+                sHelperRes.statusText = mResources.getString(R.string.download_status_success);
+                sHelperRes.descText = Formatter.formatFileSize(context, implDownload.getTotalBytes(implInfo));
                 //下载的是apk
-                if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
+                if (null != localPath
+                        && "application/vnd.android.package-archive".equals(mimeType)) {
                     PackageInfo archivePkg = context.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
                     if (null != archivePkg) {
-                        res.action = ImplInfo.ACTION_OPEN;
-                        res.actionIntent = getLaunchDownloadIntent(context, archivePkg.packageName);
-                        if (null == res.actionIntent) {
-                            res.actionText = mResources.getString(R.string.action_open);
+                        sHelperRes.action = ImplInfo.ACTION_OPEN;
+                        sHelperRes.actionIntent = getLaunchDownloadIntent(context, archivePkg.packageName);
+                        if (null == sHelperRes.actionIntent) {
+                            sHelperRes.actionText = mResources.getString(R.string.action_open);
                         } else {
-                            res.actionText = mResources.getString(R.string.action_open);
+                            sHelperRes.actionText = mResources.getString(R.string.action_open);
                         }
-                        res.descText = (String.format(mResources.getString(R.string.apk_version), archivePkg.versionName));
-                        res.actionIntent = getLaunchDownloadIntent(context, archivePkg.packageName);
+                        sHelperRes.descText = (String.format(mResources.getString(R.string.apk_version), archivePkg.versionName));
+                        sHelperRes.actionIntent = getLaunchDownloadIntent(context, archivePkg.packageName);
                     } else {//下载apk解析错误
-                        res.action = ImplInfo.ACTION_DOWNLOAD;
-                        res.actionText = mResources.getString(R.string.action_retry);
-                        res.statusText = mResources.getString(R.string.download_status_invalid_package);
+                        sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
+                        sHelperRes.actionText = mResources.getString(R.string.action_retry);
+                        sHelperRes.statusText = mResources.getString(R.string.download_status_invalid_package);
                     }
                 }
-                res.descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
-                if (null == res.actionIntent) {
-                    res.actionIntent = getOpenDownloadIntent(localPath, mimeType);
+                sHelperRes.descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
+                if (null == sHelperRes.actionIntent) {
+                    sHelperRes.actionIntent = getOpenDownloadIntent(localPath, mimeType);
                 }
                 break;
 
@@ -725,96 +744,97 @@ public class ImplHelper{
                     }
                     PackageInfo installed = context.getPackageManager()
                             .getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
-                    res.descText = (String.format(mResources.getString(R.string.apk_version), installed.versionName));
+                    sHelperRes.descText = (String.format(mResources.getString(R.string.apk_version), installed.versionName));
                     if (implInfo.getVersionCode() <= installed.versionCode ) {
                         //安装版本比目标版本新，需要打开
-                        res.action = ImplInfo.ACTION_OPEN;
-                        res.actionText = mResources.getString(R.string.action_open);
-                        res.statusText = mResources.getString(R.string.install_status_success);
-                        res.actionIntent = getLaunchDownloadIntent(context, implInfo.getPackageName());
+                        sHelperRes.action = ImplInfo.ACTION_OPEN;
+                        sHelperRes.actionText = mResources.getString(R.string.action_open);
+                        sHelperRes.statusText = mResources.getString(R.string.install_status_success);
+                        sHelperRes.actionIntent = getLaunchDownloadIntent(context, implInfo.getPackageName());
                     }else {
                         //目标版本比较新
                         if (null == localPath || TextUtils.isEmpty(localPath)) {
                             //但是apk文件不存在，需要下载
-                            res.action = ImplInfo.ACTION_DOWNLOAD;
-                            res.actionText = mResources.getString(R.string.action_upgrade);
+                            sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
+                            sHelperRes.actionText = mResources.getString(R.string.action_upgrade);
                         }else{
-                            res.action = ImplInfo.ACTION_DOWNLOAD;
-                            res.actionText = mResources.getString(R.string.action_upgrade);
+                            sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
+                            sHelperRes.actionText = mResources.getString(R.string.action_upgrade);
                             PackageInfo archivePkg = context.getPackageManager()
                                     .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
                             if (null != archivePkg) {
                                 if (archivePkg.versionCode <= installed.versionCode){
                                     //apk文件存在，但是apk的版本较旧，需要下载
-                                    res.action = ImplInfo.ACTION_DOWNLOAD;
-                                    res.actionText = mResources.getString(R.string.action_upgrade);
+                                    sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
+                                    sHelperRes.actionText = mResources.getString(R.string.action_upgrade);
                                 }else{
                                     //否则需要打开安装
-                                    res.action = ImplInfo.ACTION_OPEN;
-                                    res.actionText = mResources.getString(R.string.action_open);
-                                    res.actionIntent = getOpenDownloadIntent(localPath,MimeTypeUtils.getMimeType(localPath));
+                                    sHelperRes.action = ImplInfo.ACTION_OPEN;
+                                    sHelperRes.actionText = mResources.getString(R.string.action_open);
+                                    sHelperRes.actionIntent = getOpenDownloadIntent(localPath,MimeTypeUtils.getMimeType(localPath));
                                 }
                             }else{
-                                res.actionText = mResources.getString(R.string.action_retry);
-                                res.statusText = mResources.getString(R.string.download_status_invalid_package);
-                                res.descText = Formatter.formatFileSize(context, implDownload.getTotalBytes(implInfo));
+                                sHelperRes.actionText = mResources.getString(R.string.action_upgrade);
+                                sHelperRes.statusText = mResources.getString(R.string.install_status_success);
                             }
                         }
                     }
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
-                    res.action = ImplInfo.ACTION_DOWNLOAD;
-                    res.actionText = mResources.getString(R.string.action_retry);
-                    res.statusText = mResources.getString(R.string.download_status_invalid_package);
-                    res.descText = Formatter.formatFileSize(context, implDownload.getTotalBytes(implInfo));
+                    sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
+                    sHelperRes.actionText = mResources.getString(R.string.action_retry);
+                    sHelperRes.statusText = mResources.getString(R.string.download_status_invalid_package);
+                    sHelperRes.descText = Formatter.formatFileSize(context, implDownload.getTotalBytes(implInfo));
                 }
-                res.descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
+                sHelperRes.descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
                 break;
 
 
             case ImplInfo.STATUS_PRIVATE_INSTALLING:
             case ImplInfo.STATUS_NORMAL_INSTALLING:
-                res.action = ImplInfo.ACTION_INSTALL;
-                res.actionText = mResources.getString(R.string.action_open);
-                res.statusText = mResources.getString(R.string.install_status_installing);
-                res.descText = Formatter.formatFileSize(context, implDownload.getTotalBytes(implInfo));
-                res.descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
+                sHelperRes.action = ImplInfo.ACTION_INSTALL;
+                sHelperRes.actionText = mResources.getString(R.string.action_open);
+                sHelperRes.statusText = mResources.getString(R.string.install_status_installing);
+                sHelperRes.descText = Formatter.formatFileSize(context, implDownload.getTotalBytes(implInfo));
+                sHelperRes.descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
 
                 localPath = implInfo.getLocalPath();
                 if (null == localPath || TextUtils.isEmpty(localPath)) {
                     localPath = implDownload.getLocalPath(implInfo);
                 }
-                mimeType = MimeTypeUtils.getMimeType(localPath);
+                if (null != localPath) {
+                    mimeType = MimeTypeUtils.getMimeType(localPath);
+                }
                 //下载的是apk
                 if ("application/vnd.android.package-archive".equals(mimeType) && null != localPath) {
                     PackageInfo archivePkg = context.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
                     if (null != archivePkg) {
-                        res.actionIntent = getLaunchDownloadIntent(context, archivePkg.packageName);
+                        sHelperRes.actionIntent = getLaunchDownloadIntent(context, archivePkg.packageName);
                     }
                 }
-                if (null == res.actionIntent) {
-                    res.actionIntent = getOpenDownloadIntent(localPath, mimeType);
+                if (null == sHelperRes.actionIntent) {
+                    sHelperRes.actionIntent = getOpenDownloadIntent(localPath, mimeType);
                 }
                 break;
 
             case ImplInfo.STATUS_PACKAGE_INVALID:
-                res.action = ImplInfo.ACTION_DOWNLOAD;
-                res.actionText = mResources.getString(R.string.action_retry);
-                res.statusText = mResources.getString(R.string.download_status_invalid_package);
-                res.descText = Formatter.formatFileSize(context, implDownload.getTotalBytes(implInfo));
-                res.descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
+                sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
+                sHelperRes.actionText = mResources.getString(R.string.action_retry);
+                sHelperRes.statusText = mResources.getString(R.string.download_status_invalid_package);
+                sHelperRes.descText = Formatter.formatFileSize(context, implDownload.getTotalBytes(implInfo));
+                sHelperRes.descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
                 break;
 
             case ImplInfo.STATUS_INSTALL_FAILED:
-                res.action = ImplInfo.ACTION_DOWNLOAD;
-                res.actionText = mResources.getString(R.string.action_retry);
-                res.statusText = mResources.getString(R.string.install_status_failed);
-                res.descText = Formatter.formatFileSize(context, implDownload.getTotalBytes(implInfo));
-                res.descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
+                sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
+                sHelperRes.actionText = mResources.getString(R.string.action_retry);
+                sHelperRes.statusText = mResources.getString(R.string.install_status_failed);
+                sHelperRes.descText = Formatter.formatFileSize(context, implDownload.getTotalBytes(implInfo));
+                sHelperRes.descText += ("|" + millis2FormatString("yy-MM-dd", implInfo.getLastMod()));
                 break;
         }
-        return res;
+        return sHelperRes;
     }
 
     public static class ImplHelperRes{
@@ -826,6 +846,10 @@ public class ImplHelper{
         private int progress;
 
         public ImplHelperRes() {
+            reset();
+        }
+
+        public void reset(){
             action = ImplInfo.ACTION_DOWNLOAD;
             actionText = "";
             statusText = "";
