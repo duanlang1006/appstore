@@ -50,8 +50,8 @@ public class CustomProgressBar extends ImageButton {
         paint.setFilterBitmap(false);
         int x = 0;
         int y = 0;
-        int sc = canvas.saveLayer(x, y, x + background.getWidth(), y + background.getHeight(), null,
-                Canvas.MATRIX_SAVE_FLAG | Canvas.CLIP_SAVE_FLAG
+        int sc = canvas.saveLayer(x, y, x + background.getWidth(), y + background.getHeight(),
+                null,Canvas.MATRIX_SAVE_FLAG | Canvas.CLIP_SAVE_FLAG
                         | Canvas.HAS_ALPHA_LAYER_SAVE_FLAG
                         | Canvas.FULL_COLOR_LAYER_SAVE_FLAG
                         | Canvas.CLIP_TO_LAYER_SAVE_FLAG);

@@ -319,10 +319,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     }
 
     private void initializeView(View view) {
-        if (null == actionBar) {
-            actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();//得到ActionBar
+        if (null == lp_top) {
+//            actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();//得到ActionBar
             lp_top = new WindowManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    actionBar.getHeight(),
+                    mActivity.getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material),
                     WindowManager.LayoutParams.TYPE_APPLICATION,
                     // 设置为无焦点状态
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE

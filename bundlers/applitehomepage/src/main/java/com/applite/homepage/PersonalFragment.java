@@ -39,7 +39,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
         view.findViewById(R.id.action_logo).setOnClickListener(this);
         view.findViewById(R.id.action_setting).setOnClickListener(this);
         view.findViewById(R.id.action_lucky).setOnClickListener(this);
-                mSetWifiUpdateView = (ImageView) view.findViewById(R.id.zero_flow_update);
+        mSetWifiUpdateView = (ImageView) view.findViewById(R.id.zero_flow_update);
         mSetWifiUpdateView.setOnClickListener(this);
         setWifiUpdateViewState();
         initActionBar();
@@ -105,7 +105,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.action_search == item.getItemId()) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(true, null, null);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, null, null);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -125,7 +125,6 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
                     !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, true));
             setWifiUpdateViewState();
         } else if (R.id.action_setting == v.getId()) {
-            //
             ((OSGIServiceHost) mActivity).jumptoSetting(true);
         } else if (R.id.action_lucky == v.getId()) {
             ((OSGIServiceHost) mActivity).jumptoLucky(true);

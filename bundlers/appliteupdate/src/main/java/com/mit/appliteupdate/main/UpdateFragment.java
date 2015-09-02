@@ -351,33 +351,6 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                     path,
                     null,
                     null);
-//        implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());
-//        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
-//            switch (implInfo.getStatus()) {
-//                case ImplInfo.STATUS_PENDING:
-//                case ImplInfo.STATUS_RUNNING:
-//                    break;
-//                case ImplInfo.STATUS_PAUSED:
-//                    implAgent.resumeDownload(implInfo, null);
-//                    break;
-//                case ImplInfo.STATUS_NORMAL_INSTALLING:
-//                case ImplInfo.STATUS_PRIVATE_INSTALLING:
-//                    //正在安装或已安装
-////                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
-//                    break;
-//                case ImplInfo.STATUS_INSTALLED:
-//                default:
-//                    implAgent.newDownload(implInfo,
-//                            bean.getmUrl(),
-//                            bean.getmName(),
-//                            bean.getmImgUrl(),
-//                            Constant.extenStorageDirPath,
-//                            bean.getmName() + ".apk",
-//                            true,
-//                            null);
-//                    break;
-//            }
-//        }
     }
 
     @Override

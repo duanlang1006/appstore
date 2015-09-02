@@ -110,6 +110,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private LinearLayout mTagLayout1;
     private TextView mTagTitleView;
     private LinearLayout mTagLayout2;
+    private int mWidthPixels;
+    private int mHeightPixels;
 
     private List<SimilarBean> mSimilarData = new ArrayList<SimilarBean>();
     private SimilarView mSimilarView;
@@ -145,6 +147,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
+        DisplayMetrics mDisplayMetrics = new DisplayMetrics();
+        mActivity.getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
+        mWidthPixels = mDisplayMetrics.widthPixels;
+        mHeightPixels = mDisplayMetrics.heightPixels;
     }
 
     @Override
@@ -317,9 +323,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        LogUtils.d(TAG,"onCreateOptionsMenu");
+        LogUtils.d(TAG, "onCreateOptionsMenu");
         MenuItem item = menu.findItem(R.id.action_search);
-        if (null != item){
+        if (null != item) {
             return;
         }
 
@@ -333,7 +339,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.action_search == item.getItemId()) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(true, null, null);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, null, null);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -395,7 +401,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
-                LogUtils.i(TAG, "应用详情网络请求成功");
+                LogUtils.i(TAG, "应用详情网络请求成功:" + responseInfo.result);
                 setData(responseInfo.result);
             }
 
@@ -427,21 +433,21 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
             if (!mSimilarData.isEmpty())
                 mSimilarData.clear();
-                JSONArray similar_json = new JSONArray(similar_info);
-                SimilarBean similarBean = null;
-                if (similar_json.length() != 0 && similar_json != null) {
-                    for (int i = 0; i < 4; i++) {
-                        similarBean = new SimilarBean();
-                        JSONObject obj = new JSONObject(similar_json.get(i).toString());
-                        similarBean.setName(obj.getString("name"));
-                        similarBean.setPackageName(obj.getString("packageName"));
-                        similarBean.setIconUrl(obj.getString("iconUrl"));
-                        similarBean.setrDownloadUrl(obj.getString("rDownloadUrl"));
-                        similarBean.setVersionCode(obj.getInt("versionCode"));
-                        mSimilarData.add(similarBean);
-                    }
-                    mSimilarView.setData(mSimilarData,this);
+            JSONArray similar_json = new JSONArray(similar_info);
+            SimilarBean similarBean = null;
+            if (similar_json.length() != 0 && similar_json != null) {
+                for (int i = 0; i < 4; i++) {
+                    similarBean = new SimilarBean();
+                    JSONObject obj = new JSONObject(similar_json.get(i).toString());
+                    similarBean.setName(obj.getString("name"));
+                    similarBean.setPackageName(obj.getString("packageName"));
+                    similarBean.setIconUrl(obj.getString("iconUrl"));
+                    similarBean.setrDownloadUrl(obj.getString("rDownloadUrl"));
+                    similarBean.setVersionCode(obj.getInt("versionCode"));
+                    mSimilarData.add(similarBean);
                 }
+                mSimilarView.setData(mSimilarData, this);
+            }
 
             String mViewPagerUrl = null;
             String mApkTag = null;
@@ -469,8 +475,12 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 //                    mBitmapUtil.display(mApkImgView, mImgUrl);
                     mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size) + " | " + developer);
                 }
-                LogUtils.i(TAG, "应用介绍：" + mDescription);
-                mApkContentView.setText(mDescription);
+//                LogUtils.i(TAG, "应用介绍：" + mDescription);
+                if (TextUtils.isEmpty(mDescription)) {
+                    mApkContentView.setText(mActivity.getResources().getText(R.string.no_app_detail));
+                } else {
+                    mApkContentView.setText(mDescription);
+                }
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -483,7 +493,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     }
                 }, 500);
 
-                LogUtils.i(TAG, "更新日志：" + mDescription);
+//                LogUtils.i(TAG, "更新日志：" + mDescription);
                 if (TextUtils.isEmpty(mUpdateLog)) {
                     mUpdateLogView.setText(mActivity.getResources().getText(R.string.no_update_log));
                 } else {
@@ -510,7 +520,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
             ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName, mVersionCode);
             if (null != implinfo) {
-                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity,implinfo);
+                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity, implinfo);
                 implAgent.setImplCallback(implCallback, implinfo);
                 implinfo.setDownloadUrl(mDownloadUrl).setIconUrl(mImgUrl).setTitle(mName);
                 mProgressButton.setText(res.getActionText());
@@ -547,11 +557,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             mTagStateLayout.setVisibility(View.VISIBLE);
             String[] mApkTagList = apkTag.split(",");
 
-            DisplayMetrics mDisplayMetrics = new DisplayMetrics();
-            mActivity.getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
-            int W = mDisplayMetrics.widthPixels;//屏幕宽度
-
-            int mTagLayoutWidth = W - 20;
+            int mTagLayoutWidth = mWidthPixels - 20;
             LogUtils.d(TAG, "mTagLayoutWidth：" + mTagLayoutWidth);
 
             int[] mTagWidthList = new int[mApkTagList.length];//标签的宽度
@@ -563,7 +569,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 mTagView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        ((OSGIServiceHost) mActivity).jumptoSearch(mTagView.getText().toString(), true, null, null);
                     }
                 });
 
@@ -655,7 +661,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         }
 
         private void refresh(ImplInfo info) {
-            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity,info);
+            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity, info);
             LogUtils.d(TAG, "refresh" + res.getActionText() + "," + info.getStatus());
             mProgressButton.setText(res.getActionText());
             mProgressButton.setProgress(res.getProgress());

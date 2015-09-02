@@ -226,7 +226,7 @@ public class NetworkReceiver extends BroadcastReceiver {
                 bean.getName(),
                 bean.getIconUrl(),
                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
-                null,
+                bean.getApkMd5(),
                 null);
 
 //        implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());

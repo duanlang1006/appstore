@@ -14,7 +14,6 @@
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:choiceMode="singleChoice"
-        android:divider="@color/action_bar_tab_text_color_normal_light"
         android:dividerHeight="1dp" />
 
     <TextView
