@@ -17,29 +17,6 @@
         android:layout_alignParentLeft="true"
         android:layout_weight="0"/>
 
-    <!--<TextView-->
-        <!--android:id="@+id/action_tabs"-->
-        <!--android:layout_width="48dp"-->
-        <!--android:layout_height="48dp"-->
-        <!--android:layout_weight="1"-->
-        <!--android:gravity="center_vertical"-->
-        <!--android:layout_marginLeft="5dp"-->
-        <!--android:layout_marginRight="5dp"-->
-        <!--android:background="@android:color/white"-->
-        <!--android:hint="I'm search view"/>-->
-
-    <LinearLayout
-        android:id="@+id/action_title"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="0.55"
-        android:layout_toLeftOf="@+id/action_search"
-        android:layout_toRightOf="@+id/action_personal"
-        android:layout_toEndOf="@+id/action_personal">
-    </LinearLayout>
-
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

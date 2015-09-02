@@ -27,19 +27,17 @@ import java.util.List;
 public class SimilarAdapter extends BaseAdapter {
 
     private final Context mContext;
-    private final List<SimilarBean> mSimilarBeans;
+    private List<SimilarBean> mSimilarBeans;
     private final BitmapUtils mBitmapUtil;
     private final ImplAgent implAgent;
-    private final SimilarAPKDetailListener mSimilarAPKDetailListener;
+    private SimilarAPKDetailListener mSimilarAPKDetailListener;
 
     public interface SimilarAPKDetailListener {
         void refreshDetail(SimilarBean bean);
     }
 
-    public SimilarAdapter(Context context, List<SimilarBean> data, SimilarAPKDetailListener listener) {
+    public SimilarAdapter(Context context) {
         mContext = context;
-        mSimilarBeans = data;
-        mSimilarAPKDetailListener = listener;
         mBitmapUtil = BitmapHelper.getBitmapUtils(mContext.getApplicationContext());
         implAgent = ImplAgent.getInstance(mContext.getApplicationContext());
     }
@@ -73,8 +71,8 @@ public class SimilarAdapter extends BaseAdapter {
         final SimilarBean data = mSimilarBeans.get(position);
 
         viewholder.initView(data);
-        mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
-        viewholder.mName.setText(data.getmName());
+        mBitmapUtil.display(viewholder.mImg, data.getIconUrl());
+        viewholder.mName.setText(data.getName());
         viewholder.mImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,10 +86,10 @@ public class SimilarAdapter extends BaseAdapter {
                 ViewHolder vh = (ViewHolder) v.getTag();
                 ImplHelper.onClick(mContext,
                         vh.implInfo,
-                        data.getmDownloadUrl(),
-                        data.getmName(),
-                        data.getmImgUrl(),
-                        Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + data.getmName() + ".apk",
+                        data.getrDownloadUrl(),
+                        data.getName(),
+                        data.getIconUrl(),
+                        Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + data.getName() + ".apk",
                         null,
                         vh);
 //                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
@@ -122,7 +120,12 @@ public class SimilarAdapter extends BaseAdapter {
         return convertView;
     }
 
-    class ViewHolder implements ImplChangeCallback{
+    public void setData(List<SimilarBean> data, SimilarAPKDetailListener listener){
+        mSimilarBeans = data;
+        mSimilarAPKDetailListener = listener;
+    }
+
+    class ViewHolder implements ImplChangeCallback {
         private TextView mName;
         private ImageView mImg;
         private TextView mTv;
@@ -137,10 +140,9 @@ public class SimilarAdapter extends BaseAdapter {
 
         public void initView(SimilarBean data) {
             this.bean = data;
-            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName()/*, data.getmVersionCode()*/);
-            ;
+            this.implInfo = implAgent.getImplInfo(data.getPackageName(), data.getPackageName(), data.getVersionCode());
             if (null != this.implInfo) {
-                this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
+                this.implInfo.setDownloadUrl(data.getrDownloadUrl()).setIconUrl(data.getIconUrl()).setTitle(data.getName());
                 implAgent.setImplCallback(this, implInfo);
             }
             mTv.setTag(this);
@@ -153,18 +155,19 @@ public class SimilarAdapter extends BaseAdapter {
 
         void initProgressButton() {
             if (null != mTv && null != this.implInfo) {
+                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext,implInfo);
                 switch (implInfo.getStatus()) {
                     case ImplInfo.STATUS_PENDING:
-                        mTv.setText(ImplHelper.getActionText(mContext,implInfo));
+                        mTv.setText(res.getActionText());
                         break;
                     case ImplInfo.STATUS_RUNNING:
-                        mTv.setText(ImplHelper.getProgress(mContext,implInfo) + "%");
+                        mTv.setText(res.getProgress() + "%");
                         break;
                     case ImplInfo.STATUS_PAUSED:
-                        mTv.setText(ImplHelper.getStatusText(mContext,implInfo));
+                        mTv.setText(res.getStatusText());
                         break;
                     default:
-                        mTv.setText(ImplHelper.getActionText(mContext,implInfo));
+                        mTv.setText(res.getActionText());
                         break;
                 }
             }

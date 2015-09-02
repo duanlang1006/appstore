@@ -2,6 +2,9 @@ package com.mit.impl.download;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Handler;
+import android.os.Looper;
+
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.db.converter.ColumnConverter;
@@ -90,12 +93,12 @@ public class DownloadManager {
         HttpHandler<File> handler = http.download(url, target, autoResume, autoRename, new ManagerCallBack(downloadInfo, callback));
         downloadInfo.setHandler(handler);
         downloadInfo.setState(handler.getState());
-        if (null != callback){
-            callback.onPending();
-        }
-
         downloadInfoList.add(downloadInfo);
         db.saveBindingId(downloadInfo);
+
+        if (null != callback) {
+            callback.onEnqued(downloadInfo.getId());
+        }
         return downloadInfo;
     }
 
@@ -115,10 +118,11 @@ public class DownloadManager {
                 new ManagerCallBack(downloadInfo, callback));
         downloadInfo.setHandler(handler);
         downloadInfo.setState(handler.getState());
-        if (null != callback ){
+        db.saveOrUpdate(downloadInfo);
+
+        if (null != callback){
             callback.onPending();
         }
-        db.saveOrUpdate(downloadInfo);
     }
 
     public void removeDownload(int index) throws DbException {
@@ -132,7 +136,7 @@ public class DownloadManager {
             if (!handler.isCancelled()) {
                 handler.cancel();
             }else{
-                RequestCallBack callback = handler.getRequestCallBack();
+                final RequestCallBack callback = handler.getRequestCallBack();
                 if (null != callback){
                     callback.onCancelled();
                 }
@@ -149,24 +153,23 @@ public class DownloadManager {
 
     public void stopDownload(DownloadInfo downloadInfo,final RequestCallBack<File> baseCallback) throws DbException {
         HttpHandler<File> handler = downloadInfo.getHandler();
+        RequestCallBack<File> callbackImpl = null;
         if (handler != null) {
             if (!handler.isCancelled()) {
                 handler.cancel();
             }else{
                 RequestCallBack callback = handler.getRequestCallBack();
-                if (null != callback){
-                    callback.onCancelled();
-                }else if (null != baseCallback){
-                    baseCallback.onCancelled();
-                }
+                callbackImpl = (null != callback)?callback:baseCallback;
             }
         } else {
             downloadInfo.setState(HttpHandler.State.CANCELLED);
-            if (null != baseCallback){
-                baseCallback.onCancelled();
-            }
+            callbackImpl = baseCallback;
         }
         db.saveOrUpdate(downloadInfo);
+
+        if (null != callbackImpl) {
+            callbackImpl.onCancelled();
+        }
     }
 
     public void stopAllDownload() throws DbException {

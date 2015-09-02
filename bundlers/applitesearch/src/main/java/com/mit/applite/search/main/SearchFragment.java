@@ -153,6 +153,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             }
         }
     };
+
+    private String mInfo;
+    private String mKeyword;
     private TextView mMoreText;
     private ProgressBar mMoreProgressBar;
     private LayoutInflater mInflater;
@@ -168,12 +171,14 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 
         @Override
         public void run() {
-            mEtView.setHint(mHint[HINT_SHOW_NUMBER]);
-            mHandler.postDelayed(this, HINT_UPDATE_TIME);
-            if (HINT_SHOW_NUMBER < mHint.length - 1) {
-                HINT_SHOW_NUMBER = HINT_SHOW_NUMBER + 1;
-            } else {
-                HINT_SHOW_NUMBER = 0;
+            if (null != mHint && mHint.length != 0) {
+                mEtView.setHint(mHint[HINT_SHOW_NUMBER]);
+                mHandler.postDelayed(this, HINT_UPDATE_TIME);
+                if (HINT_SHOW_NUMBER < mHint.length - 1) {
+                    HINT_SHOW_NUMBER = HINT_SHOW_NUMBER + 1;
+                } else {
+                    HINT_SHOW_NUMBER = 0;
+                }
             }
         }
     };
@@ -183,9 +188,12 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         super();
     }
 
-    public static Bundle newBundle(String DetailTag) {
+
+    public static Bundle newBundle(String DetailTag, String info, String keyword) {
         Bundle b = new Bundle();
         b.putString("DetailTag", DetailTag);
+        b.putString("info", info);
+        b.putString("keyword", keyword);
         return b;
     }
 
@@ -197,6 +205,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         if (null != params) {
             mDetailTag = params.getString("DetailTag");
             LogUtils.i(TAG, "mDetailTag:" + mDetailTag);
+            this.mInfo = params.getString("info");
+            this.mKeyword = params.getString("keyword");
+            LogUtils.i(TAG, "mKeyword = " + mKeyword + " mInfo = " + mInfo);
         }
     }
 
@@ -215,8 +226,12 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         initView();
         if (TextUtils.isEmpty(mDetailTag)) {
             initActionBar();
-            if (mHotWordBeans.size() == 0)
+            if (TextUtils.isEmpty(mInfo))
                 postHotWord();
+            else
+                resolve(mInfo);
+            if (!TextUtils.isEmpty(mKeyword))
+                mEtViewModifyPostSearch(mKeyword, false);
         } else {
             initDetailTagActionBar();
             isHotWordLayoutVisibility(View.GONE);
@@ -225,7 +240,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             mLoadingLayout.setVisibility(View.VISIBLE);
             postDetailTag();
         }
-
         return rootView;
     }
 
@@ -255,6 +269,10 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         MenuItem item = menu.findItem(R.id.action_search);
         if (null != item) {
             item.setVisible(false);
+        }
+        MenuItem item_dm = menu.findItem(R.id.action_dm);
+        if (null != item_dm) {
+            item_dm.setVisible(false);
         }
     }
 
@@ -323,6 +341,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             actionBar.setCustomView(customView);
             actionBar.show();
         } catch (Exception e) {
@@ -526,6 +545,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         isShowPreload = showPreload;
         if (!showPreload) {
             closeKeyboard();
+            LogUtils.i(TAG, "searchName = " + searchName);
             mEtView.setText(searchName);
             if (searchName.length() < 21) {
                 mEtView.setSelection(searchName.length());
@@ -672,7 +692,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "search");
-        params.addBodyParameter("protocol_version", "1.0");
+        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
         params.addBodyParameter("key", name);
         params.addBodyParameter("key_type", "search_name");
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
@@ -754,6 +774,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "hot_word");
+        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {

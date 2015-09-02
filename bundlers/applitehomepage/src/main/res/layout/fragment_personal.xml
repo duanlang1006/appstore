@@ -113,7 +113,7 @@
             android:layout_height="50dp"
             android:layout_marginLeft="18dp"
             android:gravity="center_vertical"
-            android:src="@drawable/icon_download_list" />
+            android:src="@drawable/icon_favorite" />
 
         <TextView
             style="@style/personalListText"
@@ -178,4 +178,36 @@
         android:layout_marginLeft="18dp"
         android:layout_marginRight="12dp"
         android:background="@color/dividing_line" />
+
+    <RelativeLayout
+        android:id="@+id/action_lucky"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/lucky_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginLeft="18dp"
+            android:gravity="center_vertical"
+            android:src="@drawable/icon_favorite" />
+
+        <TextView
+            style="@style/personalListText"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginRight="2dp"
+            android:layout_toRightOf="@+id/lucky_icon"
+            android:gravity="center_vertical"
+            android:text="@string/lucky_draw" />
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="0.3dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="12dp"
+        android:background="@color/dividing_line" />
+
 </LinearLayout>

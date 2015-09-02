@@ -2,12 +2,15 @@ package com.applite.homepage;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.internal.view.SupportMenu;
 import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.ViewPager;
@@ -27,6 +30,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -44,6 +48,12 @@ import com.applite.utils.SPUtils;
 import net.tsz.afinal.FinalBitmap;
 
 import com.google.gson.Gson;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
 import com.osgi.extra.OSGIBaseFragment;
@@ -63,9 +73,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by yuzhimin on 6/17/15.
- */
+
 public class HomePageFragment extends OSGIBaseFragment implements View.OnClickListener {
     private final String TAG = "homepage_PagerFragment";
     private View popView;
@@ -102,13 +110,17 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private boolean refreshflag;
     private String whichPage;
 
+    private HttpUtils mHttpUtils;
+
+    private HomePageListFragment mHomePageListFragment;
+
     private ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
         private int prePosition = -1;
 
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             if (prePosition != position) {
-                LogUtils.d(TAG, "onPageScrolled" + position);
+                LogUtils.d(TAG, "onPageScrolled : " + position);
                 prePosition = position;
                 MitMobclickAgent.onEvent(mActivity, HomePageListFragment.class.getSimpleName() + position + "_onScrolled");
             }
@@ -116,12 +128,14 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         @Override
         public void onPageSelected(int position) {
-
+            LogUtils.d(TAG, "onPageSelected : " + position);
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+            actionBar.setSelectedNavigationItem(position);
         }
 
         @Override
         public void onPageScrollStateChanged(int state) {
-
+            LogUtils.d(TAG, "onPageScrollStateChanged : " + state);
         }
     };
 
@@ -175,6 +189,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         LogUtils.d(TAG, "onAttach ");
+        mHttpUtils = new HttpUtils();
         mInflater = LayoutInflater.from(mActivity);
         Bundle params = getArguments();
         if (null != params) {
@@ -245,17 +260,18 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity, container, false);
-        initActionBar();
+//        initActionBar();
         if (null == mPageData) {
             mViewPager.setVisibility(View.GONE);
             httpRequest();
         } else {
             mViewPager.setVisibility(View.VISIBLE);
         }
+        initActionBar();
         mPagerSlidingTabStrip.setViewPager(mViewPager);
         mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         popupWindowPost();
-
+        postSearchHint();
         return rootView;
     }
 
@@ -287,16 +303,31 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
+        mHomePageListFragment = (HomePageListFragment) getChildFragmentManager().findFragmentById(R.id.pager);
         if (!hidden) {
             LogUtils.i(TAG, "重新显示ActionBar");
             initActionBar();
 //            mActivity.runOnUiThread(mRefreshRunnable);
+
+            if (mHomePageListFragment != null) {
+                LogUtils.i(TAG, "mHomePageListFragment = " + mHomePageListFragment);
+                mHomePageListFragment.play(true);
+            } else {
+                LogUtils.i(TAG, "mHomePageListFragment = null");
+            }
+
         } else {
             try {
                 ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
                 actionBar.setHomeAsUpIndicator(mActivity.getResources().getDrawable(R.drawable.action_bar_back_light));
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+            if (mHomePageListFragment != null) {
+                LogUtils.i(TAG, "mHomePageListFragment = " + mHomePageListFragment);
+                mHomePageListFragment.play(false);
+            } else {
+                LogUtils.i(TAG, "mHomePageListFragment = null");
             }
         }
     }
@@ -311,6 +342,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
         params.put("type", "screen");
+        params.put("protocol_version", Constant.PROTOCOL_VERSION);
         mFinalHttp.post(Constant.URL, params, new AjaxCallBack<Object>() {
             @Override
             public void onSuccess(Object o) {
@@ -340,6 +372,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             JSONObject object = new JSONObject(result);
             String app_key = object.getString("app_key");
             String info = object.getString("plaque_info");
+
             if (!TextUtils.isEmpty(info)) {
                 JSONArray array = new JSONArray(info);
                 for (int i = 0; i < array.length(); i++) {
@@ -475,14 +508,13 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         super.onCreateOptionsMenu(menu, inflater);
         MenuItem item = menu.findItem(R.id.action_search);
         if (null != item) {
-            item.setVisible(true);
+            item.setVisible(false);
         }
-
-//        inflater.inflate(R.menu.menu_main_homepage, menu);
-//        MenuItem item = menu.findItem(R.id.action_search);
-//        if (null != item){
-//            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-//        }
+        inflater.inflate(R.menu.menu_main_homepage, menu);
+        MenuItem item1 = menu.findItem(R.id.action_dm);
+        if (null != item1) {
+            item1.setVisible(true);
+        }
     }
 
     @Override
@@ -493,7 +525,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 return true;
             }
         } else if (item.getItemId() == R.id.action_search) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(null, true);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
             return true;
         } else if (item.getItemId() == R.id.action_dm) {
             ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
@@ -507,28 +539,69 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         if (v.getId() == R.id.action_personal) {
             ((OSGIServiceHost) mActivity).jumptoPersonal(true);
         } else if (v.getId() == R.id.action_search) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(null, true);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+        } else if (v.getId() == R.id.action_dm) {
+            ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
+        }
+    }
+
+    private String mInfo;
+    private ViewGroup customView;
+    private EditText mEtView;
+    private ImageView mSearchView;
+    //    private String mEtViewText;
+    private String[] mHint;
+    private int HINT_UPDATE_TIME = 2000;
+    private int HINT_SHOW_NUMBER = 0;
+    private Handler mHandler = new Handler();
+    private Runnable mRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            mEtView.setHint(mHint[HINT_SHOW_NUMBER]);
+            mHandler.postDelayed(this, HINT_UPDATE_TIME);
+            if (HINT_SHOW_NUMBER < mHint.length - 1) {
+                HINT_SHOW_NUMBER = HINT_SHOW_NUMBER + 1;
+            } else {
+                HINT_SHOW_NUMBER = 0;
+            }
+        }
+    };
+
+    private void startConvenientSearch() {
+        mHandler.postDelayed(mRunnable, 0);
+    }
+
+    private void setSearchBar() {
+        if (null == customView) {
+            customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_searchbar, null);
+            mEtView = (EditText) customView.findViewById(R.id.search_et);
+            mEtView.setFocusable(false);
+            mEtView.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View paramView) {
+                    ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+                }
+            });
+            mSearchView = (ImageView) customView.findViewById(R.id.search_icon);
+            mSearchView.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View paramView) {
+                    String mKeyWord = mEtView.getHint().toString();
+                    ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord);
+                }
+            });
         }
     }
 
     private void initActionBar() {
         try {
-//            ViewGroup customView = (ViewGroup)mInflater.inflate(R.layout.actionbar_custom,new LinearLayout(mActivity),false);
-//            View personal = customView.findViewById(R.id.action_personal);
-//            personal.setOnClickListener(this);
-//            View search = customView.findViewById(R.id.action_search);
-//            search.setOnClickListener(this);
-//            //加入滑动tab管理viewPager
-//            //mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,null,false);
-//
-//            ViewGroup title = (ViewGroup)customView.findViewById(R.id.action_title);
-//            mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity,title,false);
-//            title.addView(mPagerSlidingTabStrip);
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
 
             if (isHidden()) {
                 return;
             }
+
+            setSearchBar();
+
             if (null == mCategory) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
                 actionBar.setHomeAsUpIndicator(mActivity.getResources().getDrawable(R.drawable.icon_personal_light));
@@ -537,17 +610,95 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 actionBar.setDisplayHomeAsUpEnabled(true);
                 actionBar.setHomeAsUpIndicator(mActivity.getResources().getDrawable(R.drawable.action_bar_back_light));
                 actionBar.setHomeButtonEnabled(true);
-                actionBar.setDisplayShowTitleEnabled(true);
-                actionBar.setTitle(mTitle);
+                actionBar.setDisplayShowTitleEnabled(false);
+//                actionBar.setTitle(mTitle);
             }
             actionBar.setDisplayShowCustomEnabled(true);
-            actionBar.setCustomView(mPagerSlidingTabStrip);
+            //actionBar.setCustomView(mPagerSlidingTabStrip);
+            actionBar.setCustomView(customView);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            actionBar.removeAllTabs();
+
+            for (int i = 0; i < mPageData.size(); i++) {
+                LogUtils.i(TAG, "actionBar.addTab getPageTitle(i) : " + mSectionsPagerAdapter.getPageTitle(i));
+                actionBar.addTab(actionBar.newTab().setTabListener(mBarTabListener));
+                ActionBar.Tab t = actionBar.getTabAt(i);
+                t.setCustomView(R.layout.actionbar_tab);
+                TextView title = (TextView) t.getCustomView().findViewById(R.id.tab_title);
+//                title.setBackgroundResource(R.drawable.edittext_bg);
+                title.setText(mSectionsPagerAdapter.getPageTitle(i));
+            }
             actionBar.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private final ActionBar.TabListener mBarTabListener = new ActionBar.TabListener() {
+        private final static String TAG = "homepage_PagerFragment_mBarTabListener";
+
+        @Override
+        public void onTabReselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
+            LogUtils.i(TAG, "11onTabReselected arg0.getPosition()= " + arg0.getPosition());
+        }
+
+        @Override
+        public void onTabSelected(ActionBar.Tab arg0, FragmentTransaction arg1) {
+            LogUtils.i(TAG, "11onTabSelected arg0.getPosition()= " + arg0.getPosition());
+
+            if (mViewPager != null)
+                mViewPager.setCurrentItem(arg0.getPosition());
+        }
+
+        @Override
+        public void onTabUnselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
+            LogUtils.i(TAG, "11onTabUnselected arg0.getPosition()= " + arg0.getPosition());
+        }
+    };
+
+    private void postSearchHint() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "hot_word");
+        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+            @Override
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                mInfo = responseInfo.result;
+                setSearchData(responseInfo.result);
+                startConvenientSearch();
+            }
+
+            @Override
+            public void onFailure(HttpException e, String s) {
+                LogUtils.e(TAG, "快捷搜索热词请求失败:" + s);
+            }
+        });
+    }
+
+    private void setSearchData(String result) {
+        try {
+            JSONObject object = new JSONObject(result);
+            int app_key = object.getInt("app_key");
+
+            //LogUtils.i(TAG, "result:" + result);
+            String hint_info = object.getString("searchscroll_info");
+            LogUtils.i(TAG, "hint_info:" + hint_info);
+
+            JSONArray hint_json = new JSONArray(hint_info);
+            mHint = new String[hint_json.length()];
+            for (int i = 0; i < hint_json.length(); i++) {
+                JSONObject hint_obj = new JSONObject(hint_json.get(i).toString());
+                String hint = hint_obj.getString("searchscroll");
+                mHint[i] = hint;
+            }
+            mEtView.setHint(mHint[0]);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            LogUtils.e(TAG, "搜索预加载JSON解析失败");
+        }
+    }
 
     /**
      * HomePage网络请求
@@ -556,10 +707,9 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         LogUtils.i(TAG, "httpRequest");
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-//        params.put("packagename", "com.android.applite1.0");
         params.put("packagename", mActivity.getPackageName());
         params.put("app", "applite");
-        params.put("protocol_version", "1.0");
+        params.put("protocol_version", Constant.PROTOCOL_VERSION);
         if (null == mCategory) {
             params.put("type", "homepage");
             params.put("tabTitle", "tabtitle");
@@ -582,6 +732,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
                     if (1 == data.getAppKey()) {
                         mPageData = data.getSubjectData();
+                        LogUtils.i(TAG, "mPageData:" + mPageData.toString());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -589,6 +740,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 if (LoadingAnimation != null) {
                     mLoadingView.startAnimation(LoadingAnimation);
                 }
+                initActionBar();
                 mActivity.runOnUiThread(mRefreshRunnable);
             }
 
@@ -637,6 +789,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         @Override
         public CharSequence getPageTitle(int position) {
+            LogUtils.d(TAG, "getPageTitle :" + position);
             if (null != mPageData)
                 return mPageData.get(position).getS_name();
             else
@@ -645,12 +798,14 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         @Override
         public void notifyDataSetChanged() {
+            LogUtils.d(TAG, "notifyDataSetChanged");
             mChildCount = getCount();
             super.notifyDataSetChanged();
         }
 
         @Override
         public int getItemPosition(Object object) {
+            LogUtils.d(TAG, "getItemPosition :" + object);
             if (mChildCount > 0) {
                 mChildCount--;
                 return POSITION_NONE;

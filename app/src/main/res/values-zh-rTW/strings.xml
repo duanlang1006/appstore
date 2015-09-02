@@ -3,5 +3,6 @@
     <string name="app_name">應用商店</string>
     <string name="action_settings">設置</string>
     <string name="action_search">搜索</string>
+    <string name="action_dm">下載</string>
     <string name="plugin_error">讀取插件失敗</string>
 </resources>

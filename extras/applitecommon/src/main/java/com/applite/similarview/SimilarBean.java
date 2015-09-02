@@ -1,31 +1,26 @@
 package com.applite.similarview;
 
-import com.mit.impl.ImplInfo;
-
 /**
  * Created by LSY on 15-8-12.
  */
 public class SimilarBean {
 
     private int _id;
-    private String mName;
-    private String mPackageName;
-    private String mImgUrl;
-    private int mVersionCode;
-    private String mDownloadUrl;
-
-    private ImplInfo mImplInfo;
+    private String name;
+    private String packageName;
+    private String iconUrl;
+    private int versionCode;
+    private String rDownloadUrl;
 
     @Override
     public String toString() {
         return "SimilarBean{" +
                 "_id=" + _id +
-                ", mName='" + mName + '\'' +
-                ", mPackageName='" + mPackageName + '\'' +
-                ", mImgUrl='" + mImgUrl + '\'' +
-                ", mVersionCode=" + mVersionCode +
-                ", mDownloadUrl='" + mDownloadUrl + '\'' +
-                ", mImplInfo=" + mImplInfo +
+                ", mName='" + name + '\'' +
+                ", mPackageName='" + packageName + '\'' +
+                ", mImgUrl='" + iconUrl + '\'' +
+                ", mVersionCode=" + versionCode +
+                ", mDownloadUrl='" + rDownloadUrl + '\'' +
                 '}';
     }
 
@@ -33,55 +28,47 @@ public class SimilarBean {
         return _id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+    public int getVersionCode() {
+        return versionCode;
+    }
+
+    public String getrDownloadUrl() {
+        return rDownloadUrl;
+    }
+
     public void set_id(int _id) {
         this._id = _id;
     }
 
-    public String getmName() {
-        return mName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setmName(String mName) {
-        this.mName = mName;
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 
-    public String getmPackageName() {
-        return mPackageName;
+    public void setIconUrl(String iconUrl) {
+        this.iconUrl = iconUrl;
     }
 
-    public void setmPackageName(String mPackageName) {
-        this.mPackageName = mPackageName;
+    public void setVersionCode(int versionCode) {
+        this.versionCode = versionCode;
     }
 
-    public String getmImgUrl() {
-        return mImgUrl;
-    }
-
-    public void setmImgUrl(String mImgUrl) {
-        this.mImgUrl = mImgUrl;
-    }
-
-    public int getmVersionCode() {
-        return mVersionCode;
-    }
-
-    public void setmVersionCode(int mVersionCode) {
-        this.mVersionCode = mVersionCode;
-    }
-
-    public String getmDownloadUrl() {
-        return mDownloadUrl;
-    }
-
-    public void setmDownloadUrl(String mDownloadUrl) {
-        this.mDownloadUrl = mDownloadUrl;
-    }
-
-    public ImplInfo getmImplInfo() {
-        return mImplInfo;
-    }
-
-    public void setmImplInfo(ImplInfo mImplInfo) {
-        this.mImplInfo = mImplInfo;
+    public void setrDownloadUrl(String rDownloadUrl) {
+        this.rDownloadUrl = rDownloadUrl;
     }
 }

@@ -2,15 +2,23 @@ package com.applite.homepage;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -66,9 +74,9 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     public static Bundle newBundle(String s_key, String s_name, int step, String s_datatype){
         Bundle bundle = new Bundle();
         bundle.putString("key",s_key);
-        bundle.putString("name",s_name);
-        bundle.putInt("step",step);
-        bundle.putString("datatype",s_datatype);
+        bundle.putString("name", s_name);
+        bundle.putInt("step", step);
+        bundle.putString("datatype", s_datatype);
         return bundle;
     }
 
@@ -76,7 +84,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         Bundle b = new Bundle();
         b.putParcelable("subject_data", data);
         b.putBoolean("show_home", showBack);
-        b.putInt("position",position);
+        b.putInt("position", position);
         return b;
     }
 
@@ -94,7 +102,6 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         }else{
             whichPage = HOMEPAGELISTFRAGMENT + this.mPosition;
         }
-
     }
 
     @Override
@@ -102,6 +109,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         LogUtils.i(TAG, "onAttach ");
         super.onAttach(activity);
         mActivity = activity;
+        mInflater = LayoutInflater.from(mActivity);
         Bundle params = getArguments();
         if (null != params) {
             this.mData = params.getParcelable("subject_data");
@@ -147,6 +155,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        LogUtils.i(TAG, "onItemClick");
         ListArrayAdapter.ViewHolder viewHolder = (ListArrayAdapter.ViewHolder)view.getTag();
         if (null == viewHolder){
             return;
@@ -166,8 +175,22 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (!hidden){
-            initActionBar();
+        LogUtils.i(TAG, "HomePageListFragment onHiddenChanged  hidden = " + hidden);
+//        if (!hidden){
+//            initActionBar();
+//            if (null != mTopicView){
+//                mTopicView.startPlay();
+//            }
+//        }else{
+//            if (null != mTopicView){
+//                mTopicView.stopPlay();
+//            }
+//        }
+    }
+
+    public void play(boolean flag) {
+        LogUtils.i(TAG, "play = " + flag + " mTopicView = " + mTopicView);
+        if (flag){
             if (null != mTopicView){
                 mTopicView.startPlay();
             }
@@ -180,6 +203,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     @Override
     public void onResume() {
+        LogUtils.i(TAG, "onResume");
         super.onResume();
         if (null != whichPage && !TextUtils.isEmpty(whichPage)) {
             MitMobclickAgent.onPageStart(whichPage); //统计页面
@@ -188,6 +212,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     @Override
     public void onPause() {
+        LogUtils.i(TAG, "onPause");
         super.onPause();
         if (null != whichPage && !TextUtils.isEmpty(whichPage)) {
             MitMobclickAgent.onPageEnd(whichPage);
@@ -196,26 +221,103 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
     @Override
     public void onDestroy() {
+        LogUtils.i(TAG, "onDestroy");
         super.onDestroy();
         if (showBack && null != mData.getS_key()) {
             MitMobclickAgent.onEvent(mActivity, whichPage + "_onDestroy");
         }
     }
 
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        MenuItem item1 = menu.findItem(R.id.action_dm);
+        if (null != item1) {
+            item1.setVisible(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_search) {
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+            return true;
+        } else if (item.getItemId() == R.id.action_dm) {
+            ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private String mInfo;
+    private ViewGroup customView;
+    private LayoutInflater mInflater;
+    private EditText mEtView;
+    private ImageView mSearchView;
+
     private void initActionBar(){
+        LogUtils.i(TAG, "initActionBar");
         try {
+
+            if(null == customView){
+                customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_searchbar, null);
+                mEtView = (EditText) customView.findViewById(R.id.search_et);
+                mEtView.setFocusable(false);
+                mEtView.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View paramView) {
+                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+                    }
+                });
+                mSearchView = (ImageView) customView.findViewById(R.id.search_icon);
+                mSearchView.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View paramView) {
+                        String mKeyWord = mEtView.getHint().toString();
+                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord);
+                    }
+                });
+            }
+
             if (showBack) {
                 ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
-                actionBar.setDisplayShowCustomEnabled(false);
-                actionBar.setDisplayShowTitleEnabled(true);
+                actionBar.setDisplayShowCustomEnabled(true);
+                actionBar.setDisplayShowTitleEnabled(false);
                 actionBar.setDisplayHomeAsUpEnabled(true);
-                actionBar.setTitle(mData.getS_name());
+                actionBar.setCustomView(customView);
+//                actionBar.setTitle(mData.getS_name());
+                actionBar.removeAllTabs();
+                if(!TextUtils.isEmpty(mData.getS_name())){
+                    actionBar.addTab(actionBar.newTab().setTabListener(mBarTabListener));
+                    ActionBar.Tab t = actionBar.getTabAt(0);
+                    t.setCustomView(R.layout.actionbar_tab);
+                    TextView title = (TextView)t.getCustomView().findViewById(R.id.tab_title);
+                    title.setText(mData.getS_name());
+                }
                 actionBar.show();
             }
         }catch (Exception e){
             e.printStackTrace();
         }
     }
+
+    private final ActionBar.TabListener mBarTabListener = new ActionBar.TabListener(){
+        private final static String TAG = "homepage_ListFragment_mBarTabListener";
+
+        @Override
+        public void onTabReselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
+            LogUtils.i(TAG, "onTabReselected arg0.getPosition()= "+arg0.getPosition());
+        }
+
+        @Override
+        public void onTabSelected(ActionBar.Tab arg0, FragmentTransaction arg1) {
+            LogUtils.i(TAG, "onTabSelected arg0.getPosition()= "+arg0.getPosition());
+        }
+
+        @Override
+        public void onTabUnselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
+            LogUtils.i(TAG, "onTabUnselected arg0.getPosition()= "+arg0.getPosition());
+        }
+    };
 
     private void setTopicView(Context context){
         List<SpecialTopicData> topicList = (null == mData)?null:mData.getSpecialtopic_data();
@@ -276,8 +378,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", "com.android.applite1.0");
-        params.put("protocol_version", "1.0");
-        //params.put("packagename",Utils.getPackgeName(this));
+        params.put("protocol_version", Constant.PROTOCOL_VERSION);
         params.put("app", "applite");
         params.put("type", "hptab");
         params.put("page", String.valueOf(page));
@@ -384,7 +485,8 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         @Override
         public void onClick(View v, int position){
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
-            LogUtils.i(TAG, "topicData = " + topicData);
+            LogUtils.i(TAG, "topicData = " + topicData+" mTopicView = "+mTopicView);
+//            mTopicView.stopPlay();
             if(topicData.getT_skiptype() == 1){
                 MitMobclickAgent.onEvent(mActivity, "onSlideViewClick_" + topicData.getTt_packageName());
                 ((OSGIServiceHost)mActivity).jumptoDetail(topicData.getTt_packageName(), topicData.getTt_name(), topicData.getTt_iconUrl(), true);

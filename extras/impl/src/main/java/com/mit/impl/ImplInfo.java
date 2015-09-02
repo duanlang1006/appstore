@@ -2,9 +2,12 @@ package com.mit.impl;
 
 import android.app.DownloadManager;
 
+import com.lidroid.xutils.db.annotation.Table;
+
 /**
  * Created by hxd on 15-6-11.
  */
+@Table(name=ImplDbHelper.TABLE_IMPLINFO)
 public class ImplInfo {
     public final static int ACTION_DOWNLOAD = 1;   //下载
     public final static int ACTION_INSTALL = 2;    //安装过程
@@ -43,12 +46,13 @@ public class ImplInfo {
     private String title;
     private String description;
     private long lastMod;
-//    private int versionCode;
+    private int versionCode;
     private String localPath;
-    private String mimeType;
+//    private String mimeType;
     private boolean autoLaunch;  //下载完成后自动启动安装
     private long size;
     private boolean userContinue;
+    private String md5;
 
     public ImplInfo() {
         key = null;
@@ -61,12 +65,13 @@ public class ImplInfo {
         title = null;
         description = null;
         lastMod = 0;
-//        versionCode = 0;
+        versionCode = 0;
         localPath = null;
-        mimeType = null;
+//        mimeType = null;
         autoLaunch = false;
         size = 0;
         userContinue = false;
+        md5 = null;
     }
 
     public long getId() {
@@ -113,9 +118,9 @@ public class ImplInfo {
         return lastMod;
     }
 
-//    public int getVersionCode() {
-//        return versionCode;
-//    }
+    public int getVersionCode() {
+        return versionCode;
+    }
 
     public String getLocalPath() {
         return localPath;
@@ -137,6 +142,10 @@ public class ImplInfo {
         return userContinue;
     }
 
+    public String getMd5() {
+        return md5;
+    }
+
     public void setId(long id) {
         this._id = id;
     }
@@ -153,7 +162,6 @@ public class ImplInfo {
 
     public ImplInfo setCause(int cause) {
         this.cause = cause;
-        ImplLog.d("impl_info","setCause:"+cause);
         return this;
     }
 
@@ -192,10 +200,10 @@ public class ImplInfo {
         return this;
     }
 
-//    public ImplInfo setVersionCode(int versionCode) {
-//        this.versionCode = versionCode;
-//        return this;
-//    }
+    public ImplInfo setVersionCode(int versionCode) {
+        this.versionCode = versionCode;
+        return this;
+    }
 
     public ImplInfo setLocalPath(String localPath) {
         this.localPath = localPath;
@@ -219,6 +227,11 @@ public class ImplInfo {
 
     public ImplInfo setUserContinue(boolean userContinue) {
         this.userContinue = userContinue;
+        return this;
+    }
+
+    public ImplInfo setMd5(String md5) {
+        this.md5 = md5;
         return this;
     }
 }

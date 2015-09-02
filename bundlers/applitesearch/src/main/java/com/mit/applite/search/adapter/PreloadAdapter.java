@@ -165,7 +165,7 @@ public class PreloadAdapter extends BaseAdapter {
         public void initView(SearchBean data, int position) {
             this.bean = data;
             this.mPosition = position;
-            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName()/*, data.getmVersionCode()*/);
+            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName(), data.getmVersionCode());
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
                 implAgent.setImplCallback(this, implInfo);
@@ -182,18 +182,19 @@ public class PreloadAdapter extends BaseAdapter {
 
         void initButton() {
             if (null != mBt && null != this.implInfo) {
+                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity,implInfo);
                 switch (implInfo.getStatus()) {
                     case ImplInfo.STATUS_PENDING:
-                        mBt.setText(ImplHelper.getActionText(mActivity,implInfo));
+                        mBt.setText(res.getActionText());
                         break;
                     case ImplInfo.STATUS_RUNNING:
-                        mBt.setText(ImplHelper.getProgress(mActivity,implInfo) + "%");
+                        mBt.setText(res.getProgress() + "%");
                         break;
                     case ImplInfo.STATUS_PAUSED:
-                        mBt.setText(ImplHelper.getStatusText(mActivity,implInfo));
+                        mBt.setText(res.getStatusText());
                         break;
                     default:
-                        mBt.setText(ImplHelper.getActionText(mActivity,implInfo));
+                        mBt.setText(res.getActionText());
                         break;
                 }
             }

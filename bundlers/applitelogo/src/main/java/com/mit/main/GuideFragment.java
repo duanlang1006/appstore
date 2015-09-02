@@ -517,7 +517,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
 
 
     private void download(GuideBean bean) {
-        ImplInfo implInfo = implAgent.getImplInfo(bean.getPackagename(), bean.getPackagename()/*, bean.getmVersionCode()*/);
+        ImplInfo implInfo = implAgent.getImplInfo(bean.getPackagename(), bean.getPackagename(), bean.getmVersionCode());
         if (null == implInfo) {
             return;
         }

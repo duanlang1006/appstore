@@ -17,7 +17,7 @@ public class Info {
         pm = context.getPackageManager();
     }
 
-    /*
+    /**
      * 获取程序 图标
      */
     public Drawable getAppIcon(String packname) throws PackageManager.NameNotFoundException {
