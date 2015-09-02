@@ -98,7 +98,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 vh.custompb.setVisibility(View.GONE);
             }
             vh.deleteCheckBox.setVisibility(View.GONE);
-            vh.refresh();
         }
         if (mListener.getStatusFlags() == ~isDownloaded) {
             vh.statusView.setVisibility(View.INVISIBLE);
