@@ -87,6 +87,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             }
             vh.actionBtn.setVisibility(View.GONE);
             vh.custompb.setVisibility(View.GONE);
+            vh.refresh();
         } else {//正常状态(没有删除的多选框)
             vh.deleteCheckBox.setVisibility(View.GONE);
             if (mListener.getStatusFlags() == isDownloaded) {
@@ -97,6 +98,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 vh.custompb.setVisibility(View.GONE);
             }
             vh.deleteCheckBox.setVisibility(View.GONE);
+            vh.refresh();
         }
         if (mListener.getStatusFlags() == ~isDownloaded) {
             vh.statusView.setVisibility(View.INVISIBLE);
