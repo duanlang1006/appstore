@@ -3,6 +3,10 @@ package com.mit.impl;
 import android.app.DownloadManager;
 
 import com.lidroid.xutils.db.annotation.Table;
+import com.lidroid.xutils.db.annotation.Transient;
+import com.lidroid.xutils.http.HttpHandler;
+
+import java.io.File;
 
 /**
  * Created by hxd on 15-6-11.
@@ -35,41 +39,43 @@ public class ImplInfo {
     public final static int CAUSE_PAUSED_BY_NETWORK = 2;    //没有网络暂停
     public final static int CAUSE_PAUSED_BY_OVERSIZE = 3;   //数据网络，超过允许下载大小暂停
 
-    private long _id;
-    private String key;
-    private String packageName;
-    private int status;
-    private int cause;
-    private long downloadId ;
-    private String downloadUrl;
-    private String iconUrl;
-    private String title;
-    private String description;
-    private long lastMod;
-    private int versionCode;
-    private String localPath;
-//    private String mimeType;
-    private boolean autoLaunch;  //下载完成后自动启动安装
-    private long size;
-    private boolean userContinue;
-    private String md5;
+    private long _id;               //数据库绑定自增ID
+    private String key;             //唯一主键
+    private String packageName;     //包名
+    private int status;             //impl状态
+    private int cause;              //impl原因
+    private String downloadUrl;     //下载地址
+    private String iconUrl;         //图标地址
+    private String title;           //title文本
+    private String description;     //描述
+    private long lastMod;           //最后下载时间
+    private int versionCode;        //应用对应的versionCode
+    private boolean autoLaunch;     //下载完成后自动启动安装
+    private boolean userContinue;   //用户确认继续
+    private String md5;             //下载文件对应的MD5码
+    private String localPath;       //下载完成后最终路径
+
+    @Transient
+    private HttpHandler<File> handler;      //下载handler
+    private HttpHandler.State state;        //下载状态
+    private String fileSavePath;            //文件保存路径
+    private long current;                   //当前下载的字节数
+    private long total;                     //文件的总字节数
+    private boolean autoResume;             //断点续传
+    private boolean autoRename;             //自动重命名
 
     public ImplInfo() {
         key = null;
         packageName = null;
         status = STATUS_INIT;
         cause = CAUSE_NONE;
-        downloadId = 0;
         downloadUrl = null;
         iconUrl = null;
         title = null;
         description = null;
         lastMod = 0;
         versionCode = 0;
-        localPath = null;
-//        mimeType = null;
         autoLaunch = false;
-        size = 0;
         userContinue = false;
         md5 = null;
     }
@@ -94,9 +100,9 @@ public class ImplInfo {
         return packageName;
     }
 
-    public long getDownloadId() {
-        return downloadId;
-    }
+//    public long getDownloadId() {
+//        return downloadId;
+//    }
 
     public String getDownloadUrl() {
         return downloadUrl;
@@ -134,9 +140,9 @@ public class ImplInfo {
         return autoLaunch;
     }
 
-    public long getSize() {
-        return size;
-    }
+//    public long getSize() {
+//        return size;
+//    }
 
     public boolean isUserContinue() {
         return userContinue;
@@ -144,6 +150,34 @@ public class ImplInfo {
 
     public String getMd5() {
         return md5;
+    }
+
+    public HttpHandler<File> getHandler() {
+        return handler;
+    }
+
+    public HttpHandler.State getState() {
+        return state;
+    }
+
+    public String getFileSavePath() {
+        return fileSavePath;
+    }
+
+    public long getCurrent() {
+        return current;
+    }
+
+    public long getTotal() {
+        return total;
+    }
+
+    public boolean isAutoResume() {
+        return autoResume;
+    }
+
+    public boolean isAutoRename() {
+        return autoRename;
     }
 
     public void setId(long id) {
@@ -170,10 +204,10 @@ public class ImplInfo {
         return this;
     }
 
-    public ImplInfo setDownloadId(long downloadId) {
-        this.downloadId = downloadId;
-        return this;
-    }
+//    public ImplInfo setDownloadId(long downloadId) {
+//        this.downloadId = downloadId;
+//        return this;
+//    }
 
     public ImplInfo setDownloadUrl(String downloadUrl) {
         this.downloadUrl = downloadUrl;
@@ -220,10 +254,10 @@ public class ImplInfo {
         return this;
     }
 
-    public ImplInfo setSize(long size) {
-        this.size = size;
-        return this;
-    }
+//    public ImplInfo setSize(long size) {
+//        this.size = size;
+//        return this;
+//    }
 
     public ImplInfo setUserContinue(boolean userContinue) {
         this.userContinue = userContinue;
@@ -233,5 +267,33 @@ public class ImplInfo {
     public ImplInfo setMd5(String md5) {
         this.md5 = md5;
         return this;
+    }
+
+    public void setHandler(HttpHandler<File> handler) {
+        this.handler = handler;
+    }
+
+    public void setState(HttpHandler.State state) {
+        this.state = state;
+    }
+
+    public void setFileSavePath(String fileSavePath) {
+        this.fileSavePath = fileSavePath;
+    }
+
+    public void setCurrent(long progress) {
+        this.current = progress;
+    }
+
+    public void setTotal(long fileLength) {
+        this.total = fileLength;
+    }
+
+    public void setAutoResume(boolean autoResume) {
+        this.autoResume = autoResume;
+    }
+
+    public void setAutoRename(boolean autoRename) {
+        this.autoRename = autoRename;
     }
 }

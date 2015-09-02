@@ -1,4 +1,4 @@
-package com.mit.impl.download;
+package com.mit.impl;
 
 import android.app.ActivityManager;
 import android.app.Service;
@@ -17,18 +17,18 @@ import java.util.List;
  */
 public class DownloadService extends Service {
 
-    private static DownloadManager DOWNLOAD_MANAGER;
+//    private static ImplDownload DOWNLOAD_MANAGER;
 
-    public static DownloadManager getDownloadManager(Context appContext) {
-        if (!DownloadService.isServiceRunning(appContext)) {
-            Intent downloadSvr = new Intent(appContext,DownloadService.class);
-            appContext.startService(downloadSvr);
-        }
-        if (DownloadService.DOWNLOAD_MANAGER == null) {
-            DownloadService.DOWNLOAD_MANAGER = new DownloadManager(appContext);
-        }
-        return DOWNLOAD_MANAGER;
-    }
+//    public static ImplDownload getDownloadManager(Context appContext) {
+//        if (!DownloadService.isServiceRunning(appContext)) {
+//            Intent downloadSvr = new Intent(appContext,DownloadService.class);
+//            appContext.startService(downloadSvr);
+//        }
+//        if (DownloadService.DOWNLOAD_MANAGER == null) {
+//            DownloadService.DOWNLOAD_MANAGER = ImplDownload.getInstance(appContext);
+//        }
+//        return DOWNLOAD_MANAGER;
+//    }
 
     public DownloadService() {
         super();
@@ -52,14 +52,14 @@ public class DownloadService extends Service {
 
     @Override
     public void onDestroy() {
-        if (DOWNLOAD_MANAGER != null) {
-            try {
-                DOWNLOAD_MANAGER.stopAllDownload();
-                DOWNLOAD_MANAGER.backupDownloadInfoList();
-            } catch (DbException e) {
-                LogUtils.e(e.getMessage(), e);
-            }
-        }
+//        if (DOWNLOAD_MANAGER != null) {
+//            try {
+//                DOWNLOAD_MANAGER.pauseAll();
+//                DOWNLOAD_MANAGER.backupDownloadInfoList();
+//            } catch (DbException e) {
+//                LogUtils.e(e.getMessage(), e);
+//            }
+//        }
         super.onDestroy();
     }
 

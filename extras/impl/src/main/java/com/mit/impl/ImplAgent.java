@@ -173,7 +173,7 @@ public class ImplAgent extends Observable {
         implInfo.setPackageName(packageName).setVersionCode(versionCode);
         mDownloader.fillImplInfo(implInfo);
         mInstaller.fillImplInfo(implInfo);
-        ImplLog.d(TAG,"getImplInfo,"+implInfo.getKey()+","+implInfo.getTitle()+","+implInfo.getStatus()+","+implInfo.getDownloadId());
+        ImplLog.d(TAG,"getImplInfo,"+implInfo.getKey()+","+implInfo.getTitle()+","+implInfo.getStatus());
         return implInfo;
     }
 
@@ -320,7 +320,7 @@ public class ImplAgent extends Observable {
     public List<ImplInfo> getDownloadInfoList(int statusFlag) {
         List<ImplInfo> list = new ArrayList<ImplInfo>();
         for (ImplInfo info : mImplList) {
-            if ((info.getStatus() & statusFlag) != 0 && info.getDownloadId() > 0) {
+            if ((info.getStatus() & statusFlag) != 0 && info.getId() > 0) {
                 list.add(info);
             }
         }
@@ -330,7 +330,7 @@ public class ImplAgent extends Observable {
     public int getImplInfoCount(int statusFlag) {
         int count = 0;
         for (ImplInfo info : mImplList) {
-            if ((info.getStatus() & statusFlag) != 0 && info.getDownloadId() > 0) {
+            if ((info.getStatus() & statusFlag) != 0 && info.getId() > 0) {
                 count++;
             }
         }
@@ -397,7 +397,7 @@ public class ImplAgent extends Observable {
             callbackImpl(info);
             saveImplInfo(info);
             notifyObserverUpdate("onEnqued");
-            ImplLog.d(TAG, info.getTitle() + ",onEnqued,"+info.getDownloadId());
+            ImplLog.d(TAG, info.getTitle() + ",onEnqued");
         }
 
         @Override
@@ -406,7 +406,7 @@ public class ImplAgent extends Observable {
             MitMobclickAgent.onEvent(mContext, "impl_DownloadPending");
             callbackImpl(info);
             saveImplInfo(info);
-            ImplLog.d(TAG, info.getTitle() + ",onPending,"+info.getDownloadId());
+            ImplLog.d(TAG, info.getTitle() + ",onPending");
         }
 
         @Override
@@ -415,7 +415,7 @@ public class ImplAgent extends Observable {
             MitMobclickAgent.onEvent(mContext, "impl_DownloadStart");
             callbackImpl(info);
             saveImplInfo(info);
-            ImplLog.d(TAG, info.getTitle() + ",onStart,"+info.getDownloadId());
+            ImplLog.d(TAG, info.getTitle() + ",onStart");
         }
 
         @Override
@@ -489,7 +489,6 @@ public class ImplAgent extends Observable {
             super.onUninstallSuccess(info);
             MitMobclickAgent.onEvent(mContext, "impl_UninstallSuccess");
             callbackImpl(info);
-            remove(info);       //应用卸载掉，同时删除下载记录
             ImplLog.d(TAG, info.getTitle() + ",onUninstallSuccess");
         }
 
