@@ -14,7 +14,7 @@ public class ImplDbHelper {
     public final static String TABLE_IMPLINFO = "ImplInfo";
 
     private final static String DB_NAME = "impl.db";
-    private final static int DB_VERSION = 2;
+    private final static int DB_VERSION = 3;
 
     static DbUtils db = null;
     public static DbUtils getDbUtils(Context appContext) {
@@ -33,19 +33,36 @@ public class ImplDbHelper {
                 case 2:
                     try {
                         dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"cause\" INTEGER default 0");
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
+                    } catch (DbException e) {}
                     try {
                         dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"size\" INTEGER default 0");
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
+                    } catch (DbException e) {}
                     try {
                         dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"userContinue\" INTEGER default 0");
-                    } catch (DbException e) {
-                        e.printStackTrace();
-                    }
+                    } catch (DbException e) {}
+                    break;
+                case 3:
+                    try {
+                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"md5\" TEXT");
+                    } catch (DbException e) {}
+                    try {
+                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"state\" INTEGER");
+                    } catch (DbException e) {}
+                    try {
+                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"fileSavePath\" TEXT");
+                    } catch (DbException e) {}
+                    try {
+                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"current\" INTEGER");
+                    } catch (DbException e) {}
+                    try {
+                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"total\" INTEGER");
+                    } catch (DbException e) {}
+                    try {
+                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"autoResume\" INTEGER");
+                    } catch (DbException e) {}
+                    try {
+                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"autoRename\" INTEGER");
+                    } catch (DbException e) {}
                     break;
             }
         }

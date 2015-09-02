@@ -88,9 +88,6 @@
         <service
             android:name="com.mit.market.MyIntentService"
             android:exported="false"></service>
-        <service
-            android:name="com.mit.impl.download.DownloadService"
-            android:exported="false"></service>
 
         <meta-data
             android:name="MIT_APPKEY"
