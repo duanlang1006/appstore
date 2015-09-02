@@ -35,4 +35,9 @@
     <dimen name="categoryList_listArrow_height">35dp</dimen>
     <dimen name="listPaddingRight">4dp</dimen>
     <dimen name="listPaddingLeft">4dp</dimen>
+
+    <dimen name="setting_distance_from_title_to_bottom">2dp</dimen>
+    <dimen name="setting_title_size">12dp</dimen>
+    <dimen name="divided_line_distance">6dp</dimen>
+    <dimen name="default_size">20dp</dimen>
 </resources>

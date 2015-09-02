@@ -30,4 +30,10 @@
     <dimen name="distance_to_border_right">4dp</dimen>
     <dimen name="distance_to_border_top">5dp</dimen>
     <dimen name="distance_to_border_bottom">5dp</dimen>
+
+    <dimen name="bottom_buttom_size">14dp</dimen>
+    <dimen name="action_button_distance1">1dp</dimen>
+    <dimen name="action_button_distance2">2dp</dimen>
+    <dimen name="action_button_distance10">10dp</dimen>
+    <dimen name="action_button_size">16dp</dimen>
 </resources>
