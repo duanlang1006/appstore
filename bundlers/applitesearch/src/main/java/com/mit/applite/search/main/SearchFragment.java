@@ -91,7 +91,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private View moreView;//搜索ListView尾部布局
     private boolean ISTOEND = false;//服务器数据是否到底
     private String mSearchText = "";//当前搜索的关键字
-    private boolean ISPOSTSEARCH = true;//上拉加载是否可以请求服务器
+    private boolean IS_PULL_UP_LOAD_POST_END = true;//上拉加载是否结束
     private int mShowHotWordNumber = 9;
 
     private Button refresh;
@@ -125,11 +125,17 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 } else {
                     mMoreProgressBar.setVisibility(View.VISIBLE);
                     mMoreText.setText(AppliteUtils.getString(mActivity, R.string.loading));
-                    //加载更多数据，这里可以使用异步加载
-                    if (ISPOSTSEARCH) {
-                        postSearch(mEtView.getText().toString());
-                        ISPOSTSEARCH = false;
+
+                    //加载更多数据，这里使用异步加载
+                    if (IS_PULL_UP_LOAD_POST_END) {
+                        if (TextUtils.isEmpty(mDetailTag)) {
+                            postSearch(mEtView.getText().toString());
+                        } else {
+                            postDetailTag();
+                        }
+                        IS_PULL_UP_LOAD_POST_END = false;
                     }
+
                 }
                 LogUtils.i(TAG, "加载更多数据");
 
@@ -171,15 +177,27 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             }
         }
     };
+    private String mDetailTag;
 
     public SearchFragment() {
         super();
+    }
+
+    public static Bundle newBundle(String DetailTag) {
+        Bundle b = new Bundle();
+        b.putString("DetailTag", DetailTag);
+        return b;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mHttpUtils = new HttpUtils();
+        Bundle params = getArguments();
+        if (null != params) {
+            mDetailTag = params.getString("DetailTag");
+            LogUtils.i(TAG, "mDetailTag:" + mDetailTag);
+        }
     }
 
     @Override
@@ -195,8 +213,18 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         rootView = mInflater.inflate(R.layout.fragment_search, container, false);
         moreView = mInflater.inflate(R.layout.load, null);
         initView();
-        if (mHotWordBeans.size() == 0)
-            postHotWord();
+        if (TextUtils.isEmpty(mDetailTag)) {
+            initActionBar();
+            if (mHotWordBeans.size() == 0)
+                postHotWord();
+        } else {
+            initDetailTagActionBar();
+            isHotWordLayoutVisibility(View.GONE);
+            mPreloadListView.setVisibility(View.GONE);
+            mListView.setVisibility(View.GONE);
+            mLoadingLayout.setVisibility(View.VISIBLE);
+            postDetailTag();
+        }
 
         return rootView;
     }
@@ -249,6 +277,26 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         super.onDetach();
     }
 
+    /**
+     * 详情标签进来的ActionBar
+     */
+    private void initDetailTagActionBar() {
+        try {
+            LogUtils.i(TAG, "initDetailTagActionBar");
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+            actionBar.setDisplayShowCustomEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(mDetailTag);
+            actionBar.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 搜索页面的ActionBar
+     */
     private void initActionBar() {
         try {
             LogUtils.i(TAG, "initActionBar");
@@ -257,6 +305,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mBackView = (ImageView) customView.findViewById(R.id.search_back);
                 mBackView.setOnClickListener(this);
                 mEtView = (EditText) customView.findViewById(R.id.search_et);
+                mEtView.addTextChangedListener(mTextWatcher);
+                mEtView.setOnClickListener(this);
                 mSearchView = (ImageView) customView.findViewById(R.id.search_search);
                 mSearchView.setOnClickListener(this);
                 mDeleteView = (ImageView) customView.findViewById(R.id.search_delete);
@@ -284,8 +334,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      * 初始化控件
      */
     private void initView() {
-        initActionBar();
-
         //加载中
         mLoadingLayout = (LinearLayout) rootView.findViewById(R.id.search_loading_layout);
         mLoadingImgView = (ImageView) rootView.findViewById(R.id.search_loading_img);
@@ -319,9 +367,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         mListView.setSelected(true);
         mListView.setOnScrollListener(mOnScrollListener);
 
-        mEtView.addTextChangedListener(mTextWatcher);
-
-        mEtView.setOnClickListener(this);
         mHotChangeView.setOnClickListener(this);
         refresh.setOnClickListener(this);
     }
@@ -340,7 +385,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         @Override
         public void afterTextChanged(Editable s) {
             LogUtils.i(TAG, "输入文字后的状态");
-            ISPOSTSEARCH = true;
+            IS_PULL_UP_LOAD_POST_END = true;
             if (TextUtils.isEmpty(mEtView.getText().toString())) {
                 isHotWordLayoutVisibility(View.VISIBLE);
                 no_network.setVisibility(View.GONE);
@@ -422,7 +467,11 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             startConvenientSearch();
         } else if (v.getId() == R.id.refresh_btn) {
             no_network.setVisibility(View.GONE);
-            postSearch(mEtView.getText().toString());
+            if (TextUtils.isEmpty(mDetailTag)) {
+                postSearch(mEtView.getText().toString());
+            } else {
+                postDetailTag();
+            }
         } else if (v.getId() == R.id.search_et) {
             getfocuable();
             openKeyboard();
@@ -466,7 +515,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     private void closeKeyboard() {
-        KeyBoardUtils.closeKeyboard(mEtView, mActivity);
+        if (TextUtils.isEmpty(mDetailTag))
+            KeyBoardUtils.closeKeyboard(mEtView, mActivity);
     }
 
     /**
@@ -483,9 +533,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mEtView.setSelection(20);
             }
         }
-        if (ISPOSTSEARCH) {
+        if (IS_PULL_UP_LOAD_POST_END) {
             ISTOEND = false;
-            ISPOSTSEARCH = false;
+            IS_PULL_UP_LOAD_POST_END = false;
             mSearchPostPage = 0;
             postSearch(mEtView.getText().toString());
         }
@@ -510,6 +560,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("packagename", mActivity.getPackageName());
         params.addBodyParameter("type", "search");
         params.addBodyParameter("key", name);
+        params.addBodyParameter("key_type", "search_name");
         params.addBodyParameter("page", mSearchPostPage + "");
         final String finalName = name;
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
@@ -521,7 +572,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                     setSearchData(responseInfo.result);
 
                     mSearchText = finalName;
-                    ISPOSTSEARCH = true;//请求结束后，才可以继续请求
+                    IS_PULL_UP_LOAD_POST_END = true;//请求结束后，才可以继续请求
                     mSearchPostPage = mSearchPostPage + 1;//请求成功后，请求的页数加1
                 }
             }
@@ -531,7 +582,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mLoadingLayout.setVisibility(View.GONE);
                 if (mListView.getVisibility() == View.GONE && mPreloadListView.getVisibility() == View.GONE && mHotWordLL.getVisibility() == View.GONE)
                     no_network.setVisibility(View.VISIBLE);
-                ISPOSTSEARCH = true;
+                IS_PULL_UP_LOAD_POST_END = true;
                 mListView.removeFooterView(moreView);
                 if (null != mAdapter)
                     mActivity.runOnUiThread(mNotifyRunnable);
@@ -623,6 +674,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("type", "search");
         params.addBodyParameter("protocol_version", "1.0");
         params.addBodyParameter("key", name);
+        params.addBodyParameter("key_type", "search_name");
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
@@ -809,5 +861,80 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void clickItem(String name) {
         mEtViewModifyPostSearch(name, false);
+    }
+
+    /**
+     * 详情标签请求
+     */
+    private void postDetailTag() {
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.addBodyParameter("packagename", mActivity.getPackageName());
+        params.addBodyParameter("type", "search");
+        params.addBodyParameter("key_type", "search_tag");
+        params.addBodyParameter("key", mDetailTag);
+        params.addBodyParameter("page", mSearchPostPage + "");
+        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+            @Override
+            public void onSuccess(ResponseInfo<String> responseInfo) {
+                LogUtils.i(TAG, "详情点击标签请求成功，reuslt:" + responseInfo.result);
+                resolveDetailTagData(responseInfo.result);
+                IS_PULL_UP_LOAD_POST_END = true;//请求结束后，才可以继续请求
+                mSearchPostPage = mSearchPostPage + 1;//请求成功后，请求的页数加1
+            }
+
+            @Override
+            public void onFailure(HttpException e, String s) {
+                LogUtils.e(TAG, "详情点击标签请求请求失败:" + s);
+                IS_PULL_UP_LOAD_POST_END = true;//请求结束后，才可以继续请求
+                mLoadingLayout.setVisibility(View.GONE);
+                if (mListView.getVisibility() == View.GONE)
+                    no_network.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    /**
+     * 解析详情标签请求返回数据
+     *
+     * @param data
+     */
+    private void resolveDetailTagData(String data) {
+        SearchBean bean;
+        try {
+            JSONObject object = new JSONObject(data);
+            int app_key = object.getInt("app_key");
+            String json = object.getString("search_info");
+            ISTOEND = object.getBoolean("istoend");
+            if (!TextUtils.isEmpty(json)) {
+                JSONArray array = new JSONArray(json);
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject obj = new JSONObject(array.get(i).toString());
+                    bean = new SearchBean();
+                    bean.setmPackageName(obj.getString("packageName"));
+                    bean.setmName(obj.getString("name"));
+                    bean.setmImgUrl(obj.getString("iconUrl"));
+                    bean.setmApkSize(obj.getString("apkSize"));
+                    bean.setmDownloadNumber(obj.getString("downloadTimes"));
+                    bean.setmXing(obj.getString("rating"));
+                    bean.setmVersionName(obj.getString("versionName"));
+                    bean.setmVersionCode(obj.getInt("versionCode"));
+                    bean.setmDownloadUrl(obj.getString("rDownloadUrl"));
+
+                    mSearchApkContents.add(bean);
+                }
+                if (null == mAdapter) {
+                    mAdapter = new SearchApkAdapter(mActivity, mSearchApkContents, this);
+                    mListView.setAdapter(mAdapter);
+                } else {
+                    mAdapter.notifyDataSetChanged();
+                }
+                mLoadingLayout.setVisibility(View.GONE);
+                mListView.setVisibility(View.VISIBLE);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            LogUtils.e(TAG, "详情点击标签返回JSON解析失败");
+        }
     }
 }

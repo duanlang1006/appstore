@@ -553,7 +553,7 @@ public class ImplHelper{
                         iconUrl,
                         fullname,
                         md5,
-                        true,
+                        false,
                         null);
                 break;
         }

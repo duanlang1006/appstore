@@ -493,7 +493,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 return true;
             }
         } else if (item.getItemId() == R.id.action_search) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(true);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true);
             return true;
         } else if (item.getItemId() == R.id.action_dm) {
             ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
@@ -507,7 +507,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         if (v.getId() == R.id.action_personal) {
             ((OSGIServiceHost) mActivity).jumptoPersonal(true);
         } else if (v.getId() == R.id.action_search) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(true);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true);
         }
     }
 

@@ -103,7 +103,7 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.action_search == item.getItemId()) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(true);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true);
             return true;
         }
         return super.onOptionsItemSelected(item);

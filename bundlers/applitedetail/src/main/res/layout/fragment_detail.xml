@@ -84,14 +84,16 @@
         android:orientation="vertical">
 
         <!-- 应用详情图片，应用详情文字介绍，progressbar-->
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <ScrollView
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout_marginBottom="60dp">
+                android:background="@color/background_main">
 
                 <LinearLayout
                     android:id="@+id/detail_vp_container"
@@ -342,23 +344,23 @@
 
                 </LinearLayout>
             </ScrollView>
+        </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/detail_download_layout"
+        <LinearLayout
+            android:id="@+id/detail_download_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <View
                 android:layout_width="fill_parent"
-                android:layout_height="60dp"
-                android:layout_alignParentBottom="true"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
+                android:layout_height="0.5dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/open_line" />
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="0.5dp"
-                    android:layout_marginBottom="10dp"
-                    android:background="@color/open_line" />
-
-            </LinearLayout>
-        </RelativeLayout>
+        </LinearLayout>
     </LinearLayout>
+
 
 </LinearLayout>

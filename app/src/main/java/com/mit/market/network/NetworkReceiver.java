@@ -168,6 +168,7 @@ public class NetworkReceiver extends BroadcastReceiver {
                     bean.setmPackageName(obj.getString("packageName"));
                     bean.setmUrl(obj.getString("rDownloadUrl"));
                     bean.setmSize(obj.getLong("apkSize"));
+                    bean.setmMD5(obj.getString("apkMd5"));
                     mDataContents.add(bean);
                 }
                 if (array.length() != 0) {
@@ -227,7 +228,7 @@ public class NetworkReceiver extends BroadcastReceiver {
                 bean.getmName(),
                 bean.getmImgUrl(),
                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getmName() + ".apk",
-                null,
+                bean.getmMD5(),
                 null);
 
 //        implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());

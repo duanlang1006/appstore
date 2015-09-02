@@ -15,7 +15,7 @@ public interface OSGIServiceHost {
     public void jumptoDetail(String packageName,String name,String imgUrl,boolean addToBackstack);
     public void jumptoDetail(String httpUrl,boolean addToBackstack);
     public void jumptoTopic(String key,String name,int step,String datatype,boolean addToBackstack);
-    public void jumptoSearch(boolean addToBackstack);
+    public void jumptoSearch(String detailTag, boolean addToBackstack);
     public void jumptoPersonal(boolean addToBackstack);
     public void jumptoUpdate(boolean addToBackstack);
     public void jumptoDownloadManager(boolean addToBackstack);
