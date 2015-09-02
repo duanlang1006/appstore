@@ -8,6 +8,7 @@
     <string name="logo_manager">我的一天</string>
     <string name="zero_flow_update">零流量更新</string>
     <string name="setting">设置</string>
+    <string name="lucky_draw">幸運抽獎</string>
     <string name="manager_catergory_title">管理</string>
     <string name="install">安装</string>
     <string name="notification">通知栏提示</string>
@@ -21,5 +22,6 @@
     <string name="no_picture_detail">仅WIFI下载图片</string>
     <string name="feedback">意见反馈</string>
     <string name="abort">关于</string>
+    <string name="help">帮助</string>
 
 </resources>

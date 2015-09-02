@@ -16,6 +16,7 @@ public class Constant {
 //    public static final String OSGI_SERVICE_HOST_OPT = "osgi.service.host.opt";
     public static final String OSGI_SERVICE_DETAIL_FRAGMENT = "osgi.service.detail.fragment";
     public static final String OSGI_SERVICE_UPDATE_FRAGMENT = "osgi.service.update.fragment";
+    public static final String OSGI_SERVICE_LUCKY_FRAGMENT = "osgi.service.lucky.fragment";
 
     public static final String OSGI_SERVICE_IMPL_LISTENER = "osgi.service.impl.listener";
 
@@ -23,6 +24,7 @@ public class Constant {
     public static final String CONFIG_BUNDLES_INFO = "bundles_info";
     public static final String KEY_BUNDLES = "bundles";
 
+    public static final String PROTOCOL_VERSION = "1.0";
 
     public static final String META_DATA_MIT = "MIT_APPKEY";
     public static final String extenStorageDirPath = ".android/";//下载的APK保存文件夹

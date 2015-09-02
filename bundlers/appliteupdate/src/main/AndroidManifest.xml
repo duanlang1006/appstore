@@ -11,6 +11,16 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name">
+        <receiver
+            android:name="com.mit.appliteupdate.main.UpdateReceiver"
+            android:exported="true">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <!--<action android:name="android.intent.action.PACKAGE_REMOVED" />-->
+                <!--<action android:name="android.intent.action.PACKAGE_CHANGED" />-->
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

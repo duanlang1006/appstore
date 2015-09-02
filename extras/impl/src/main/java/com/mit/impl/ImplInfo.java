@@ -48,10 +48,11 @@ public class ImplInfo {
     private long lastMod;
     private int versionCode;
     private String localPath;
-    private String mimeType;
+//    private String mimeType;
     private boolean autoLaunch;  //下载完成后自动启动安装
     private long size;
     private boolean userContinue;
+    private String md5;
 
     public ImplInfo() {
         key = null;
@@ -66,10 +67,11 @@ public class ImplInfo {
         lastMod = 0;
         versionCode = 0;
         localPath = null;
-        mimeType = null;
+//        mimeType = null;
         autoLaunch = false;
         size = 0;
         userContinue = false;
+        md5 = null;
     }
 
     public long getId() {
@@ -138,6 +140,10 @@ public class ImplInfo {
 
     public boolean isUserContinue() {
         return userContinue;
+    }
+
+    public String getMd5() {
+        return md5;
     }
 
     public void setId(long id) {
@@ -221,6 +227,11 @@ public class ImplInfo {
 
     public ImplInfo setUserContinue(boolean userContinue) {
         this.userContinue = userContinue;
+        return this;
+    }
+
+    public ImplInfo setMd5(String md5) {
+        this.md5 = md5;
         return this;
     }
 }

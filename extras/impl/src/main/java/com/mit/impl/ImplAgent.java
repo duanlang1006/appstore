@@ -239,9 +239,7 @@ public class ImplAgent extends Observable {
         }
         ImplLog.d(TAG,"newDownload,"+title+","+implInfo.getStatus());
         setImplCallback(appCallback, implInfo);
-        if (null != downloadUrl) {
-            implInfo.setDownloadUrl(downloadUrl);
-        }
+        implInfo.setDownloadUrl(downloadUrl);
         if (null != title){
             implInfo.setTitle(title);
         }else if (null == implInfo.getTitle()){
@@ -252,9 +250,8 @@ public class ImplAgent extends Observable {
                 implInfo.setTitle(fullname);
             }
         }
-        if (null != iconUrl){
-            implInfo.setIconUrl(iconUrl);
-        }
+        implInfo.setIconUrl(iconUrl);
+        implInfo.setMd5(md5);
         implInfo.setAutoLaunch(autoLauncher);
         mDownloader.addDownload(implInfo, fullname, md5, mImplCallback);
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionAdd");
