@@ -241,7 +241,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_search) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(true, mInfo, null);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
             return true;
         } else if (item.getItemId() == R.id.action_dm) {
             ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
@@ -266,14 +266,14 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                 mEtView.setFocusable(false);
                 mEtView.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View paramView) {
-                        ((OSGIServiceHost) mActivity).jumptoSearch(true, mInfo, null);
+                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
                     }
                 });
                 mSearchView = (ImageView) customView.findViewById(R.id.search_icon);
                 mSearchView.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View paramView) {
                         String mKeyWord = mEtView.getHint().toString();
-                        ((OSGIServiceHost) mActivity).jumptoSearch(true, mInfo, mKeyWord);
+                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord);
                     }
                 });
             }

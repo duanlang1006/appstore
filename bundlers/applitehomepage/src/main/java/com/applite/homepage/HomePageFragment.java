@@ -74,7 +74,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class HomePageFragment extends OSGIBaseFragment implements View.OnClickListener {
     private final String TAG = "homepage_PagerFragment";
     private View popView;
@@ -310,10 +309,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             initActionBar();
 //            mActivity.runOnUiThread(mRefreshRunnable);
 
-            if(mHomePageListFragment != null){
-                LogUtils.i(TAG, "mHomePageListFragment = "+mHomePageListFragment);
+            if (mHomePageListFragment != null) {
+                LogUtils.i(TAG, "mHomePageListFragment = " + mHomePageListFragment);
                 mHomePageListFragment.play(true);
-            }else{
+            } else {
                 LogUtils.i(TAG, "mHomePageListFragment = null");
             }
 
@@ -324,10 +323,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(mHomePageListFragment != null){
-                LogUtils.i(TAG, "mHomePageListFragment = "+mHomePageListFragment);
+            if (mHomePageListFragment != null) {
+                LogUtils.i(TAG, "mHomePageListFragment = " + mHomePageListFragment);
                 mHomePageListFragment.play(false);
-            }else{
+            } else {
                 LogUtils.i(TAG, "mHomePageListFragment = null");
             }
         }
@@ -508,10 +507,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         MenuItem item = menu.findItem(R.id.action_search);
-        if (null != item){
+        if (null != item) {
             item.setVisible(false);
         }
-        inflater.inflate(R.menu.menu_main_homepage,menu);
+        inflater.inflate(R.menu.menu_main_homepage, menu);
         MenuItem item1 = menu.findItem(R.id.action_dm);
         if (null != item1) {
             item1.setVisible(true);
@@ -526,7 +525,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 return true;
             }
         } else if (item.getItemId() == R.id.action_search) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(true, mInfo, null);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
             return true;
         } else if (item.getItemId() == R.id.action_dm) {
             ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
@@ -540,8 +539,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         if (v.getId() == R.id.action_personal) {
             ((OSGIServiceHost) mActivity).jumptoPersonal(true);
         } else if (v.getId() == R.id.action_search) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(true, mInfo, null);
-        }else if (v.getId() == R.id.action_dm) {
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+        } else if (v.getId() == R.id.action_dm) {
             ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
         }
     }
@@ -550,7 +549,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private ViewGroup customView;
     private EditText mEtView;
     private ImageView mSearchView;
-//    private String mEtViewText;
+    //    private String mEtViewText;
     private String[] mHint;
     private int HINT_UPDATE_TIME = 2000;
     private int HINT_SHOW_NUMBER = 0;
@@ -573,21 +572,21 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         mHandler.postDelayed(mRunnable, 0);
     }
 
-    private void setSearchBar(){
-        if(null == customView){
+    private void setSearchBar() {
+        if (null == customView) {
             customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_searchbar, null);
             mEtView = (EditText) customView.findViewById(R.id.search_et);
             mEtView.setFocusable(false);
             mEtView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View paramView) {
-                    ((OSGIServiceHost) mActivity).jumptoSearch(true, mInfo, null);
+                    ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
                 }
             });
             mSearchView = (ImageView) customView.findViewById(R.id.search_icon);
             mSearchView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View paramView) {
                     String mKeyWord = mEtView.getHint().toString();
-                    ((OSGIServiceHost) mActivity).jumptoSearch(true, mInfo, mKeyWord);
+                    ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord);
                 }
             });
         }
@@ -620,12 +619,12 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             actionBar.removeAllTabs();
 
-            for(int i=0;i<mPageData.size();i++){
+            for (int i = 0; i < mPageData.size(); i++) {
                 LogUtils.i(TAG, "actionBar.addTab getPageTitle(i) : " + mSectionsPagerAdapter.getPageTitle(i));
                 actionBar.addTab(actionBar.newTab().setTabListener(mBarTabListener));
                 ActionBar.Tab t = actionBar.getTabAt(i);
                 t.setCustomView(R.layout.actionbar_tab);
-                TextView title = (TextView)t.getCustomView().findViewById(R.id.tab_title);
+                TextView title = (TextView) t.getCustomView().findViewById(R.id.tab_title);
 //                title.setBackgroundResource(R.drawable.edittext_bg);
                 title.setText(mSectionsPagerAdapter.getPageTitle(i));
             }
@@ -635,17 +634,17 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         }
     }
 
-    private final ActionBar.TabListener mBarTabListener = new ActionBar.TabListener(){
+    private final ActionBar.TabListener mBarTabListener = new ActionBar.TabListener() {
         private final static String TAG = "homepage_PagerFragment_mBarTabListener";
 
         @Override
         public void onTabReselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "11onTabReselected arg0.getPosition()= "+arg0.getPosition());
+            LogUtils.i(TAG, "11onTabReselected arg0.getPosition()= " + arg0.getPosition());
         }
 
         @Override
         public void onTabSelected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "11onTabSelected arg0.getPosition()= "+arg0.getPosition());
+            LogUtils.i(TAG, "11onTabSelected arg0.getPosition()= " + arg0.getPosition());
 
             if (mViewPager != null)
                 mViewPager.setCurrentItem(arg0.getPosition());
@@ -653,7 +652,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         @Override
         public void onTabUnselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "11onTabUnselected arg0.getPosition()= "+arg0.getPosition());
+            LogUtils.i(TAG, "11onTabUnselected arg0.getPosition()= " + arg0.getPosition());
         }
     };
 
@@ -733,7 +732,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
                     if (1 == data.getAppKey()) {
                         mPageData = data.getSubjectData();
-                        LogUtils.i(TAG, "mPageData:"+mPageData.toString());
+                        LogUtils.i(TAG, "mPageData:" + mPageData.toString());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -790,7 +789,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         @Override
         public CharSequence getPageTitle(int position) {
-            LogUtils.d(TAG, "getPageTitle :"+position);
+            LogUtils.d(TAG, "getPageTitle :" + position);
             if (null != mPageData)
                 return mPageData.get(position).getS_name();
             else
@@ -806,7 +805,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         @Override
         public int getItemPosition(Object object) {
-            LogUtils.d(TAG, "getItemPosition :"+object);
+            LogUtils.d(TAG, "getItemPosition :" + object);
             if (mChildCount > 0) {
                 mChildCount--;
                 return POSITION_NONE;

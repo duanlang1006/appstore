@@ -35,6 +35,7 @@ public class SimilarView extends LinearLayout{
         super.onFinishInflate();
         mTitle = (TextView)findViewById(R.id.similar_title);
         mGridView = (GridView)findViewById(R.id.similar_grid);
+        mGridView.setFocusable(false);
     }
 
     public void setData(List<SimilarBean> data,SimilarAdapter.SimilarAPKDetailListener listener){

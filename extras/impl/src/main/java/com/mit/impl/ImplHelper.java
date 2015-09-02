@@ -161,21 +161,20 @@ public class ImplHelper{
                 case ImplInfo.STATUS_PRIVATE_INSTALLING:
                     //正在安装或已安装
 //                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
-                    break;
-                case ImplInfo.STATUS_INSTALLED:
-                default:
-                    implAgent.newDownload(implInfo,
-                            downloadUrl,
-                            name,
-                            iconUrl,
-                            fullname,
-                            md5,
-                            true,
-                            null);
-                    break;
-            }
+                break;
+            case ImplInfo.STATUS_INSTALLED:
+            default:
+                implAgent.newDownload(implInfo,
+                        downloadUrl,
+                        name,
+                        iconUrl,
+                        fullname,
+                        md5,
+                        false,
+                        null);
+                break;
         }
-    }
+    }}
 
     public static String getFileMD5(File file) {
         if (!file.isFile()) {
