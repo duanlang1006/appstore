@@ -13,15 +13,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="@dimen/action_button_distance10"
         android:background="@drawable/btn_cancel_selector"
-        android:paddingBottom="1dp"
-        android:paddingLeft="1dp"
-        android:paddingRight="1dp"
-        android:paddingTop="1dp"
+        android:paddingBottom="@dimen/action_button_distance1"
+        android:paddingLeft="@dimen/action_button_distance2"
+        android:paddingRight="@dimen/action_button_distance2"
+        android:paddingTop="@dimen/action_button_distance1"
         android:text="@string/cancel_btn"
         android:textColor="@color/black"
-        android:textSize="16dp"
+        android:textSize="@dimen/action_button_size"
         android:textStyle="bold" />
 
     <TextView
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
-        android:textSize="16dp"
+        android:textSize="@dimen/action_button_size"
         android:textStyle="bold" />
 
     <Button
@@ -39,15 +39,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginRight="10dp"
+        android:layout_marginRight="@dimen/action_button_distance10"
         android:background="@drawable/btn_allpick_selector"
-        android:paddingBottom="1dp"
-        android:paddingLeft="2dp"
-        android:paddingRight="2dp"
-        android:paddingTop="1dp"
+        android:paddingBottom="@dimen/action_button_distance1"
+        android:paddingLeft="@dimen/action_button_distance2"
+        android:paddingRight="@dimen/action_button_distance2"
+        android:paddingTop="@dimen/action_button_distance1"
         android:text="@string/allpick_btn"
         android:textColor="@color/white"
-        android:textSize="16dp"
+        android:textSize="@dimen/action_button_size"
         android:textStyle="bold" />
 
 

@@ -22,7 +22,7 @@
         android:enabled="false"
         android:text="@string/share_btn"
         android:textColor="@color/lightgrey"
-        android:textSize="14dp" />
+        android:textSize="@dimen/bottom_buttom_size" />
 
     <TextView
         android:id="@+id/tvNone2"
@@ -42,7 +42,7 @@
         android:text="@string/delete_btn"
         android:textColor="@color/black"
         style="@style/CustomDownLoadButton"
-        android:textSize="14dp" />
+        android:textSize="@dimen/bottom_buttom_size" />
 
     <TextView
         android:id="@+id/tvNone3"

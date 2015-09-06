@@ -10,9 +10,22 @@
     <string name="upgrade_manager">Upgrade manager</string>
     <string name="logo_manager">Logo manager</string>
     <string name="zero_flow_update">Zero flow update</string>
+    <string name="setting">Setting</string>
     <string name="lucky_draw">Lucky draw</string>
     <string name="load_end">ending...</string>
 
     <string name="install">Install</string>
-
+    <string name="update_remind">Remind when updating</string>
+    <string name="notification">Notification</string>
+    <string name="update_notification">Update Notification</string>
+    <string name="other_function">Other Function</string>
+    <string name="clean_cache">Clean Cache</string>
+    <string name="clean_cache_detail">Clean You Cache</string>
+    <string name="delete_package">Delete Package</string>
+    <string name="delete_package_detail">Delete The Package When Finish The Setup</string>
+    <string name="no_picture">No Picture</string>
+    <string name="no_picture_detail">Only Download Picture When You Are Using WIFI</string>
+    <string name="feedback">Feedback</string>
+    <string name="abort">Abort</string>
+    <string name="help">Help</string>
 </resources>
