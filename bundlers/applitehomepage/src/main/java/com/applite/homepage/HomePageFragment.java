@@ -130,7 +130,9 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         public void onPageSelected(int position) {
             LogUtils.d(TAG, "onPageSelected : " + position);
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
-            actionBar.setSelectedNavigationItem(position);
+            if(actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS){
+                actionBar.setSelectedNavigationItem(position);
+            }
         }
 
         @Override
@@ -558,12 +560,14 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         @Override
         public void run() {
-            mEtView.setHint(mHint[HINT_SHOW_NUMBER]);
-            mHandler.postDelayed(this, HINT_UPDATE_TIME);
-            if (HINT_SHOW_NUMBER < mHint.length - 1) {
-                HINT_SHOW_NUMBER = HINT_SHOW_NUMBER + 1;
-            } else {
-                HINT_SHOW_NUMBER = 0;
+            if (null != mHint && mHint.length != 0) {
+                mEtView.setHint(mHint[HINT_SHOW_NUMBER]);
+                mHandler.postDelayed(this, HINT_UPDATE_TIME);
+                if (HINT_SHOW_NUMBER < mHint.length - 1) {
+                    HINT_SHOW_NUMBER = HINT_SHOW_NUMBER + 1;
+                } else {
+                    HINT_SHOW_NUMBER = 0;
+                }
             }
         }
     };
@@ -639,12 +643,12 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         @Override
         public void onTabReselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "11onTabReselected arg0.getPosition()= " + arg0.getPosition());
+            LogUtils.i(TAG, "onTabReselected arg0.getPosition()= " + arg0.getPosition());
         }
 
         @Override
         public void onTabSelected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "11onTabSelected arg0.getPosition()= " + arg0.getPosition());
+            LogUtils.i(TAG, "onTabSelected arg0.getPosition()= " + arg0.getPosition());
 
             if (mViewPager != null)
                 mViewPager.setCurrentItem(arg0.getPosition());
@@ -652,7 +656,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         @Override
         public void onTabUnselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "11onTabUnselected arg0.getPosition()= " + arg0.getPosition());
+            LogUtils.i(TAG, "onTabUnselected arg0.getPosition()= " + arg0.getPosition());
         }
     };
 
