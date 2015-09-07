@@ -15,4 +15,19 @@
 
     <string name="install">Install</string>
 
+    <string name="rules_title">Rules</string>
+    <string name="ok">OK</string>
+
+    <string name="IntegralProblem">Integral Problem</string>
+
+    <string name="rules_no1">Rules no1</string>
+    <string name="rules_no2">Rules no2</string>
+    <string name="rules_no3">Rules no3</string>
+    <string name="rules_no4">Rules no4</string>
+    <string name="rules_no5">Rules no5</string>
+    <string name="rules_no6">Rules no6</string>
+    <string name="rules_no7">Rules no7</string>
+    <string name="rules_else">Rules else</string>
+    <string name="rules_end">Rules end</string>
+
 </resources>

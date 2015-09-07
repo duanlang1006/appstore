@@ -19,4 +19,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />
+
+    <Button
+        android:id="@+id/rules"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="rules"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="49dp"
+        android:layout_marginStart="49dp"
+        android:layout_marginTop="34dp" />
+
+    <TextView
+        android:id="@+id/points"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_alignTop="@+id/rules"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="60dp"
+        android:layout_marginEnd="60dp" />
 </RelativeLayout>

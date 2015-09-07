@@ -30,6 +30,13 @@ public class AppliteSPUtils {
     public static final String LOGO_IMG_SAVE_PATH = "logo_img_save_path";
     public static final String LOGO_IMG_DOWNLOAD_URL = "logo_img_download_url";
 
+
+    /**
+     * 幸运抽奖积分
+     */
+    public static final String LUCKY_POINTS = "lucky_points";
+    public static final String SIGN_IN = "sign_in";
+
     /**
      * 通知显示时间
      */

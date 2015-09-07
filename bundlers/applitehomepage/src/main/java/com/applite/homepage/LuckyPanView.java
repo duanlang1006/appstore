@@ -17,6 +17,7 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 
 public class LuckyPanView extends SurfaceView implements Callback, Runnable {
+	private final String TAG = "LuckyPanView";
 
 	private SurfaceHolder mHolder;
 	/**
@@ -35,18 +36,18 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 	/**
 	 * 抽奖的文字
 	 */
-	private String[] mStrs = new String[] { "单反相机", "IPAD", "恭喜发财", "IPHONE",
-			"妹子一只", "恭喜发财" };
+	private String[] mStrs = new String[] { "10积分", "50积分", "100积分", "10M流量",
+			"手机一台", "谢谢参与" };
 	/**
 	 * 每个盘块的颜色
 	 */
 	private int[] mColors = new int[] { 0xFFFFC300, 0xFFF17E01, 0xFFFFC300,
 			0xFFF17E01, 0xFFFFC300, 0xFFF17E01 };
 	/**
-	 * 与文字对应的图片
+	 * 与文字对应的图片.
 	 */
-	private int[] mImgs = new int[] { R.drawable.danfan, R.drawable.ipad,
-			R.drawable.f040, R.drawable.iphone, R.drawable.meizi,
+	private int[] mImgs = new int[] { R.drawable.f040, R.drawable.f040,
+			R.drawable.f040, R.drawable.f040, R.drawable.f040,
 			R.drawable.f040 };
 
 	/**
@@ -300,7 +301,6 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 
 			if ((rotate > from) && (rotate < to))
 			{
-				Log.d("TAG", mStrs[i]);
 				return;
 			}
 		}
@@ -372,10 +372,12 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 		 * </pre>
 		 */
 		float v1 = (float) (Math.sqrt(1 * 1 + 8 * 1 * targetFrom) - 1) / 2;
-		float targetTo = 4 * 360 + to;
-		float v2 = (float) (Math.sqrt(1 * 1 + 8 * 1 * targetTo) - 1) / 2;
+//		float targetTo = 4 * 360 + to;
+//		float v2 = (float) (Math.sqrt(1 * 1 + 8 * 1 * targetTo) - 1) / 2;
 
-		mSpeed = (float) (v1 + Math.random() * (v2 - v1));
+//		mSpeed = (float) (v1 + Math.random() * (v2 - v1));
+		mSpeed = (float) (v1 + Math.random()*6);
+		Log.d(TAG, "mSpeed = "+mSpeed);
 		isShouldEnd = false;
 	}
 
