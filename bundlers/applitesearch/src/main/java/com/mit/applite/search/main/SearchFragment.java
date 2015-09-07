@@ -261,6 +261,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onResume() {
         super.onResume();
+        getfocuable();
+        openKeyboard();
     }
 
     @Override
@@ -480,10 +482,10 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             }
         } else if (v.getId() == R.id.hot_word_change) {
             MitMobclickAgent.onEvent(mActivity, "clickHotWordChange");
-            losefocuable();
-            closeKeyboard();
+//            losefocuable();
+//            closeKeyboard();
             changeHotWord();
-            startConvenientSearch();
+//            startConvenientSearch();
         } else if (v.getId() == R.id.refresh_btn) {
             no_network.setVisibility(View.GONE);
             if (TextUtils.isEmpty(mDetailTag)) {
