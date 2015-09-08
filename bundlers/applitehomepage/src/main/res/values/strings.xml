@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    my_app_nam
+    <string name="my_app_name">Applite</string>
     <string name="app_name">ApplitHome</string>
     <string name="personal">Personal</string>
 
