@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialog_feedback"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="我们很重视您的意见和建议"
+        android:textColor="#EE7600"
+        android:textSize="25dp" />
+
+    <RadioGroup
+        android:id="@+id/dialog_feedback_rg1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/dialog_feedback_rb1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="下载失败" />
+
+        <RadioButton
+            android:id="@+id/dialog_feedback_rb2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="找不到应用" />
+
+        <RadioButton
+            android:id="@+id/dialog_feedback_rb3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="操作不流畅" />
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/dialog_feedback_rg2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/dialog_feedback_rb4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="界面不好" />
+
+        <RadioButton
+            android:id="@+id/dialog_feedback_rb5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="闪退或重启" />
+
+        <RadioButton
+            android:id="@+id/dialog_feedback_rb6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="账号有问题" />
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/dialog_feedback_et1"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:gravity="start"
+        android:hint="请输入您的意见和建议"
+        android:singleLine="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="被采纳的意见会获得"
+            android:textSize="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="小奖品"
+            android:textColor="#EE7600"
+            android:textSize="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="，记得留下联系方式哦～"
+            android:textSize="12dp" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/dialog_feedback_et2"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:hint="手机/QQ邮箱"
+        android:singleLine="true"
+        android:textSize="15dp" />
+
+</LinearLayout>
