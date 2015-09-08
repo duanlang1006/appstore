@@ -191,18 +191,12 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         } else {
             rootView = mInflater.inflate(R.layout.fragment_logo, container, false);
             logoInitView();
+            LogUtils.d(TAG, "当前时间：" + System.currentTimeMillis() + "-----下次请求时间：" + AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_NEXT_TIME, 0L));
             if (System.currentTimeMillis() > (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_NEXT_TIME, 0L)) {
                 logoPost();
             }
         }
 
-
-        if (null != mToHomeView) {
-            mToHomeView.setEnabled(true);
-        } else {
-            long timeout = (long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_SHOW_TIME, 3000L);
-            mHandler.postDelayed(mThread, timeout);
-        }
         implAgent.addObserver(this);
         return rootView;
     }
@@ -212,6 +206,12 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         LogUtils.i(TAG, "onResume");
         super.onResume();
         MitMobclickAgent.onPageStart(whichPage); //统计页面
+        if (null != mToHomeView) {
+            mToHomeView.setEnabled(true);
+        } else {
+            long timeout = (long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_SHOW_TIME, 3000L);
+            mHandler.postDelayed(mThread, timeout);
+        }
 
         getView().setFocusableInTouchMode(true);
         getView().requestFocus();
@@ -292,6 +292,8 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
             AppliteSPUtils.put(mActivity, AppliteSPUtils.ISGUIDE, false);
             mToHomeView.setVisibility(View.GONE);
         }
+
+        getImplInfoCount();
     }
 
     /**
@@ -472,11 +474,18 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         if (null == implAgent || null == mInstallView || null == mActivity) {
             return;
         }
+        getImplInfoCount();
+    }
+
+    private void getImplInfoCount() {
         mDownloadQueueNumber = implAgent.getImplInfoCount(ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PENDING | ImplInfo.STATUS_PAUSED);
-        if (mDownloadQueueNumber == 0) {
-            mInstallView.setText(mActivity.getResources().getText(R.string.one_click_install));
-        } else {
-            mInstallView.setText(mActivity.getResources().getText(R.string.downloading) + "(" + mDownloadQueueNumber + ")");
+        LogUtils.d(TAG, "mDownloadQueueNumber:" + mDownloadQueueNumber);
+        if (null != mInstallView) {
+            if (mDownloadQueueNumber == 0) {
+                mInstallView.setText(mActivity.getResources().getText(R.string.one_click_install));
+            } else {
+                mInstallView.setText(mActivity.getResources().getText(R.string.downloading) + "(" + mDownloadQueueNumber + ")");
+            }
         }
     }
 
@@ -734,25 +743,29 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                 try {
                     JSONObject obj = new JSONObject(responseInfo.result);
                     int app_key = obj.getInt("app_key");
-                    long NextTime = obj.getLong("nexttime") * 1000;
-                    long ShowTime = obj.getInt("i_staytime") * 1000;
-                    String BigImgUrl = obj.getString("i_biglogourl");
-                    String SmallImgUrl = obj.getString("i_smalllogourl");
-                    long StartTime = obj.getLong("limit_starttime") * 1000;
-                    long EndTime = obj.getLong("limit_endtime") * 1000;
+                    String info = obj.getString("info");
+                    if (!TextUtils.isEmpty(info)) {
+                        JSONObject object = new JSONObject(info);
+                        long NextTime = object.getLong("nexttime") * 1000;
+                        long ShowTime = object.getInt("i_staytime") * 1000;
+                        String BigImgUrl = object.getString("i_biglogourl");
+                        String SmallImgUrl = object.getString("i_smalllogourl");
+                        long StartTime = object.getLong("limit_starttime") * 1000;
+                        long EndTime = object.getLong("limit_endtime") * 1000;
+                        LogUtils.d(TAG, "BigImgUrl:" + BigImgUrl);
+                        LogUtils.d(TAG, "LOGO_IMG_DOWNLOAD_URL:" + AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, ""));
+                        if (!BigImgUrl.equals(AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, ""))) {
+                            AppliteUtils.delFile((String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_SAVE_PATH, ""));
+                            download(Constant.LOGO_IMG_NAME, BigImgUrl);
+                        }
 
-                    LogUtils.d(TAG, "BigImgUrl:" + BigImgUrl);
-                    LogUtils.d(TAG, "LOGO_IMG_DOWNLOAD_URL:" + AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, ""));
-                    if (!BigImgUrl.equals(AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, ""))) {
-                        AppliteUtils.delFile((String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_SAVE_PATH, ""));
-                        download(Constant.LOGO_IMG_NAME, BigImgUrl);
+                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_NEXT_TIME, NextTime);
+                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_SHOW_TIME, ShowTime);
+                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_START_SHOW_TIME, StartTime);
+                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, EndTime);
+                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, BigImgUrl);
                     }
 
-                    AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_NEXT_TIME, NextTime);
-                    AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_SHOW_TIME, ShowTime);
-                    AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_START_SHOW_TIME, StartTime);
-                    AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, EndTime);
-                    AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, BigImgUrl);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     LogUtils.e(TAG, "LOGO,JSON解析异常");

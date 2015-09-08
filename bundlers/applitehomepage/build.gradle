@@ -62,6 +62,7 @@ dependencies {
     provided files('../../extras/impl/applite-impl-v1.1.jar')
     provided files('../../extras/mitUpdateSDK/mit-update-v1.0.jar')
     provided files('../../app/reflibs/gson-2.2.4.jar')
+    compile 'com.android.support:support-v4:21.0.3'
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile project(':extras:mittheme')
 }

@@ -8,8 +8,8 @@ android {
         applicationId "com.shly.appstore"
         minSdkVersion 10
         targetSdkVersion 21
-        versionCode 36
-        versionName "2.0.036"
+        versionCode 37
+        versionName "2.0.037"
         multiDexEnabled true
         manifestPlaceholders = [UMENG_CHANNEL_VALUE: "leadexceed_buildin"]
     }
@@ -89,7 +89,7 @@ android {
         archiveName "../appstore_v${defaultConfig.versionName}.zip"
     }
 
-    task setTag (type : Exec) {
+    task setTag(type: Exec) {
         executable "git"
         args "tag"
         args "-af"
@@ -98,7 +98,7 @@ android {
         args "release for appstore_v${defaultConfig.versionName}"
     }
 
-    task pushTag (type : Exec) {
+    task pushTag(type: Exec) {
         executable "git"
         args "push"
         args "origin"

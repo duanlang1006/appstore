@@ -278,4 +278,56 @@ public class MitMobclickAgent {
         }
     }
 
+    /**
+     * 计算抽奖积分
+     *
+     * @return
+     */
+    public static int calDrawPoints(int points, String type){
+        switch (type){
+            case "download":
+                points+=20;
+                break;
+            case "qq":
+                points+=50;
+                break;
+            case "weixin":
+                points+=50;
+                break;
+            case "weibo":
+                points+=50;
+                break;
+            case "phone":
+                points+=50;
+                break;
+            case "DailyAttendance1":
+                points+=20;
+                break;
+            case "DailyAttendance2":
+                points+=30;
+                break;
+            case "DailyAttendance3":
+                points+=40;
+                break;
+            case "DailyAttendance4":
+                points+=50;
+                break;
+            case "DailyAttendance5":
+                points+=60;
+                break;
+            case "DailyAttendance6":
+                points+=70;
+                break;
+            case "DailyAttendance7":
+                points+=80;
+                break;
+            case "choujiang":
+                points-=20;
+                break;
+            default:
+                break;
+        }
+        return points;
+    }
+
 }

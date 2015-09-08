@@ -51,13 +51,6 @@
         android:text="~我~们~的~队~伍~像~太~阳~"
         android:textColor="@color/star_color" />
 
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/a_delete_soon1" />
-
-
     <com.applite.homepage.WheelView
         android:id="@+id/aa"
         android:layout_width="match_parent"
