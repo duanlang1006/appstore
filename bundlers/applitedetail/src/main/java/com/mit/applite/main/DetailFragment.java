@@ -91,11 +91,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     //    private LinearLayout mLoadLayout;
 //    private ImageView mLoadView;
 //    private Animation LoadingAnimation;
-    private TextView mUpdateLogView;
     private String mDescription;
     private String mUpdateLog;
     private ImageView mOpenIntroduceView;
-    private ImageView mOpenUpdateLogView;
     private int DEFAULT_MAX_LINE_COUNT = 3;//应用介绍、更新日志默认最多显示3行
     private int COLLAPSIBLE_STATE_NONE = 0;//少于3行状态
     private int COLLAPSIBLE_STATE_SHRINKUP = 1;//收缩状态
@@ -251,8 +249,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         refreshButton = (Button) rootView.findViewById(R.id.refresh_btn);
 
         mOpenIntroduceView = (ImageView) rootView.findViewById(R.id.detail_open_introduce_content);
-        mOpenUpdateLogView = (ImageView) rootView.findViewById(R.id.detail_open_update_log);
-        mUpdateLogView = (TextView) rootView.findViewById(R.id.detail_update_log);
 
         mHorDefaultLayout = (LinearLayout) rootView.findViewById(R.id.detail_hor_default_layout);
 
@@ -313,9 +309,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             }
         });
         mOpenIntroduceView.setOnClickListener(this);
-        mOpenUpdateLogView.setOnClickListener(this);
         mApkContentView.setOnClickListener(this);
-        mUpdateLogView.setOnClickListener(this);
         refreshButton.setOnClickListener(this);
     }
 
@@ -369,18 +363,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 mApkContentView.setMaxLines(DEFAULT_MAX_LINE_COUNT);
                 CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
                 mOpenIntroduceView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_more));
-            }
-        } else if (v.getId() == R.id.detail_update_log || v.getId() == R.id.detail_open_update_log) {
-            if (UPDATE_LOG_STATE == COLLAPSIBLE_STATE_SHRINKUP) {
-                LogUtils.i(TAG, "更新日志展开");
-                mUpdateLogView.setMaxLines(Integer.MAX_VALUE);
-                UPDATE_LOG_STATE = COLLAPSIBLE_STATE_SPREAD;
-                mOpenUpdateLogView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_less));
-            } else if (UPDATE_LOG_STATE == COLLAPSIBLE_STATE_SPREAD) {
-                LogUtils.i(TAG, "更新日志收缩");
-                mUpdateLogView.setMaxLines(DEFAULT_MAX_LINE_COUNT);
-                UPDATE_LOG_STATE = COLLAPSIBLE_STATE_SHRINKUP;
-                mOpenUpdateLogView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_more));
             }
         }
     }
@@ -489,24 +471,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                         } else {
                             mApkContentView.setLines(DEFAULT_MAX_LINE_COUNT);
                             CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
-                        }
-                    }
-                }, 500);
-
-//                LogUtils.i(TAG, "更新日志：" + mDescription);
-                if (TextUtils.isEmpty(mUpdateLog)) {
-                    mUpdateLogView.setText(mActivity.getResources().getText(R.string.no_update_log));
-                } else {
-                    mUpdateLogView.setText(mUpdateLog);
-                }
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mUpdateLogView.getLineCount() <= DEFAULT_MAX_LINE_COUNT) {
-                            mOpenUpdateLogView.setVisibility(View.GONE);
-                        } else {
-                            mUpdateLogView.setLines(DEFAULT_MAX_LINE_COUNT);
-                            UPDATE_LOG_STATE = COLLAPSIBLE_STATE_SHRINKUP;
                         }
                     }
                 }, 500);

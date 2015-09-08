@@ -47,6 +47,7 @@ public class UpdateReceiver extends BroadcastReceiver {
                 new UpdateCheckTask().execute(context,packageName);
             }
         }
+
     }
 
     class UpdateCheckTask extends AsyncTask<Object,Object,String>{
