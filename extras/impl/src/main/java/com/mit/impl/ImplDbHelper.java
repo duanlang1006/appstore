@@ -36,74 +36,86 @@ public class ImplDbHelper {
         @Override
         public void onUpgrade(DbUtils dbUtils, int oldVersion, int newVersion) {
             ImplLog.d("impl_db","onUpgrade,"+oldVersion+","+newVersion);
-            switch(newVersion){
-                case 2:
-                    try {
-                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"cause\" INTEGER default 0");
-                    } catch (DbException e) {}
-                    try {
-                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"size\" INTEGER default 0");
-                    } catch (DbException e) {}
-                    try {
-                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"userContinue\" INTEGER default 0");
-                    } catch (DbException e) {}
-                    break;
-                case 3:
-                    try {
-                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"md5\" TEXT");
-                    } catch (DbException e) {}
-                    try {
-                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"state\" INTEGER");
-                    } catch (DbException e) {}
-                    try {
-                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"fileSavePath\" TEXT");
-                    } catch (DbException e) {}
-                    try {
-                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"current\" INTEGER");
-                    } catch (DbException e) {}
-                    try {
-                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"total\" INTEGER");
-                    } catch (DbException e) {}
-                    try {
-                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"autoResume\" INTEGER");
-                    } catch (DbException e) {}
-                    try {
-                        dbUtils.execNonQuery("Alter table "+TABLE_IMPLINFO+" add column \"autoRename\" INTEGER");
-                    } catch (DbException e) {}
-                    break;
+            for (int i = oldVersion+1; i <= newVersion;i++) {
+                switch (i) {
+                    case 2:
+                        try {
+                            dbUtils.execNonQuery("Alter table " + TABLE_IMPLINFO + " add column \"cause\" INTEGER default 0");
+                        } catch (DbException e) {
+                        }
+                        try {
+                            dbUtils.execNonQuery("Alter table " + TABLE_IMPLINFO + " add column \"size\" INTEGER default 0");
+                        } catch (DbException e) {
+                        }
+                        try {
+                            dbUtils.execNonQuery("Alter table " + TABLE_IMPLINFO + " add column \"userContinue\" INTEGER default 0");
+                        } catch (DbException e) {
+                        }
+                        break;
+                    case 3:
+                        try {
+                            dbUtils.execNonQuery("Alter table " + TABLE_IMPLINFO + " add column \"md5\" TEXT");
+                        } catch (DbException e) {
+                        }
+                        try {
+                            dbUtils.execNonQuery("Alter table " + TABLE_IMPLINFO + " add column \"state\" INTEGER");
+                        } catch (DbException e) {
+                        }
+                        try {
+                            dbUtils.execNonQuery("Alter table " + TABLE_IMPLINFO + " add column \"fileSavePath\" TEXT");
+                        } catch (DbException e) {
+                        }
+                        try {
+                            dbUtils.execNonQuery("Alter table " + TABLE_IMPLINFO + " add column \"current\" INTEGER");
+                        } catch (DbException e) {
+                        }
+                        try {
+                            dbUtils.execNonQuery("Alter table " + TABLE_IMPLINFO + " add column \"total\" INTEGER");
+                        } catch (DbException e) {
+                        }
+                        try {
+                            dbUtils.execNonQuery("Alter table " + TABLE_IMPLINFO + " add column \"autoResume\" INTEGER");
+                        } catch (DbException e) {
+                        }
+                        try {
+                            dbUtils.execNonQuery("Alter table " + TABLE_IMPLINFO + " add column \"autoRename\" INTEGER");
+                        } catch (DbException e) {
+                        }
+                        break;
 
-                case 4:
-                    Cursor c = null;
-                    try {
-                        c = dbUtils.execQuery("select id,state,fileSavePath,progress,fileLength,autoResume,autoRename from DownloadInfo");
-                        if (null != c && c.getCount() > 0 && c.moveToFirst()){
-                            dbUtils.getDatabase().beginTransaction();
-                            do{
-                                long id = c.getLong(c.getColumnIndex("id"));
-                                int state = c.getInt(c.getColumnIndex("state"));
-                                String fileSavePath = c.getString(c.getColumnIndex("fileSavePath"));
-                                long progress = c.getLong(c.getColumnIndex("progress"));
-                                long fileLength = c.getLong(c.getColumnIndex("fileLength"));
-                                int autoResume = c.getInt(c.getColumnIndex("autoResume"));
-                                int autoRename = c.getInt(c.getColumnIndex("autoRename"));
-                                dbUtils.execNonQuery("update "+TABLE_IMPLINFO+" set state="+state+" where downloadId="+id);
-                                dbUtils.execNonQuery("update "+TABLE_IMPLINFO+" set fileSavePath=\""+fileSavePath+"\" where downloadId="+id);
-                                dbUtils.execNonQuery("update "+TABLE_IMPLINFO+" set current="+progress+" where downloadId="+id);
-                                dbUtils.execNonQuery("update "+TABLE_IMPLINFO+" set total="+fileLength+" where downloadId="+id);
-                                dbUtils.execNonQuery("update "+TABLE_IMPLINFO+" set autoResume="+autoResume+" where downloadId="+id);
-                                dbUtils.execNonQuery("update "+TABLE_IMPLINFO+" set autoRename="+autoRename+" where downloadId="+id);
-                            }while(c.moveToNext());
-                            dbUtils.getDatabase().setTransactionSuccessful();
+                    case 4:
+                        Cursor c = null;
+                        try {
+                            c = dbUtils.execQuery("select id,state,fileSavePath,progress,fileLength,autoResume,autoRename from DownloadInfo");
+                            if (null != c && c.getCount() > 0 && c.moveToFirst()) {
+                                dbUtils.getDatabase().beginTransaction();
+                                do {
+                                    long id = c.getLong(c.getColumnIndex("id"));
+                                    int state = c.getInt(c.getColumnIndex("state"));
+                                    String fileSavePath = c.getString(c.getColumnIndex("fileSavePath"));
+                                    long progress = c.getLong(c.getColumnIndex("progress"));
+                                    long fileLength = c.getLong(c.getColumnIndex("fileLength"));
+                                    int autoResume = c.getInt(c.getColumnIndex("autoResume"));
+                                    int autoRename = c.getInt(c.getColumnIndex("autoRename"));
+                                    dbUtils.execNonQuery("update " + TABLE_IMPLINFO + " set state=" + state + " where downloadId=" + id);
+                                    dbUtils.execNonQuery("update " + TABLE_IMPLINFO + " set fileSavePath=\"" + fileSavePath + "\" where downloadId=" + id);
+                                    dbUtils.execNonQuery("update " + TABLE_IMPLINFO + " set current=" + progress + " where downloadId=" + id);
+                                    dbUtils.execNonQuery("update " + TABLE_IMPLINFO + " set total=" + fileLength + " where downloadId=" + id);
+                                    dbUtils.execNonQuery("update " + TABLE_IMPLINFO + " set autoResume=" + autoResume + " where downloadId=" + id);
+                                    dbUtils.execNonQuery("update " + TABLE_IMPLINFO + " set autoRename=" + autoRename + " where downloadId=" + id);
+                                } while (c.moveToNext());
+                                dbUtils.getDatabase().setTransactionSuccessful();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            dbUtils.getDatabase().endTransaction();
+                            if (null != c) {
+                                c.close();
+                            }
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }finally {
-                        dbUtils.getDatabase().endTransaction();
-                        if (null != c){
-                            c.close();
-                        }
-                    }
-                    break;
+                        break;
+                }
             }
         }
 

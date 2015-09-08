@@ -3,6 +3,7 @@ package com.mit.impl;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -52,13 +53,13 @@ public class ImplPackageManager{
                 break;
             default:
                 try {
-                    PackageInfo pakageinfo = pm.getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
+                    ApplicationInfo appInfo = pm.getApplicationInfo(implInfo.getPackageName(), PackageManager.GET_META_DATA);
 //                    if (implInfo.getVersionCode() <= pakageinfo.versionCode) {
                         implInfo.setStatus(ImplInfo.STATUS_INSTALLED);
 //                    }else{
 //                        implInfo.setStatus(ImplInfo.STATUS_UPGRADE);
 //                    }
-                } catch (PackageManager.NameNotFoundException e) {
+                } catch (Exception e) {
                     //e.printStackTrace();
                 }
                 break;
@@ -76,11 +77,11 @@ public class ImplPackageManager{
         PackageInfo info = pm.getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES);
         if (null != info && info.packageName.equals(implInfo.getPackageName())){
             try {
-                pm.getPackageInfo("com.android.installer", 0);
+                pm.getApplicationInfo("com.android.installer", 0);
                 installImpl(implInfo,path, silent);
             } catch (NameNotFoundException e) {
                 try{
-                    pm.getPackageInfo("com.android.dbservices", 0);
+                    pm.getApplicationInfo("com.android.dbservices", 0);
                     installImpl(implInfo,path,silent);
                 }catch(Exception e1){
 //                    e1.printStackTrace();
@@ -97,7 +98,7 @@ public class ImplPackageManager{
 
     void uninstall(ImplInfo implInfo,boolean silent,ImplListener callback){
         try{
-            pm.getPackageInfo("com.android.dbservices", 0);
+            pm.getApplicationInfo("com.android.dbservices", 0);
             Intent intent = new Intent("com.installer.action.delete");
             intent.putExtra("name", implInfo.getPackageName());
             intent.putExtra("nameTag", "APK_PATH_NAME.tag");
@@ -132,16 +133,18 @@ public class ImplPackageManager{
     }
 
     void onPackageAdded(ImplInfo implInfo,ImplListener callback){
-        try {
-            String localPath = implInfo.getLocalPath();
-            if (null == localPath){
-                localPath = implInfo.getFileSavePath();
-            }
-            new File(localPath).delete();
-            implInfo.setLocalPath(null);
-            implInfo.setCurrent(0);
-        }catch(Exception e){
+        if (implInfo.isAutoDelete()) {
+            try {
+                String localPath = implInfo.getLocalPath();
+                if (null == localPath) {
+                    localPath = implInfo.getFileSavePath();
+                }
+                new File(localPath).delete();
+                implInfo.setLocalPath(null);
+                implInfo.setCurrent(0);
+            } catch (Exception e) {
 //            e.printStackTrace();
+            }
         }
         implInfo.setStatus(ImplInfo.STATUS_INSTALLED);
         callback.onInstallSuccess(implInfo);
