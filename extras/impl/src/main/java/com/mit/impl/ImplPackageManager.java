@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.SparseArray;
 import java.io.File;
 import java.lang.reflect.Method;
@@ -66,6 +67,9 @@ public class ImplPackageManager{
 
     void install(ImplInfo implInfo,boolean silent,ImplListener callback){
         String path = implInfo.getLocalPath();
+        if (null == path || TextUtils.isEmpty(path)){
+            path = implInfo.getFileSavePath();
+        }
         if (null == path || path.length()<1){
             return;
         }
@@ -73,14 +77,14 @@ public class ImplPackageManager{
         if (null != info && info.packageName.equals(implInfo.getPackageName())){
             try {
                 pm.getPackageInfo("com.android.installer", 0);
-                installImpl(implInfo, silent);
+                installImpl(implInfo,path, silent);
             } catch (NameNotFoundException e) {
                 try{
                     pm.getPackageInfo("com.android.dbservices", 0);
-                    installImpl(implInfo,silent);
+                    installImpl(implInfo,path,silent);
                 }catch(Exception e1){
 //                    e1.printStackTrace();
-                    installImpl(implInfo, false);
+                    installImpl(implInfo, path,false);
                 }
             }
             callback.onInstalling(implInfo);
@@ -129,12 +133,17 @@ public class ImplPackageManager{
 
     void onPackageAdded(ImplInfo implInfo,ImplListener callback){
         try {
-            new File(implInfo.getLocalPath()).delete();
+            String localPath = implInfo.getLocalPath();
+            if (null == localPath){
+                localPath = implInfo.getFileSavePath();
+            }
+            new File(localPath).delete();
+            implInfo.setLocalPath(null);
+            implInfo.setCurrent(0);
         }catch(Exception e){
 //            e.printStackTrace();
         }
         implInfo.setStatus(ImplInfo.STATUS_INSTALLED);
-//        implInfo.setLocalPath(null);
         callback.onInstallSuccess(implInfo);
     }
 
@@ -148,8 +157,7 @@ public class ImplPackageManager{
         callback.onUninstallSuccess(implInfo);
     }
 
-    private void installImpl(final ImplInfo implInfo, boolean silent) {
-        String filename = implInfo.getLocalPath();
+    private void installImpl(final ImplInfo implInfo, String filename,boolean silent) {
         if(silent){
             Intent intent = new Intent();
             intent.setAction("com.installer.system");

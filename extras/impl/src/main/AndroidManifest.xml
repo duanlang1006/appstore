@@ -19,6 +19,9 @@
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
+        <service
+            android:name="com.mit.impl.DownloadService"
+            android:exported="false"/>
     </application>
 
 </manifest>

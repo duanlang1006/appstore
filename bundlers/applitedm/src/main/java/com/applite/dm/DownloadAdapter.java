@@ -87,6 +87,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             }
             vh.actionBtn.setVisibility(View.GONE);
             vh.custompb.setVisibility(View.GONE);
+            vh.refresh();
         } else {//正常状态(没有删除的多选框)
             vh.deleteCheckBox.setVisibility(View.GONE);
             if (mListener.getStatusFlags() == isDownloaded) {
@@ -97,6 +98,9 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 vh.custompb.setVisibility(View.GONE);
             }
             vh.deleteCheckBox.setVisibility(View.GONE);
+        }
+        if (mListener.getStatusFlags() == ~isDownloaded) {
+            vh.statusView.setVisibility(View.INVISIBLE);
         }
         return view;
     }
@@ -145,8 +149,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             if (null == this.implInfo) {
                 return;
             }
-//            actionBtn.setText(implAgent.getActionText(implInfo));//??
-//            descView.setText(implAgent.getDescText(implInfo));//??
             implAgent.setImplCallback(this, implInfo);
             String title = implInfo.getTitle();
             if (null == title || title.isEmpty()) {
@@ -163,20 +165,23 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 return;
             }
             ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext, implInfo);
-            actionBtn.setText(res.getStatusText());
+            actionBtn.setText(res.getActionText());
             actionBtn.setEnabled(true);
             switch (implInfo.getStatus()) {
-                case ImplInfo.STATUS_PRIVATE_INSTALLING://静默安装
-//                    actionBtn.setEnabled(false);
-                    break;
-                case ImplInfo.ACTION_DOWNLOAD://下载
-                    custompb.setImageResource(R.drawable.download_status_pause);
-                    break;
-                case ImplInfo.ACTION_INSTALL://安装过程   ------->这里有时下载也会显示安装过程!
-                    custompb.setImageResource(R.drawable.download_status_pause);
+//                case ImplInfo.STATUS_PRIVATE_INSTALLING://静默安装
+////                    actionBtn.setEnabled(false);
+//                    break;
+//                case ImplInfo.ACTION_DOWNLOAD://下载
+//                    custompb.setImageResource(R.drawable.download_status_pause);
+//                    break;
+//                case ImplInfo.ACTION_INSTALL://安装过程   ------->这里有时下载也会显示安装过程!
+//                    custompb.setImageResource(R.drawable.download_status_pause);
+//                    break;
+                case ImplInfo.STATUS_RUNNING://下载中
+                    custompb.setImageResource(R.drawable.download_status_running);
                     break;
                 case ImplInfo.STATUS_PAUSED://下载暂停
-                    custompb.setImageResource(R.drawable.download_status_running);
+                    custompb.setImageResource(R.drawable.download_status_pause);
                     break;
                 case ImplInfo.STATUS_FAILED://下载失败
                     custompb.setImageResource(R.drawable.download_status_retry);
@@ -188,8 +193,9 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
 //                    Toast.makeText(mContext, "其他", Toast.LENGTH_SHORT).show();
                     break;
             }
+            descView.setText(res.getDescText());
             statusView.setText(res.getStatusText());
-            setProgress();
+            setProgress(res);
         }
 
         private void setIcon() {
@@ -213,12 +219,9 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         }
 
 
-        private void setProgress() {
-            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext, implInfo);
+        private void setProgress(ImplHelper.ImplHelperRes res) {
             custompb.setVisibility(View.VISIBLE);
             custompb.setProgress(res.getProgress());
-            descView.setText(res.getDescText());
-//            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
