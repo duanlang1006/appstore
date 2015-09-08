@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="wheel_shadows_default">
+        <item>0xa0eeeeee</item>
+        <item>0x00FFFFFF</item>
+        <item>0x00FFFFFF</item>
+    </integer-array>
+</resources>

@@ -25,4 +25,9 @@
         <attr name="progressButtonText" format="string" />
     </declare-styleable>
 
+    <declare-styleable name="WheelView">
+        <attr name="wheelVal" format="reference" />
+        <attr name="wheelShadows" format="reference" />
+    </declare-styleable>
+
 </resources>
