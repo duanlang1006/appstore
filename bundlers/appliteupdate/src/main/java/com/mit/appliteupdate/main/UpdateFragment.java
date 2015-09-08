@@ -112,7 +112,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_update, container, false);
-        mSimilarView = (SimilarView)View.inflate(mActivity,R.layout.similar_view,null);
+        mSimilarView = (SimilarView) View.inflate(mActivity, R.layout.similar_view, null);
         initView();
         if (TextUtils.isEmpty(mUpdateData)) {
             post();
@@ -187,8 +187,10 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 Toast.makeText(mActivity, AppliteUtils.getString(mActivity, R.string.no_update), Toast.LENGTH_SHORT).show();
             }
         } else if (v.getId() == R.id.update_post_button) {
-            if (mPostStats)
+            if (mPostStats) {
                 post();
+                setStatsLayoutVisibility(View.GONE, null);
+            }
         }
     }
 
@@ -296,8 +298,8 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         if (!TextUtils.isEmpty(mUpdateData))
             setLoadLayoutVisibility(View.GONE);
         try {
-            UpdateData updateData = mGson.fromJson(result,UpdateData.class);
-            if (null != updateData){
+            UpdateData updateData = mGson.fromJson(result, UpdateData.class);
+            if (null != updateData) {
                 mUpdateApkList = updateData.getInstalled_update_list();
                 mSimilarDataList = updateData.getSimilar_info();
             }
@@ -308,7 +310,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             } else {
                 setStatsLayoutVisibility(View.GONE, null);
             }
-            mSimilarView.setData(mSimilarDataList,this);
+            mSimilarView.setData(mSimilarDataList, this);
             mAdapter = new UpdateAdapter(mActivity, mUpdateApkList);
             mListView.setAdapter(mAdapter);
             mListView.setVisibility(View.VISIBLE);
