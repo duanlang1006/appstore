@@ -19,6 +19,7 @@ import com.applite.common.Constant;
 import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
 import com.applite.dm.DownloadPagerFragment;
+import com.applite.homepage.AbortFragment;
 import com.applite.homepage.HomePageFragment;
 import com.applite.homepage.HomePageListFragment;
 import com.applite.homepage.LuckyFragment;
@@ -363,9 +364,16 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     }
 
     @Override
+    public void jumptoAbort(boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_ABORT_FRAGMENT,
+                AbortFragment.class.getName(),
+                null, addToBackstack);
+    }
+
+    @Override
     public void jumptoConversation() {
         com.umeng.fb.util.Res.setPackageName(R.class.getPackage().getName());
-        Intent intent = new Intent(this,ConversationActivity.class);
+        Intent intent = new Intent(this, ConversationActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
@@ -391,6 +399,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_LOGO_FRAGMENT, "com.mit.main.GuideFragment");
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_SETTING_FRAGMENT, "com.applite.homepage.SettingFragment");
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_LUCKY_FRAGMENT, "com.applite.homepage.LuckyFragment");
+        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_ABORT_FRAGMENT, "com.applite.homepage.AbortFragment");
     }
 
     private void unregisterClients() {
@@ -403,5 +412,6 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_LOGO_FRAGMENT);
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_SETTING_FRAGMENT);
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_LUCKY_FRAGMENT);
+        OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_ABORT_FRAGMENT);
     }
 }

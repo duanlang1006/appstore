@@ -119,6 +119,7 @@
     <orderEntry type="library" exported="" name="Bundle2.8.1.02-Dev" level="project" />
     <orderEntry type="library" exported="" name="afinal_0.5.1_bin" level="project" />
     <orderEntry type="library" exported="" name="analytics-5.5.3" level="project" />
+    <orderEntry type="library" exported="" name="com.umeng.fb.5.4.0" level="project" />
     <orderEntry type="module" module-name="applitedm" exported="" />
     <orderEntry type="module" module-name="appliteupdate" exported="" />
     <orderEntry type="module" module-name="applitehomepage" exported="" />

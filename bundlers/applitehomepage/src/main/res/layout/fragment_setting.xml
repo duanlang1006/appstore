@@ -11,7 +11,6 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/textViewTitle1"
         style="@style/Setting_title_style"
         android:layout_width="match_parent"
         android:layout_height="40dp"
@@ -39,7 +38,6 @@
 
 
             <TextView
-                android:id="@+id/textViewShow1_1"
                 style="@style/Default_charactor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -49,7 +47,6 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageView1_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/divided_line_distance"
@@ -69,7 +66,6 @@
         android:layout_height="0.3dp" />
 
     <TextView
-        android:id="@+id/textViewTitle2"
         style="@style/Setting_title_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -97,7 +93,6 @@
 
 
             <TextView
-                android:id="@+id/textViewShow2_1"
                 style="@style/Default_charactor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -105,7 +100,6 @@
 
 
             <TextView
-                android:id="@+id/textViewHide2_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/clean_cache_detail"
@@ -113,7 +107,6 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageView2_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/divided_line_distance"
@@ -142,14 +135,12 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textViewShow2_2"
                 style="@style/Default_charactor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/delete_package" />
 
             <TextView
-                android:id="@+id/textViewHide2_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/delete_package_detail"
@@ -157,7 +148,6 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageView2_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/divided_line_distance"
@@ -188,7 +178,6 @@
 
 
             <TextView
-                android:id="@+id/textViewShow2_3"
                 style="@style/Default_charactor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -196,7 +185,6 @@
 
 
             <TextView
-                android:id="@+id/textViewHide2_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/no_picture_detail"
@@ -204,7 +192,6 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageView2_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/divided_line_distance"
@@ -246,7 +233,6 @@
 
 
             <TextView
-                android:id="@+id/textViewShow3_1"
                 style="@style/Default_charactor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -270,7 +256,6 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/textViewShow3_3"
             style="@style/Default_charactor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

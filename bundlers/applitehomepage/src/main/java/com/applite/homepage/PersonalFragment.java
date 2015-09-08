@@ -146,4 +146,5 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
             e.printStackTrace();
         }
     }
+
 }
