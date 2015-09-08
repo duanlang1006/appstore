@@ -54,6 +54,8 @@ android {
     }
 }
 
+
+
 dependencies {
     provided files('../../app/libs/afinal_0.5.1_bin.jar')
     provided files('../../app/reflibs/xUtils-2.6.14.jar')

@@ -51,7 +51,7 @@
         android:text="~我~们~的~队~伍~像~太~阳~"
         android:textColor="@color/star_color" />
 
-    <com.applite.homepage.WheelView
+    <kankan.wheel.widget.WheelView
         android:id="@+id/aa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

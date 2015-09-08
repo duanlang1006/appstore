@@ -1,12 +1,28 @@
-package com.applite.homepage;
+/*
+ *  Copyright 2011 Yuri Kanivets
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+package kankan.wheel.widget.adapters;
 
 import android.content.Context;
 
 /**
- * Created by wanghaochen on 15-9-7.
+ * The simple Array wheel adapter
+ * @param <T> the element type
  */
 public class ArrayWheelAdapter<T> extends AbstractWheelTextAdapter {
-
+    
     // items
     private T items[];
 
@@ -17,11 +33,11 @@ public class ArrayWheelAdapter<T> extends AbstractWheelTextAdapter {
      */
     public ArrayWheelAdapter(Context context, T items[]) {
         super(context);
-
+        
         //setEmptyItemResource(TEXT_VIEW_ITEM_RESOURCE);
         this.items = items;
     }
-
+    
     @Override
     public CharSequence getItemText(int index) {
         if (index >= 0 && index < items.length) {
@@ -39,4 +55,3 @@ public class ArrayWheelAdapter<T> extends AbstractWheelTextAdapter {
         return items.length;
     }
 }
-
