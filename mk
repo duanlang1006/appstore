@@ -7,23 +7,23 @@ else
     exit 0
 fi
 
-#cd ../impl
-#../../gradlew makeJar
-#if [ $? -eq 0 ];then
-#    echo impl ok!!!!!!!!!!!!!!!!!!!!!!!!
-#else
-#    echo impl error!!!!!!!!!!!!!!!!!!!!!!!!
-#    exit 0
-#fi
+cd ../impl
+../../gradlew makeJar
+if [ $? -eq 0 ];then
+    echo impl ok!!!!!!!!!!!!!!!!!!!!!!!!
+else
+    echo impl error!!!!!!!!!!!!!!!!!!!!!!!!
+    exit 0
+fi
 
-#cd ../applitecommon
-#../../gradlew makeJar
-#if [ $? -eq 0 ];then
-#    echo applitecommon ok!!!!!!!!!!!!!!!!!!!!!!!!
-#else
-#    echo applitecommon error!!!!!!!!!!!!!!!!!!!!!!!!
-#    exit 0
-#fi
+cd ../applitecommon
+../../gradlew makeJar
+if [ $? -eq 0 ];then
+    echo applitecommon ok!!!!!!!!!!!!!!!!!!!!!!!!
+else
+    echo applitecommon error!!!!!!!!!!!!!!!!!!!!!!!!
+    exit 0
+fi
 
 cd ../../app
 if [ $# -lt 1 ]; then
