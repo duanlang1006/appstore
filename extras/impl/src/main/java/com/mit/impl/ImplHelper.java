@@ -203,9 +203,9 @@ public class ImplHelper{
         boolean ret = false;
         PackageManager pm = context.getPackageManager();
         try {
-            pm.getPackageInfo(packageName, 0);
+            pm.getApplicationInfo(packageName, 0);
             ret = true;
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (Exception e) {
         }
         return ret;
     }
@@ -339,7 +339,7 @@ public class ImplHelper{
                             }
                         }
                     }
-                } catch (PackageManager.NameNotFoundException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     sHelperRes.action = ImplInfo.ACTION_DOWNLOAD;
                     sHelperRes.actionText = mResources.getString(R.string.action_retry);

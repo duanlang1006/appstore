@@ -180,39 +180,63 @@ public class ImplAgent extends Observable {
     public boolean onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         Log.d(TAG, "onReceive," + action);
-        ImplInfo implInfo = null;
         if (IMPL_ACTION_PACKAGE_ADDED.equals(action)) {
-            String packageName = intent.getData().getSchemeSpecificPart();
-            implInfo = findImplInfoByPackageName(packageName);
-            if (null != implInfo) {
-                mInstaller.onPackageAdded(implInfo, mImplCallback);
-            }
+            final String packageName = intent.getData().getSchemeSpecificPart();
+            mWorkHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    ImplInfo implInfo = findImplInfoByPackageName(packageName);
+                    if (null != implInfo) {
+                        mInstaller.onPackageAdded(implInfo, mImplCallback);
+                    }
+                }
+            });
         } else if (IMPL_ACTION_PACKAGE_CHANGED.equals(action)) {
-            String packageName = intent.getData().getSchemeSpecificPart();
-            implInfo = findImplInfoByPackageName(packageName);
-            if (null != implInfo) {
-                mInstaller.onPackageChanged(implInfo, mImplCallback);
-            }
+            final String packageName = intent.getData().getSchemeSpecificPart();
+            mWorkHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    ImplInfo implInfo = findImplInfoByPackageName(packageName);
+                    if (null != implInfo) {
+                        mInstaller.onPackageChanged(implInfo, mImplCallback);
+                    }
+                }
+            });
         } else if (IMPL_ACTION_PACKAGE_REMOVED.equals(action)) {
-            String packageName = intent.getData().getSchemeSpecificPart();
-            implInfo = findImplInfoByPackageName(packageName);
-            if (null != implInfo) {
-                mInstaller.onPackageRemoved(implInfo, mImplCallback);
-            }
+            final String packageName = intent.getData().getSchemeSpecificPart();
+            mWorkHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    ImplInfo implInfo = findImplInfoByPackageName(packageName);
+                    if (null != implInfo) {
+                        mInstaller.onPackageRemoved(implInfo, mImplCallback);
+                    }
+                }
+            });
         } else if (IMPL_ACTION_SYSTEM_INSTALL_RESULT.equals(action)) {
-            String packageName = intent.getStringExtra("name");
-            int result = intent.getIntExtra("result", 0);
-            implInfo = findImplInfoByPackageName(packageName);
-            if (null != implInfo) {
-                mInstaller.onSystemInstallResult(implInfo, result, mImplCallback);
-            }
+            final String packageName = intent.getStringExtra("name");
+            final int result = intent.getIntExtra("result", 0);
+            mWorkHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    ImplInfo implInfo = findImplInfoByPackageName(packageName);
+                    if (null != implInfo) {
+                        mInstaller.onSystemInstallResult(implInfo, result, mImplCallback);
+                    }
+                }
+            });
         } else if (IMPL_ACTION_SYSTEM_DELETE_RESULT.equals(action)) {
-            String packageName = intent.getStringExtra("name");
-            int result = intent.getIntExtra("result", 0);
-            implInfo = findImplInfoByPackageName(packageName);
-            if (null != implInfo) {
-                mInstaller.onSystemDeleteResult(implInfo, result, mImplCallback);
-            }
+            final String packageName = intent.getStringExtra("name");
+            final int result = intent.getIntExtra("result", 0);
+            mWorkHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    ImplInfo implInfo = findImplInfoByPackageName(packageName);
+                    if (null != implInfo) {
+                        mInstaller.onSystemDeleteResult(implInfo, result, mImplCallback);
+                    }
+                }
+            });
         } else if (IMPL_ACTION_DOWNLOAD_COMPLETE.equals(action)) {
 //                    mDownloader.onDownloadComplete(intent);
         }else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)){

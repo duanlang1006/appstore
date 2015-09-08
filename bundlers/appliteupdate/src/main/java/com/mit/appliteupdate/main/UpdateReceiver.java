@@ -40,13 +40,14 @@ public class UpdateReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         LogUtils.d(TAG,"onReceiver,action="+action);
-        if (Intent.ACTION_PACKAGE_ADDED.equals(action)) {
-            String packageName = intent.getData().getSchemeSpecificPart();
-            if (ImplHelper.packageInstalled(context,"com.android.installer")
-                    || ImplHelper.packageInstalled(context,"com.android.dbservices")){
-                new UpdateCheckTask().execute(context,packageName);
-            }
-        }
+        //由wifi网络下检查更新处理，这里不再处理
+//        if (Intent.ACTION_PACKAGE_ADDED.equals(action)) {
+//            String packageName = intent.getData().getSchemeSpecificPart();
+//            if (ImplHelper.packageInstalled(context,"com.android.installer")
+//                    || ImplHelper.packageInstalled(context,"com.android.dbservices")){
+//                new UpdateCheckTask().execute(context,packageName);
+//            }
+//        }
     }
 
     class UpdateCheckTask extends AsyncTask<Object,Object,String>{
@@ -104,6 +105,7 @@ public class UpdateReceiver extends BroadcastReceiver {
                         if (null != beans && beans.size() > 0){
                             for (int i = 0;i < beans.size(); i++) {
                                 ApkData bean = beans.get(i);
+                                LogUtils.d(TAG,md5+","+bean.getName()+","+bean.getApkMd5());
                                 if (packageName.equals(bean.getPackageName()) && !md5.equals(bean.getApkMd5())) {
                                     ImplAgent.getInstance(mContext.getApplicationContext()).newDownload(
                                             implInfo,
