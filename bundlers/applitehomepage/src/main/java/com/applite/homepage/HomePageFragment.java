@@ -130,7 +130,9 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         public void onPageSelected(int position) {
             LogUtils.d(TAG, "onPageSelected : " + position);
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
-            actionBar.setSelectedNavigationItem(position);
+            if(actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS){
+                actionBar.setSelectedNavigationItem(position);
+            }
         }
 
         @Override
@@ -551,6 +553,9 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private ImageView mSearchView;
     //    private String mEtViewText;
     private String[] mHint;
+    private String[] mHint_PackageName;
+    private String[] mHint_Name;
+    private String[] mHint_IconUrl;
     private int HINT_UPDATE_TIME = 2000;
     private int HINT_SHOW_NUMBER = 0;
     private Handler mHandler = new Handler();
@@ -558,12 +563,14 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         @Override
         public void run() {
-            mEtView.setHint(mHint[HINT_SHOW_NUMBER]);
-            mHandler.postDelayed(this, HINT_UPDATE_TIME);
-            if (HINT_SHOW_NUMBER < mHint.length - 1) {
-                HINT_SHOW_NUMBER = HINT_SHOW_NUMBER + 1;
-            } else {
-                HINT_SHOW_NUMBER = 0;
+            if (null != mHint && mHint.length != 0) {
+                mEtView.setHint(mHint[HINT_SHOW_NUMBER]);
+                mHandler.postDelayed(this, HINT_UPDATE_TIME);
+                if (HINT_SHOW_NUMBER < mHint.length - 1) {
+                    HINT_SHOW_NUMBER = HINT_SHOW_NUMBER + 1;
+                } else {
+                    HINT_SHOW_NUMBER = 0;
+                }
             }
         }
     };
@@ -586,10 +593,29 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             mSearchView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View paramView) {
                     String mKeyWord = mEtView.getHint().toString();
-                    ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord);
+                    LogUtils.i(TAG, "mKeyWord:"+mKeyWord);
+                    int i = getHintNum(mKeyWord);
+                    if(i != -1){
+                        ((OSGIServiceHost)mActivity).jumptoDetail(mHint_PackageName[i], mHint_Name[i], mHint_IconUrl[i], true);
+                    }else{
+                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord);
+                    }
                 }
             });
         }
+    }
+
+    private int getHintNum(String str){
+        int i;
+        if(null == str){
+            return -1;
+        }
+        for(i=0;i<mHint.length;i++){
+            if(mHint_Name[i].equals(str)){
+                return i;
+            }
+        }
+        return -1;
     }
 
     private void initActionBar() {
@@ -639,12 +665,12 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         @Override
         public void onTabReselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "11onTabReselected arg0.getPosition()= " + arg0.getPosition());
+            LogUtils.i(TAG, "onTabReselected arg0.getPosition()= " + arg0.getPosition());
         }
 
         @Override
         public void onTabSelected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "11onTabSelected arg0.getPosition()= " + arg0.getPosition());
+            LogUtils.i(TAG, "onTabSelected arg0.getPosition()= " + arg0.getPosition());
 
             if (mViewPager != null)
                 mViewPager.setCurrentItem(arg0.getPosition());
@@ -652,7 +678,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
         @Override
         public void onTabUnselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "11onTabUnselected arg0.getPosition()= " + arg0.getPosition());
+            LogUtils.i(TAG, "onTabUnselected arg0.getPosition()= " + arg0.getPosition());
         }
     };
 
@@ -688,10 +714,20 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
             JSONArray hint_json = new JSONArray(hint_info);
             mHint = new String[hint_json.length()];
+            mHint_PackageName = new String[hint_json.length()];
+            mHint_Name = new String[hint_json.length()];
+            mHint_IconUrl = new String[hint_json.length()];
             for (int i = 0; i < hint_json.length(); i++) {
                 JSONObject hint_obj = new JSONObject(hint_json.get(i).toString());
                 String hint = hint_obj.getString("searchscroll");
+                String packagename = hint_obj.getString("packageName");
+                String name = hint_obj.getString("name");
+                String iconurl = hint_obj.getString("iconUrl");
                 mHint[i] = hint;
+                mHint_PackageName[i]= packagename;
+                mHint_Name[i]= name;
+                mHint_IconUrl[i]= iconurl;
+                LogUtils.e(TAG, "mHint_PackageName["+i+"]:"+mHint_PackageName[i]+"  mHint_Name["+i+"]:"+mHint_Name[i]+"  mHint_IconUrl["+i+"]:"+mHint_IconUrl[i]);
             }
             mEtView.setHint(mHint[0]);
         } catch (JSONException e) {

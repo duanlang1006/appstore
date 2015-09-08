@@ -34,6 +34,13 @@ public class AppliteSPUtils {
     public static final String DELETE_PACKAGE = "delete_package";//删除安装包
     public static final String NO_PICTURE = "no_pic";//智能无图
 
+
+    /**
+     * 幸运抽奖积分
+     */
+    public static final String LUCKY_POINTS = "lucky_points";
+    public static final String SIGN_IN = "sign_in";
+
     /**
      * 通知显示时间
      */
