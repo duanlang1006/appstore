@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_main"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="2dp"
-        android:background="@drawable/item_bg"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -19,6 +20,7 @@
             android:src="@drawable/apk_icon_defailt_img" />
 
         <LinearLayout
+            android:id="@+id/item_update_open1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -59,5 +61,88 @@
             android:layout_marginLeft="@dimen/apklist_btn_interval_distance"
             android:layout_marginRight="@dimen/apklist_btn_interval_distance"
             android:text="@string/update" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/item_update_open"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/item_update_show_detail_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:lines="1"
+                android:textColor="@color/dividing_line"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/item_update_show_all_detail_tv"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:textColor="@color/dividing_line"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/item_update_detail_state_img"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|top"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/desc_more" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/item_update_but_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/item_update_uninstall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/update_detail_but_bg"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="@string/uninstall" />
+
+            <TextView
+                android:id="@+id/item_update_ignore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/update_detail_but_bg"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="@string/ignore" />
+
+            <TextView
+                android:id="@+id/item_update_detail_but"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/update_detail_but_bg"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="@string/detail" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

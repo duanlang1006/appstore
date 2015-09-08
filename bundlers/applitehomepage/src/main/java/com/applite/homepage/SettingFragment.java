@@ -1,6 +1,7 @@
 package com.applite.homepage;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,8 +9,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.applite.common.Constant;
 import com.applite.sharedpreferences.AppliteSPUtils;
 import com.osgi.extra.OSGIBaseFragment;
+import com.osgi.extra.OSGIServiceHost;
 
 /**
  * Created by wanghaochen on 15-9-1.
@@ -95,10 +98,10 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     }
 
     private void setAllState() {
-        ll1_1.setSelected((boolean)AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, true));
-        ll2_1.setSelected((boolean)AppliteSPUtils.get(mActivity, AppliteSPUtils.CLEAR_CACHE, true));
-        ll2_2.setSelected((boolean)AppliteSPUtils.get(mActivity, AppliteSPUtils.DELETE_PACKAGE, true));
-        ll2_3.setSelected((boolean)AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, true));
+        ll1_1.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, true));
+        ll2_1.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.CLEAR_CACHE, true));
+        ll2_2.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.DELETE_PACKAGE, true));
+        ll2_3.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, true));
     }
 
     @Override
@@ -119,10 +122,59 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             AppliteSPUtils.put(mActivity, AppliteSPUtils.NO_PICTURE,
                     !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, true));
             setAllState();
-        } else if (R.id.ll_item3_1 == v.getId()) {//关于
+        } else if (R.id.ll_item3_1 == v.getId()) {//意见反馈
+//            Toast.makeText(mActivity, "意见反馈", Toast.LENGTH_LONG).show();
+            ((OSGIServiceHost) getActivity()).jumptoConversation();
+//            FeedbackAgent agent = new FeedbackAgent(mActivity);
+//            agent.startFeedbackActivity();
+//            Intent intent = new Intent(getActivity(), ConversationActivity.class);
+//            getActivity().startActivity(intent);
+//            LayoutInflater inflater = LayoutInflater.from(mActivity);
+//            final View layout = inflater.inflate(R.layout.dialog_feedback, (ViewGroup) v.findViewById(R.id.dialog_feedback));
+//            new AlertDialog.Builder(mActivity)
+//                    .setTitle("我们很重视您的意见和建议")
+//                    .setView(layout).setNegativeButton("取消", null)
+//                    .setPositiveButton("提交", null)
+//                    .show();
+//            final RadioGroup rg1 = (RadioGroup) layout.findViewById(R.id.dialog_feedback_rg1);
+//            final RadioGroup rg2 = (RadioGroup) layout.findViewById(R.id.dialog_feedback_rg2);
+//            final RadioButton rb1 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb1);
+//            final RadioButton rb2 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb2);
+//            final RadioButton rb3 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb3);
+//            final RadioButton rb4 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb4);
+//            final RadioButton rb5 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb5);
+//            final RadioButton rb6 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb6);
+//            DialogInterface.OnClickListener lis = new DialogInterface.OnClickListener() {
+//
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//            if ((rb1.isChecked() || rb2.isChecked() || rb3.isChecked()) && rg2.isChecked) {
+//                        rg2.clearCheck();
+//            } else if ((rb4.isChecked() || rb5.isChecked() || rb6.isChecked()) && rg2.isChecked) {
+//                        rg1.clearCheck();
+//                    }
+//                }
+//            };
+//            RadioGroup.OnCheckedChangeListener lis = new RadioGroup.OnCheckedChangeListener() {
+//                @Override
+//                public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                    if (rb1.isChecked() || rb2.isChecked() || rb3.isChecked()) {
+//                        rg2.clearCheck();
+//                    } else if (rb4.isChecked() || rb5.isChecked() || rb6.isChecked()) {
+//                        rg1.clearCheck();
+//                    }
+//                    if (R.id.dialog_feedback_rg1 == checkedId) {
+//                        rg2.clearCheck();
+//                    } else {
+//                        rg1.clearCheck();
+//                    }
+//                }
+//            };
+//            rg1.setOnCheckedChangeListener(lis);
+//            rg2.setOnCheckedChangeListener(lis);
+        } else if (R.id.ll_item3_2 == v.getId())
+        {//关于
             Toast.makeText(mActivity, "关于", Toast.LENGTH_LONG).show();
-        } else if (R.id.ll_item3_2 == v.getId()) {//意见反馈
-            Toast.makeText(mActivity, "意见反馈", Toast.LENGTH_LONG).show();
         }
     }
 }

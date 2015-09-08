@@ -13,6 +13,8 @@ public class ApkData {
     private int versionCode;
     private String versionName;
     private String apkMd5;
+    private String updateInfo;
+    private String updateTime;
 //    private String mShowText;
 
     //    public String getmShowText() {
@@ -25,16 +27,34 @@ public class ApkData {
 
     @Override
     public String toString() {
-        return "DataBean{" +
-                "mName='" + name + '\'' +
-                ", mImgUrl='" + iconUrl + '\'' +
-                ", mPackageName='" + packageName + '\'' +
-                ", mUrl='" + rDownloadUrl + '\'' +
-                ", mSize=" + apkSize +
-                ", mVersionCode=" + versionCode +
-                ", mVersionName='" + versionName + '\'' +
-                ", mMD5='" + apkMd5 + '\'' +
+        return "ApkData{" +
+                "name='" + name + '\'' +
+                ", iconUrl='" + iconUrl + '\'' +
+                ", packageName='" + packageName + '\'' +
+                ", rDownloadUrl='" + rDownloadUrl + '\'' +
+                ", apkSize=" + apkSize +
+                ", versionCode=" + versionCode +
+                ", versionName='" + versionName + '\'' +
+                ", apkMd5='" + apkMd5 + '\'' +
+                ", updateInfo='" + updateInfo + '\'' +
+                ", updateTime='" + updateTime + '\'' +
                 '}';
+    }
+
+    public String getUpdateInfo() {
+        return updateInfo;
+    }
+
+    public void setUpdateInfo(String updateInfo) {
+        this.updateInfo = updateInfo;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 
     public String getName() {

@@ -236,45 +236,6 @@
 
                     </LinearLayout>
 
-                    <!-- 更新日志内容-->
-                    <LinearLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginTop="10dp"
-                            android:text="@string/update_log"
-                            android:textColor="@color/black"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/detail_update_log"
-                            android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:ellipsize="end"
-                            android:textColor="@color/dividing_line"
-                            android:textSize="16sp" />
-
-                        <ImageView
-                            android:id="@+id/detail_open_update_log"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginBottom="5dp"
-                            android:src="@drawable/desc_more" />
-
-                        <View
-                            android:layout_width="fill_parent"
-                            android:layout_height="0.5dp"
-                            android:background="@color/open_line" />
-                    </LinearLayout>
-
                     <!--<LinearLayout-->
                         <!--android:layout_width="fill_parent"-->
                         <!--android:layout_height="wrap_content"-->

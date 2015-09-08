@@ -21,6 +21,7 @@ import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.applite.sharedpreferences.AppliteSPUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplHelper;
@@ -103,13 +104,21 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         return convertView;
     }
 
+    private String luckydrawicon = "http://www.fuli365.net/applite_content_console/image/iden_icon_image_type15.png";
+    private Boolean luckyflag = false;
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.list_item_progress_button){
             Object obj = v.getTag();
             if (obj instanceof ViewHolder) {
                 ViewHolder vh = (ViewHolder) obj;
-                MitMobclickAgent.onEvent(mContext,"onClickButton"+vh.getItemPosition());
+                MitMobclickAgent.onEvent(mContext, "onClickButton" + vh.getItemPosition());
+                if(vh.itemData.getBoxLabel().equals(luckydrawicon)){
+                    LogUtils.i(TAG, "youjiangxiazai");
+                    luckyflag = true;
+                }else{
+                    luckyflag = false;
+                }
                 ImplHelper.onClick(mContext,
                         vh.implInfo,
                         vh.itemData.getrDownloadUrl(),
@@ -278,8 +287,14 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         void initProgressButton() {
             if (null != mProgressButton && null != this.implInfo){
                 ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext,implInfo);
-                LogUtils.d(TAG,implInfo.getTitle()+","+implInfo.getStatus()+","+res.getActionText());
+                LogUtils.d(TAG, implInfo.getTitle() + "," + implInfo.getStatus() + "," + res.getActionText());
                 mProgressButton.setEnabled(true);
+                if((implInfo.getStatus() == implInfo.STATUS_INSTALLED) && luckyflag){
+                    luckyflag = false;
+                    int mLuckyPonints = (int) AppliteSPUtils.get(mContext, AppliteSPUtils.LUCKY_POINTS, 0);
+                    mLuckyPonints = MitMobclickAgent.calDrawPoints(mLuckyPonints, "download");
+                    AppliteSPUtils.put(mContext, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
+                }
                 switch (implInfo.getStatus()){
                     case ImplInfo.STATUS_PENDING:
                         mProgressButton.setText(res.getActionText());
