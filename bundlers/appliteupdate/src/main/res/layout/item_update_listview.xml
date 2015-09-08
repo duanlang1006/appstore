@@ -122,7 +122,7 @@
                 android:background="@drawable/update_detail_but_bg"
                 android:gravity="center"
                 android:padding="5dp"
-                android:text="卸载" />
+                android:text="@string/uninstall" />
 
             <TextView
                 android:id="@+id/item_update_ignore"
@@ -132,7 +132,7 @@
                 android:background="@drawable/update_detail_but_bg"
                 android:gravity="center"
                 android:padding="5dp"
-                android:text="忽略" />
+                android:text="@string/ignore" />
 
             <TextView
                 android:id="@+id/item_update_detail_but"
@@ -142,7 +142,7 @@
                 android:background="@drawable/update_detail_but_bg"
                 android:gravity="center"
                 android:padding="5dp"
-                android:text="详情" />
+                android:text="@string/detail" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

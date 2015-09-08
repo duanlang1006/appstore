@@ -1,6 +1,10 @@
 package com.mit.appliteupdate.main;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -85,6 +89,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private Animation LoadingAnimation;
     private String mUpdateData;
     private Gson mGson = new Gson();
+    private UninstallReceiver mReceiver;
 
     public UpdateFragment() {
         super();
@@ -106,6 +111,11 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHttpUtils = new HttpUtils();
+        mReceiver = new UninstallReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addDataScheme("package");
+        mActivity.registerReceiver(mReceiver, filter);
     }
 
     @Override
@@ -148,6 +158,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mActivity.unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -358,5 +369,29 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void refreshDetail(SimilarBean similarBean) {
         ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), true);
+    }
+
+    private class UninstallReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //接收卸载广播
+            String action = intent.getAction();
+            if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
+                int position = -1;
+                String packageName = intent.getDataString();
+                if (null != mUpdateApkList && !mUpdateApkList.isEmpty() && null != mAdapter) {
+                    for (int i = 0; i < mUpdateApkList.size(); i++) {
+                        if (packageName.equals("package:" + mUpdateApkList.get(i).getPackageName())) {
+                            position = i;
+                        }
+                    }
+                    if (position != -1) {
+                        mUpdateApkList.remove(position);
+                        mActivity.runOnUiThread(mNotifyRunnable);
+                        LogUtils.d(TAG, "检测到卸载，mAdapter刷新");
+                    }
+                }
+            }
+        }
     }
 }

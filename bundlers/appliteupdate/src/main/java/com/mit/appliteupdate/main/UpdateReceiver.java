@@ -47,6 +47,13 @@ public class UpdateReceiver extends BroadcastReceiver {
                 new UpdateCheckTask().execute(context,packageName);
             }
         }
+
+        //接收卸载广播
+        if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
+            String packageName = intent.getDataString();
+            System.out.println("卸载了:"  + packageName + "包名的程序");
+
+        }
     }
 
     class UpdateCheckTask extends AsyncTask<Object,Object,String>{
