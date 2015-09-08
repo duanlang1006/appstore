@@ -57,6 +57,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     private Animation animaBt1;
     private Animation animaBt2;
     private boolean checkBoxAnima = true;
+    private String temp = null;
     private DownloadListener mDownloadListener = new DownloadListener() {
         @Override
         public boolean getFlag1() {
@@ -143,7 +144,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     }
 
     private void setButtonStatus() {
-        tvShowTotal.setText("选中了" + checkedCount + "个安装包");
+        temp = mActivity.getResources().getString(R.string.choose_message1) + checkedCount +
+                mActivity.getResources().getString(R.string.choose_message2);
+        tvShowTotal.setText(temp);
+        temp = null;
         if (0 == checkedCount) {
             btnAllpick.setText(R.string.allpick_btn);
             btnDelete.setEnabled(false);
@@ -315,10 +319,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     }
 
     private void initializeView(View view) {
-        if (null == actionBar) {
-            actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();//得到ActionBar
+        if (null == lp_top) {
+//            actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();//得到ActionBar
             lp_top = new WindowManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    actionBar.getHeight(),
+                    mActivity.getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material),
                     WindowManager.LayoutParams.TYPE_APPLICATION,
                     // 设置为无焦点状态
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
