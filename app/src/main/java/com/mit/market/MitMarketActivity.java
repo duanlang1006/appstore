@@ -6,15 +6,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
-import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.Window;
 import android.widget.Toast;
 
+import com.applite.android.R;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
@@ -37,10 +36,10 @@ import com.mit.appliteupdate.main.UpdateFragment;
 import com.mit.main.GuideFragment;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
-import com.applite.android.R;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceClient;
 import com.osgi.extra.OSGIServiceHost;
+import com.umeng.fb.ConversationActivity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -361,6 +360,14 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         jumpto(Constant.OSGI_SERVICE_LUCKY_FRAGMENT,
                 LuckyFragment.class.getName(),
                 null, addToBackstack);
+    }
+
+    @Override
+    public void jumptoConversation() {
+        com.umeng.fb.util.Res.setPackageName(R.class.getPackage().getName());
+        Intent intent = new Intent(this,ConversationActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     private void setOverflowShowingAlways() {

@@ -89,7 +89,7 @@ android {
         archiveName "../appstore_v${defaultConfig.versionName}.zip"
     }
 
-    task setTag (type : Exec) {
+    task setTag(type: Exec) {
         executable "git"
         args "tag"
         args "-af"
@@ -98,7 +98,7 @@ android {
         args "release for appstore_v${defaultConfig.versionName}"
     }
 
-    task pushTag (type : Exec) {
+    task pushTag(type: Exec) {
         executable "git"
         args "push"
         args "origin"
