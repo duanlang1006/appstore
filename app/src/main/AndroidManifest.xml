@@ -89,6 +89,8 @@
             android:name="com.mit.market.MyIntentService"
             android:exported="false"></service>
 
+        <activity android:name="com.umeng.fb.ConversationActivity" />
+
         <meta-data
             android:name="MIT_APPKEY"
             android:value="AOUEu1TAV+FVl1GpUbYGllOAB7ZT7gHGVmABYgNhW2hZYVFiADcAaFEwAWE=" />
