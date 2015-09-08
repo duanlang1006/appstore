@@ -22,5 +22,6 @@ public interface OSGIServiceHost {
     public void jumptoDownloadManager(boolean addToBackstack);
     public void jumptoMylife(boolean addToBackstack);
     public void jumptoSetting(boolean addToBackstack);
+    public void jumptoAbort(boolean addToBackstack);
     public void jumptoConversation();
 }

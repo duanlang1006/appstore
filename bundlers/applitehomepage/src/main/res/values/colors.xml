@@ -29,4 +29,6 @@
 
     <color name="title_grey">#999999</color>
     <color name="divided_line">#b7b6b7</color>
+
+    <!--<color name="theme">#FFFFFF</color>-->
 </resources>

@@ -3,7 +3,10 @@ package com.applite.homepage;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -23,6 +26,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     private LinearLayout ll2_1;//清除缓存
     private LinearLayout ll2_2;//删除安装包
     private LinearLayout ll2_3;//智能无图
+    private ActionBar actionBar;
 
     public SettingFragment() {
         super();
@@ -42,6 +46,9 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 //        return super.onCreateView(inflater, container, savedInstanceState);
+        actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+        initActionBar();
+
         View view = inflater.inflate(R.layout.fragment_setting, container, false);
         ll1_1 = (LinearLayout) view.findViewById(R.id.ll_item1_1);//更新提醒
         ll1_1.setOnClickListener(this);
@@ -172,9 +179,33 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
 //            };
 //            rg1.setOnCheckedChangeListener(lis);
 //            rg2.setOnCheckedChangeListener(lis);
-        } else if (R.id.ll_item3_2 == v.getId())
-        {//关于
-            Toast.makeText(mActivity, "关于", Toast.LENGTH_LONG).show();
+        } else if (R.id.ll_item3_2 == v.getId()) {//关于
+            ((OSGIServiceHost) mActivity).jumptoAbort(true);
         }
     }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            initActionBar();
+        }
+    }
+
+    private void initActionBar() {
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(mActivity.getResources().getString(R.string.setting));
+        actionBar.setDisplayShowCustomEnabled(false);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.show();
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_search).setVisible(false);
+        super.onPrepareOptionsMenu(menu);
+    }
+
 }
+

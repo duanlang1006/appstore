@@ -381,7 +381,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                 mImplList.remove(i);
             }
         }
-        String temp = mActivity.getResources().getString(R.string.delete_message1) + checkedCount + mActivity.getResources().getString(R.string.delete_message2);
-        Toast.makeText(mActivity.getApplicationContext(), temp, Toast.LENGTH_LONG).show();
+        Toast.makeText(mActivity.getApplicationContext(),
+                mActivity.getResources().getString(R.string.delete_message1)
+                        + checkedCount + mActivity.getResources().getString(R.string.delete_message2),
+                Toast.LENGTH_LONG).show();
     }
 }
