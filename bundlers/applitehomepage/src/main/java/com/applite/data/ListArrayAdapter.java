@@ -208,55 +208,37 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 implAgent.setImplCallback(this, implInfo);
             }
 
-            if (null != this.mAppIcon && null != itemData.getIconUrl()){
+            //app图标
+            if ((null != this.mAppIcon) && !TextUtils.isEmpty(itemData.getIconUrl())){
                 mFinalBitmap.display(this.mAppIcon, itemData.getIconUrl(), defaultLoadingIcon);
             }else {
                 mAppIcon.setImageBitmap(defaultLoadingIcon);
             }
-            if (null != this.mAppName && null != itemData.getName()) {
+
+            //app名称
+            if ((null != this.mAppName) && !TextUtils.isEmpty(itemData.getName())) {
                 this.mAppName.setText(itemData.getName());
             }
-            if (null != this.mCategorySub && null != itemData.getCategorysub()) {
+
+            //app分类
+            if ((null != this.mCategorySub) && !TextUtils.isEmpty(itemData.getCategorysub())) {
                 this.mCategorySub.setText(itemData.getCategorysub());
             }
-            if (null != this.mAppSize && null != itemData.getApkSize()) {
+
+            //app大小
+            if ((null != this.mAppSize) && !TextUtils.isEmpty(itemData.getApkSize())) {
                 String mSize = AppliteUtils.bytes2kb(Long.parseLong(itemData.getApkSize()));
                 if (null != mSize) {
                     this.mAppSize.setText(mSize);
                 }
             }
-//            if (null != this.mExtentIcon) {
-//                String s = itemData.getBoxLabel();
-//                switch (s){
-//                    case "1":
-//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type1);
-//                        break;
-//                    case "2":
-//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type2);
-//                        break;
-//                    case "3":
-//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type3);
-//                        break;
-//                    case "4":
-//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type4);
-//                        break;
-//                    case "5":
-//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type5);
-//                        break;
-//                    case "6":
-//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type6);
-//                        break;
-//                    case "7":
-//                        this.mExtentIcon.setImageResource(R.drawable.iden_icon_image_type7);
-//                        break;
-//                    default:
-//                        break;
-//                }
-//            }
-            if (null != this.mExtentIcon && null != itemData.getBoxLabel()){
+
+            //app角标
+            if ((null != this.mExtentIcon) && !TextUtils.isEmpty(itemData.getBoxLabel())){
                 mFinalBitmap.display(this.mExtentIcon, itemData.getBoxLabel());
             }
 
+            //app介绍
             if (null != this.mAppBrief){
                 if(!TextUtils.isEmpty(itemData.getBrief())){
                     this.mAppBrief.setText(itemData.getBrief());
@@ -265,6 +247,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                     this.mAppBrief.setVisibility(View.GONE);
                 }
             }
+
+            //app评分
             if (null != mRatingBar) {
                 float star = 0.0f;
                 try {
@@ -273,6 +257,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 }
                 this.mRatingBar.setRating(star/2.0f);
             }
+
             if(null != mCategoryListArrow) {
                 mCategoryListArrow.setImageResource(R.drawable.back);
             }
