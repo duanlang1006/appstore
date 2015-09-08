@@ -583,6 +583,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("type", "search");
         params.addBodyParameter("key", name);
         params.addBodyParameter("key_type", "search_name");
+        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
         params.addBodyParameter("page", mSearchPostPage + "");
         final String finalName = name;
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
@@ -897,6 +898,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         params.addBodyParameter("key_type", "search_tag");
         params.addBodyParameter("key", mDetailTag);
         params.addBodyParameter("page", mSearchPostPage + "");
+        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
         mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
