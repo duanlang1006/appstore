@@ -228,34 +228,6 @@ public class NetworkReceiver extends BroadcastReceiver {
                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
                 bean.getApkMd5(),
                 null);
-
-//        implInfo.setTitle(bean.getmName()).setDownloadUrl(bean.getmUrl()).setIconUrl(bean.getmImgUrl());
-//        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implInfo)) {
-//            switch (implInfo.getStatus()) {
-//                case ImplInfo.STATUS_PENDING:
-//                case ImplInfo.STATUS_RUNNING:
-//                    break;
-//                case ImplInfo.STATUS_PAUSED:
-//                    implAgent.resumeDownload(implInfo, null);
-//                    break;
-//                case ImplInfo.STATUS_INSTALLED:
-//                case ImplInfo.STATUS_NORMAL_INSTALLING:
-//                case ImplInfo.STATUS_PRIVATE_INSTALLING:
-//                    //正在安装或已安装
-////                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
-//                    break;
-//                default:
-//                    implAgent.newDownload(implInfo,
-//                            bean.getmUrl(),
-//                            bean.getmName(),
-//                            bean.getmImgUrl(),
-//                            Constant.extenStorageDirPath,
-//                            bean.getmName() + ".apk",
-//                            true,
-//                            null);
-//                    break;
-//            }
-//        }
     }
 
 }

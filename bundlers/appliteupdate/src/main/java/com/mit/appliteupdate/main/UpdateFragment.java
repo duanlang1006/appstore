@@ -43,6 +43,7 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.appliteupdate.R;
+import com.mit.appliteupdate.adapter.MySimilarAdapter;
 import com.mit.appliteupdate.adapter.UpdateAdapter;
 import com.mit.appliteupdate.bean.ApkData;
 import com.mit.appliteupdate.bean.UpdateData;
@@ -70,6 +71,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private ListView mListView;
     private List<ApkData> mUpdateApkList;
     private SimilarView mSimilarView;
+    private SimilarAdapter mSimilarAdapter;
     private List<SimilarBean> mSimilarDataList;
     private UpdateAdapter mAdapter;
     private Runnable mNotifyRunnable = new Runnable() {
@@ -321,7 +323,14 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             } else {
                 setStatsLayoutVisibility(View.GONE, null);
             }
-            mSimilarView.setData(mSimilarDataList, this);
+            if (null == mSimilarAdapter){
+                mSimilarAdapter = new MySimilarAdapter(mActivity);
+                mSimilarAdapter.setData(mSimilarDataList,this);
+                mSimilarView.setAdapter(mSimilarAdapter);
+            }else {
+                mSimilarAdapter.setData(mSimilarDataList,this);
+                mSimilarAdapter.notifyDataSetChanged();
+            }
             mAdapter = new UpdateAdapter(mActivity, mUpdateApkList);
             mListView.setAdapter(mAdapter);
             mListView.setVisibility(View.VISIBLE);

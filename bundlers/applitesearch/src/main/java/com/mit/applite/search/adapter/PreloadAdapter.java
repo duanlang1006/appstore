@@ -116,29 +116,6 @@ public class PreloadAdapter extends BaseAdapter {
                         Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getmName() + ".apk",
                         null,
                         vh);
-//                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-//                    switch (vh.implInfo.getStatus()) {
-//                        case ImplInfo.STATUS_PENDING:
-//                        case ImplInfo.STATUS_RUNNING:
-//                            implAgent.pauseDownload(vh.implInfo);
-//                            break;
-//                        case ImplInfo.STATUS_PAUSED:
-//                            implAgent.resumeDownload(vh.implInfo, vh);
-//                            break;
-//                        default:
-//                            implAgent.newDownload(vh.implInfo,
-//                                    vh.bean.getmDownloadUrl(),
-//                                    vh.bean.getmName(),
-//                                    vh.bean.getmImgUrl(),
-//                                    Constant.extenStorageDirPath,
-//                                    vh.bean.getmName() + ".apk",
-//                                    true,
-//                                    vh);
-//                            break;
-//                    }
-//                } else {
-//                    implAgent.startActivity(vh.implInfo);
-//                }
             }
         });
         return convertView;

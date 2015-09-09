@@ -30,10 +30,7 @@ import android.widget.CheckBox;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.applite.common.Constant;
-import com.applite.common.LogUtils;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;

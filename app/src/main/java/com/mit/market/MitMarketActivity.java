@@ -1,7 +1,9 @@
 package com.mit.market;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -25,6 +27,7 @@ import com.applite.homepage.HomePageListFragment;
 import com.applite.homepage.LuckyFragment;
 import com.applite.homepage.PersonalFragment;
 import com.applite.homepage.SettingFragment;
+import com.applite.sharedpreferences.AppliteSPUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
@@ -34,6 +37,7 @@ import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.applite.main.DetailFragment;
 import com.mit.applite.search.main.SearchFragment;
 import com.mit.appliteupdate.main.UpdateFragment;
+import com.mit.impl.ImplAgent;
 import com.mit.main.GuideFragment;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
@@ -53,6 +57,15 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     private String mUpdateData;
 
+    private SharedPreferences.OnSharedPreferenceChangeListener mConfigListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if (AppliteSPUtils.DELETE_PACKAGE.equals(key)){
+                configImpl();
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         LogUtils.d(TAG, "onCreate:" + savedInstanceState);
@@ -69,6 +82,9 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         LogUtils.d(TAG, "onCreate take " + (System.currentTimeMillis() - current) + " ms");
 
         registerClients();
+
+        AppliteSPUtils.registerChangeListener(this,mConfigListener);
+        configImpl();
 
         FragmentManager fgm = getSupportFragmentManager();
         Fragment fg = fgm.findFragmentById(R.id.container);
@@ -205,6 +221,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         super.onDestroy();
         unregisterClients();
         IconCache.getInstance(this).flush();
+        AppliteSPUtils.unregisterChangeListener(this,mConfigListener);
     }
 
 //    @Override
@@ -376,6 +393,11 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         Intent intent = new Intent(this, ConversationActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    private void configImpl(){
+        boolean delete = (boolean)AppliteSPUtils.get(MitMarketActivity.this,AppliteSPUtils.DELETE_PACKAGE,false);
+        ImplAgent.getInstance(MitMarketActivity.this).configDeleteAfterInstalled(delete);
     }
 
     private void setOverflowShowingAlways() {

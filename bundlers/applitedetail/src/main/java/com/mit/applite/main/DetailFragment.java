@@ -113,6 +113,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     private List<SimilarBean> mSimilarData = new ArrayList<SimilarBean>();
     private SimilarView mSimilarView;
+    private SimilarAdapter mSimilarAdapter;
 
     public static Bundle newBundle(String packageName, String name, String imgUrl) {
         Bundle b = new Bundle();
@@ -280,30 +281,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + mApkName + ".apk",
                                 null,
                                 implCallback);
-
-//                        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implinfo)) {
-//                            switch (implinfo.getStatus()) {
-//                                case ImplInfo.STATUS_PENDING:
-//                                case ImplInfo.STATUS_RUNNING:
-//                                    implAgent.pauseDownload(implinfo);
-//                                    break;
-//                                case ImplInfo.STATUS_PAUSED:
-//                                    implAgent.resumeDownload(implinfo, implCallback);
-//                                    break;
-//                                default:
-//                                    implAgent.newDownload(implinfo,
-//                                            mDownloadUrl,
-//                                            mName,
-//                                            mImgUrl,
-//                                            Constant.extenStorageDirPath,
-//                                            mApkName + ".apk",
-//                                            true,
-//                                            implCallback);
-//                                    break;
-//                            }
-//                        } else {
-//                            implAgent.startActivity(implinfo);
-//                        }
                     }
                 }
             }
@@ -428,7 +405,14 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     similarBean.setVersionCode(obj.getInt("versionCode"));
                     mSimilarData.add(similarBean);
                 }
-                mSimilarView.setData(mSimilarData, this);
+                if (null == mSimilarAdapter){
+                    mSimilarAdapter = new MySimilarAdapter(mActivity);
+                    mSimilarAdapter.setData(mSimilarData,this);
+                    mSimilarView.setAdapter(mSimilarAdapter);
+                }else{
+                    mSimilarAdapter.setData(mSimilarData,this);
+                    mSimilarAdapter.notifyDataSetChanged();
+                }
             }
 
             String mViewPagerUrl = null;

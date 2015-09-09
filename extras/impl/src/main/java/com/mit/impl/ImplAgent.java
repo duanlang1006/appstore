@@ -390,6 +390,14 @@ public class ImplAgent extends Observable {
         }
     }
 
+    public void configDeleteAfterInstalled(boolean delete){
+        ImplConfig.setDeleteAfterInstalled(mContext,delete);
+    }
+
+    public void configMaxOverSize(long size){
+        ImplConfig.setMaxOverSize(mContext,size);
+    }
+
     private ImplInfo findImplInfoByPackageName(String packageName) {
         ImplInfo implInfo = null;
         for (int i = 0; i < mImplList.size(); i++) {

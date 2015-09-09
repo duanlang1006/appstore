@@ -127,31 +127,6 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                         Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.itemData.getName() + ".apk",
                         null,
                         vh);
-
-//                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-//                    switch (vh.implInfo.getStatus()) {
-//                        case ImplInfo.STATUS_PENDING:
-//                            break;
-//                        case ImplInfo.STATUS_RUNNING:
-//                            implAgent.pauseDownload(vh.implInfo);
-//                            break;
-//                        case ImplInfo.STATUS_PAUSED:
-//                            implAgent.resumeDownload(vh.implInfo, vh);
-//                            break;
-//                        default:
-//                            implAgent.newDownload(vh.implInfo,
-//                                    vh.itemData.getrDownloadUrl(),
-//                                    vh.itemData.getName(),
-//                                    vh.itemData.getIconUrl(),
-//                                    Constant.extenStorageDirPath,
-//                                    vh.itemData.getName() + ".apk",
-//                                    true,
-//                                    vh);
-//                            break;
-//                    }
-//                } else {
-//                    implAgent.startActivity(vh.implInfo);
-//                }
             }
         }
     }

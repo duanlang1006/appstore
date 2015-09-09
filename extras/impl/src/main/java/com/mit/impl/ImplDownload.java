@@ -124,7 +124,7 @@ public class ImplDownload  {
         @Override
         protected void onPostExecute(File file) {
             super.onPostExecute(file);
-            ImplLog.d(TAG,"run,"+implInfo.getTitle()+","+implInfo.getStatus());
+            ImplLog.d(TAG,"AddDownloadAsync::onPostExecute,"+implInfo.getTitle()+","+implInfo.getStatus());
             if (null != file){
                 implInfo.setFileSavePath(file.getAbsolutePath());
                 implInfo.setLocalPath(file.getAbsolutePath());
@@ -450,7 +450,7 @@ public class ImplDownload  {
     private boolean overSizePause(ImplInfo implInfo,ImplListener callback){
         boolean ret = false;
         if ("mobile".equals(ImplReceiver.getNetwork(mContext))
-                && implInfo.getTotal() > 1024000) {
+                && implInfo.getTotal() > ImplConfig.getMaxOverSize(mContext)) {
             if (implInfo.isUserContinue()){
                 return ret;
             }
@@ -520,6 +520,7 @@ public class ImplDownload  {
             if (null != baseCallback){
                 baseCallback.onEnqued(implInfo);
             }
+            ImplLog.d(TAG,implInfo.getTitle()+",onEnqued,"+implInfo);
         }
 
         public void onPending(){
@@ -527,6 +528,7 @@ public class ImplDownload  {
             if (null != baseCallback){
                 baseCallback.onPending(implInfo);
             }
+            ImplLog.d(TAG,implInfo.getTitle()+",onPending,"+implInfo);
         }
 
         @Override
@@ -562,7 +564,7 @@ public class ImplDownload  {
             if (null != baseCallback){
                 baseCallback.onCancelled(implInfo);
             }
-            ImplLog.d(TAG,implInfo.getTitle()+",onCancelled");
+            ImplLog.d(TAG,implInfo.getTitle()+",onCancelled,"+implInfo);
         }
 
         @Override
@@ -577,7 +579,7 @@ public class ImplDownload  {
             if (null != baseCallback){
                 baseCallback.onStart(implInfo);
             }
-            ImplLog.d(TAG,implInfo.getTitle()+",onStart");
+            ImplLog.d(TAG,implInfo.getTitle()+",onStart,"+implInfo);
         }
 
         @Override
@@ -600,7 +602,7 @@ public class ImplDownload  {
                     baseCallback.onFailure(implInfo, null, "download file not exist");
                 }
             }
-            ImplLog.d(TAG,implInfo.getTitle()+",onSuccess");
+            ImplLog.d(TAG,implInfo.getTitle()+",onSuccess,"+implInfo);
         }
 
         @Override
@@ -630,17 +632,20 @@ public class ImplDownload  {
 
         @Override
         public HttpHandler.State getFieldValue(Cursor cursor, int index) {
+            ImplLog.d(TAG,"getFieldValue:"+HttpHandler.State.valueOf(cursor.getInt(index)));
             return HttpHandler.State.valueOf(cursor.getInt(index));
         }
 
         @Override
         public HttpHandler.State getFieldValue(String fieldStringValue) {
             if (fieldStringValue == null) return null;
+            ImplLog.d(TAG,"getFieldValue:"+fieldStringValue);
             return HttpHandler.State.valueOf(fieldStringValue);
         }
 
         @Override
         public Object fieldValue2ColumnValue(HttpHandler.State fieldValue) {
+            if (null == fieldValue) return null;
             return fieldValue.value();
         }
 

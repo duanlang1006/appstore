@@ -64,8 +64,6 @@ public class ImplInfo {
     private boolean autoResume;             //断点续传
     private boolean autoRename;             //自动重命名
 
-    private boolean autoDelete;             //安装成功后自动删除包
-
     public ImplInfo() {
         key = null;
         packageName = null;
@@ -180,10 +178,6 @@ public class ImplInfo {
 
     public boolean isAutoRename() {
         return autoRename;
-    }
-
-    public boolean isAutoDelete() {
-        return autoDelete;
     }
 
     public void setId(long id) {
@@ -303,7 +297,8 @@ public class ImplInfo {
         this.autoRename = autoRename;
     }
 
-    public void setAutoDelete(boolean autoDelete) {
-        this.autoDelete = autoDelete;
+    @Override
+    public String toString() {
+        return "ImplInfo:"+title+","+state+","+status;
     }
 }
