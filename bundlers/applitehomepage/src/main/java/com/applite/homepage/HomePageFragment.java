@@ -309,6 +309,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         if (!hidden) {
             LogUtils.i(TAG, "重新显示ActionBar");
             initActionBar();
+            if (mViewPager != null){
+                mViewPager.setCurrentItem(mTabSelect);
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 //            mActivity.runOnUiThread(mRefreshRunnable);
 
             if (mHomePageListFragment != null) {
@@ -660,8 +664,9 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         }
     }
 
+    private int mTabSelect;
     private final ActionBar.TabListener mBarTabListener = new ActionBar.TabListener() {
-        private final static String TAG = "homepage_PagerFragment_mBarTabListener";
+        private final static String TAG = "homepagePagerFragment_mBarTabListener";
 
         @Override
         public void onTabReselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
@@ -679,6 +684,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         @Override
         public void onTabUnselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
             LogUtils.i(TAG, "onTabUnselected arg0.getPosition()= " + arg0.getPosition());
+            mTabSelect = arg0.getPosition();
         }
     };
 
