@@ -560,6 +560,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private String[] mHint_PackageName;
     private String[] mHint_Name;
     private String[] mHint_IconUrl;
+
     private int HINT_UPDATE_TIME = 2000;
     private int HINT_SHOW_NUMBER = 0;
     private Handler mHandler = new Handler();
@@ -596,8 +597,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             mSearchView = (ImageView) customView.findViewById(R.id.search_icon);
             mSearchView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View paramView) {
-                    String mKeyWord = mEtView.getHint().toString();
-                    LogUtils.i(TAG, "mKeyWord:"+mKeyWord);
+                    String mKeyWord = null;
+                    if(!TextUtils.isEmpty(mEtView.getHint())){
+                        mKeyWord = mEtView.getHint().toString();
+                    }
                     int i = getHintNum(mKeyWord);
                     if(i != -1){
                         ((OSGIServiceHost)mActivity).jumptoDetail(mHint_PackageName[i], mHint_Name[i], mHint_IconUrl[i], true);
