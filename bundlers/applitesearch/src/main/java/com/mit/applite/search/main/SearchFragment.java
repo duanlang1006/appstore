@@ -505,10 +505,11 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     private void getfocuable() {
-        LogUtils.i(TAG, "getfocuable");
-        mEtView.setFocusable(true);
-        mEtView.setFocusableInTouchMode(true);
-        mEtView.requestFocus();
+        if(null != mEtView){
+            mEtView.setFocusable(true);
+            mEtView.setFocusableInTouchMode(true);
+            mEtView.requestFocus();
+        }
     }
 
     private void changeHotWord() {
@@ -532,6 +533,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     private void openKeyboard() {
+        if (TextUtils.isEmpty(mDetailTag))
         KeyBoardUtils.openKeyboard(mEtView, mActivity);
     }
 
