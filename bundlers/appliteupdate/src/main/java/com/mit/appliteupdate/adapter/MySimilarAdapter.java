@@ -60,7 +60,7 @@ public class MySimilarAdapter extends SimilarAdapter {
         public void initView(SimilarBean data) {
             implInfo = implAgent.getImplInfo(data.getPackageName(), data.getPackageName(), data.getVersionCode());
             if (null != implInfo) {
-                implAgent.setImplCallback(this, implInfo);
+                implAgent.bindImplCallback(this, implInfo);
             }
             super.initView(data);
         }
@@ -69,13 +69,13 @@ public class MySimilarAdapter extends SimilarAdapter {
         public void refresh() {
             super.refresh();
             if (null != mTv && null != this.implInfo) {
-                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(getContext(),implInfo);
+                ImplInfo.ImplRes res = implInfo.getImplRes();
                 switch (implInfo.getStatus()) {
                     case ImplInfo.STATUS_PENDING:
                         mTv.setText(res.getActionText());
                         break;
                     case ImplInfo.STATUS_RUNNING:
-                        mTv.setText(res.getProgress() + "%");
+                        mTv.setText(implInfo.getProgress() + "%");
                         break;
                     case ImplInfo.STATUS_PAUSED:
                         mTv.setText(res.getStatusText());
@@ -86,46 +86,6 @@ public class MySimilarAdapter extends SimilarAdapter {
                 }
             }
         }
-        //        public ViewHolder(View view) {
-//            this.mImg = (ImageView) view.findViewById(R.id.item_similar_img);
-//            this.mName = (TextView) view.findViewById(R.id.item_similar_name);
-//            this.mTv = (TextView) view.findViewById(R.id.item_similar_install_tv);
-//        }
-
-//        public void initView(SimilarBean data) {
-//            this.bean = data;
-//            this.implInfo = implAgent.getImplInfo(data.getPackageName(), data.getPackageName(), data.getVersionCode());
-//            if (null != this.implInfo) {
-//                this.implInfo.setDownloadUrl(data.getrDownloadUrl()).setIconUrl(data.getIconUrl()).setTitle(data.getName());
-//                implAgent.setImplCallback(this, implInfo);
-//            }
-//            mTv.setTag(this);
-//            refresh();
-//        }
-
-//        public void refresh() {
-//            initProgressButton();
-//        }
-
-//        void initProgressButton() {
-//            if (null != mTv && null != this.implInfo) {
-//                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext,implInfo);
-//                switch (implInfo.getStatus()) {
-//                    case ImplInfo.STATUS_PENDING:
-//                        mTv.setText(res.getActionText());
-//                        break;
-//                    case ImplInfo.STATUS_RUNNING:
-//                        mTv.setText(res.getProgress() + "%");
-//                        break;
-//                    case ImplInfo.STATUS_PAUSED:
-//                        mTv.setText(res.getStatusText());
-//                        break;
-//                    default:
-//                        mTv.setText(res.getActionText());
-//                        break;
-//                }
-//            }
-//        }
 
         @Override
         public void onChange(ImplInfo info) {

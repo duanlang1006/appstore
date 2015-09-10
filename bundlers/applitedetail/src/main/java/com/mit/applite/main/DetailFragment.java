@@ -468,11 +468,11 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
             ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName, mVersionCode);
             if (null != implinfo) {
-                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity, implinfo);
-                implAgent.setImplCallback(implCallback, implinfo);
+                ImplInfo.ImplRes res = implinfo.getImplRes();
+                implAgent.bindImplCallback(implCallback, implinfo);
                 implinfo.setDownloadUrl(mDownloadUrl).setIconUrl(mImgUrl).setTitle(mName);
                 mProgressButton.setText(res.getActionText());
-                mProgressButton.setProgress(res.getProgress());
+                mProgressButton.setProgress(implinfo.getProgress());
                 if (mProgressButton.getProgress() == 0) {
                     mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_foreground));
                 } else {
@@ -609,10 +609,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         }
 
         private void refresh(ImplInfo info) {
-            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity, info);
+            ImplInfo.ImplRes res = info.getImplRes();
             LogUtils.d(TAG, "refresh" + res.getActionText() + "," + info.getStatus());
             mProgressButton.setText(res.getActionText());
-            mProgressButton.setProgress(res.getProgress());
+            mProgressButton.setProgress(info.getProgress());
         }
     }
 }

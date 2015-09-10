@@ -180,7 +180,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 this.implInfo.setDownloadUrl(itemData.getrDownloadUrl())
                         .setTitle(itemData.getName())
                         .setIconUrl(itemData.getIconUrl());
-                implAgent.setImplCallback(this, implInfo);
+                implAgent.bindImplCallback(this, implInfo);
             }
 
             if (null != this.mAppIcon && null != itemData.getIconUrl()){
@@ -261,7 +261,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
         void initProgressButton() {
             if (null != mProgressButton && null != this.implInfo){
-                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext,implInfo);
+                ImplInfo.ImplRes res = implInfo.getImplRes();
                 LogUtils.d(TAG, implInfo.getTitle() + "," + implInfo.getStatus() + "," + res.getActionText());
                 mProgressButton.setEnabled(true);
                 if((implInfo.getStatus() == implInfo.STATUS_INSTALLED) && luckyflag){
@@ -275,7 +275,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                         mProgressButton.setText(res.getActionText());
                         break;
                     case ImplInfo.STATUS_RUNNING:
-                        mProgressButton.setText(res.getProgress()+"%");
+                        mProgressButton.setText(implInfo.getProgress()+"%");
                         break;
                     case ImplInfo.STATUS_PAUSED:
                         mProgressButton.setText(res.getStatusText());

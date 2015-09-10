@@ -103,6 +103,7 @@ public class ImplAgent extends Observable {
                     ImplInfo implInfo = mImplList.get(i);
                     mDownloader.fillImplInfo(implInfo);
                     mInstaller.fillImplInfo(implInfo);
+                    implInfo.initImplRes(mContext);
                 }
 
                 mDownloader.kickDownload(mImplList,mImplCallback);
@@ -149,7 +150,7 @@ public class ImplAgent extends Observable {
         }
 
         ImplInfo implInfo = null;
-        if (true == mInited.get()) {
+        if (mInited.get()) {
             mergePendingList();
             for (int i = 0; i < mImplList.size(); i++) {
                 if (mImplList.get(i).getKey().equals(key)) {
@@ -173,6 +174,7 @@ public class ImplAgent extends Observable {
         implInfo.setPackageName(packageName).setVersionCode(versionCode);
         mDownloader.fillImplInfo(implInfo);
         mInstaller.fillImplInfo(implInfo);
+        implInfo.initImplRes(mContext);
         ImplLog.d(TAG,"getImplInfo,"+implInfo.getKey()+","+implInfo.getTitle()+","+implInfo.getStatus());
         return implInfo;
     }
@@ -262,7 +264,7 @@ public class ImplAgent extends Observable {
             return;
         }
         ImplLog.d(TAG,"newDownload,"+title+","+implInfo.getStatus());
-        setImplCallback(appCallback, implInfo);
+        bindImplCallback(appCallback, implInfo);
         implInfo.setDownloadUrl(downloadUrl);
         if (null != title){
             implInfo.setTitle(title);
@@ -302,7 +304,7 @@ public class ImplAgent extends Observable {
         }
         ImplLog.d(TAG,"resumeDownload,"+implInfo.getTitle()+","+implInfo.getStatus());
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionResume");
-        setImplCallback(appCallback, implInfo);
+        bindImplCallback(appCallback, implInfo);
         mDownloader.resume(implInfo, mImplCallback);
     }
 
@@ -331,13 +333,13 @@ public class ImplAgent extends Observable {
 
     public void install(ImplInfo implInfo, boolean silent, ImplChangeCallback appCallback) {
         MitMobclickAgent.onEvent(mContext, "impl_InstallerActionInstall");
-        setImplCallback(appCallback, implInfo);
+        bindImplCallback(appCallback, implInfo);
         mInstaller.install(implInfo, silent, mImplCallback);
     }
 
     public void uninstall(ImplInfo implInfo, boolean silent, ImplChangeCallback appCallback) {
         MitMobclickAgent.onEvent(mContext, "impl_InstallerActionUninstall");
-        setImplCallback(appCallback, implInfo);
+        bindImplCallback(appCallback, implInfo);
         mInstaller.uninstall(implInfo, silent, mImplCallback);
     }
 
@@ -375,7 +377,7 @@ public class ImplAgent extends Observable {
         }
         return ret;
     }
-    public void setImplCallback(ImplChangeCallback appCallback, ImplInfo implInfo) {
+    public void bindImplCallback(ImplChangeCallback appCallback, ImplInfo implInfo) {
         if (null != appCallback && null != implInfo) {
             synchronized (mWeakCallbackMap) {
                 List<WeakReference<ImplChangeCallback>> list = mWeakCallbackMap.get(implInfo);
@@ -560,6 +562,7 @@ public class ImplAgent extends Observable {
                         WeakReference<ImplChangeCallback> weakref = (WeakReference<ImplChangeCallback>)it.next();
                         ImplChangeCallback callback = weakref.get();
                         if (null != callback) {
+                            info.updateImplRes(mContext);
                             if (Looper.myLooper() != Looper.getMainLooper()) {
                                 mMainHandler.post(new CallbackRunnable(info, callback));
                             }else{

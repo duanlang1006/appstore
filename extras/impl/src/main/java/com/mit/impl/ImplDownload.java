@@ -496,14 +496,6 @@ public class ImplDownload  {
         }
     }
 
-    int getProgress(ImplInfo implInfo){
-        int progress = 0;
-        if (null != implInfo && implInfo.getTotal() > 0){
-            progress = (int)(implInfo.getCurrent()*100/implInfo.getTotal());
-        }
-        return progress;
-    }
-
     public class DownloadCallback<File> extends RequestCallBack<File> {
         private ImplInfo implInfo;
         private ImplListener baseCallback;

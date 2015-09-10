@@ -223,18 +223,19 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         public Fragment getItem(int position) {
             Fragment fg = null;
             OSGIServiceHost host = (OSGIServiceHost)mActivity;
-            int downloadFlag = ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PAUSED | ImplInfo.STATUS_FAILED;
+            int downloadFlag = ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PAUSED
+                    | ImplInfo.STATUS_FAILED | ImplInfo.STATUS_PACKAGE_INVALID;
             if (null != host) {
                 if (R.string.dm_downloaded == tabs[position]) {
                     fg = host.newFragment(
                             Constant.OSGI_SERVICE_DM_FRAGMENT,
                             DownloadListFragment.class.getName(),
-                            DownloadListFragment.newBundle(~downloadFlag));
+                            DownloadListFragment.newBundle(R.string.dm_downloaded,~downloadFlag));
                 } else if (R.string.dm_downloading == tabs[position]) {
                     fg = host.newFragment(
                             Constant.OSGI_SERVICE_DM_FRAGMENT,
                             DownloadListFragment.class.getName(),
-                            DownloadListFragment.newBundle(downloadFlag));
+                            DownloadListFragment.newBundle(R.string.dm_downloading,downloadFlag));
                 }
             }
             return fg;

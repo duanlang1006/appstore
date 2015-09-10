@@ -19,7 +19,6 @@ package com.applite.dm;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,14 +29,13 @@ import android.widget.CheckBox;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.applite.common.Constant;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplChangeCallback;
+import com.mit.impl.ImplLog;
 
-import java.io.File;
 import java.util.List;
 
 public class DownloadAdapter extends ArrayAdapter implements View.OnClickListener {
@@ -46,10 +44,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
 
     private BitmapUtils mBitmapHelper;
     private ImplAgent implAgent;
-
     private DownloadListener mListener;
-    private ImplInfo implInfo;
-    private int isDownloaded = ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PAUSED | ImplInfo.STATUS_FAILED;
 
     public DownloadAdapter(Context context,
                            int resource,
@@ -84,21 +79,20 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             }
             vh.actionBtn.setVisibility(View.GONE);
             vh.custompb.setVisibility(View.GONE);
-            vh.refresh();
         } else {//正常状态(没有删除的多选框)
             vh.deleteCheckBox.setVisibility(View.GONE);
-            if (mListener.getStatusFlags() == isDownloaded) {
+            if (mListener.getTitleId() == R.string.dm_downloading) {
                 vh.actionBtn.setVisibility(View.GONE);
                 vh.custompb.setVisibility(View.VISIBLE);
-            } else if (mListener.getStatusFlags() == ~isDownloaded) {
+                vh.statusView.setVisibility(View.VISIBLE);
+            } else if (mListener.getTitleId() == R.string.dm_downloaded) {
                 vh.actionBtn.setVisibility(View.VISIBLE);
                 vh.custompb.setVisibility(View.GONE);
+                vh.statusView.setVisibility(View.INVISIBLE);
             }
             vh.deleteCheckBox.setVisibility(View.GONE);
         }
-        if (mListener.getStatusFlags() == ~isDownloaded) {
-            vh.statusView.setVisibility(View.INVISIBLE);
-        }
+        vh.refresh();
         return view;
     }
 
@@ -110,7 +104,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 vh.implInfo.getDownloadUrl(),
                 vh.implInfo.getTitle(),
                 vh.implInfo.getIconUrl(),
-                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.implInfo.getTitle() + ".apk",
+                vh.implInfo.getFileSavePath(),
                 null,
                 vh);
     }
@@ -146,7 +140,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             if (null == this.implInfo) {
                 return;
             }
-            implAgent.setImplCallback(this, implInfo);
+            implAgent.bindImplCallback(this, implInfo);
             String title = implInfo.getTitle();
             if (null == title || title.isEmpty()) {
                 title = mContext.getResources().getString(R.string.missing_title);
@@ -161,38 +155,31 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             if (null == this.implInfo) {
                 return;
             }
-            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext, implInfo);
-            actionBtn.setText(res.getActionText());
+            ImplInfo.ImplRes implRes = implInfo.getImplRes();
+            actionBtn.setText(implRes.getActionText());
             actionBtn.setEnabled(true);
             switch (implInfo.getStatus()) {
-//                case ImplInfo.STATUS_PRIVATE_INSTALLING://静默安装
-////                    actionBtn.setEnabled(false);
-//                    break;
-//                case ImplInfo.ACTION_DOWNLOAD://下载
-//                    custompb.setImageResource(R.drawable.download_status_pause);
-//                    break;
-//                case ImplInfo.ACTION_INSTALL://安装过程   ------->这里有时下载也会显示安装过程!
-//                    custompb.setImageResource(R.drawable.download_status_pause);
-//                    break;
                 case ImplInfo.STATUS_RUNNING://下载中
                     custompb.setImageResource(R.drawable.download_status_running);
                     break;
                 case ImplInfo.STATUS_PAUSED://下载暂停
                     custompb.setImageResource(R.drawable.download_status_pause);
                     break;
-                case ImplInfo.STATUS_FAILED://下载失败
-                    custompb.setImageResource(R.drawable.download_status_retry);
-                    break;
+                case ImplInfo.STATUS_PACKAGE_INVALID:
                 case ImplInfo.STATUS_INSTALL_FAILED: //安装失败
+                case ImplInfo.STATUS_FAILED://下载失败
                     custompb.setImageResource(R.drawable.download_status_retry);
                     break;
                 default:
 //                    Toast.makeText(mContext, "其他", Toast.LENGTH_SHORT).show();
                     break;
             }
-            descView.setText(res.getDescText());
-            statusView.setText(res.getStatusText());
-            setProgress(res);
+            descView.setText(implRes.getDescText());
+            descView.invalidate();
+            statusView.setText(implRes.getStatusText());
+            statusView.invalidate();
+            custompb.setProgress(implInfo.getProgress());
+            ImplLog.d("impl_dm",implInfo.getTitle()+","+implRes.getStatusText()+","+implRes.getDescText()+","+implInfo.getProgress());
         }
 
         private void setIcon() {
@@ -215,15 +202,11 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             }
         }
 
-
-        private void setProgress(ImplHelper.ImplHelperRes res) {
-            custompb.setVisibility(View.VISIBLE);
-            custompb.setProgress(res.getProgress());
-        }
-
         @Override
         public void onChange(ImplInfo info) {
             refresh();
+            ImplInfo.ImplRes implRes = implInfo.getImplRes();
+            ImplLog.d("impl_dm","onChange,"+implInfo.getTitle()+","+implRes.getStatusText()+","+implRes.getDescText()+","+(info==implInfo));
         }
     }
 }
