@@ -211,7 +211,6 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         LogUtils.d(TAG, "onCreateView");
 
         boolean networkState = NetworkDetector.detect(mActivity);
-        LogUtils.i(TAG, "networkState = " + networkState);
 
         rootView = (ViewGroup) mInflater.inflate(R.layout.fragment_homepage_main, container, false);
 
@@ -547,6 +546,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private ViewGroup customView;
     private EditText mEtView;
     private ImageView mSearchView;
+    private TextView mGameTitle;
     //    private String mEtViewText;
     private String[] mHint;
     private String[] mHint_PackageName;
@@ -607,8 +607,24 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                     }
                 }
             });
+                mGameTitle = (TextView) customView.findViewById(R.id.game_title);
         }
     }
+
+    private String gametitle;
+
+    private void refreshActionbar(){
+        if(null != customView){
+            if(null != gametitle){
+                mGameTitle.setText(gametitle);
+                mGameTitle.setVisibility(View.VISIBLE);
+            }
+            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+            actionBar.setCustomView(customView);
+            actionBar.show();
+        }
+    }
+
 
     private int getHintNum(String str) {
         int i;
@@ -625,6 +641,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
     private void initActionBar() {
         try {
+            LogUtils.i(TAG, "initActionBar");
+
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
 
             if (isHidden()) {
@@ -712,7 +730,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
             //LogUtils.i(TAG, "result:" + result);
             String hint_info = object.getString("searchscroll_info");
-            LogUtils.i(TAG, "hint_info:" + hint_info);
+//            LogUtils.i(TAG, "hint_info:" + hint_info);
 
             JSONArray hint_json = new JSONArray(hint_info);
             mHint = new String[hint_json.length()];
@@ -729,7 +747,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 mHint_PackageName[i] = packagename;
                 mHint_Name[i] = name;
                 mHint_IconUrl[i] = iconurl;
-                LogUtils.e(TAG, "mHint_PackageName[" + i + "]:" + mHint_PackageName[i] + "  mHint_Name[" + i + "]:" + mHint_Name[i] + "  mHint_IconUrl[" + i + "]:" + mHint_IconUrl[i]);
+//                LogUtils.e(TAG, "mHint_PackageName[" + i + "]:" + mHint_PackageName[i] + "  mHint_Name[" + i + "]:" + mHint_Name[i] + "  mHint_IconUrl[" + i + "]:" + mHint_IconUrl[i]);
             }
             mEtView.setHint(mHint[0]);
         } catch (JSONException e) {
@@ -771,6 +789,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                     if (1 == data.getAppKey()) {
                         mPageData = data.getSubjectData();
                         LogUtils.i(TAG, "mPageData:" + mPageData.toString());
+                        if(mPageData.get(0).getS_key().equals("goods_m_game")){
+                            gametitle = getString(R.string.gametitle);
+                            refreshActionbar();
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
