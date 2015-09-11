@@ -8,10 +8,12 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"
         android:gravity="center_horizontal"
-        android:text="我们很重视您的意见和建议"
+        android:text="@string/dialog_feedback_title"
         android:textColor="#EE7600"
-        android:textSize="25dp" />
+        android:textSize="22dp" />
 
     <RadioGroup
         android:id="@+id/dialog_feedback_rg1"
@@ -24,21 +26,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="下载失败" />
+            android:gravity="center_vertical"
+            android:tag="@string/tag_rb1"
+            android:text="@string/tag_rb1"
+            android:textSize="14dp" />
 
         <RadioButton
             android:id="@+id/dialog_feedback_rb2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="找不到应用" />
+            android:gravity="center_vertical"
+            android:tag="@string/tag_rb2"
+            android:text="@string/tag_rb2"
+            android:textSize="14dp" />
 
         <RadioButton
             android:id="@+id/dialog_feedback_rb3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="操作不流畅" />
+            android:gravity="center_vertical"
+            android:tag="@string/tag_rb3"
+            android:text="@string/tag_rb3"
+            android:textSize="14dp" />
     </RadioGroup>
 
     <RadioGroup
@@ -52,30 +63,43 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="界面不好" />
+            android:gravity="center_vertical"
+            android:tag="@string/tag_rb4"
+            android:text="@string/tag_rb4"
+            android:textSize="14dp" />
 
         <RadioButton
             android:id="@+id/dialog_feedback_rb5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="闪退或重启" />
+            android:gravity="center_vertical"
+            android:tag="@string/tag_rb5"
+            android:text="@string/tag_rb5"
+            android:textSize="14dp" />
 
         <RadioButton
             android:id="@+id/dialog_feedback_rb6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="账号有问题" />
+            android:gravity="center_vertical"
+            android:tag="@string/tag_rb6"
+            android:text="@string/tag_rb6"
+            android:textSize="14dp" />
     </RadioGroup>
 
     <EditText
         android:id="@+id/dialog_feedback_et1"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="100dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:background="@drawable/edittext_shape"
         android:gravity="start"
-        android:hint="请输入您的意见和建议"
-        android:singleLine="true" />
+        android:hint="@string/dialog_feedback_hint"
+        android:singleLine="true"
+        android:textSize="20dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -85,29 +109,33 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="被采纳的意见会获得"
+            android:layout_marginLeft="6dp"
+            android:text="@string/tv_1"
             android:textSize="12dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="小奖品"
+            android:text="@string/tv_2"
             android:textColor="#EE7600"
             android:textSize="12dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="，记得留下联系方式哦～"
+            android:text="@string/tv_3"
             android:textSize="12dp" />
     </LinearLayout>
 
     <EditText
         android:id="@+id/dialog_feedback_et2"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:hint="手机/QQ邮箱"
+        android:layout_height="36dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:background="@drawable/edittext_shape"
+        android:hint="@string/dialog_contact_hint"
         android:singleLine="true"
-        android:textSize="15dp" />
+        android:textSize="14dp" />
 
 </LinearLayout>
