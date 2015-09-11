@@ -31,6 +31,8 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.applite.bean.PopupWindowBean;
+import com.applite.bean.ScreenBean;
 import com.applite.bean.HomePageDataBean;
 import com.applite.bean.ScreenBean;
 import com.applite.bean.SubjectData;
@@ -72,10 +74,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private PopupWindow popupWindow;
     private List<ScreenBean> mScreenBeanList = new ArrayList<ScreenBean>();
     private FinalBitmap mFinalBitmap;
-    private String mPopImgUrl;
     private boolean mPopIsClick = false;
-    private long mPopStartTime;
-    private long mPopEndTime;
 
     private LayoutInflater mInflater;
     private ViewPager mViewPager;
@@ -150,7 +149,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         }
     };
     private ViewGroup rootView;
-    private SubjectData mPopData = new SubjectData();
+    private PopupWindowBean mPopData = new PopupWindowBean();
+    private String mPopType;
 
     public static Bundle newBundle(String category, String title) {
         Bundle bundle = new Bundle();
@@ -345,10 +345,11 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
+                LogUtils.i(TAG, "插屏网络请求成功，result:" + o);
+                LogUtils.i(TAG, "System.currentTimeMillis():" + System.currentTimeMillis());
                 if (null != o) {
                     String result = (String) o;
                     setData(result);
-                    LogUtils.i(TAG, "插屏网络请求成功，result:" + result);
                 }
             }
 
@@ -369,25 +370,43 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         try {
             JSONObject object = new JSONObject(result);
             String app_key = object.getString("app_key");
-            String info = object.getString("plaque_info");
+            mPopType = object.getString("use_info");
+            String plaque_info = object.getString("plaque_info");
+            String detail_info = object.getString("detail_info");
+            LogUtils.i(TAG, "plaque_info:" + plaque_info);
+            LogUtils.i(TAG, "detail_info:" + detail_info);
 
-            if (!TextUtils.isEmpty(info)) {
-                JSONArray array = new JSONArray(info);
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject obj = new JSONObject(array.get(i).toString());
+            JSONArray plaque_array = new JSONArray(plaque_info);
+            if (plaque_array.length() != 0) {
+                for (int i = 0; i < plaque_array.length(); i++) {
+                    JSONObject obj = new JSONObject(plaque_array.get(i).toString());
                     mPopData.setS_key(obj.getString("spt_key"));
                     mPopData.setS_name(obj.getString("pl_name"));
                     mPopData.setStep(obj.getInt("step"));
                     mPopData.setS_datatype(obj.getString("s_datatype"));
-                    mPopImgUrl = obj.getString("pl_iconurl");
-                    mPopStartTime = obj.getLong("pl_starttime") * 1000;
-                    mPopEndTime = obj.getLong("pl_endtime") * 1000;
+                    mPopData.setmPopImgUrl(obj.getString("pl_iconurl"));
+                    mPopData.setmPopStartTime(obj.getLong("pl_starttime") * 1000);
+                    mPopData.setmPopEndTime(obj.getLong("pl_endtime") * 1000);
+                    mPopData.setmPopImgName(obj.getString("pl_iconurl_img"));
                 }
-                if (!TextUtils.isEmpty(mPopImgUrl))
-                    download(mPopData.getS_name() + ".jpg", mPopImgUrl);
             }
+            JSONArray detail_array = new JSONArray(detail_info);
+            if (detail_array.length() != 0) {
+                for (int i = 0; i < detail_array.length(); i++) {
+                    JSONObject obj = new JSONObject(detail_array.get(i).toString());
+                    mPopData.setmPackageName(obj.getString("packageName"));
+                    mPopData.setmName(obj.getString("name"));
+                    mPopData.setmIconUrl(obj.getString("iconUrl"));
+                    mPopData.setmPopImgUrl(obj.getString("pl_iconurl"));
+                    mPopData.setmPopStartTime(obj.getLong("pl_starttime") * 1000);
+                    mPopData.setmPopEndTime(obj.getLong("pl_endtime") * 1000);
+                    mPopData.setmPopImgName(obj.getString("pl_iconurl_img"));
+                }
+            }
+            download(mPopData.getmPopImgName(), mPopData.getmPopImgUrl());
         } catch (JSONException e) {
             e.printStackTrace();
+            LogUtils.i(TAG, "插屏JSONException");
         }
     }
 
@@ -410,7 +429,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                         LogUtils.i(TAG, name + "下载成功");
                         LogUtils.i(TAG, "Utils.getAppDir(name):" + AppliteUtils.getAppDir(name));
                         SPUtils.put(mActivity, SPUtils.POP_IMG_SAVE_PATH, AppliteUtils.getAppDir(name));
-                        if (System.currentTimeMillis() > mPopStartTime && System.currentTimeMillis() < mPopEndTime) {
+                        if (System.currentTimeMillis() > mPopData.getmPopStartTime() && System.currentTimeMillis() < mPopData.getmPopEndTime()) {
 //                            if(SPUtils.get(mActivity,SPUtils.POP_IMGURL,"").equals(mPopImgUrl)){
 //                                if (!(boolean)SPUtils.get(mActivity,SPUtils.POP_IMGURL_ISCLICK,false))
 //                                    initPopuWindow();
@@ -438,11 +457,16 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             if (v.getId() == R.id.pop_img_exit) {
 
             } else if (v.getId() == R.id.pop_img_img) {
-                ((OSGIServiceHost) mActivity).jumptoTopic(mPopData.getS_key(),
-                        mPopData.getS_name(),
-                        mPopData.getStep(),
-                        mPopData.getS_datatype(),
-                        true);
+                if ("plaque_info".equals(mPopType)) {
+                    ((OSGIServiceHost) mActivity).jumptoTopic(mPopData.getS_key(),
+                            mPopData.getS_name(),
+                            mPopData.getStep(),
+                            mPopData.getS_datatype(),
+                            true);
+                } else if ("detail_info".equals(mPopType)) {
+                    ((OSGIServiceHost) mActivity).jumptoDetail(mPopData.getmPackageName(),
+                            mPopData.getmName(), mPopData.getmIconUrl(), true);
+                }
             }
         }
     };

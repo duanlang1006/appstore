@@ -13,14 +13,14 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/item_update_img"
+            android:id="@+id/item_ignore_img"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_margin="5dp"
             android:src="@drawable/apk_icon_defailt_img" />
 
         <LinearLayout
-            android:id="@+id/item_update_click"
+            android:id="@+id/item_ignore_click"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -28,7 +28,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/item_update_name"
+                android:id="@+id/item_ignore_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
@@ -36,7 +36,7 @@
                 android:textColor="@color/black" />
 
             <TextView
-                android:id="@+id/item_update_versionname"
+                android:id="@+id/item_ignore_versionname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
@@ -45,7 +45,7 @@
                 android:textSize="10sp" />
 
             <TextView
-                android:id="@+id/item_update_size"
+                android:id="@+id/item_ignore_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3.6MB"
@@ -54,13 +54,13 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/item_update_button"
+            android:id="@+id/item_ignore_button"
             style="@style/apkListButton"
-            android:layout_width="80dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/apklist_btn_interval_distance"
             android:layout_marginRight="@dimen/apklist_btn_interval_distance"
-            android:text="@string/update" />
+            android:text="@string/cancel_ignore" />
     </LinearLayout>
 
     <LinearLayout
@@ -70,13 +70,13 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/item_update_default"
+            android:id="@+id/item_ignore_default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/item_update_show_default_tv"
+                android:id="@+id/item_ignore_show_default_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
@@ -96,72 +96,29 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/item_update_show_all"
-            android:layout_width="fill_parent"
+            android:id="@+id/item_ignore_shrink"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:background="@color/background_main"
+            android:orientation="horizontal"
             android:visibility="gone">
 
-            <LinearLayout
-                android:id="@+id/item_update_shrink"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/item_ignore_all_detail_tv"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:textColor="@color/dividing_line"
+                android:textSize="12sp" />
 
-                <TextView
-                    android:id="@+id/item_update_all_detail_tv"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:layout_weight="1"
-                    android:textColor="@color/dividing_line"
-                    android:textSize="12sp" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center|top"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:background="@drawable/desc_less" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <ImageView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/item_update_uninstall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/update_detail_but_bg"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="@string/uninstall" />
-
-                <TextView
-                    android:id="@+id/item_update_ignore"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/update_detail_but_bg"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="@string/ignore" />
-
-                <TextView
-                    android:id="@+id/item_update_detail_but"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/update_detail_but_bg"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="@string/detail" />
-            </LinearLayout>
+                android:layout_gravity="center|top"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/desc_less" />
         </LinearLayout>
 
     </LinearLayout>

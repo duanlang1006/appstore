@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -21,6 +20,7 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.applite.sharedpreferences.AppliteSPUtils;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.bean.ApkData;
@@ -41,13 +41,21 @@ public class UpdateAdapter extends BaseAdapter {
 
     private final BitmapUtils mBitmapUtil;
     private final PackageManager mPackageManager;
+    private UpdateSuccessListener mListener;
     private Context mActivity;
     private List<ApkData> mDatas;
     private ImplAgent implAgent;
     private int mCheckedItemPosition = -1;
 
-    public UpdateAdapter(Context context, List<ApkData> mDatas) {
+    public interface UpdateSuccessListener {
+        void removeDataPosition(String packageName);//删除已更新条目的源数据
+
+        void ignoreDataPosition(String packageName);//忽略数据
+    }
+
+    public UpdateAdapter(Context context, List<ApkData> mDatas, UpdateSuccessListener mListener) {
         this.mDatas = mDatas;
+        this.mListener = mListener;
         mActivity = context;
         mPackageManager = mActivity.getPackageManager();
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
@@ -83,27 +91,23 @@ public class UpdateAdapter extends BaseAdapter {
         final ApkData data = mDatas.get(position);
         viewholder.initView(data, position);
         if (mCheckedItemPosition == position) {
-            viewholder.mButLayout.setVisibility(View.VISIBLE);
-            viewholder.mDetailStateImg.setBackground(mActivity.getResources().getDrawable(R.drawable.desc_less));
-            viewholder.mDetailDataTv.setVisibility(View.GONE);
-            viewholder.mDetailAllDataTv.setVisibility(View.VISIBLE);
+            viewholder.mShowDefault.setVisibility(View.GONE);
+            viewholder.mShowAll.setVisibility(View.VISIBLE);
         } else {
-            viewholder.mButLayout.setVisibility(View.GONE);
-            viewholder.mDetailStateImg.setBackground(mActivity.getResources().getDrawable(R.drawable.desc_more));
-            viewholder.mDetailDataTv.setVisibility(View.VISIBLE);
-            viewholder.mDetailAllDataTv.setVisibility(View.GONE);
+            viewholder.mShowDefault.setVisibility(View.VISIBLE);
+            viewholder.mShowAll.setVisibility(View.GONE);
         }
 
         viewholder.mName.setText(data.getName());
         if (!TextUtils.isEmpty(data.getUpdateInfo())) {
-            viewholder.mDetailDataTv.setText(data.getUpdateInfo());
+            viewholder.mDefaultDetailTv.setText(data.getUpdateInfo());
             viewholder.mDetailAllDataTv.setText(data.getUpdateInfo());
         } else {
             if (!TextUtils.isEmpty(data.getUpdateTime())) {
-                viewholder.mDetailDataTv.setText(data.getUpdateTime());
+                viewholder.mDefaultDetailTv.setText(data.getUpdateTime());
                 viewholder.mDetailAllDataTv.setText(data.getUpdateInfo());
             } else {
-                viewholder.mDetailDataTv.setText(null);
+                viewholder.mDefaultDetailTv.setText(null);
                 viewholder.mDetailAllDataTv.setText(data.getUpdateInfo());
             }
         }
@@ -136,23 +140,19 @@ public class UpdateAdapter extends BaseAdapter {
         viewholder.mOpenDetailLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mCheckedItemPosition == viewholder.position) {
-                    mCheckedItemPosition = -1;
-                } else {
-                    mCheckedItemPosition = viewholder.position;
-                }
-                notifyDataSetChanged();
+                setShowContent(viewholder);
             }
         });
-        viewholder.mOpenDetailLayout1.setOnClickListener(new View.OnClickListener() {
+        viewholder.mShowDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mCheckedItemPosition == viewholder.position) {
-                    mCheckedItemPosition = -1;
-                } else {
-                    mCheckedItemPosition = viewholder.position;
-                }
-                notifyDataSetChanged();
+                setShowContent(viewholder);
+            }
+        });
+        viewholder.mShrink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setShowContent(viewholder);
             }
         });
         viewholder.mUninstallTv.setOnClickListener(new View.OnClickListener() {
@@ -166,7 +166,9 @@ public class UpdateAdapter extends BaseAdapter {
         viewholder.mIgnoreTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                mListener.ignoreDataPosition(data.getPackageName());
+                mCheckedItemPosition = -1;
+                AppliteSPUtils.put(mActivity, data.getPackageName(), data.getVersionCode());
             }
         });
         viewholder.mToDetailTv.setOnClickListener(new View.OnClickListener() {
@@ -177,6 +179,20 @@ public class UpdateAdapter extends BaseAdapter {
         });
 
         return convertView;
+    }
+
+    /**
+     * 显示详细内容
+     *
+     * @param viewholder
+     */
+    private void setShowContent(ViewHolder viewholder) {
+        if (mCheckedItemPosition == viewholder.position) {
+            mCheckedItemPosition = -1;
+        } else {
+            mCheckedItemPosition = viewholder.position;
+        }
+        notifyDataSetChanged();
     }
 
     public class ViewHolder implements ImplChangeCallback {
@@ -190,10 +206,11 @@ public class UpdateAdapter extends BaseAdapter {
         private int position;
 
         private LinearLayout mOpenDetailLayout;
-        private LinearLayout mOpenDetailLayout1;
-        private TextView mDetailDataTv;
+        private LinearLayout mShrink;
+        private LinearLayout mShowDefault;
+        private LinearLayout mShowAll;
+        private TextView mDefaultDetailTv;
         private TextView mDetailAllDataTv;
-        private LinearLayout mButLayout;
         private TextView mUninstallTv;
         private TextView mIgnoreTv;
         private TextView mToDetailTv;
@@ -206,12 +223,12 @@ public class UpdateAdapter extends BaseAdapter {
             this.mVersionName = (TextView) v.findViewById(R.id.item_update_versionname);
             this.mBt = (Button) v.findViewById(R.id.item_update_button);
 
-            this.mOpenDetailLayout = (LinearLayout) v.findViewById(R.id.item_update_open);
-            this.mOpenDetailLayout1 = (LinearLayout) v.findViewById(R.id.item_update_open1);
-            this.mButLayout = (LinearLayout) v.findViewById(R.id.item_update_but_layout);
-            this.mDetailDataTv = (TextView) v.findViewById(R.id.item_update_show_detail_tv);
-            this.mDetailAllDataTv = (TextView) v.findViewById(R.id.item_update_show_all_detail_tv);
-            this.mDetailStateImg = (ImageView) v.findViewById(R.id.item_update_detail_state_img);
+            this.mOpenDetailLayout = (LinearLayout) v.findViewById(R.id.item_update_click);
+            this.mShrink = (LinearLayout) v.findViewById(R.id.item_update_shrink);
+            this.mShowDefault = (LinearLayout) v.findViewById(R.id.item_update_default);
+            this.mShowAll = (LinearLayout) v.findViewById(R.id.item_update_show_all);
+            this.mDefaultDetailTv = (TextView) v.findViewById(R.id.item_update_show_default_tv);
+            this.mDetailAllDataTv = (TextView) v.findViewById(R.id.item_update_all_detail_tv);
             this.mUninstallTv = (TextView) v.findViewById(R.id.item_update_uninstall);
             this.mIgnoreTv = (TextView) v.findViewById(R.id.item_update_ignore);
             this.mToDetailTv = (TextView) v.findViewById(R.id.item_update_detail_but);
@@ -251,6 +268,9 @@ public class UpdateAdapter extends BaseAdapter {
         public void onChange(ImplInfo info) {
             LogUtils.d("UpdateFragment", "onChange," + info.getTitle() + "," + info.getStatus() + "," + info.getState());
             refresh();
+            if (info.getStatus() == ImplInfo.STATUS_INSTALLED) {
+                mListener.removeDataPosition(info.getPackageName());
+            }
         }
     }
 }

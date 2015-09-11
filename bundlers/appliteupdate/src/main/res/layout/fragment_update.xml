@@ -7,6 +7,7 @@
     tools:context="com.mit.appliteupdate.main.UpdateFragment">
 
     <LinearLayout
+        android:id="@+id/update_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -57,7 +58,16 @@
     <ListView
         android:id="@+id/update_listview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@color/background_main"
+        android:divider="@color/dividing_line"
+        android:dividerHeight="0.5dp"
+        android:visibility="gone"></ListView>
+
+    <ListView
+        android:id="@+id/update_ignore_listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@color/background_main"
         android:divider="@color/dividing_line"
         android:dividerHeight="0.5dp"

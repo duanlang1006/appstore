@@ -369,8 +369,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 LogUtils.e(TAG, "应用详情网络请求失败:" + s);
                 // 这里设置没有网络时的图片
 //                mLoadLayout.setVisibility(View.GONE);
-                mDataLayout.setVisibility(View.GONE);
-                no_network.setVisibility(View.VISIBLE);
+//                mDataLayout.setVisibility(View.GONE);
+//                no_network.setVisibility(View.VISIBLE);
             }
         });
     }
