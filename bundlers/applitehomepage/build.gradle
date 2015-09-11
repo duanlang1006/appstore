@@ -60,6 +60,7 @@ dependencies {
     provided files('../../app/libs/afinal_0.5.1_bin.jar')
     provided files('../../app/reflibs/xUtils-2.6.14.jar')
     provided files('../../app/reflibs/android-support-v4.jar')
+    provided files('../../app/libs/com.umeng.fb.5.4.0.jar')
 //    provided files('../../extras/applitecommon/applite-common-v1.0.jar')
 //    provided files('../../extras/impl/applite-impl-v1.1.jar')
     compile project(':extras:impl')
