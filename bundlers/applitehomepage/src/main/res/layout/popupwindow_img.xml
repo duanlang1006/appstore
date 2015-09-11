@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent">
 
     <ImageView
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
         android:id="@+id/pop_img_img"
-        android:background="@drawable/ic_launcher"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:scaleType="fitXY" />
 
     <ImageView
         android:id="@+id/pop_img_exit"
-        android:layout_margin="10dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/exit_bg"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/pop_img_img"
+        android:layout_alignTop="@id/pop_img_img"
+        android:layout_margin="5dp"
+        android:background="@drawable/exit_bg" />
 
 </RelativeLayout>

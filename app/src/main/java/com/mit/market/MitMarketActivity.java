@@ -25,6 +25,7 @@ import com.applite.homepage.HomePageListFragment;
 import com.applite.homepage.LuckyFragment;
 import com.applite.homepage.PersonalFragment;
 import com.applite.homepage.SettingFragment;
+import com.applite.sharedpreferences.AppliteSPUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
@@ -50,8 +51,6 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     private boolean personal_flag = false;
     Toast toast;
-
-    private String mUpdateData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +102,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 LogUtils.i(TAG, "首页更新请求成功，resulit：" + responseInfo.result);
-                mUpdateData = responseInfo.result;
+                AppliteSPUtils.put(MitMarketActivity.this, AppliteSPUtils.UPDATE_DATA, responseInfo.result);
             }
 
             @Override
@@ -205,6 +204,9 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         super.onDestroy();
         unregisterClients();
         IconCache.getInstance(this).flush();
+
+        //置更新数据为空
+        AppliteSPUtils.put(this, AppliteSPUtils.UPDATE_DATA, "");
     }
 
 //    @Override
@@ -328,11 +330,9 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     @Override
     public void jumptoUpdate(boolean addToBackstack) {
-        Bundle bundle = new Bundle();
-        bundle.putString("update_data", mUpdateData);
         jumpto(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,
                 UpdateFragment.class.getName(),
-                bundle, addToBackstack);
+                null, addToBackstack);
     }
 
     @Override
