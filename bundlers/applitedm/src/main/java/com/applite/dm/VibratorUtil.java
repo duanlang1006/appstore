@@ -1,7 +1,7 @@
 package com.applite.dm;
 
-import android.app.Activity;
 import android.app.Service;
+import android.content.Context;
 import android.os.Vibrator;
 
 /**
@@ -15,12 +15,12 @@ public class VibratorUtil {
      * boolean isRepeat ： 是否反复震动，如果是true，反复震动，如果是false，只震动一次
      */
 
-    public static void Vibrate(final Activity activity, long milliseconds) {
-        Vibrator vib = (Vibrator) activity.getSystemService(Service.VIBRATOR_SERVICE);
+    public static void Vibrate(final Context context, long milliseconds) {
+        Vibrator vib = (Vibrator) context.getSystemService(Service.VIBRATOR_SERVICE);
         vib.vibrate(milliseconds);
     }
-    public static void Vibrate(final Activity activity, long[] pattern,boolean isRepeat) {
-        Vibrator vib = (Vibrator) activity.getSystemService(Service.VIBRATOR_SERVICE);
+    public static void Vibrate(final Context context, long[] pattern,boolean isRepeat) {
+        Vibrator vib = (Vibrator) context.getSystemService(Service.VIBRATOR_SERVICE);
         vib.vibrate(pattern, isRepeat ? 1 : -1);
     }
 }

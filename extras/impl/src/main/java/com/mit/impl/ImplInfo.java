@@ -1,10 +1,13 @@
 package com.mit.impl;
 
 import android.app.DownloadManager;
+import android.content.Context;
+import android.content.Intent;
 
 import com.lidroid.xutils.db.annotation.Table;
 import com.lidroid.xutils.db.annotation.Transient;
 import com.lidroid.xutils.http.HttpHandler;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 
 import java.io.File;
 
@@ -64,7 +67,8 @@ public class ImplInfo {
     private boolean autoResume;             //断点续传
     private boolean autoRename;             //自动重命名
 
-    private boolean autoDelete;             //安装成功后自动删除包
+    @Transient
+    private ImplRes implRes;                //从implinfo生成的资源
 
     public ImplInfo() {
         key = null;
@@ -80,6 +84,7 @@ public class ImplInfo {
         autoLaunch = false;
         userContinue = false;
         md5 = null;
+        implRes = new ImplRes();
     }
 
     public long getId() {
@@ -182,10 +187,19 @@ public class ImplInfo {
         return autoRename;
     }
 
-    public boolean isAutoDelete() {
-        return autoDelete;
+    public int getProgress(){
+        int progress = 0;
+        if (total > 0){
+            progress = (int)(current*100/total);
+        }
+        return progress;
     }
 
+    public ImplRes getImplRes() {
+        return implRes;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public void setId(long id) {
         this._id = id;
     }
@@ -303,7 +317,81 @@ public class ImplInfo {
         this.autoRename = autoRename;
     }
 
-    public void setAutoDelete(boolean autoDelete) {
-        this.autoDelete = autoDelete;
+    @Override
+    public String toString() {
+        return "ImplInfo:"+title+","+state+","+status;
+    }
+
+    public void initImplRes(Context context){
+        if (implRes.inited){
+            return;
+        }
+        ImplHelper.fillImplRes(context,this);
+    }
+
+    public void updateImplRes(Context context){
+        ImplHelper.fillImplRes(context,this);
+    }
+
+    public class ImplRes{
+        private boolean inited;
+        private int action;
+        private String actionText;
+        private String statusText;
+        private String descText;
+        private Intent actionIntent;
+
+        public ImplRes() {
+            reset();
+        }
+
+        public void reset(){
+            action = ImplInfo.ACTION_DOWNLOAD;
+            actionText = "";
+            statusText = "";
+            descText = "";
+            actionIntent = null;
+            inited = false;
+        }
+
+        public int getAction() {
+            return action;
+        }
+
+        public String getActionText() {
+            return actionText;
+        }
+
+        public String getStatusText() {
+            return statusText;
+        }
+
+        public String getDescText() {
+            return descText;
+        }
+
+        Intent getActionIntent() {
+            return actionIntent;
+        }
+
+        public void setAction(int action) {
+            this.action = action;
+        }
+
+        public void setActionText(String actionText) {
+            this.actionText = actionText;
+        }
+
+        public void setStatusText(String statusText) {
+            this.statusText = statusText;
+        }
+
+        public void setDescText(String descText) {
+            this.descText = descText;
+        }
+
+        public void setActionIntent(Intent actionIntent) {
+            this.actionIntent = actionIntent;
+        }
     }
 }

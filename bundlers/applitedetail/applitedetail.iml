@@ -92,9 +92,9 @@
     <orderEntry type="library" exported="" name="android-support-v4" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
+    <orderEntry type="library" exported="" name="applite-impl-v1.1" level="project" />
+    <orderEntry type="library" exported="" name="applite-common-v1.0" level="project" />
     <orderEntry type="library" exported="" name="afinal_0.5.1_bin" level="project" />
-    <orderEntry type="module" module-name="applitecommon" exported="" />
-    <orderEntry type="module" module-name="impl" exported="" />
     <orderEntry type="module" module-name="mittheme" exported="" />
   </component>
 </module>

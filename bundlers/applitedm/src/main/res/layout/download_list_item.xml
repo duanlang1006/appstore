@@ -104,6 +104,7 @@
 
         <com.applite.dm.CustomProgressBar
             android:id="@+id/cpb"
+            style="@style/DownloadOptButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/interval_distance"
