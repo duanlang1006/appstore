@@ -165,6 +165,17 @@ public class AppliteSPUtils {
         return sp.getAll();
     }
 
+    public static void registerChangeListener(Context context,SharedPreferences.OnSharedPreferenceChangeListener listener){
+        SharedPreferences sp = context.getSharedPreferences(FILE_NAME,Context.MODE_PRIVATE);
+        sp.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    public static void unregisterChangeListener(Context context,SharedPreferences.OnSharedPreferenceChangeListener listener){
+        SharedPreferences sp = context.getSharedPreferences(FILE_NAME,Context.MODE_PRIVATE);
+        sp.unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
+
     /**
      * 创建一个解决SharedPreferencesCompat.apply方法的一个兼容类
      */

@@ -538,33 +538,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
                 null,
                 null);
-//        implInfo.setTitle(bean.getName()).setDownloadUrl(bean.getUrl()).setIconUrl(bean.getImgurl());
-//        if (ImplInfo.ACTION_DOWNLOAD == ImplHelper.getAction(mActivity,implInfo)) {
-//            switch (implInfo.getStatus()) {
-//                case ImplInfo.STATUS_PENDING:
-//                case ImplInfo.STATUS_RUNNING:
-//                    break;
-//                case ImplInfo.STATUS_PAUSED:
-//                    implAgent.resumeDownload(implInfo, null);
-//                    break;
-//                case ImplInfo.STATUS_INSTALLED:
-//                case ImplInfo.STATUS_NORMAL_INSTALLING:
-//                case ImplInfo.STATUS_PRIVATE_INSTALLING:
-//                    //正在安装或已安装
-////                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
-//                    break;
-//                default:
-//                    implAgent.newDownload(implInfo,
-//                            bean.getUrl(),
-//                            bean.getName(),
-//                            bean.getImgurl(),
-//                            Constant.extenStorageDirPath,
-//                            bean.getName() + ".apk",
-//                            true,
-//                            null);
-//                    break;
-//            }
-//        }
     }
 
     /**
