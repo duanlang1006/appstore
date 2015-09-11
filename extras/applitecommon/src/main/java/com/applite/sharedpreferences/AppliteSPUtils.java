@@ -33,7 +33,8 @@ public class AppliteSPUtils {
     public static final String CLEAR_CACHE = "clear_cache";//清除缓存
     public static final String DELETE_PACKAGE = "delete_package";//删除安装包
     public static final String NO_PICTURE = "no_pic";//智能无图
-
+    public static final String CURRENT_DATE = "cur_date";//当前日期
+    public static final String CURRENT_TIMES = "cur_times";//当前次数
 
     /**
      * 幸运抽奖积分
@@ -55,6 +56,11 @@ public class AppliteSPUtils {
      * WIFI自动更新开关
      */
     public static final String WIFI_UPDATE_SWITCH = "wifi_update_switch";
+
+    /**
+     * 需要更新APK的数据
+     */
+    public static final String UPDATE_DATA = "update_data";
 
     /**
      * 保存数据的方法，我们需要拿到保存数据的具体类型，然后根据类型调用不同的保存方法
@@ -164,6 +170,17 @@ public class AppliteSPUtils {
                 Context.MODE_PRIVATE);
         return sp.getAll();
     }
+
+    public static void registerChangeListener(Context context,SharedPreferences.OnSharedPreferenceChangeListener listener){
+        SharedPreferences sp = context.getSharedPreferences(FILE_NAME,Context.MODE_PRIVATE);
+        sp.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    public static void unregisterChangeListener(Context context,SharedPreferences.OnSharedPreferenceChangeListener listener){
+        SharedPreferences sp = context.getSharedPreferences(FILE_NAME,Context.MODE_PRIVATE);
+        sp.unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
 
     /**
      * 创建一个解决SharedPreferencesCompat.apply方法的一个兼容类

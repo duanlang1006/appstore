@@ -105,6 +105,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     }
 
     private String luckydrawicon = "http://www.fuli365.net/applite_content_console/image/iden_icon_image_type15.png";
+    private String boxlabel;
+    private String luckytype;
     private Boolean luckyflag = false;
     @Override
     public void onClick(View v) {
@@ -113,6 +115,11 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             if (obj instanceof ViewHolder) {
                 ViewHolder vh = (ViewHolder) obj;
                 MitMobclickAgent.onEvent(mContext, "onClickButton" + vh.getItemPosition());
+
+                boxlabel = vh.itemData.getBoxLabel();
+                luckytype = boxlabel.substring(boxlabel.length() - 6, boxlabel.length() - 4);
+                LogUtils.i(TAG, "luckytype = "+luckytype);
+
                 if(vh.itemData.getBoxLabel().equals(luckydrawicon)){
                     LogUtils.i(TAG, "youjiangxiazai");
                     luckyflag = true;
@@ -127,31 +134,6 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                         Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.itemData.getName() + ".apk",
                         null,
                         vh);
-
-//                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-//                    switch (vh.implInfo.getStatus()) {
-//                        case ImplInfo.STATUS_PENDING:
-//                            break;
-//                        case ImplInfo.STATUS_RUNNING:
-//                            implAgent.pauseDownload(vh.implInfo);
-//                            break;
-//                        case ImplInfo.STATUS_PAUSED:
-//                            implAgent.resumeDownload(vh.implInfo, vh);
-//                            break;
-//                        default:
-//                            implAgent.newDownload(vh.implInfo,
-//                                    vh.itemData.getrDownloadUrl(),
-//                                    vh.itemData.getName(),
-//                                    vh.itemData.getIconUrl(),
-//                                    Constant.extenStorageDirPath,
-//                                    vh.itemData.getName() + ".apk",
-//                                    true,
-//                                    vh);
-//                            break;
-//                    }
-//                } else {
-//                    implAgent.startActivity(vh.implInfo);
-//                }
             }
         }
     }
@@ -205,7 +187,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 this.implInfo.setDownloadUrl(itemData.getrDownloadUrl())
                         .setTitle(itemData.getName())
                         .setIconUrl(itemData.getIconUrl());
-                implAgent.setImplCallback(this, implInfo);
+                implAgent.bindImplCallback(this, implInfo);
             }
 
             //app图标
@@ -271,7 +253,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
         void initProgressButton() {
             if (null != mProgressButton && null != this.implInfo){
-                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mContext,implInfo);
+                ImplInfo.ImplRes res = implInfo.getImplRes();
                 LogUtils.d(TAG, implInfo.getTitle() + "," + implInfo.getStatus() + "," + res.getActionText());
                 mProgressButton.setEnabled(true);
                 if((implInfo.getStatus() == implInfo.STATUS_INSTALLED) && luckyflag){
@@ -285,7 +267,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                         mProgressButton.setText(res.getActionText());
                         break;
                     case ImplInfo.STATUS_RUNNING:
-                        mProgressButton.setText(res.getProgress()+"%");
+                        mProgressButton.setText(implInfo.getProgress()+"%");
                         break;
                     case ImplInfo.STATUS_PAUSED:
                         mProgressButton.setText(res.getStatusText());

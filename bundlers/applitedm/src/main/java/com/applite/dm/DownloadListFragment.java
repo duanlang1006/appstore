@@ -41,6 +41,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     private boolean[] status = null;//这里存放checkBox的选中状态
     private int checkedCount = 0;
     private Integer mStatusFlags = null;
+    private int mTitleId;
     private ImplAgent mImplAgent;
     private List<ImplInfo> mImplList;
     private BitmapUtils mBitmapHelper;
@@ -73,8 +74,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         }
 
         @Override
-        public Integer getStatusFlags() {
-            return mStatusFlags;
+        public int getTitleId() {
+            return mTitleId;
         }
 
         @Override
@@ -102,8 +103,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     };
 
 
-    public static Bundle newBundle(int flag) {
+    public static Bundle newBundle(int resid,int flag) {
         Bundle b = new Bundle();
+        b.putInt("titleId", resid);
         b.putInt("statusFilter", flag);
         return b;
     }
@@ -168,7 +170,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         super.onAttach(activity);
         Bundle params = getArguments();
         if (null != params) {
-            mStatusFlags = params.getInt("statusFilter");//
+            mStatusFlags = params.getInt("statusFilter");
+            mTitleId = params.getInt("titleId");
         }
         mImplAgent = ImplAgent.getInstance(activity.getApplicationContext());
         mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);

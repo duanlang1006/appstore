@@ -39,5 +39,7 @@
     <string name="uninstall">卸载</string>
     <string name="ignore">忽略</string>
     <string name="detail">详情</string>
+    <string name="cancel_ignore">取消忽略</string>
+    <string name="ignore_update">已忽略更新</string>
 
 </resources>

@@ -113,6 +113,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     private List<SimilarBean> mSimilarData = new ArrayList<SimilarBean>();
     private SimilarView mSimilarView;
+    private SimilarAdapter mSimilarAdapter;
 
     public static Bundle newBundle(String packageName, String name, String imgUrl) {
         Bundle b = new Bundle();
@@ -280,30 +281,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + mApkName + ".apk",
                                 null,
                                 implCallback);
-
-//                        if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(implinfo)) {
-//                            switch (implinfo.getStatus()) {
-//                                case ImplInfo.STATUS_PENDING:
-//                                case ImplInfo.STATUS_RUNNING:
-//                                    implAgent.pauseDownload(implinfo);
-//                                    break;
-//                                case ImplInfo.STATUS_PAUSED:
-//                                    implAgent.resumeDownload(implinfo, implCallback);
-//                                    break;
-//                                default:
-//                                    implAgent.newDownload(implinfo,
-//                                            mDownloadUrl,
-//                                            mName,
-//                                            mImgUrl,
-//                                            Constant.extenStorageDirPath,
-//                                            mApkName + ".apk",
-//                                            true,
-//                                            implCallback);
-//                                    break;
-//                            }
-//                        } else {
-//                            implAgent.startActivity(implinfo);
-//                        }
                     }
                 }
             }
@@ -333,7 +310,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.action_search == item.getItemId()) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, null, null);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, null, null, null);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -392,8 +369,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 LogUtils.e(TAG, "应用详情网络请求失败:" + s);
                 // 这里设置没有网络时的图片
 //                mLoadLayout.setVisibility(View.GONE);
-                mDataLayout.setVisibility(View.GONE);
-                no_network.setVisibility(View.VISIBLE);
+//                mDataLayout.setVisibility(View.GONE);
+//                no_network.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -428,7 +405,14 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     similarBean.setVersionCode(obj.getInt("versionCode"));
                     mSimilarData.add(similarBean);
                 }
-                mSimilarView.setData(mSimilarData, this);
+                if (null == mSimilarAdapter){
+                    mSimilarAdapter = new MySimilarAdapter(mActivity);
+                    mSimilarAdapter.setData(mSimilarData,this);
+                    mSimilarView.setAdapter(mSimilarAdapter);
+                }else{
+                    mSimilarAdapter.setData(mSimilarData,this);
+                    mSimilarAdapter.notifyDataSetChanged();
+                }
             }
 
             String mViewPagerUrl = null;
@@ -484,11 +468,11 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
             ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName, mVersionCode);
             if (null != implinfo) {
-                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity, implinfo);
-                implAgent.setImplCallback(implCallback, implinfo);
+                ImplInfo.ImplRes res = implinfo.getImplRes();
+                implAgent.bindImplCallback(implCallback, implinfo);
                 implinfo.setDownloadUrl(mDownloadUrl).setIconUrl(mImgUrl).setTitle(mName);
                 mProgressButton.setText(res.getActionText());
-                mProgressButton.setProgress(res.getProgress());
+                mProgressButton.setProgress(implinfo.getProgress());
                 if (mProgressButton.getProgress() == 0) {
                     mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_foreground));
                 } else {
@@ -533,7 +517,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 mTagView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ((OSGIServiceHost) mActivity).jumptoSearch(mTagView.getText().toString(), true, null, null);
+                        ((OSGIServiceHost) mActivity).jumptoSearch(mTagView.getText().toString(), true, null, null, null);
                     }
                 });
 
@@ -625,10 +609,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         }
 
         private void refresh(ImplInfo info) {
-            ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity, info);
+            ImplInfo.ImplRes res = info.getImplRes();
             LogUtils.d(TAG, "refresh" + res.getActionText() + "," + info.getStatus());
             mProgressButton.setText(res.getActionText());
-            mProgressButton.setProgress(res.getProgress());
+            mProgressButton.setProgress(info.getProgress());
         }
     }
 }

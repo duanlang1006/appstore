@@ -6,7 +6,7 @@ package com.applite.dm;
 public interface DownloadListener {
     boolean getFlag1();
     boolean getStatus(int position);
-    Integer getStatusFlags();
+    int getTitleId();
     boolean getFlag2();
     void setFlag2(boolean b);
 }

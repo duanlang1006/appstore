@@ -1,7 +1,9 @@
 package com.mit.market;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -25,6 +27,7 @@ import com.applite.homepage.HomePageListFragment;
 import com.applite.homepage.LuckyFragment;
 import com.applite.homepage.PersonalFragment;
 import com.applite.homepage.SettingFragment;
+import com.applite.sharedpreferences.AppliteSPUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
@@ -34,6 +37,7 @@ import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.applite.main.DetailFragment;
 import com.mit.applite.search.main.SearchFragment;
 import com.mit.appliteupdate.main.UpdateFragment;
+import com.mit.impl.ImplAgent;
 import com.mit.main.GuideFragment;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
@@ -53,6 +57,15 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     private String mUpdateData;
 
+    private SharedPreferences.OnSharedPreferenceChangeListener mConfigListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if (AppliteSPUtils.DELETE_PACKAGE.equals(key)){
+                configImpl();
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         LogUtils.d(TAG, "onCreate:" + savedInstanceState);
@@ -69,6 +82,9 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         LogUtils.d(TAG, "onCreate take " + (System.currentTimeMillis() - current) + " ms");
 
         registerClients();
+
+        AppliteSPUtils.registerChangeListener(this,mConfigListener);
+        configImpl();
 
         FragmentManager fgm = getSupportFragmentManager();
         Fragment fg = fgm.findFragmentById(R.id.container);
@@ -103,7 +119,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 LogUtils.i(TAG, "首页更新请求成功，resulit：" + responseInfo.result);
-                mUpdateData = responseInfo.result;
+                AppliteSPUtils.put(MitMarketActivity.this, AppliteSPUtils.UPDATE_DATA, responseInfo.result);
             }
 
             @Override
@@ -159,7 +175,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (R.id.action_search == id) {
-            jumptoSearch(null, true, null, null);
+            jumptoSearch(null, true, null, null, null);
             return true;
         } else if (R.id.action_dm == id) {
             jumptoDownloadManager(true);
@@ -205,6 +221,10 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         super.onDestroy();
         unregisterClients();
         IconCache.getInstance(this).flush();
+
+        //置更新数据为空
+        AppliteSPUtils.put(this, AppliteSPUtils.UPDATE_DATA, "");
+        AppliteSPUtils.unregisterChangeListener(this,mConfigListener);
     }
 
 //    @Override
@@ -312,10 +332,10 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     }
 
     @Override
-    public void jumptoSearch(String detailTag, boolean addToBackstack, String info, String keyword) {
+    public void jumptoSearch(String detailTag, boolean addToBackstack, String info, String keyword, String hintword) {
         jumpto(Constant.OSGI_SERVICE_SEARCH_FRAGMENT,
                 SearchFragment.class.getName(),
-                SearchFragment.newBundle(detailTag, info, keyword),
+                SearchFragment.newBundle(detailTag, info, keyword, hintword),
                 addToBackstack);
     }
 
@@ -328,11 +348,9 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     @Override
     public void jumptoUpdate(boolean addToBackstack) {
-        Bundle bundle = new Bundle();
-        bundle.putString("update_data", mUpdateData);
         jumpto(Constant.OSGI_SERVICE_UPDATE_FRAGMENT,
                 UpdateFragment.class.getName(),
-                bundle, addToBackstack);
+                null, addToBackstack);
     }
 
     @Override
@@ -376,6 +394,11 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         Intent intent = new Intent(this, ConversationActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    private void configImpl(){
+        boolean delete = (boolean)AppliteSPUtils.get(MitMarketActivity.this,AppliteSPUtils.DELETE_PACKAGE,false);
+        ImplAgent.getInstance(MitMarketActivity.this).configDeleteAfterInstalled(delete);
     }
 
     private void setOverflowShowingAlways() {

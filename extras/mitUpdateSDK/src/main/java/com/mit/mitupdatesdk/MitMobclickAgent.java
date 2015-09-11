@@ -324,6 +324,15 @@ public class MitMobclickAgent {
             case "choujiang":
                 points-=20;
                 break;
+            case "zhongjiang10":
+                points+=10;
+                break;
+            case "zhongjiang50":
+                points+=50;
+                break;
+            case "zhongjiang100":
+                points+=100;
+                break;
             default:
                 break;
         }

@@ -1,18 +1,13 @@
 package com.applite.homepage;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.internal.view.SupportMenu;
-import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -36,17 +31,16 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.applite.bean.PopupWindowBean;
 import com.applite.bean.ScreenBean;
 import com.applite.bean.HomePageDataBean;
+import com.applite.bean.ScreenBean;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
 import com.applite.utils.SPUtils;
-
-import net.tsz.afinal.FinalBitmap;
-
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -59,6 +53,7 @@ import com.mit.mitupdatesdk.MitUpdateAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
+import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
@@ -69,7 +64,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,10 +74,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private PopupWindow popupWindow;
     private List<ScreenBean> mScreenBeanList = new ArrayList<ScreenBean>();
     private FinalBitmap mFinalBitmap;
-    private String mPopImgUrl;
     private boolean mPopIsClick = false;
-    private long mPopStartTime;
-    private long mPopEndTime;
 
     private LayoutInflater mInflater;
     private ViewPager mViewPager;
@@ -130,7 +121,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         public void onPageSelected(int position) {
             LogUtils.d(TAG, "onPageSelected : " + position);
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
-            if(actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS){
+            if (actionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS) {
                 actionBar.setSelectedNavigationItem(position);
             }
         }
@@ -158,7 +149,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         }
     };
     private ViewGroup rootView;
-    private SubjectData mPopData = new SubjectData();
+    private PopupWindowBean mPopData = new PopupWindowBean();
+    private String mPopType;
 
     public static Bundle newBundle(String category, String title) {
         Bundle bundle = new Bundle();
@@ -309,6 +301,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         if (!hidden) {
             LogUtils.i(TAG, "重新显示ActionBar");
             initActionBar();
+            if (mViewPager != null) {
+                mViewPager.setCurrentItem(mTabSelect);
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 //            mActivity.runOnUiThread(mRefreshRunnable);
 
             if (mHomePageListFragment != null) {
@@ -349,10 +345,11 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
+                LogUtils.i(TAG, "插屏网络请求成功，result:" + o);
+                LogUtils.i(TAG, "System.currentTimeMillis():" + System.currentTimeMillis());
                 if (null != o) {
                     String result = (String) o;
                     setData(result);
-                    LogUtils.i(TAG, "插屏网络请求成功，result:" + result);
                 }
             }
 
@@ -373,25 +370,43 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         try {
             JSONObject object = new JSONObject(result);
             String app_key = object.getString("app_key");
-            String info = object.getString("plaque_info");
+            mPopType = object.getString("use_info");
+            String plaque_info = object.getString("plaque_info");
+            String detail_info = object.getString("detail_info");
+            LogUtils.i(TAG, "plaque_info:" + plaque_info);
+            LogUtils.i(TAG, "detail_info:" + detail_info);
 
-            if (!TextUtils.isEmpty(info)) {
-                JSONArray array = new JSONArray(info);
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject obj = new JSONObject(array.get(i).toString());
+            JSONArray plaque_array = new JSONArray(plaque_info);
+            if (plaque_array.length() != 0) {
+                for (int i = 0; i < plaque_array.length(); i++) {
+                    JSONObject obj = new JSONObject(plaque_array.get(i).toString());
                     mPopData.setS_key(obj.getString("spt_key"));
                     mPopData.setS_name(obj.getString("pl_name"));
                     mPopData.setStep(obj.getInt("step"));
                     mPopData.setS_datatype(obj.getString("s_datatype"));
-                    mPopImgUrl = obj.getString("pl_iconurl");
-                    mPopStartTime = obj.getLong("pl_starttime") * 1000;
-                    mPopEndTime = obj.getLong("pl_endtime") * 1000;
+                    mPopData.setmPopImgUrl(obj.getString("pl_iconurl"));
+                    mPopData.setmPopStartTime(obj.getLong("pl_starttime") * 1000);
+                    mPopData.setmPopEndTime(obj.getLong("pl_endtime") * 1000);
+                    mPopData.setmPopImgName(obj.getString("pl_iconurl_img"));
                 }
-                if (!TextUtils.isEmpty(mPopImgUrl))
-                    download(mPopData.getS_name() + ".jpg", mPopImgUrl);
             }
+            JSONArray detail_array = new JSONArray(detail_info);
+            if (detail_array.length() != 0) {
+                for (int i = 0; i < detail_array.length(); i++) {
+                    JSONObject obj = new JSONObject(detail_array.get(i).toString());
+                    mPopData.setmPackageName(obj.getString("packageName"));
+                    mPopData.setmName(obj.getString("name"));
+                    mPopData.setmIconUrl(obj.getString("iconUrl"));
+                    mPopData.setmPopImgUrl(obj.getString("pl_iconurl"));
+                    mPopData.setmPopStartTime(obj.getLong("pl_starttime") * 1000);
+                    mPopData.setmPopEndTime(obj.getLong("pl_endtime") * 1000);
+                    mPopData.setmPopImgName(obj.getString("pl_iconurl_img"));
+                }
+            }
+            download(mPopData.getmPopImgName(), mPopData.getmPopImgUrl());
         } catch (JSONException e) {
             e.printStackTrace();
+            LogUtils.i(TAG, "插屏JSONException");
         }
     }
 
@@ -414,7 +429,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                         LogUtils.i(TAG, name + "下载成功");
                         LogUtils.i(TAG, "Utils.getAppDir(name):" + AppliteUtils.getAppDir(name));
                         SPUtils.put(mActivity, SPUtils.POP_IMG_SAVE_PATH, AppliteUtils.getAppDir(name));
-                        if (System.currentTimeMillis() > mPopStartTime && System.currentTimeMillis() < mPopEndTime) {
+                        if (System.currentTimeMillis() > mPopData.getmPopStartTime() && System.currentTimeMillis() < mPopData.getmPopEndTime()) {
 //                            if(SPUtils.get(mActivity,SPUtils.POP_IMGURL,"").equals(mPopImgUrl)){
 //                                if (!(boolean)SPUtils.get(mActivity,SPUtils.POP_IMGURL_ISCLICK,false))
 //                                    initPopuWindow();
@@ -442,11 +457,16 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             if (v.getId() == R.id.pop_img_exit) {
 
             } else if (v.getId() == R.id.pop_img_img) {
-                ((OSGIServiceHost) mActivity).jumptoTopic(mPopData.getS_key(),
-                        mPopData.getS_name(),
-                        mPopData.getStep(),
-                        mPopData.getS_datatype(),
-                        true);
+                if ("plaque_info".equals(mPopType)) {
+                    ((OSGIServiceHost) mActivity).jumptoTopic(mPopData.getS_key(),
+                            mPopData.getS_name(),
+                            mPopData.getStep(),
+                            mPopData.getS_datatype(),
+                            true);
+                } else if ("detail_info".equals(mPopType)) {
+                    ((OSGIServiceHost) mActivity).jumptoDetail(mPopData.getmPackageName(),
+                            mPopData.getmName(), mPopData.getmIconUrl(), true);
+                }
             }
         }
     };
@@ -527,7 +547,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 return true;
             }
         } else if (item.getItemId() == R.id.action_search) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null, null);
             return true;
         } else if (item.getItemId() == R.id.action_dm) {
             ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
@@ -541,7 +561,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         if (v.getId() == R.id.action_personal) {
             ((OSGIServiceHost) mActivity).jumptoPersonal(true);
         } else if (v.getId() == R.id.action_search) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null, null);
         } else if (v.getId() == R.id.action_dm) {
             ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
         }
@@ -556,6 +576,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private String[] mHint_PackageName;
     private String[] mHint_Name;
     private String[] mHint_IconUrl;
+
     private int HINT_UPDATE_TIME = 2000;
     private int HINT_SHOW_NUMBER = 0;
     private Handler mHandler = new Handler();
@@ -586,32 +607,40 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             mEtView.setFocusable(false);
             mEtView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View paramView) {
-                    ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+                    String mHintword = null;
+                    if (!TextUtils.isEmpty(mEtView.getHint())) {
+                        mHintword = mEtView.getHint().toString();
+                        LogUtils.i(TAG, "mHintword = " + mHintword);
+                    }
+                    ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null, mHintword);
                 }
             });
             mSearchView = (ImageView) customView.findViewById(R.id.search_icon);
             mSearchView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View paramView) {
-                    String mKeyWord = mEtView.getHint().toString();
-                    LogUtils.i(TAG, "mKeyWord:"+mKeyWord);
+                    String mKeyWord = null;
+                    if (!TextUtils.isEmpty(mEtView.getHint())) {
+                        mKeyWord = mEtView.getHint().toString();
+                        LogUtils.i(TAG, "mKeyWord = " + mKeyWord);
+                    }
                     int i = getHintNum(mKeyWord);
-                    if(i != -1){
-                        ((OSGIServiceHost)mActivity).jumptoDetail(mHint_PackageName[i], mHint_Name[i], mHint_IconUrl[i], true);
-                    }else{
-                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord);
+                    if (i != -1) {
+                        ((OSGIServiceHost) mActivity).jumptoDetail(mHint_PackageName[i], mHint_Name[i], mHint_IconUrl[i], true);
+                    } else {
+                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord, null);
                     }
                 }
             });
         }
     }
 
-    private int getHintNum(String str){
+    private int getHintNum(String str) {
         int i;
-        if(null == str){
+        if (null == str) {
             return -1;
         }
-        for(i=0;i<mHint.length;i++){
-            if(mHint_Name[i].equals(str)){
+        for (i = 0; i < mHint.length; i++) {
+            if (mHint_Name[i].equals(str)) {
                 return i;
             }
         }
@@ -660,25 +689,22 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         }
     }
 
+    private int mTabSelect;
     private final ActionBar.TabListener mBarTabListener = new ActionBar.TabListener() {
-        private final static String TAG = "homepage_PagerFragment_mBarTabListener";
 
         @Override
         public void onTabReselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "onTabReselected arg0.getPosition()= " + arg0.getPosition());
         }
 
         @Override
         public void onTabSelected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "onTabSelected arg0.getPosition()= " + arg0.getPosition());
-
             if (mViewPager != null)
                 mViewPager.setCurrentItem(arg0.getPosition());
         }
 
         @Override
         public void onTabUnselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "onTabUnselected arg0.getPosition()= " + arg0.getPosition());
+            mTabSelect = arg0.getPosition();
         }
     };
 
@@ -724,10 +750,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 String name = hint_obj.getString("name");
                 String iconurl = hint_obj.getString("iconUrl");
                 mHint[i] = hint;
-                mHint_PackageName[i]= packagename;
-                mHint_Name[i]= name;
-                mHint_IconUrl[i]= iconurl;
-                LogUtils.e(TAG, "mHint_PackageName["+i+"]:"+mHint_PackageName[i]+"  mHint_Name["+i+"]:"+mHint_Name[i]+"  mHint_IconUrl["+i+"]:"+mHint_IconUrl[i]);
+                mHint_PackageName[i] = packagename;
+                mHint_Name[i] = name;
+                mHint_IconUrl[i] = iconurl;
+                LogUtils.e(TAG, "mHint_PackageName[" + i + "]:" + mHint_PackageName[i] + "  mHint_Name[" + i + "]:" + mHint_Name[i] + "  mHint_IconUrl[" + i + "]:" + mHint_IconUrl[i]);
             }
             mEtView.setHint(mHint[0]);
         } catch (JSONException e) {

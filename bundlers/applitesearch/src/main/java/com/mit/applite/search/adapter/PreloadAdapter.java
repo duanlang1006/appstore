@@ -116,29 +116,6 @@ public class PreloadAdapter extends BaseAdapter {
                         Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getmName() + ".apk",
                         null,
                         vh);
-//                if (ImplInfo.ACTION_DOWNLOAD == implAgent.getAction(vh.implInfo)) {
-//                    switch (vh.implInfo.getStatus()) {
-//                        case ImplInfo.STATUS_PENDING:
-//                        case ImplInfo.STATUS_RUNNING:
-//                            implAgent.pauseDownload(vh.implInfo);
-//                            break;
-//                        case ImplInfo.STATUS_PAUSED:
-//                            implAgent.resumeDownload(vh.implInfo, vh);
-//                            break;
-//                        default:
-//                            implAgent.newDownload(vh.implInfo,
-//                                    vh.bean.getmDownloadUrl(),
-//                                    vh.bean.getmName(),
-//                                    vh.bean.getmImgUrl(),
-//                                    Constant.extenStorageDirPath,
-//                                    vh.bean.getmName() + ".apk",
-//                                    true,
-//                                    vh);
-//                            break;
-//                    }
-//                } else {
-//                    implAgent.startActivity(vh.implInfo);
-//                }
             }
         });
         return convertView;
@@ -168,7 +145,7 @@ public class PreloadAdapter extends BaseAdapter {
             this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName(), data.getmVersionCode());
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
-                implAgent.setImplCallback(this, implInfo);
+                implAgent.bindImplCallback(this, implInfo);
             }
             mBt.setTag(this);
             refresh();
@@ -182,13 +159,13 @@ public class PreloadAdapter extends BaseAdapter {
 
         void initButton() {
             if (null != mBt && null != this.implInfo) {
-                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity,implInfo);
+                ImplInfo.ImplRes res = implInfo.getImplRes();
                 switch (implInfo.getStatus()) {
                     case ImplInfo.STATUS_PENDING:
                         mBt.setText(res.getActionText());
                         break;
                     case ImplInfo.STATUS_RUNNING:
-                        mBt.setText(res.getProgress() + "%");
+                        mBt.setText(implInfo.getProgress() + "%");
                         break;
                     case ImplInfo.STATUS_PAUSED:
                         mBt.setText(res.getStatusText());

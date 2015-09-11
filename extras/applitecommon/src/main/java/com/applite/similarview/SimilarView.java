@@ -16,7 +16,7 @@ public class SimilarView extends LinearLayout{
     private TextView mTitle;
     private GridView mGridView;
     private SimilarAdapter mAdapter;
-    private List<SimilarBean> mSimilarData;
+//    private List<SimilarBean> mSimilarData;
 
     public SimilarView(Context context) {
         super(context,null);
@@ -38,21 +38,35 @@ public class SimilarView extends LinearLayout{
         mGridView.setFocusable(false);
     }
 
-    public void setData(List<SimilarBean> data,SimilarAdapter.SimilarAPKDetailListener listener){
-        mSimilarData = data;
-        if (null != mSimilarData && mSimilarData.size() > 0){
-            mGridView.setVisibility(View.VISIBLE);
-            if (null == mAdapter){
-                mAdapter = new SimilarAdapter(getContext());
-                mAdapter.setData(data,listener);
-                mGridView.setAdapter(mAdapter);
-            }else{
-                mAdapter.setData(data,listener);
-                mAdapter.notifyDataSetChanged();
-            }
-        }else{
+//    public void setData(List<SimilarBean> data,SimilarAdapter.SimilarAPKDetailListener listener){
+//        mSimilarData = data;
+//        if (null != mSimilarData && mSimilarData.size() > 0){
+//            mGridView.setVisibility(View.VISIBLE);
+//            if (null == mAdapter){
+//                mAdapter = new SimilarAdapter(getContext());
+//                mAdapter.setData(data,listener);
+//                mGridView.setAdapter(mAdapter);
+//            }else{
+//                mAdapter.setData(data,listener);
+//                mAdapter.notifyDataSetChanged();
+//            }
+//        }else{
+//            mGridView.setVisibility(View.GONE);
+//        }
+//    }
+
+    public void setAdapter(SimilarAdapter adapter){
+        if (null == adapter){
             mGridView.setVisibility(View.GONE);
+            return;
         }
+        mAdapter = adapter;
+        mGridView.setAdapter(adapter);
+        mGridView.setVisibility(View.VISIBLE);
+    }
+
+    public SimilarAdapter getAdapter() {
+        return mAdapter;
     }
 
     public void setTitle(String title) {

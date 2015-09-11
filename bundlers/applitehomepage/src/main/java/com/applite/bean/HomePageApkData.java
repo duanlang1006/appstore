@@ -17,6 +17,7 @@ public class HomePageApkData implements Parcelable{
     private String versionName;
     private int versionCode;
     private String boxLabel;
+    private String boxLabeldata;
     private String downloadTimes;
     private String rDownloadUrl;
     private String apkSize;
@@ -37,6 +38,7 @@ public class HomePageApkData implements Parcelable{
         versionName = in.readString();
         versionCode = in.readInt();
         boxLabel = in.readString();
+        boxLabeldata = in.readString();
         downloadTimes = in.readString();
         rDownloadUrl = in.readString();
         apkSize = in.readString();
@@ -61,6 +63,7 @@ public class HomePageApkData implements Parcelable{
         dest.writeString(versionName);
         dest.writeInt(versionCode);
         dest.writeString(boxLabel);
+        dest.writeString(boxLabeldata);
         dest.writeString(downloadTimes);
         dest.writeString(rDownloadUrl);
         dest.writeString(apkSize);
@@ -96,6 +99,7 @@ public class HomePageApkData implements Parcelable{
                 ", versionName='" + versionName + '\'' +
                 ", versionCode='" + versionCode + '\'' +
                 ", boxLabel='" + boxLabel + '\'' +
+                ", boxLabeldata='" + boxLabeldata + '\'' +
                 ", downloadTimes='" + downloadTimes + '\'' +
                 ", mDownloadNumber='" + mDownloadNumber + '\'' +
                 '}';
@@ -139,6 +143,10 @@ public class HomePageApkData implements Parcelable{
 
     public String getBoxLabel() {
         return boxLabel;
+    }
+
+    public String getBoxLabeldata() {
+        return boxLabeldata;
     }
 
     public String getDownloadTimes() {
@@ -200,6 +208,10 @@ public class HomePageApkData implements Parcelable{
 
     public void setBoxLabel(String boxLabel) {
         this.boxLabel = boxLabel;
+    }
+
+    public void setBoxLabeldata(String boxLabeldata) {
+        this.boxLabeldata = boxLabeldata;
     }
 
     public void setDownloadTimes(String downloadTimes) {

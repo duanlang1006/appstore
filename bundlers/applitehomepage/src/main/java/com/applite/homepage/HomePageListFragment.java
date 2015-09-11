@@ -2,9 +2,7 @@ package com.applite.homepage;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -34,6 +32,7 @@ import com.google.gson.Gson;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
+
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
@@ -42,9 +41,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-* Created by hxd on 15-6-9.
-*/
-public class HomePageListFragment extends OSGIBaseFragment implements AbsListView.OnItemClickListener{
+ * Created by hxd on 15-6-9.
+ */
+public class HomePageListFragment extends OSGIBaseFragment implements AbsListView.OnItemClickListener {
     private final static String TAG = "homepage_ListFragment";
     private final static int MSG_LOAD_DATA = 0;
 
@@ -71,16 +70,16 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     private static final String TOPICFRAGMENT = "TopicListFragment";
     private static final String HOMEPAGELISTFRAGMENT = "HomepageListFragment";
 
-    public static Bundle newBundle(String s_key, String s_name, int step, String s_datatype){
+    public static Bundle newBundle(String s_key, String s_name, int step, String s_datatype) {
         Bundle bundle = new Bundle();
-        bundle.putString("key",s_key);
+        bundle.putString("key", s_key);
         bundle.putString("name", s_name);
         bundle.putInt("step", step);
         bundle.putString("datatype", s_datatype);
         return bundle;
     }
 
-    public static Bundle newBundle(SubjectData data,int position,boolean showBack){
+    public static Bundle newBundle(SubjectData data, int position, boolean showBack) {
         Bundle b = new Bundle();
         b.putParcelable("subject_data", data);
         b.putBoolean("show_home", showBack);
@@ -97,9 +96,9 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         super.onCreate(savedInstanceState);
         LogUtils.i(TAG, "ListFragment.onCreate() ");
         if (showBack && null != mData.getS_key()) {
-            whichPage = TOPICFRAGMENT+"_"+mData.getS_key();
-            MitMobclickAgent.onEvent(mActivity, whichPage+"_onCreate");
-        }else{
+            whichPage = TOPICFRAGMENT + "_" + mData.getS_key();
+            MitMobclickAgent.onEvent(mActivity, whichPage + "_onCreate");
+        } else {
             whichPage = HOMEPAGELISTFRAGMENT + this.mPosition;
         }
     }
@@ -115,7 +114,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
             this.mData = params.getParcelable("subject_data");
             this.showBack = params.getBoolean("show_home");
             this.mPosition = params.getInt("position");
-            if (null == mData){
+            if (null == mData) {
                 mData = new SubjectData();
                 mData.setS_key(params.getString("key"));
                 mData.setS_name(params.getString("name"));
@@ -137,7 +136,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         // Set the adapter
         mListView = (ListView) rootView.findViewById(android.R.id.list);
 
-        if (null == mData || null == mData.getData() || mData.getData().size() == 0){
+        if (null == mData || null == mData.getData() || mData.getData().size() == 0) {
             httpRequest();
         }
 
@@ -146,7 +145,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(mOnScrollListener);
-        mListAdapter = new ListArrayAdapter(mActivity,mData);
+        mListAdapter = new ListArrayAdapter(mActivity, mData);
         mListView.setAdapter(mListAdapter);
         initActionBar();
         return rootView;
@@ -156,18 +155,18 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         LogUtils.i(TAG, "onItemClick");
-        ListArrayAdapter.ViewHolder viewHolder = (ListArrayAdapter.ViewHolder)view.getTag();
-        if (null == viewHolder){
+        ListArrayAdapter.ViewHolder viewHolder = (ListArrayAdapter.ViewHolder) view.getTag();
+        if (null == viewHolder) {
             return;
         }
         HomePageApkData itemData = viewHolder.getItemData();
-        if (null == itemData){
+        if (null == itemData) {
             return;
         }
         if (viewHolder.getLayoutStr().equals("fragment_categorylist")) {
-            ((OSGIServiceHost)mActivity).jumptoHomepage(itemData.getKey(),itemData.getName(),true);
-        }else if (viewHolder.getLayoutStr().equals("fragment_apklist")){
-            ((OSGIServiceHost)mActivity).jumptoDetail(itemData.getPackageName(),itemData.getName(),itemData.getIconUrl(),true);
+            ((OSGIServiceHost) mActivity).jumptoHomepage(itemData.getKey(), itemData.getName(), true);
+        } else if (viewHolder.getLayoutStr().equals("fragment_apklist")) {
+            ((OSGIServiceHost) mActivity).jumptoDetail(itemData.getPackageName(), itemData.getName(), itemData.getIconUrl(), true);
         }
         MitMobclickAgent.onEvent(mActivity, "onItemClick" + viewHolder.getItemPosition());
     }
@@ -189,13 +188,12 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     }
 
     public void play(boolean flag) {
-        LogUtils.i(TAG, "play = " + flag + " mTopicView = " + mTopicView);
-        if (flag){
-            if (null != mTopicView){
+        if (flag) {
+            if (null != mTopicView) {
                 mTopicView.startPlay();
             }
-        }else{
-            if (null != mTopicView){
+        } else {
+            if (null != mTopicView) {
                 mTopicView.stopPlay();
             }
         }
@@ -241,7 +239,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_search) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null, null);
             return true;
         } else if (item.getItemId() == R.id.action_dm) {
             ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
@@ -256,24 +254,25 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
     private EditText mEtView;
     private ImageView mSearchView;
 
-    private void initActionBar(){
+    private void initActionBar() {
         LogUtils.i(TAG, "initActionBar");
         try {
 
-            if(null == customView){
+            if (null == customView) {
                 customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_searchbar, null);
                 mEtView = (EditText) customView.findViewById(R.id.search_et);
                 mEtView.setFocusable(false);
                 mEtView.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View paramView) {
-                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+                        LogUtils.i(TAG, "homepagelistfragment  mEtView get hintword");
+                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null, null);
                     }
                 });
                 mSearchView = (ImageView) customView.findViewById(R.id.search_icon);
                 mSearchView.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View paramView) {
                         String mKeyWord = mEtView.getHint().toString();
-                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord);
+                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord, null);
                     }
                 });
             }
@@ -286,44 +285,44 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                 actionBar.setCustomView(customView);
 //                actionBar.setTitle(mData.getS_name());
                 actionBar.removeAllTabs();
-                if(!TextUtils.isEmpty(mData.getS_name())){
+                if (!TextUtils.isEmpty(mData.getS_name())) {
                     actionBar.addTab(actionBar.newTab().setTabListener(mBarTabListener));
                     ActionBar.Tab t = actionBar.getTabAt(0);
                     t.setCustomView(R.layout.actionbar_tab);
-                    TextView title = (TextView)t.getCustomView().findViewById(R.id.tab_title);
+                    TextView title = (TextView) t.getCustomView().findViewById(R.id.tab_title);
                     title.setText(mData.getS_name());
                 }
                 actionBar.show();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private final ActionBar.TabListener mBarTabListener = new ActionBar.TabListener(){
+    private final ActionBar.TabListener mBarTabListener = new ActionBar.TabListener() {
         private final static String TAG = "homepage_ListFragment_mBarTabListener";
 
         @Override
         public void onTabReselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "onTabReselected arg0.getPosition()= "+arg0.getPosition());
+            LogUtils.i(TAG, "onTabReselected arg0.getPosition()= " + arg0.getPosition());
         }
 
         @Override
         public void onTabSelected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "onTabSelected arg0.getPosition()= "+arg0.getPosition());
+            LogUtils.i(TAG, "onTabSelected arg0.getPosition()= " + arg0.getPosition());
         }
 
         @Override
         public void onTabUnselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "onTabUnselected arg0.getPosition()= "+arg0.getPosition());
+            LogUtils.i(TAG, "onTabUnselected arg0.getPosition()= " + arg0.getPosition());
         }
     };
 
-    private void setTopicView(Context context){
-        List<SpecialTopicData> topicList = (null == mData)?null:mData.getSpecialtopic_data();
-        if (null != topicList && topicList.size()>0){
+    private void setTopicView(Context context) {
+        List<SpecialTopicData> topicList = (null == mData) ? null : mData.getSpecialtopic_data();
+        if (null != topicList && topicList.size() > 0) {
             String[] urls = new String[topicList.size()];
-            for(int i = 0;i < topicList.size();i++){
+            for (int i = 0; i < topicList.size(); i++) {
                 urls[i] = topicList.get(i).t_iconurl;
             }
             mTopicView = new SlideShowView(context);
@@ -333,8 +332,8 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         }
     }
 
-    private void setMoreView(LayoutInflater inflater){
-        if (null != mMoreView){
+    private void setMoreView(LayoutInflater inflater) {
+        if (null != mMoreView) {
             mListView.removeFooterView(mMoreView);
         }
         mMoreView = inflater.inflate(R.layout.more, null);
@@ -344,14 +343,14 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         mListView.addFooterView(mMoreView);
     }
 
-    private void removeMoreView(){
-        if (null != mMoreView){
+    private void removeMoreView() {
+        if (null != mMoreView) {
             mListView.removeFooterView(mMoreView);
         }
     }
 
-    private void setEndView(LayoutInflater inflater){
-        if (null != mEndView){
+    private void setEndView(LayoutInflater inflater) {
+        if (null != mEndView) {
             mListView.removeFooterView(mEndView);
         }
         mEndView = inflater.inflate(R.layout.notify_end, null);
@@ -359,8 +358,8 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         mListView.invalidate();
     }
 
-    private void removeEndView(){
-        if (null != mEndView){
+    private void removeEndView() {
+        if (null != mEndView) {
             mListView.removeFooterView(mEndView);
         }
     }
@@ -369,11 +368,11 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         int page = 0;
         if (null != mData.getData()) {
             page = mData.getData().size() / mData.getStep();
-            if (mData.getData().size()% mData.getStep() != 0){
-                page ++;
+            if (mData.getData().size() % mData.getStep() != 0) {
+                page++;
             }
         }
-        LogUtils.i(TAG, mData+"");
+        LogUtils.i(TAG, mData + "");
         LogUtils.d(TAG, "httpRequest  mPage : " + page);
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
@@ -408,7 +407,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
                 mMoreView.setVisibility(View.GONE);
                 //mMoreTextView.setVisibility(View.GONE);
 
-                if((pageData.getSubjectData().get(0).getS_key().equals("maintype"))||(pageData.getSubjectData().get(0).getS_key().equals("maintype_m_game"))){
+                if ((pageData.getSubjectData().get(0).getS_key().equals("maintype")) || (pageData.getSubjectData().get(0).getS_key().equals("maintype_m_game"))) {
                     removeMoreView();
                 }
 
@@ -436,10 +435,10 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         });
     }
 
-    private HomePageApkData findBeanByKey(String key){
+    private HomePageApkData findBeanByKey(String key) {
         HomePageApkData bean = null;
-        for (int i = 0;i<mData.getData().size();i++){
-            if (key.equals(mData.getData().get(i).getPackageName())){
+        for (int i = 0; i < mData.getData().size(); i++) {
+            if (key.equals(mData.getData().get(i).getPackageName())) {
                 bean = mData.getData().get(i);
                 break;
             }
@@ -447,22 +446,23 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         return bean;
     }
 
-    class MyScrollListener implements AbsListView.OnScrollListener{
+    class MyScrollListener implements AbsListView.OnScrollListener {
         private boolean isLastRow = false;
+
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
             if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
                 LogUtils.i(TAG, "拉到最底部");
-                if(!isend){
+                if (!isend) {
                     mMoreView.setVisibility(view.VISIBLE);
                     mEndTextView.setVisibility(View.GONE);
                     //mMoreTextView.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     mMoreView.setVisibility(view.VISIBLE);
                     mMoreTextView.setVisibility(View.GONE);
                     mEndTextView.setVisibility(View.VISIBLE);
                 }
-                if(sendhttpreq){
+                if (sendhttpreq) {
                     httpRequest();
                     sendhttpreq = false;
                 }
@@ -481,18 +481,18 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         }
     }
 
-    class MySlideViewListener implements SlideShowView.OnSlideViewClickListener{
+    class MySlideViewListener implements SlideShowView.OnSlideViewClickListener {
         @Override
-        public void onClick(View v, int position){
+        public void onClick(View v, int position) {
             SpecialTopicData topicData = mData.getSpecialtopic_data().get(position);
-            LogUtils.i(TAG, "topicData = " + topicData+" mTopicView = "+mTopicView);
+            LogUtils.i(TAG, "topicData = " + topicData + " mTopicView = " + mTopicView);
 //            mTopicView.stopPlay();
-            if(topicData.getT_skiptype() == 1){
+            if (topicData.getT_skiptype() == 1) {
                 MitMobclickAgent.onEvent(mActivity, "onSlideViewClick_" + topicData.getTt_packageName());
-                ((OSGIServiceHost)mActivity).jumptoDetail(topicData.getTt_packageName(), topicData.getTt_name(), topicData.getTt_iconUrl(), true);
-            }else{
+                ((OSGIServiceHost) mActivity).jumptoDetail(topicData.getTt_packageName(), topicData.getTt_name(), topicData.getTt_iconUrl(), true);
+            } else {
                 MitMobclickAgent.onEvent(mActivity, "onSlideViewClick_" + topicData.t_key);
-                ((OSGIServiceHost)mActivity).jumptoTopic(topicData.t_key,topicData.t_info,mData.getStep(),mData.getS_datatype(),true);
+                ((OSGIServiceHost) mActivity).jumptoTopic(topicData.t_key, topicData.t_info, mData.getStep(), mData.getS_datatype(), true);
             }
         }
     }
