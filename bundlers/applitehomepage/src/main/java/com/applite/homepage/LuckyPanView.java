@@ -336,7 +336,6 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
                     }
                     toast.setGravity(Gravity.CENTER, 0, 0);
 					toast.show();
-                    mc.changePointsString();
 					break;
 				case LUCKYDRAW_1:
 					//50积分
@@ -349,7 +348,6 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 					}
 					toast.setGravity(Gravity.CENTER, 0, 0);
 					toast.show();
-                    mc.changePointsString();
 					break;
 				case LUCKYDRAW_2:
 					//100积分
@@ -362,7 +360,6 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 					}
 					toast.setGravity(Gravity.CENTER, 0, 0);
 					toast.show();
-                    mc.changePointsString();
 					break;
 				case LUCKYDRAW_3:
 					//10M流量
@@ -406,8 +403,6 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 	}
 
     public MyCallInterface mc;
-
-
 
     public interface MyCallInterface {
         public void changePointsString();

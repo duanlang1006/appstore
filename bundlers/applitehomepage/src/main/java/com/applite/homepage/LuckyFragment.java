@@ -39,7 +39,7 @@ public class LuckyFragment extends OSGIBaseFragment {
 
     private Toast toast;
 
-    private int mDate;
+    private int Conunts;
 
     public LuckyFragment() {
         super();
@@ -58,11 +58,15 @@ public class LuckyFragment extends OSGIBaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int da = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.CURRENT_DATE, 0);
+        Conunts = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.CURRENT_TIMES, 0);
+        String da = (String) AppliteSPUtils.get(mActivity, AppliteSPUtils.CURRENT_DATE, null);
         LogUtils.i(TAG, "da = " + da);
 
-        mDate = getDate();
-        AppliteSPUtils.put(mActivity, AppliteSPUtils.CURRENT_DATE, mDate);
+        if(!getDate().equals(da)){
+            Conunts = 0;
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.CURRENT_TIMES, Conunts);
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.CURRENT_DATE, getDate());
+        }
 
         mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 1000);
     }
@@ -88,9 +92,26 @@ public class LuckyFragment extends OSGIBaseFragment {
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                     } else {
+                        //判断当天抽奖次数，如果已满3次，则弹出提示当天不允许再抽奖
+                        Conunts = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.CURRENT_TIMES, 0);
+                        if (Conunts < 3) {
+                            Conunts++;
+                            AppliteSPUtils.put(mActivity, AppliteSPUtils.CURRENT_TIMES, Conunts);
+                        } else {
+                            if (toast == null) {
+                                toast = Toast.makeText(mActivity, getString(R.string.beyond_limit), Toast.LENGTH_SHORT);
+                            }
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                            return;
+                        }
+
+                        //读取当前积分，减去当前抽奖花费的积分
                         mLuckyPonints = MitMobclickAgent.calDrawPoints(mLuckyPonints, "choujiang");
                         mPoints.setText("积分：" + String.valueOf(mLuckyPonints));
                         AppliteSPUtils.put(mActivity, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
+
+                        //重新绘制界面
                         mStartBtn.setImageResource(R.drawable.stop);
 //                        mLuckyPanView.luckyStart(1);
                         mLuckyPanView.luckyStart(); //随机中奖概率
@@ -139,14 +160,15 @@ public class LuckyFragment extends OSGIBaseFragment {
         return view;
     }
 
-    private int getDate(){
+    private String getDate(){
         Time t = new Time();
         t.setToNow();
         int lastmonth = t.month + 1 ;
         int date =  t.year + lastmonth + t.monthDay;
         //String str =  t.year + "年" + lastmonth + "月" + t.monthDay + "日" + t.hour + ":"+ t.minute + ":"+ t.second;
-        LogUtils.i(TAG, "date = "+date);
-        return date;
+        String str =  t.year + "年" + lastmonth + "月" + t.monthDay + "日";
+        LogUtils.i(TAG, "str = "+str);
+        return str;
     }
 
     private void getRulesStr(){

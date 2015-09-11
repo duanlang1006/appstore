@@ -22,6 +22,8 @@
 
     <string name="IntegralProblem">Integral Problem</string>
 
+    <string name="beyond_limit">Beyond the limit of the day</string>
+
     <string name="rules_no1">Rules no1</string>
     <string name="rules_no2">Rules no2</string>
     <string name="rules_no3">Rules no3</string>

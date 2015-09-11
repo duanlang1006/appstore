@@ -47,4 +47,6 @@
     <string name="testimonial_3">10M</string>
     <string name="testimonial_4">手机一台</string>
     <string name="testimonial_5">谢谢参与</string>
+
+    <string name="beyond_limit">今天抽奖次数已满，请明天再来</string>
 </resources>

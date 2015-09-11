@@ -34,7 +34,7 @@ public class AppliteSPUtils {
     public static final String DELETE_PACKAGE = "delete_package";//删除安装包
     public static final String NO_PICTURE = "no_pic";//智能无图
     public static final String CURRENT_DATE = "cur_date";//当前日期
-
+    public static final String CURRENT_TIMES = "cur_times";//当前次数
 
     /**
      * 幸运抽奖积分
