@@ -5,12 +5,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.Time;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,19 +39,35 @@ public class LuckyFragment extends OSGIBaseFragment {
 
     private Toast toast;
 
+    private int Conunts;
+
     public LuckyFragment() {
         super();
     }
+
+    private LuckyCallback mLuckyCallback;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
+        mLuckyCallback = new LuckyCallback();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Conunts = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.CURRENT_TIMES, 0);
+        String da = (String) AppliteSPUtils.get(mActivity, AppliteSPUtils.CURRENT_DATE, null);
+        LogUtils.i(TAG, "da = " + da);
+
+        if(!getDate().equals(da)){
+            Conunts = 0;
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.CURRENT_TIMES, Conunts);
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.CURRENT_DATE, getDate());
+        }
+
         mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 1000);
     }
 
@@ -71,21 +85,40 @@ public class LuckyFragment extends OSGIBaseFragment {
             public void onClick(View v) {
                 if (!mLuckyPanView.isStart()) {
                     mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 1000);
-                    if(mLuckyPonints < 20){
-                        if(toast == null){
+                    if (mLuckyPonints < 20) {
+                        if (toast == null) {
                             toast = Toast.makeText(mActivity, getString(R.string.IntegralProblem), Toast.LENGTH_SHORT);
                         }
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    } else {
+                        //判断当天抽奖次数，如果已满3次，则弹出提示当天不允许再抽奖
+                        Conunts = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.CURRENT_TIMES, 0);
+                        if (Conunts < 3) {
+                            Conunts++;
+                            AppliteSPUtils.put(mActivity, AppliteSPUtils.CURRENT_TIMES, Conunts);
+                        } else {
+                            if (toast == null) {
+                                toast = Toast.makeText(mActivity, getString(R.string.beyond_limit), Toast.LENGTH_SHORT);
+                            }
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
-                    }else{
+                            return;
+                        }
+
+                        //读取当前积分，减去当前抽奖花费的积分
                         mLuckyPonints = MitMobclickAgent.calDrawPoints(mLuckyPonints, "choujiang");
-                        mPoints.setText("积分："+String.valueOf(mLuckyPonints));
+                        mPoints.setText("积分：" + String.valueOf(mLuckyPonints));
                         AppliteSPUtils.put(mActivity, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
+
+                        //重新绘制界面
                         mStartBtn.setImageResource(R.drawable.stop);
-                        mLuckyPanView.luckyStart(1);
+//                        mLuckyPanView.luckyStart(1);
+                        mLuckyPanView.luckyStart(); //随机中奖概率
+                        mLuckyPanView.setflag(true);
                     }
                 } else {
-                    if (!mLuckyPanView.isShouldEnd()){
+                    if (!mLuckyPanView.isShouldEnd()) {
                         mStartBtn.setImageResource(R.drawable.start);
                         mLuckyPanView.luckyEnd();
                     }
@@ -124,17 +157,18 @@ public class LuckyFragment extends OSGIBaseFragment {
 
         initActionBar();
 
-        getDate();
         return view;
     }
 
-    private void getDate(){
+    private String getDate(){
         Time t = new Time();
         t.setToNow();
         int lastmonth = t.month + 1 ;
-        final String str =  t.year + "年" + lastmonth + "月" + t.monthDay + "日";
+        int date =  t.year + lastmonth + t.monthDay;
+        //String str =  t.year + "年" + lastmonth + "月" + t.monthDay + "日" + t.hour + ":"+ t.minute + ":"+ t.second;
+        String str =  t.year + "年" + lastmonth + "月" + t.monthDay + "日";
         LogUtils.i(TAG, "str = "+str);
-
+        return str;
     }
 
     private void getRulesStr(){
@@ -184,4 +218,21 @@ public class LuckyFragment extends OSGIBaseFragment {
             e.printStackTrace();
         }
     }
+
+    public class LuckyCallback implements LuckyPanView.MyCallInterface {
+        @Override
+        public void changePointsString(){
+            LogUtils.i(TAG, "call to change points");
+            mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
+            if(mPoints != null){
+                mPoints.setText("积分：" + String.valueOf(mLuckyPonints));
+            }else{
+                LogUtils.i(TAG, "mPoints = null");
+            }
+        }
+    }
+
+
+
+
 }

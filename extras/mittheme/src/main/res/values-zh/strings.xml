@@ -1,4 +1,5 @@
 <resources>
     <string name="action_search">搜索</string>
     <string name="action_dm">下载</string>
+    <string name="action_download">下载</string>
 </resources>

@@ -29,4 +29,7 @@
 
     <color name="title_grey">#999999</color>
     <color name="divided_line">#b7b6b7</color>
+
+    <color name="text_tab_selected">#ffff7100</color>
+    <color name="text_tab_unselected">#ff000000</color>
 </resources>
