@@ -333,7 +333,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.action_search == item.getItemId()) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, null, null);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, null, null, null);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -533,7 +533,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 mTagView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ((OSGIServiceHost) mActivity).jumptoSearch(mTagView.getText().toString(), true, null, null);
+                        ((OSGIServiceHost) mActivity).jumptoSearch(mTagView.getText().toString(), true, null, null, null);
                     }
                 });
 

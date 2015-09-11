@@ -41,4 +41,10 @@
     <string name="abort">关于</string>
     <string name="help">帮助</string>
 
+    <string name="testimonial_0">10 积分</string>
+    <string name="testimonial_1">50 积分</string>
+    <string name="testimonial_2">100 积分</string>
+    <string name="testimonial_3">10M</string>
+    <string name="testimonial_4">手机一台</string>
+    <string name="testimonial_5">谢谢参与</string>
 </resources>

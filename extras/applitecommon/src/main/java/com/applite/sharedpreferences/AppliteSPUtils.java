@@ -33,6 +33,7 @@ public class AppliteSPUtils {
     public static final String CLEAR_CACHE = "clear_cache";//清除缓存
     public static final String DELETE_PACKAGE = "delete_package";//删除安装包
     public static final String NO_PICTURE = "no_pic";//智能无图
+    public static final String CURRENT_DATE = "cur_date";//当前日期
 
 
     /**

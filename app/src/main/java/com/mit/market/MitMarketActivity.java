@@ -159,7 +159,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (R.id.action_search == id) {
-            jumptoSearch(null, true, null, null);
+            jumptoSearch(null, true, null, null, null);
             return true;
         } else if (R.id.action_dm == id) {
             jumptoDownloadManager(true);
@@ -312,10 +312,10 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     }
 
     @Override
-    public void jumptoSearch(String detailTag, boolean addToBackstack, String info, String keyword) {
+    public void jumptoSearch(String detailTag, boolean addToBackstack, String info, String keyword, String hintword) {
         jumpto(Constant.OSGI_SERVICE_SEARCH_FRAGMENT,
                 SearchFragment.class.getName(),
-                SearchFragment.newBundle(detailTag, info, keyword),
+                SearchFragment.newBundle(detailTag, info, keyword, hintword),
                 addToBackstack);
     }
 

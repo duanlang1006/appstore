@@ -97,10 +97,10 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private Button refresh;
     private RelativeLayout no_network;
 
-    private int HINT_UPDATE_TIME = 2000;
-    private int HINT_SHOW_NUMBER = 0;
+//    private int HINT_UPDATE_TIME = 2000;
+//    private int HINT_SHOW_NUMBER = 0;
 
-    private boolean switch_hint = false;
+//    private boolean switch_hint = false;
 
     private Runnable mNotifyRunnable = new Runnable() {
         @Override
@@ -156,6 +156,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 
     private String mInfo;
     private String mKeyword;
+    private String mHintword;
     private TextView mMoreText;
     private ProgressBar mMoreProgressBar;
     private LayoutInflater mInflater;
@@ -166,22 +167,23 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private ImageView mLoadingImgView;
     private Animation LoadingAnimation;
     private String[] mHint;
-    private Handler mHandler = new Handler();
-    private Runnable mRunnable = new Runnable() {
 
-        @Override
-        public void run() {
-            if (null != mHint && mHint.length != 0) {
-                mEtView.setHint(mHint[HINT_SHOW_NUMBER]);
-                mHandler.postDelayed(this, HINT_UPDATE_TIME);
-                if (HINT_SHOW_NUMBER < mHint.length - 1) {
-                    HINT_SHOW_NUMBER = HINT_SHOW_NUMBER + 1;
-                } else {
-                    HINT_SHOW_NUMBER = 0;
-                }
-            }
-        }
-    };
+    //    private Handler mHandler = new Handler();
+//    private Runnable mRunnable = new Runnable() {
+//
+//        @Override
+//        public void run() {
+//            if (null != mHint && mHint.length != 0) {
+//                mEtView.setHint(mHint[HINT_SHOW_NUMBER]);
+//                mHandler.postDelayed(this, HINT_UPDATE_TIME);
+//                if (HINT_SHOW_NUMBER < mHint.length - 1) {
+//                    HINT_SHOW_NUMBER = HINT_SHOW_NUMBER + 1;
+//                } else {
+//                    HINT_SHOW_NUMBER = 0;
+//                }
+//            }
+//        }
+//    };
     private String mDetailTag;
 
     public SearchFragment() {
@@ -189,11 +191,12 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
 
-    public static Bundle newBundle(String DetailTag, String info, String keyword) {
+    public static Bundle newBundle(String DetailTag, String info, String keyword, String hintword) {
         Bundle b = new Bundle();
         b.putString("DetailTag", DetailTag);
         b.putString("info", info);
         b.putString("keyword", keyword);
+        b.putString("hintword", hintword);
         return b;
     }
 
@@ -207,7 +210,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             LogUtils.i(TAG, "mDetailTag:" + mDetailTag);
             this.mInfo = params.getString("info");
             this.mKeyword = params.getString("keyword");
-            LogUtils.i(TAG, "mKeyword = " + mKeyword + " mInfo = " + mInfo);
+            this.mHintword = params.getString("hintword");
+            LogUtils.i(TAG, "mHintword = " + mHintword + " mKeyword = " + mKeyword + " mInfo = " + mInfo);
         }
     }
 
@@ -240,6 +244,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             mLoadingLayout.setVisibility(View.VISIBLE);
             postDetailTag();
         }
+        if (!TextUtils.isEmpty(mHintword)) {
+            mEtView.setHint(mHintword);
+        }
         return rootView;
     }
 
@@ -254,7 +261,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             LogUtils.i(TAG, "显示搜索页面");
             initActionBar();
             closeKeyboard();
-            startConvenientSearch();
+            //startConvenientSearch();
         }
     }
 
@@ -457,12 +464,12 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             mEtView.setText(null);
             getfocuable();
             openKeyboard();
-            stopConvenientSearch();
+//            stopConvenientSearch();
         } else if (v.getId() == R.id.search_search) {
             MitMobclickAgent.onEvent(mActivity, "clickSearch");
             getfocuable();
             closeKeyboard();
-            stopConvenientSearch();
+//            stopConvenientSearch();
             mPreloadListView.setVisibility(View.GONE);
             if (TextUtils.isEmpty(mEtView.getText())) {
                 if (TextUtils.isEmpty(mEtView.getHint())) {
@@ -496,7 +503,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         } else if (v.getId() == R.id.search_et) {
             getfocuable();
             openKeyboard();
-            stopConvenientSearch();
+//            stopConvenientSearch();
         }
     }
 
@@ -505,7 +512,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     private void getfocuable() {
-        if(null != mEtView){
+        if (null != mEtView) {
             mEtView.setFocusable(true);
             mEtView.setFocusableInTouchMode(true);
             mEtView.requestFocus();
@@ -520,21 +527,21 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         mChangeNumbew = mChangeNumbew + 1;
     }
 
-    private void stopConvenientSearch() {
-        switch_hint = false;
-        mHandler.removeCallbacks(mRunnable);
-    }
+//    private void stopConvenientSearch() {
+//        switch_hint = false;
+////        mHandler.removeCallbacks(mRunnable);
+//    }
 
-    private void startConvenientSearch() {
-        if (!switch_hint) {
-            switch_hint = true;
-            mHandler.postDelayed(mRunnable, 0);
-        }
-    }
+//    private void startConvenientSearch() {
+//        if (!switch_hint) {
+//            switch_hint = true;
+//            mHandler.postDelayed(mRunnable, 0);
+//        }
+//    }
 
     private void openKeyboard() {
         if (TextUtils.isEmpty(mDetailTag))
-        KeyBoardUtils.openKeyboard(mEtView, mActivity);
+            KeyBoardUtils.openKeyboard(mEtView, mActivity);
     }
 
     private void closeKeyboard() {
@@ -817,7 +824,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mHint[i] = hint;
             }
             //mHandler.postDelayed(mRunnable, 0);
-            mEtView.setHint(mHint[0]);
+            //mEtView.setHint(mHint[0]);
 
             JSONArray hotword_json = new JSONArray(hotword_info);
             for (int i = 0; i < hotword_json.length(); i++) {

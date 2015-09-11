@@ -9,12 +9,19 @@ import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
+import android.widget.Toast;
+
+import com.applite.sharedpreferences.AppliteSPUtils;
+import com.mit.mitupdatesdk.MitMobclickAgent;
 
 public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 	private final String TAG = "LuckyPanView";
@@ -105,10 +112,19 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 	 * 文字的大小
 	 */
 	private float mTextSize = TypedValue.applyDimension(
-			TypedValue.COMPLEX_UNIT_SP, 20, getResources().getDisplayMetrics());
+            TypedValue.COMPLEX_UNIT_SP, 20, getResources().getDisplayMetrics());
 
-	public LuckyPanView(Context context)
-	{
+	private int luckyposition;
+
+	private int mLuckyPonints;
+
+	private Toast toast;
+
+	private Context mContext;
+
+	private LuckyFragment mLuckyFragment;
+
+	public LuckyPanView(Context context) {
 		this(context, null);
 	}
 
@@ -116,6 +132,7 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 	{
 		super(context, attrs);
 
+		mContext = context;
 		mHolder = getHolder();
 		mHolder.addCallback(this);
 
@@ -132,8 +149,7 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 	 * 设置控件为正方形
 	 */
 	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-	{
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
 		int width = Math.min(getMeasuredWidth(), getMeasuredHeight());
@@ -147,8 +163,7 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 	}
 
 	@Override
-	public void surfaceCreated(SurfaceHolder holder)
-	{
+	public void surfaceCreated(SurfaceHolder holder) {
 		// 初始化绘制圆弧的画笔
 		mArcPaint = new Paint();
 		mArcPaint.setAntiAlias(true);
@@ -163,8 +178,7 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 
 		// 初始化图片
 		mImgsBitmap = new Bitmap[mItemCount];
-		for (int i = 0; i < mItemCount; i++)
-		{
+		for (int i = 0; i < mItemCount; i++) {
 			mImgsBitmap[i] = BitmapFactory.decodeResource(getResources(),
 					mImgs[i]);
 		}
@@ -176,37 +190,28 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 	}
 
 	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width,
-			int height)
-	{
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void surfaceDestroyed(SurfaceHolder holder)
-	{
+	public void surfaceDestroyed(SurfaceHolder holder) {
 		// 通知关闭线程
 		isRunning = false;
 	}
 
 	@Override
-	public void run()
-	{
+	public void run() {
 		// 不断的进行draw
-		while (isRunning)
-		{
+		while (isRunning) {
 			long start = System.currentTimeMillis();
 			draw();
 			long end = System.currentTimeMillis();
-			try
-			{
-				if (end - start < 50)
-				{
+			try {
+				if (end - start < 50) {
 					Thread.sleep(50 - (end - start));
 				}
-			} catch (InterruptedException e)
-			{
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 
@@ -214,14 +219,11 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 
 	}
 
-	private void draw()
-	{
-		try
-		{
+	private void draw() {
+		try {
 			// 获得canvas
 			mCanvas = mHolder.lockCanvas();
-			if (mCanvas != null)
-			{
+			if (mCanvas != null) {
 				// 绘制背景图
 				drawBg();
 
@@ -230,8 +232,7 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 				 */
 				float tmpAngle = mStartAngle;
 				float sweepAngle = (float) (360 / mItemCount);
-				for (int i = 0; i < mItemCount; i++)
-				{
+				for (int i = 0; i < mItemCount; i++) {
 					// 绘制快快
 					mArcPaint.setColor(mColors[i]);
 //					mArcPaint.setStyle(Style.STROKE);
@@ -249,34 +250,173 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 				mStartAngle += mSpeed;
 
 				// 点击停止时，设置mSpeed为递减，为0值转盘停止
-				if (isShouldEnd)
-				{
+				if (isShouldEnd){
 					mSpeed -= 1;
 				}
-				if (mSpeed <= 0)
-				{
+				if (mSpeed <= 0){
 					mSpeed = 0;
 					isShouldEnd = false;
 				}
 				// 根据当前旋转的mStartAngle计算当前滚动到的区域
-				calInExactArea(mStartAngle);
+				luckyposition = calInExactArea(mStartAngle);
+				if((mSpeed == 0)&&flag){
+					//输出奖项
+					showToast(luckyposition);
+					flag = false;
+				}
 			}
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
-		} finally
-		{
+		} finally {
 			if (mCanvas != null)
 				mHolder.unlockCanvasAndPost(mCanvas);
 		}
-
 	}
 
-	/**
+	private Boolean flag = false;
+
+	public void setflag(Boolean f){
+		flag = f;
+	}
+
+	private void showToast(int position){
+		Message msg;
+		switch (position){
+			case 0:
+				msg = mHandler.obtainMessage(LUCKYDRAW_0);
+				mHandler.sendMessage(msg);
+				break;
+			case 1:
+				msg = mHandler.obtainMessage(LUCKYDRAW_1);
+				mHandler.sendMessage(msg);
+				break;
+			case 2:
+				msg = mHandler.obtainMessage(LUCKYDRAW_2);
+				mHandler.sendMessage(msg);
+				break;
+			case 3:
+				msg = mHandler.obtainMessage(LUCKYDRAW_3);
+				mHandler.sendMessage(msg);
+				break;
+			case 4:
+				msg = mHandler.obtainMessage(LUCKYDRAW_4);
+				mHandler.sendMessage(msg);
+				break;
+			case 5:
+				msg = mHandler.obtainMessage(LUCKYDRAW_5);
+				mHandler.sendMessage(msg);
+				break;
+		}
+	}
+
+	private final int LUCKYDRAW_0 = 0;
+	private final int LUCKYDRAW_1 = 1;
+	private final int LUCKYDRAW_2 = 2;
+	private final int LUCKYDRAW_3 = 3;
+	private final int LUCKYDRAW_4 = 4;
+	private final int LUCKYDRAW_5 = 5;
+
+    private MyCallInterface mMyCallInterface;
+
+	private Handler mHandler = new Handler(){
+
+		@Override
+		public void handleMessage(Message msg){
+
+			mLuckyPonints = (int) AppliteSPUtils.get(mContext, AppliteSPUtils.LUCKY_POINTS, 0);
+			switch (msg.what){
+				case LUCKYDRAW_0:
+					//10积分
+					mLuckyPonints = MitMobclickAgent.calDrawPoints(mLuckyPonints, "zhongjiang10");
+                    AppliteSPUtils.put(mContext, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
+					if(toast == null){
+						toast = Toast.makeText(mContext, getString(R.string.testimonial_0) , Toast.LENGTH_SHORT);
+					}else{
+						toast.setText("10分");
+                    }
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+					toast.show();
+                    mc.changePointsString();
+					break;
+				case LUCKYDRAW_1:
+					//50积分
+					mLuckyPonints = MitMobclickAgent.calDrawPoints(mLuckyPonints, "zhongjiang50");
+					AppliteSPUtils.put(mContext, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
+					if(toast == null){
+						toast = Toast.makeText(mContext, getString(R.string.testimonial_1) , Toast.LENGTH_SHORT);
+					}else{
+						toast.setText("50分");
+					}
+					toast.setGravity(Gravity.CENTER, 0, 0);
+					toast.show();
+                    mc.changePointsString();
+					break;
+				case LUCKYDRAW_2:
+					//100积分
+					mLuckyPonints = MitMobclickAgent.calDrawPoints(mLuckyPonints, "zhongjiang100");
+					AppliteSPUtils.put(mContext, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
+					if(toast == null){
+						toast = Toast.makeText(mContext, getString(R.string.testimonial_2) , Toast.LENGTH_SHORT);
+					}else{
+						toast.setText("100分");
+					}
+					toast.setGravity(Gravity.CENTER, 0, 0);
+					toast.show();
+                    mc.changePointsString();
+					break;
+				case LUCKYDRAW_3:
+					//10M流量
+					if(toast == null){
+						toast = Toast.makeText(mContext, getString(R.string.testimonial_3) , Toast.LENGTH_SHORT);
+					}else{
+						toast.setText("10M");
+					}
+					toast.setGravity(Gravity.CENTER, 0, 0);
+					toast.show();
+					break;
+				case LUCKYDRAW_4:
+					//手机一台
+					if(toast == null){
+						toast = Toast.makeText(mContext, getString(R.string.testimonial_4) , Toast.LENGTH_SHORT);
+					}else {
+						toast.setText("手机一台");
+					}
+					toast.setGravity(Gravity.CENTER, 0, 0);
+					toast.show();
+					break;
+				case LUCKYDRAW_5:
+					//谢谢参与
+					if(toast == null){
+						toast = Toast.makeText(mContext, getString(R.string.testimonial_5) , Toast.LENGTH_SHORT);
+					}else{
+						toast.setText("谢谢参与");
+                    }
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+					toast.show();
+					break;
+				default:
+					super.handleMessage(msg);
+					break;
+			}
+		}
+	};
+
+	private String getString(int resId) {
+		return mContext.getResources().getString(resId);
+	}
+
+    public MyCallInterface mc;
+
+
+
+    public interface MyCallInterface {
+        public void changePointsString();
+    }
+
+    /**
 	 * 根据当前旋转的mStartAngle计算当前滚动到的区域 绘制背景，不重要，完全为了美观
 	 */
-	private void drawBg()
-	{
+	private void drawBg() {
 		mCanvas.drawColor(0xFFFFFFFF);
 		mCanvas.drawBitmap(mBgBitmap, null, new Rect(mPadding / 2,
 				mPadding / 2, getMeasuredWidth() - mPadding / 2,
@@ -288,22 +428,23 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 	 * 
 	 * @param startAngle
 	 */
-	public void calInExactArea(float startAngle)
-	{
+	public int calInExactArea(float startAngle) {
 		// 让指针从水平向右开始计算
 		float rotate = startAngle + 90;
 		rotate %= 360.0;
-		for (int i = 0; i < mItemCount; i++)
-		{
+
+		for (int i = 0; i < mItemCount; i++) {
 			// 每个的中奖范围
 			float from = 360 - (i + 1) * (360 / mItemCount);
 			float to = from + 360 - (i) * (360 / mItemCount);
 
-			if ((rotate > from) && (rotate < to))
-			{
-				return;
+			Log.d(TAG, "calInExactArea from = "+from+" to = "+to+" rotate = "+rotate);
+			if ((rotate > from) && (rotate < to)) {
+				Log.d(TAG, "(rotate > from) && (rotate < to)");
+				return i;
 			}
 		}
+		return -1;
 	}
 
 	/**
@@ -313,8 +454,7 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 	 * @param sweepAngle
 	 * @param i
 	 */
-	private void drawIcon(float startAngle, int i)
-	{
+	private void drawIcon(float startAngle, int i) {
 		// 设置图片的宽度为直径的1/8
 		int imgWidth = mRadius / 8;
 
@@ -334,13 +474,11 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 	/**
 	 * 绘制文本
 	 * 
-	 * @param rect
 	 * @param startAngle
 	 * @param sweepAngle
 	 * @param string
 	 */
-	private void drawText(float startAngle, float sweepAngle, String string)
-	{
+	private void drawText(float startAngle, float sweepAngle, String string) {
 		Path path = new Path();
 		path.addArc(mRange, startAngle, sweepAngle);
 		float textWidth = mTextPaint.measureText(string);
@@ -352,11 +490,10 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 
 	/**
 	 * 点击开始旋转
-	 * 
+	 * 伪随机中奖概率
 	 * @param luckyIndex
 	 */
-	public void luckyStart(int luckyIndex)
-	{
+	public void luckyStart(int luckyIndex) {
 		// 每项角度大小
 		float angle = (float) (360 / mItemCount);
 		// 中奖角度范围（因为指针向上，所以水平第一项旋转到指针指向，需要旋转210-270；）
@@ -372,28 +509,34 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 		 * </pre>
 		 */
 		float v1 = (float) (Math.sqrt(1 * 1 + 8 * 1 * targetFrom) - 1) / 2;
-//		float targetTo = 4 * 360 + to;
-//		float v2 = (float) (Math.sqrt(1 * 1 + 8 * 1 * targetTo) - 1) / 2;
+		float targetTo = 4 * 360 + to;
+		float v2 = (float) (Math.sqrt(1 * 1 + 8 * 1 * targetTo) - 1) / 2;
 
-//		mSpeed = (float) (v1 + Math.random() * (v2 - v1));
-		mSpeed = (float) (v1 + Math.random()*6);
+		mSpeed = (float) (v1 + Math.random() * (v2 - v1));
 		Log.d(TAG, "mSpeed = "+mSpeed);
 		isShouldEnd = false;
 	}
 
-	public void luckyEnd()
-	{
+	/**
+	 * 随机中奖概率
+	 *
+	 */
+	public void luckyStart() {
+		mSpeed = Math.random()*10 + 50;
+		Log.d(TAG, "mSpeed = "+mSpeed);
+		isShouldEnd = false;
+	}
+
+	public void luckyEnd() {
 		mStartAngle = 0;
 		isShouldEnd = true;
 	}
 
-	public boolean isStart()
-	{
+	public boolean isStart() {
 		return mSpeed != 0;
 	}
 
-	public boolean isShouldEnd()
-	{
+	public boolean isShouldEnd() {
 		return isShouldEnd;
 	}
 

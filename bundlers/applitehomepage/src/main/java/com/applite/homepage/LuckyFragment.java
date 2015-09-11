@@ -5,12 +5,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.Time;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,19 +39,31 @@ public class LuckyFragment extends OSGIBaseFragment {
 
     private Toast toast;
 
+    private int mDate;
+
     public LuckyFragment() {
         super();
     }
+
+    private LuckyCallback mLuckyCallback;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
+        mLuckyCallback = new LuckyCallback();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        int da = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.CURRENT_DATE, 0);
+        LogUtils.i(TAG, "da = " + da);
+
+        mDate = getDate();
+        AppliteSPUtils.put(mActivity, AppliteSPUtils.CURRENT_DATE, mDate);
+
         mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 1000);
     }
 
@@ -71,21 +81,23 @@ public class LuckyFragment extends OSGIBaseFragment {
             public void onClick(View v) {
                 if (!mLuckyPanView.isStart()) {
                     mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 1000);
-                    if(mLuckyPonints < 20){
-                        if(toast == null){
+                    if (mLuckyPonints < 20) {
+                        if (toast == null) {
                             toast = Toast.makeText(mActivity, getString(R.string.IntegralProblem), Toast.LENGTH_SHORT);
                         }
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                    }else{
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    } else {
                         mLuckyPonints = MitMobclickAgent.calDrawPoints(mLuckyPonints, "choujiang");
-                        mPoints.setText("积分："+String.valueOf(mLuckyPonints));
+                        mPoints.setText("积分：" + String.valueOf(mLuckyPonints));
                         AppliteSPUtils.put(mActivity, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
                         mStartBtn.setImageResource(R.drawable.stop);
-                        mLuckyPanView.luckyStart(1);
+//                        mLuckyPanView.luckyStart(1);
+                        mLuckyPanView.luckyStart(); //随机中奖概率
+                        mLuckyPanView.setflag(true);
                     }
                 } else {
-                    if (!mLuckyPanView.isShouldEnd()){
+                    if (!mLuckyPanView.isShouldEnd()) {
                         mStartBtn.setImageResource(R.drawable.start);
                         mLuckyPanView.luckyEnd();
                     }
@@ -124,17 +136,17 @@ public class LuckyFragment extends OSGIBaseFragment {
 
         initActionBar();
 
-        getDate();
         return view;
     }
 
-    private void getDate(){
+    private int getDate(){
         Time t = new Time();
         t.setToNow();
         int lastmonth = t.month + 1 ;
-        final String str =  t.year + "年" + lastmonth + "月" + t.monthDay + "日";
-        LogUtils.i(TAG, "str = "+str);
-
+        int date =  t.year + lastmonth + t.monthDay;
+        //String str =  t.year + "年" + lastmonth + "月" + t.monthDay + "日" + t.hour + ":"+ t.minute + ":"+ t.second;
+        LogUtils.i(TAG, "date = "+date);
+        return date;
     }
 
     private void getRulesStr(){
@@ -184,4 +196,21 @@ public class LuckyFragment extends OSGIBaseFragment {
             e.printStackTrace();
         }
     }
+
+    public class LuckyCallback implements LuckyPanView.MyCallInterface {
+        @Override
+        public void changePointsString(){
+            LogUtils.i(TAG, "call to change points");
+            mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
+            if(mPoints != null){
+                mPoints.setText("积分：" + String.valueOf(mLuckyPonints));
+            }else{
+                LogUtils.i(TAG, "mPoints = null");
+            }
+        }
+    }
+
+
+
+
 }
