@@ -37,5 +37,6 @@
     <string name="ignore">Ignore</string>
     <string name="detail">Detail</string>
     <string name="cancel_ignore">Cancel ignore</string>
+    <string name="ignore_update">Ignore update</string>
 
 </resources>

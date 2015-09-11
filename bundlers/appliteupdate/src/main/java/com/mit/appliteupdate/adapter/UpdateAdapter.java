@@ -240,7 +240,7 @@ public class UpdateAdapter extends BaseAdapter {
             this.implInfo = implAgent.getImplInfo(bean.getPackageName(), bean.getPackageName(), bean.getVersionCode());
             if (null != this.implInfo) {
                 this.implInfo.setDownloadUrl(bean.getrDownloadUrl()).setIconUrl(bean.getIconUrl()).setTitle(bean.getName());
-                implAgent.setImplCallback(this, implInfo);
+                implAgent.bindImplCallback(this, implInfo);
             }
             mBt.setTag(this);
             refresh();
@@ -252,10 +252,10 @@ public class UpdateAdapter extends BaseAdapter {
 
         void initProgressButton() {
             if (null != mBt && null != this.implInfo) {
-                ImplHelper.ImplHelperRes res = ImplHelper.getImplRes(mActivity, implInfo);
+                ImplInfo.ImplRes res = implInfo.getImplRes();
                 switch (implInfo.getStatus()) {
                     case ImplInfo.STATUS_RUNNING:
-                        mBt.setText(res.getProgress() + "%");
+                        mBt.setText(implInfo.getProgress() + "%");
                         break;
                     default:
                         mBt.setText(res.getActionText());

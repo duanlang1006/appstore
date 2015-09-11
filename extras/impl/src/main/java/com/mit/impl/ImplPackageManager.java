@@ -133,7 +133,7 @@ public class ImplPackageManager{
     }
 
     void onPackageAdded(ImplInfo implInfo,ImplListener callback){
-        if (implInfo.isAutoDelete()) {
+        if (ImplConfig.getDeleteAfterInstalled(mContext)) {
             try {
                 String localPath = implInfo.getLocalPath();
                 if (null == localPath) {
