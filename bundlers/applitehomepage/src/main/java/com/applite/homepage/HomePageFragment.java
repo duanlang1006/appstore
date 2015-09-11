@@ -1,18 +1,13 @@
 package com.applite.homepage;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.internal.view.SupportMenu;
-import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -39,15 +34,13 @@ import android.widget.TextView;
 import com.applite.bean.PopupWindowBean;
 import com.applite.bean.ScreenBean;
 import com.applite.bean.HomePageDataBean;
+import com.applite.bean.ScreenBean;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
 import com.applite.utils.SPUtils;
-
-import net.tsz.afinal.FinalBitmap;
-
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -60,6 +53,7 @@ import com.mit.mitupdatesdk.MitUpdateAgent;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
+import net.tsz.afinal.FinalBitmap;
 import net.tsz.afinal.FinalHttp;
 import net.tsz.afinal.http.AjaxCallBack;
 import net.tsz.afinal.http.AjaxParams;
@@ -70,7 +64,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -308,6 +301,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         if (!hidden) {
             LogUtils.i(TAG, "重新显示ActionBar");
             initActionBar();
+            if (mViewPager != null) {
+                mViewPager.setCurrentItem(mTabSelect);
+                mSectionsPagerAdapter.notifyDataSetChanged();
+            }
 //            mActivity.runOnUiThread(mRefreshRunnable);
 
             if (mHomePageListFragment != null) {
@@ -550,7 +547,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 return true;
             }
         } else if (item.getItemId() == R.id.action_search) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null, null);
             return true;
         } else if (item.getItemId() == R.id.action_dm) {
             ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
@@ -564,7 +561,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         if (v.getId() == R.id.action_personal) {
             ((OSGIServiceHost) mActivity).jumptoPersonal(true);
         } else if (v.getId() == R.id.action_search) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null, null);
         } else if (v.getId() == R.id.action_dm) {
             ((OSGIServiceHost) mActivity).jumptoDownloadManager(true);
         }
@@ -579,6 +576,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private String[] mHint_PackageName;
     private String[] mHint_Name;
     private String[] mHint_IconUrl;
+
     private int HINT_UPDATE_TIME = 2000;
     private int HINT_SHOW_NUMBER = 0;
     private Handler mHandler = new Handler();
@@ -609,19 +607,27 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             mEtView.setFocusable(false);
             mEtView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View paramView) {
-                    ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null);
+                    String mHintword = null;
+                    if (!TextUtils.isEmpty(mEtView.getHint())) {
+                        mHintword = mEtView.getHint().toString();
+                        LogUtils.i(TAG, "mHintword = " + mHintword);
+                    }
+                    ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null, mHintword);
                 }
             });
             mSearchView = (ImageView) customView.findViewById(R.id.search_icon);
             mSearchView.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View paramView) {
-                    String mKeyWord = mEtView.getHint().toString();
-                    LogUtils.i(TAG, "mKeyWord:" + mKeyWord);
+                    String mKeyWord = null;
+                    if (!TextUtils.isEmpty(mEtView.getHint())) {
+                        mKeyWord = mEtView.getHint().toString();
+                        LogUtils.i(TAG, "mKeyWord = " + mKeyWord);
+                    }
                     int i = getHintNum(mKeyWord);
                     if (i != -1) {
                         ((OSGIServiceHost) mActivity).jumptoDetail(mHint_PackageName[i], mHint_Name[i], mHint_IconUrl[i], true);
                     } else {
-                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord);
+                        ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord, null);
                     }
                 }
             });
@@ -683,25 +689,22 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         }
     }
 
+    private int mTabSelect;
     private final ActionBar.TabListener mBarTabListener = new ActionBar.TabListener() {
-        private final static String TAG = "homepage_PagerFragment_mBarTabListener";
 
         @Override
         public void onTabReselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "onTabReselected arg0.getPosition()= " + arg0.getPosition());
         }
 
         @Override
         public void onTabSelected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "onTabSelected arg0.getPosition()= " + arg0.getPosition());
-
             if (mViewPager != null)
                 mViewPager.setCurrentItem(arg0.getPosition());
         }
 
         @Override
         public void onTabUnselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-            LogUtils.i(TAG, "onTabUnselected arg0.getPosition()= " + arg0.getPosition());
+            mTabSelect = arg0.getPosition();
         }
     };
 

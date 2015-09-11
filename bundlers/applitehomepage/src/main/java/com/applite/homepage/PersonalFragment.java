@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -105,12 +104,11 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.action_search == item.getItemId()) {
-            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, null, null);
+            ((OSGIServiceHost) mActivity).jumptoSearch(null, true, null, null, null);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public void onClick(View v) {
@@ -130,7 +128,6 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
             ((OSGIServiceHost) mActivity).jumptoLucky(true);
         }
     }
-
 
     private void initActionBar() {
         try {
