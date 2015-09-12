@@ -39,11 +39,6 @@
         <item name="@android:windowExitAnimation">@anim/top_out</item>
     </style>
 
-    <style name="anim_view_bottom">
-        <item name="@android:windowEnterAnimation">@anim/bottom_layout_in</item>
-        <item name="@android:windowExitAnimation">@anim/bottom_out</item>
-    </style>
-
     <style name="CustomDownLoadButton">
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center</item>

@@ -181,7 +181,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 LogUtils.i(TAG, "更新请求成功，resulit：" + responseInfo.result);
-                LogUtils.d("wanghc", "更新请求成功，resulit：" + responseInfo.result);
                 try {
                     JSONObject object = new JSONObject(responseInfo.result);
                     String similar_info = object.getString("similar_info");
@@ -217,13 +216,12 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
 
             @Override
             public void onFailure(HttpException e, String s) {
-                LogUtils.d("wanghc", mActivity.getPackageName() + "");
                 LogUtils.i(TAG, mActivity.getPackageName() + "");
             }
 
         });
         mSimilarView.setVisibility(View.VISIBLE);
-        animaSimilarViewOut = AnimationUtils.loadAnimation(mActivity, R.anim.bottom_out);
+        animaSimilarViewOut = AnimationUtils.loadAnimation(mActivity, R.anim.similarview_out);
         ll = (LinearLayout) view.findViewById(R.id.layout_button);
         btnShare = (Button) view.findViewById(R.id.btnShare);
         animaBt1 = AnimationUtils.loadAnimation(mActivity, R.anim.btn_share_in);
