@@ -50,6 +50,22 @@
     <string name="abort">Abort</string>
     <string name="help">Help</string>
 
+    <string name="dialog_dataclean_title">清除缓存</string>
+    <string name="dialog_dataclean_content">确定要删除所有数据吗?</string>
+
+    <string name="dialog_feedback_title">我们很重视您的意见和建议</string>
+    <string name="tag_rb1">下载失败</string>
+    <string name="tag_rb2">找不到应用</string>
+    <string name="tag_rb3">操作不流畅</string>
+    <string name="tag_rb4">界面不好</string>
+    <string name="tag_rb5">闪退或重启</string>
+    <string name="tag_rb6">账号有问题</string>
+    <string name="dialog_feedback_hint">请输入您的意见和建议</string>
+    <string name="tv_1">被采纳的意见会获得</string>
+    <string name="tv_2">小奖品</string>
+    <string name="tv_3">，记得留下联系方式哦～</string>
+    <string name="dialog_contact_hint">手机/QQ邮箱</string>
+
     <string name="testimonial_0">10 积分</string>
     <string name="testimonial_1">50 积分</string>
     <string name="testimonial_2">100 积分</string>

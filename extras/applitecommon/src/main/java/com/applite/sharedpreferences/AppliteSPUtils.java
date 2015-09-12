@@ -58,6 +58,11 @@ public class AppliteSPUtils {
     public static final String WIFI_UPDATE_SWITCH = "wifi_update_switch";
 
     /**
+     * 需要更新APK的数据
+     */
+    public static final String UPDATE_DATA = "update_data";
+
+    /**
      * 保存数据的方法，我们需要拿到保存数据的具体类型，然后根据类型调用不同的保存方法
      *
      * @param context
