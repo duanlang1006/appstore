@@ -116,9 +116,9 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 ViewHolder vh = (ViewHolder) obj;
                 MitMobclickAgent.onEvent(mContext, "onClickButton" + vh.getItemPosition());
 
-                boxlabel = vh.itemData.getBoxLabel();
-                luckytype = boxlabel.substring(boxlabel.length() - 6, boxlabel.length() - 4);
-                LogUtils.i(TAG, "luckytype = "+luckytype);
+//                boxlabel = vh.itemData.getBoxLabel();
+//                luckytype = boxlabel.substring(boxlabel.length() - 6, boxlabel.length() - 4);
+//                LogUtils.i(TAG, "luckytype = "+luckytype);
 
                 if(vh.itemData.getBoxLabel().equals(luckydrawicon)){
                     LogUtils.i(TAG, "youjiangxiazai");

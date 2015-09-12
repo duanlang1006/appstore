@@ -20,6 +20,8 @@
     <string name="rules_title">Rules</string>
     <string name="ok">OK</string>
 
+    <string name="gametitle">Games</string>
+
     <string name="IntegralProblem">Integral Problem</string>
 
     <string name="beyond_limit">Beyond the limit of the day</string>
