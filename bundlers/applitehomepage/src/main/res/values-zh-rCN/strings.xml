@@ -12,17 +12,18 @@
     <string name="lucky_draw">幸运抽奖</string>
     <string name="manager_catergory_title">管理</string>
     <string name="install">安装</string>
-    <string name="notification">通知栏提示</string>
+    <string name="notification">提示</string>
     <string name="update_notification">更新提醒</string>
-    <string name="other_function">其他功能</string>
+    <string name="other_function">功能</string>
     <string name="clean_cache">清除缓存</string>
     <string name="clean_cache_detail">点我清除缓存</string>
     <string name="delete_package">删除安装包</string>
     <string name="delete_package_detail">安装完成后删除安装包</string>
+    <string name="zero_flow_update_detail">零流量下载</string>
     <string name="no_picture">智能无图</string>
     <string name="no_picture_detail">仅WIFI下载图片</string>
     <string name="feedback">意见反馈</string>
-    <string name="abort">关于</string>
+    <string name="about">关于</string>
     <string name="help">帮助</string>
 
 </resources>

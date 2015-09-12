@@ -16,12 +16,8 @@
         android:textColor="@color/category_title"
         android:textSize="14sp" />
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp"
-        android:layout_marginLeft="18dp"
-        android:layout_marginRight="12dp"
-        android:background="@color/dividing_line" />
+    <include layout="@layout/default_line"></include>
+
 
     <RelativeLayout
         android:id="@+id/action_upgrade"
@@ -56,12 +52,7 @@
             android:visibility="visible" />
     </RelativeLayout>
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp"
-        android:layout_marginLeft="18dp"
-        android:layout_marginRight="12dp"
-        android:background="@color/dividing_line" />
+    <include layout="@layout/default_line"></include>
 
     <RelativeLayout
         android:id="@+id/action_dm"
@@ -95,12 +86,7 @@
             android:visibility="visible" />
     </RelativeLayout>
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp"
-        android:layout_marginLeft="18dp"
-        android:layout_marginRight="12dp"
-        android:background="@color/dividing_line" />
+    <include layout="@layout/default_line"></include>
 
     <RelativeLayout
         android:id="@+id/action_logo"
@@ -134,50 +120,7 @@
             android:visibility="visible" />
     </RelativeLayout>
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp"
-        android:layout_marginLeft="18dp"
-        android:layout_marginRight="12dp"
-        android:background="@color/dividing_line" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:id="@+id/wifi_update_img"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_marginLeft="18dp"
-            android:gravity="center_vertical"
-            android:src="@drawable/icon_download_list" />
-
-        <TextView
-            style="@style/personalListText"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginRight="2dp"
-            android:layout_toRightOf="@+id/wifi_update_img"
-            android:gravity="center_vertical"
-            android:text="@string/zero_flow_update" />
-
-        <ImageView
-            android:id="@+id/zero_flow_update"
-            style="@style/personalListText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/setup_wifi_click_bg" />
-    </RelativeLayout>
-
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp"
-        android:layout_marginLeft="18dp"
-        android:layout_marginRight="12dp"
-        android:background="@color/dividing_line" />
+    <include layout="@layout/default_line"></include>
 
     <RelativeLayout
         android:id="@+id/action_lucky"
@@ -203,12 +146,7 @@
 
     </RelativeLayout>
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp"
-        android:layout_marginLeft="18dp"
-        android:layout_marginRight="12dp"
-        android:background="@color/dividing_line" />
+    <include layout="@layout/default_line"></include>
 
     <RelativeLayout
         android:id="@+id/action_setting"
@@ -243,10 +181,5 @@
 
     </RelativeLayout>
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp"
-        android:layout_marginLeft="18dp"
-        android:layout_marginRight="12dp"
-        android:background="@color/dividing_line" />
+    <include layout="@layout/default_line"></include>
 </LinearLayout>

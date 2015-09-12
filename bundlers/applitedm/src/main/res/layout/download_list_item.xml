@@ -102,7 +102,7 @@
             android:focusableInTouchMode="true"
             android:visibility="gone" />
 
-        <com.applite.dm.CustomProgressBar
+        <com.applite.view.CustomProgressBar
             android:id="@+id/cpb"
             style="@style/DownloadOptButton"
             android:layout_width="wrap_content"

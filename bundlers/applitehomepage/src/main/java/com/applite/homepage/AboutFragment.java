@@ -7,18 +7,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.osgi.extra.OSGIBaseFragment;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import kankan.wheel.widget.WheelView;
 import kankan.wheel.widget.adapters.ArrayWheelAdapter;
@@ -26,7 +19,7 @@ import kankan.wheel.widget.adapters.ArrayWheelAdapter;
 /**
  * Created by wanghaochen on 15-9-6.
  */
-public class AbortFragment extends OSGIBaseFragment {
+public class AboutFragment extends OSGIBaseFragment {
     private Activity mActivity;
     private View view = null;
     private LayoutInflater mInflater;
@@ -36,7 +29,7 @@ public class AbortFragment extends OSGIBaseFragment {
     private TextView tv_app_version;
 
 
-    public AbortFragment() {
+    public AboutFragment() {
         super();
     }
 
@@ -61,7 +54,7 @@ public class AbortFragment extends OSGIBaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
         initActionBar();
-        view = inflater.inflate(R.layout.fragment_abort, container, false);
+        view = inflater.inflate(R.layout.fragment_about, container, false);
         mInflater = LayoutInflater.from(mActivity);
 
         wheelView = (WheelView) view.findViewById(R.id.aa);
@@ -89,7 +82,7 @@ public class AbortFragment extends OSGIBaseFragment {
     private void initActionBar() {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mActivity.getResources().getString(R.string.setting));
+        actionBar.setTitle(mActivity.getResources().getString(R.string.about));
         actionBar.setDisplayShowCustomEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowCustomEnabled(false);

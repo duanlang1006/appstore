@@ -31,6 +31,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     private LinearLayout ll2_1;//清除缓存
     private LinearLayout ll2_2;//删除安装包
     private LinearLayout ll2_3;//智能无图
+    private LinearLayout ll2_4;//零流量下载
     private ActionBar actionBar;
 
     public SettingFragment() {
@@ -63,6 +64,8 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         ll2_2.setOnClickListener(this);
         ll2_3 = (LinearLayout) view.findViewById(R.id.ll_item2_3);//智能无图
         ll2_3.setOnClickListener(this);
+        ll2_4 = (LinearLayout) view.findViewById(R.id.ll_item2_4);//零流量下载
+        ll2_4.setOnClickListener(this);
         view.findViewById(R.id.ll_item3_1).setOnClickListener(this);//关于
         view.findViewById(R.id.ll_item3_2).setOnClickListener(this);//意见反馈
         setAllState();
@@ -114,6 +117,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         ll2_1.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.CLEAR_CACHE, true));
         ll2_2.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.DELETE_PACKAGE, true));
         ll2_3.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, true));
+        ll2_4.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, true));
     }
 
     @Override
@@ -135,16 +139,18 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             AppliteSPUtils.put(mActivity, AppliteSPUtils.NO_PICTURE,
                     !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, true));
             setAllState();
+        } else if (R.id.ll_item2_4 == v.getId()) {//零流量下载
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH,
+                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, true));
+            setAllState();
         } else if (R.id.ll_item3_1 == v.getId()) {//意见反馈
             FeedbackDialog.show(mActivity);
 //            Toast.makeText(mActivity, "意见反馈", Toast.LENGTH_LONG).show();
 //            ((OSGIServiceHost) getActivity()).jumptoConversation();
 //            FeedbackAgent agent = new FeedbackAgent(mActivity);
 //            agent.startFeedbackActivity();
-        } else if (R.id.ll_item3_2 == v.getId())
-
-        {//关于
-            ((OSGIServiceHost) mActivity).jumptoAbort(true);
+        } else if (R.id.ll_item3_2 == v.getId()) {//关于
+            ((OSGIServiceHost) mActivity).jumptoAbout(true);
         }
 
     }

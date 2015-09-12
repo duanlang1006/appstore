@@ -9,7 +9,7 @@
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/layout_button"
+        android:layout_above="@+id/similar_view_dm"
         android:layout_alignParentTop="true"
         android:choiceMode="singleChoice"
         android:dividerHeight="0dp" />
@@ -22,6 +22,16 @@
         android:layout_centerInParent="true"
         android:drawableTop="@drawable/content_empty_icon"
         android:text="@string/no_downloads" />
+
+    <include
+        android:id="@+id/similar_view_dm"
+        layout="@layout/similar_view_dm"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/layout_button"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="10dp"
+        android:visibility="invisible" />
 
     <LinearLayout
         android:id="@+id/layout_button"
