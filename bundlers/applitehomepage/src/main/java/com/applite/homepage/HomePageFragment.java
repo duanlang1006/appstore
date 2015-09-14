@@ -279,8 +279,12 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
                     // handle back button
+
                     getFragmentManager().popBackStackImmediate();
-                    return false;
+                    if (backflag && backflag1)
+                        return false;
+                    else
+                        return true;
                 }
                 return false;
             }
@@ -293,12 +297,18 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         MitMobclickAgent.onPageEnd(whichPage);
     }
 
+    private boolean backflag;
+    private boolean backflag1;
+
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         mHomePageListFragment = (HomePageListFragment) getChildFragmentManager().findFragmentById(R.id.pager);
         if (!hidden) {
             LogUtils.i(TAG, "重新显示ActionBar");
+            if (!backflag1)
+                backflag1 = true;
+            backflag = true;
             initActionBar();
             if (mViewPager != null) {
                 mViewPager.setCurrentItem(mTabSelect);
@@ -314,6 +324,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             }
 
         } else {
+            if (!backflag)
+                backflag1 = false;
+            backflag = false;
+
             try {
                 ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
                 actionBar.setHomeAsUpIndicator(mActivity.getResources().getDrawable(R.drawable.action_bar_back_light));
@@ -825,10 +839,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
-                LogUtils.i(TAG, "获取首页数据:"+o);
+                LogUtils.i(TAG, "获取首页数据:");
                 try {
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
-
+                    LogUtils.i(TAG, "获取首页数据:" + data);
                     if (1 == data.getAppKey()) {
                         mPageData = data.getSubjectData();
                         if (mPageData.get(0).getS_key().equals("goods_m_game")) {
