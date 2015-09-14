@@ -31,9 +31,8 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.applite.bean.PopupWindowBean;
-import com.applite.bean.ScreenBean;
 import com.applite.bean.HomePageDataBean;
+import com.applite.bean.PopupWindowBean;
 import com.applite.bean.ScreenBean;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
@@ -264,6 +263,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         mPagerSlidingTabStrip.setViewPager(mViewPager);
         mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         popupWindowPost();
+        LogUtils.i(TAG, "search hint text ");
         postSearchHint();
         return rootView;
     }
@@ -372,8 +372,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             mPopType = object.getString("use_info");
             String plaque_info = object.getString("plaque_info");
             String detail_info = object.getString("detail_info");
-            LogUtils.i(TAG, "plaque_info:" + plaque_info);
-            LogUtils.i(TAG, "detail_info:" + detail_info);
+//            LogUtils.i(TAG, "plaque_info:" + plaque_info);
+//            LogUtils.i(TAG, "detail_info:" + detail_info);
 
             JSONArray plaque_array = new JSONArray(plaque_info);
             if (plaque_array.length() != 0) {
@@ -568,8 +568,11 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
     private String mInfo;
     private ViewGroup customView;
+    private RelativeLayout mSearchbarView;
+    private RelativeLayout mHideSearchbarView;
     private EditText mEtView;
     private ImageView mSearchView;
+    private ImageView mSearchView1;
     private TextView mGameTitle;
     //    private String mEtViewText;
     private String[] mHint;
@@ -603,6 +606,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private void setSearchBar() {
         if (null == customView) {
             customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_searchbar, null);
+            mSearchbarView = (RelativeLayout) customView.findViewById(R.id.search_bar);
+
             mEtView = (EditText) customView.findViewById(R.id.search_et);
             mEtView.setFocusable(false);
             mEtView.setOnClickListener(new View.OnClickListener() {
@@ -631,17 +636,27 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                     }
                 }
             });
-                mGameTitle = (TextView) customView.findViewById(R.id.game_title);
+            mHideSearchbarView = (RelativeLayout) customView.findViewById(R.id.hide_search_bar);
+            mGameTitle = (TextView) customView.findViewById(R.id.game_title);
+            mSearchView1 = (ImageView) customView.findViewById(R.id.search_icon1);
+            mSearchView1.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View paramView) {
+                    ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null, null);
+                }
+            });
         }
     }
 
     private String gametitle;
 
-    private void refreshActionbar(){
-        if(null != customView){
-            if(null != gametitle){
+    private void refreshActionbar() {
+        if (null != customView) {
+            if (null != gametitle) {
                 mGameTitle.setText(gametitle);
-                mGameTitle.setVisibility(View.VISIBLE);
+//                mGameTitle.setVisibility(View.VISIBLE);
+//                mSearchView1.setVisibility(View.VISIBLE);
+                mSearchbarView.setVisibility(View.GONE);
+                mHideSearchbarView.setVisibility(View.VISIBLE);
             }
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.setCustomView(customView);
@@ -807,14 +822,17 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
-                LogUtils.i(TAG, "获取首页数据:");
+                LogUtils.i(TAG, "获取首页数据:"+o);
                 try {
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
+
                     if (1 == data.getAppKey()) {
                         mPageData = data.getSubjectData();
-                        LogUtils.i(TAG, "mPageData:" + mPageData.toString());
-                        if(mPageData.get(0).getS_key().equals("goods_m_game")){
+                        if (mPageData.get(0).getS_key().equals("goods_m_game")) {
                             gametitle = getString(R.string.gametitle);
+                            refreshActionbar();
+                        } else if (!mPageData.get(0).getS_key().equals("goods")) {
+                            gametitle = mPageData.get(0).getData().get(0).getCategorysub();
                             refreshActionbar();
                         }
                     }
