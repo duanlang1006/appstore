@@ -636,6 +636,9 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                     }
                 }
             });
+
+            mSearchbarView.setVisibility(View.VISIBLE);
+
             mHideSearchbarView = (RelativeLayout) customView.findViewById(R.id.hide_search_bar);
             mGameTitle = (TextView) customView.findViewById(R.id.game_title);
             mSearchView1 = (ImageView) customView.findViewById(R.id.search_icon1);
