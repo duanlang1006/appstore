@@ -66,11 +66,11 @@
     <string name="tv_3">，记得留下联系方式哦～</string>
     <string name="dialog_contact_hint">手机/QQ邮箱</string>
 
-    <string name="testimonial_0">10 积分</string>
-    <string name="testimonial_1">50 积分</string>
-    <string name="testimonial_2">100 积分</string>
-    <string name="testimonial_3">10M</string>
-    <string name="testimonial_4">手机一台</string>
+    <string name="testimonial_0">恭喜您抽中 10 积分</string>
+    <string name="testimonial_1">恭喜您抽中 50 积分</string>
+    <string name="testimonial_2">恭喜您抽中 100 积分</string>
+    <string name="testimonial_3">恭喜您抽中手机流量10M</string>
+    <string name="testimonial_4">恭喜您抽中手机一台</string>
     <string name="testimonial_5">谢谢参与</string>
 
 </resources>
