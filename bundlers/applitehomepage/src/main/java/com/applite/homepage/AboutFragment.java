@@ -1,7 +1,9 @@
 package com.applite.homepage;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.pm.PackageInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -27,7 +29,8 @@ public class AboutFragment extends OSGIBaseFragment {
     private WheelView wheelView;
     private PackageInfo info;
     private TextView tv_app_version;
-
+    private float scale = 0.75f;
+    private int distance = 25;
 
     public AboutFragment() {
         super();
@@ -50,6 +53,7 @@ public class AboutFragment extends OSGIBaseFragment {
         super.onCreate(savedInstanceState);
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
@@ -61,7 +65,9 @@ public class AboutFragment extends OSGIBaseFragment {
         String ss[] = mActivity.getResources().getStringArray(R.array.team);
         wheelView.setViewAdapter(new ArrayWheelAdapter<>(this.getActivity(), ss));
         wheelView.setCyclic(true);
-
+        wheelView.setScaleX(scale);
+        wheelView.setScaleY(scale);
+        wheelView.setMinimumHeight(distance);
 
         tv_app_version = (TextView) view.findViewById(R.id.app_version_code);
         tv_app_version.setText(info.versionName);

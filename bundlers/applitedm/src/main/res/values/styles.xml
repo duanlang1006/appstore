@@ -46,4 +46,15 @@
         <item name="android:minWidth">@dimen/download_btn_min_width</item>
     </style>
 
+    <style name="DownloadListEmpty0">
+        <item name="android:textSize">@dimen/button_text_size</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minHeight">@dimen/download_btn_min_height</item>
+        <item name="android:minWidth">@dimen/download_btn_min_width</item>
+        <item name="android:background">@drawable/btn_bg_rect_light</item>
+        <item name="android:textColor">@color/download_item_title</item>
+    </style>
+
+
 </resources>

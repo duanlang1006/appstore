@@ -80,7 +80,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             if (true == mListener.getFlag2() || true == temp) {
                 vh.animaCheckBox.setDuration(80 * (position + 1));
                 vh.deleteCheckBox.startAnimation(vh.animaCheckBox);
-
                 temp = true;
                 mListener.setFlag2(false);
                 if (position == Math.min(8 - 1, getCount() - 1)) {
@@ -102,7 +101,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             }
             vh.deleteCheckBox.setVisibility(View.GONE);
         }
-        vh.refresh();
+//        vh.refresh();
         return view;
     }
 
@@ -193,8 +192,8 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                     }
                     break;
             }
-            LogUtils.d("wanghc", "titleView" + implInfo.getTitle() + "");
-            LogUtils.d("wanghc", "descView" + implRes.getDescText() + "");
+//            LogUtils.d("wanghc", "titleView__" + implInfo.getTitle() + "");
+//            LogUtils.d("wanghc", "descView__" + implRes.getDescText() + "");
             descView.setText(implRes.getDescText());
             descView.invalidate();
             statusView.setText(implRes.getStatusText());
