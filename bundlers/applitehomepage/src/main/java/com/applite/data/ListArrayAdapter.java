@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
 import com.applite.bean.HomePageApkData;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
@@ -44,8 +45,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     private FinalBitmap mFinalBitmap;
     private Bitmap defaultLoadingIcon;
     private ImplAgent implAgent;
+    private boolean removeimage;
 
     int layoutResourceId = 0;
+
     public ListArrayAdapter(Context context, SubjectData data) {
         this.mContext = context;
         this.mData = data;
@@ -57,17 +60,19 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         try {
             Field field = R.layout.class.getField(mData.getS_datatype());
             layoutResourceId = field.getInt(new R.layout());
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        defaultLoadingIcon = BitmapFactory.decodeResource(mResource,R.drawable.buffer);
+        defaultLoadingIcon = BitmapFactory.decodeResource(mResource, R.drawable.buffer);
         implAgent = ImplAgent.getInstance(mContext.getApplicationContext());
+        removeimage = (boolean)AppliteSPUtils.get(mContext, AppliteSPUtils.NO_PICTURE, false);
+        LogUtils.i(TAG, "removeimage = "+removeimage);
     }
 
     @Override
     public int getCount() {
         List<HomePageApkData> apkList = mData.getData();
-        if(null != apkList) {
+        if (null != apkList) {
             return apkList.size();
         }
         return 0;
@@ -83,7 +88,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         if (position == 0)
             return 0;
         else
-            return position-1;
+            return position - 1;
     }
 
     @Override
@@ -99,25 +104,29 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         if (null != mData && null != mData.getData()) {
 
             HomePageApkData itemData = mData.getData().get(position);
-            viewHolder.initView(itemData,mData.getS_datatype(),position);
+            viewHolder.initView(itemData, mData.getS_datatype(), position);
         }
         return convertView;
     }
 
     private String luckydrawicon = "http://www.fuli365.net/applite_content_console/image/iden_icon_image_type15.png";
-    private Boolean luckyflag = false;
+    private String boxLabel_value;
+    private boolean luckyflag = false;
+
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.list_item_progress_button){
+        if (v.getId() == R.id.list_item_progress_button) {
             Object obj = v.getTag();
             if (obj instanceof ViewHolder) {
                 ViewHolder vh = (ViewHolder) obj;
                 MitMobclickAgent.onEvent(mContext, "onClickButton" + vh.getItemPosition());
 
-                if(vh.itemData.getBoxLabel().equals(luckydrawicon)){
-                    LogUtils.i(TAG, "youjiangxiazai");
+                boxLabel_value = vh.itemData.getBoxLabelvale();
+                LogUtils.d(TAG, "boxLabel_value = " + boxLabel_value);
+
+                if (vh.itemData.getBoxLabel().equals(luckydrawicon)) {
                     luckyflag = true;
-                }else{
+                } else {
                     luckyflag = false;
                 }
                 ImplHelper.onClick(mContext,
@@ -132,7 +141,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
     }
 
-    public class ViewHolder implements ImplChangeCallback{
+    public class ViewHolder implements ImplChangeCallback {
         //不变控件
         private ImageView mAppIcon;
         private TextView mAppName;
@@ -151,8 +160,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private HomePageApkData itemData;
         private int position;
 
-        ViewHolder(View mView){
-            this.pullDownView = (LinearLayout)mView.findViewById(R.id.pullDownView);
+        private boolean showimage;
+
+        ViewHolder(View mView) {
+            this.pullDownView = (LinearLayout) mView.findViewById(R.id.pullDownView);
             this.mAppIcon = (ImageView) mView.findViewById(R.id.imageViewName);
             this.mAppName = (TextView) mView.findViewById(R.id.apkName);
             this.mCategorySub = (TextView) mView.findViewById(R.id.categorySub);
@@ -162,7 +173,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             this.mCategoryListArrow = (ImageView) mView.findViewById(R.id.categoryListArrow);
             this.mExtentIcon = (ImageView) mView.findViewById(R.id.extentIcon);
             this.mAppBrief = (TextView) mView.findViewById(R.id.apkBrief);
-            if (null != mProgressButton ){
+            if (null != mProgressButton) {
                 mProgressButton.setTag(this);
                 mProgressButton.setOnClickListener(ListArrayAdapter.this);
             }
@@ -172,7 +183,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             initProgressButton();
         }
 
-        public void initView(HomePageApkData itemData,String layout,int position){
+        public void initView(HomePageApkData itemData, String layout, int position) {
             this.itemData = itemData;
             this.layoutStr = layout;
             this.position = position;
@@ -185,9 +196,9 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             }
 
             //app图标
-            if ((null != this.mAppIcon) && !TextUtils.isEmpty(itemData.getIconUrl())){
+            if ((null != this.mAppIcon) && !TextUtils.isEmpty(itemData.getIconUrl()) && !removeimage) {
                 mFinalBitmap.display(this.mAppIcon, itemData.getIconUrl(), defaultLoadingIcon);
-            }else {
+            } else {
                 mAppIcon.setImageBitmap(defaultLoadingIcon);
             }
 
@@ -210,16 +221,16 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             }
 
             //app角标
-            if ((null != this.mExtentIcon) && !TextUtils.isEmpty(itemData.getBoxLabel())){
+            if ((null != this.mExtentIcon) && !TextUtils.isEmpty(itemData.getBoxLabel())) {
                 mFinalBitmap.display(this.mExtentIcon, itemData.getBoxLabel());
             }
 
             //app介绍
-            if (null != this.mAppBrief){
-                if(!TextUtils.isEmpty(itemData.getBrief())){
+            if (null != this.mAppBrief) {
+                if (!TextUtils.isEmpty(itemData.getBrief())) {
                     this.mAppBrief.setText(itemData.getBrief());
                     this.mAppBrief.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     this.mAppBrief.setVisibility(View.GONE);
                 }
             }
@@ -231,10 +242,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                     star = Float.parseFloat(itemData.getRating());
                 } catch (Exception e) {
                 }
-                this.mRatingBar.setRating(star/2.0f);
+                this.mRatingBar.setRating(star / 2.0f);
             }
 
-            if(null != mCategoryListArrow) {
+            if (null != mCategoryListArrow) {
                 mCategoryListArrow.setImageResource(R.drawable.back);
             }
             initProgressButton();
@@ -246,22 +257,22 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
 
         void initProgressButton() {
-            if (null != mProgressButton && null != this.implInfo){
+            if (null != mProgressButton && null != this.implInfo) {
                 ImplInfo.ImplRes res = implInfo.getImplRes();
                 LogUtils.d(TAG, implInfo.getTitle() + "," + implInfo.getStatus() + "," + res.getActionText());
                 mProgressButton.setEnabled(true);
-                if((implInfo.getStatus() == implInfo.STATUS_INSTALLED) && luckyflag){
+                if ((implInfo.getStatus() == implInfo.STATUS_INSTALLED) && luckyflag) {
                     luckyflag = false;
                     int mLuckyPonints = (int) AppliteSPUtils.get(mContext, AppliteSPUtils.LUCKY_POINTS, 0);
                     mLuckyPonints = MitMobclickAgent.calDrawPoints(mLuckyPonints, "download");
                     AppliteSPUtils.put(mContext, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
                 }
-                switch (implInfo.getStatus()){
+                switch (implInfo.getStatus()) {
                     case ImplInfo.STATUS_PENDING:
                         mProgressButton.setText(res.getActionText());
                         break;
                     case ImplInfo.STATUS_RUNNING:
-                        mProgressButton.setText(implInfo.getProgress()+"%");
+                        mProgressButton.setText(implInfo.getProgress() + "%");
                         break;
                     case ImplInfo.STATUS_PAUSED:
                         mProgressButton.setText(res.getStatusText());
