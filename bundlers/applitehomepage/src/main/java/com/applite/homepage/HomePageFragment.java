@@ -665,6 +665,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     }
 
     private String gametitle;
+    private Boolean removetab = false;
 
     private void refreshActionbar() {
         if (null != customView) {
@@ -673,12 +674,19 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 mSearchbarView.setVisibility(View.GONE);
                 mHideSearchbarView.setVisibility(View.VISIBLE);
             }
-            ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
-            actionBar.setCustomView(customView);
-            actionBar.show();
         }
     }
 
+    private void removeActionTabbar() {
+        if (null != customView) {
+            if (null != gametitle) {
+                mSubTitle.setText(gametitle);
+                mSearchbarView.setVisibility(View.GONE);
+                mHideSearchbarView.setVisibility(View.VISIBLE);
+            }
+            removetab = true;
+        }
+    }
 
     private int getHintNum(String str) {
         int i;
@@ -719,19 +727,26 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             actionBar.setDisplayShowCustomEnabled(true);
             //actionBar.setCustomView(mPagerSlidingTabStrip);
             actionBar.setCustomView(customView);
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-            actionBar.removeAllTabs();
+            if (removetab) {
+                removetab = false;
+                actionBar.removeAllTabs();
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                actionBar.show();
+            } else {
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+                actionBar.removeAllTabs();
 
-            for (int i = 0; i < mPageData.size(); i++) {
-                LogUtils.i(TAG, "actionBar.addTab getPageTitle(i) : " + mSectionsPagerAdapter.getPageTitle(i));
-                actionBar.addTab(actionBar.newTab().setTabListener(mBarTabListener));
-                ActionBar.Tab t = actionBar.getTabAt(i);
-                t.setCustomView(R.layout.actionbar_tab);
-                TextView title = (TextView) t.getCustomView().findViewById(R.id.tab_title);
-//                title.setBackgroundResource(R.drawable.edittext_bg);
-                title.setText(mSectionsPagerAdapter.getPageTitle(i));
+                for (int i = 0; i < mPageData.size(); i++) {
+                    LogUtils.i(TAG, "actionBar.addTab getPageTitle(i) : " + mSectionsPagerAdapter.getPageTitle(i));
+                    actionBar.addTab(actionBar.newTab().setTabListener(mBarTabListener));
+                    ActionBar.Tab t = actionBar.getTabAt(i);
+                    t.setCustomView(R.layout.actionbar_tab);
+                    TextView title = (TextView) t.getCustomView().findViewById(R.id.tab_title);
+                    title.setText(mSectionsPagerAdapter.getPageTitle(i));
+                }
+                actionBar.show();
             }
-            actionBar.show();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -840,12 +855,18 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 LogUtils.i(TAG, "获取首页数据:");
                 try {
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
-                    LogUtils.i(TAG, "获取首页数据:" + data);
+//                    LogUtils.i(TAG, "获取首页数据:" + data);
                     if (1 == data.getAppKey()) {
                         mPageData = data.getSubjectData();
+                        LogUtils.i(TAG, "获取首页数据  mPageData: " + mPageData);
+
                         if (mPageData.get(0).getS_key().equals("goods_m_game")) {
                             gametitle = getString(R.string.gametitle);
                             refreshActionbar();
+                        } else if (mPageData.get(0).getData().get(0).getCategorymain().equals("游戏")) {
+                            LogUtils.i(TAG, "获取首页数据  游戏数据分类: ");
+                            gametitle = mPageData.get(0).getData().get(0).getCategorysub();
+                            removeActionTabbar();
                         } else if (!mPageData.get(0).getS_key().equals("goods")) {
                             gametitle = mPageData.get(0).getData().get(0).getCategorysub();
                             refreshActionbar();
