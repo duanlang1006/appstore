@@ -13,6 +13,11 @@
         <option name="ASSEMBLE_TASK_NAME" value="assembleLeadexceed_buildinDebug" />
         <option name="COMPILE_JAVA_TASK_NAME" value="compileLeadexceed_buildinDebugSources" />
         <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleLeadexceed_buildinDebugAndroidTest" />
+        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileLeadexceed_buildinDebugAndroidTestSources" />
+        <afterSyncTasks>
+          <task>generateLeadexceed_buildinDebugAndroidTestSources</task>
+          <task>generateLeadexceed_buildinDebugSources</task>
+        </afterSyncTasks>
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="MANIFEST_FILE_RELATIVE_PATH" value="/src/main/AndroidManifest.xml" />
         <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
@@ -102,7 +107,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 21 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 21 Platform (1)" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="gson-2.2.4" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.3" level="project" />
