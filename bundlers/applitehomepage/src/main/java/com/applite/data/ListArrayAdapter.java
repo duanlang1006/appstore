@@ -111,6 +111,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
     private String luckydrawicon = "http://www.fuli365.net/applite_content_console/image/iden_icon_image_type15.png";
     private String boxLabel_value;
+    private int points;
     private boolean luckyflag = false;
 
     @Override
@@ -124,11 +125,13 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 boxLabel_value = vh.itemData.getBoxLabelvale();
                 LogUtils.d(TAG, "boxLabel_value = " + boxLabel_value);
 
-                if (vh.itemData.getBoxLabel().equals(luckydrawicon)) {
+                if(!TextUtils.isEmpty(boxLabel_value)){
                     luckyflag = true;
-                } else {
+                    points = Integer.parseInt(boxLabel_value);
+                } else
                     luckyflag = false;
-                }
+                LogUtils.d(TAG, "points = " + points+" luckyflag = "+luckyflag);
+
                 ImplHelper.onClick(mContext,
                         vh.implInfo,
                         vh.itemData.getrDownloadUrl(),
@@ -264,7 +267,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 if ((implInfo.getStatus() == implInfo.STATUS_INSTALLED) && luckyflag) {
                     luckyflag = false;
                     int mLuckyPonints = (int) AppliteSPUtils.get(mContext, AppliteSPUtils.LUCKY_POINTS, 0);
-                    mLuckyPonints = MitMobclickAgent.calDrawPoints(mLuckyPonints, "download");
+                    mLuckyPonints += points;
                     AppliteSPUtils.put(mContext, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
                 }
                 switch (implInfo.getStatus()) {
