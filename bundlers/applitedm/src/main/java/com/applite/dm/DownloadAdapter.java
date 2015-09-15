@@ -48,7 +48,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
     private BitmapUtils mBitmapHelper;
     private ImplAgent implAgent;
     private DownloadListener mListener;
-    private boolean temp = false;
 
     public DownloadAdapter(Context context,
                            int resource,
@@ -77,14 +76,9 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         if (mListener.getFlag1()) {//显示删除多选框
             vh.deleteCheckBox.setVisibility(View.VISIBLE);
             vh.deleteCheckBox.setChecked(mListener.getStatus(position));
-            if (true == mListener.getFlag2() || true == temp) {
-                vh.animaCheckBox.setDuration(80 * (position + 1));
+            if (true == mListener.getFlag2()) {
                 vh.deleteCheckBox.startAnimation(vh.animaCheckBox);
-                temp = true;
                 mListener.setFlag2(false);
-                if (position == Math.min(8 - 1, getCount() - 1)) {
-                    temp = false;
-                }
             }
             vh.actionBtn.setVisibility(View.GONE);
             vh.custompb.setVisibility(View.GONE);
@@ -170,6 +164,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             switch (implInfo.getStatus()) {
                 case ImplInfo.STATUS_PENDING://下载等待
                     custompb.setImageResource(R.drawable.download_status_pause);
+                    break;
                 case ImplInfo.STATUS_RUNNING://下载中
                     custompb.setImageResource(R.drawable.download_status_running);
                     break;
@@ -182,14 +177,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                     custompb.setImageResource(R.drawable.download_status_retry);
                     break;
                 default:
-                    if (!(1 << 3 == implInfo.getStatus()
-                            || 1 << 9 == implInfo.getStatus()
-                            || 1 << 10 == implInfo.getStatus()
-                            || 1 << 11 == implInfo.getStatus()
-                            || 1 << 12 == implInfo.getStatus())) {
-                        Toast.makeText(mContext, implInfo.getStatus() +
-                                "测试版本,如果你看到这条提示,请告诉我,谢谢！", Toast.LENGTH_SHORT).show();
-                    }
                     break;
             }
 //            LogUtils.d("wanghc", "titleView__" + implInfo.getTitle() + "");
@@ -199,7 +186,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             statusView.setText(implRes.getStatusText());
             statusView.invalidate();
             custompb.setProgress(implInfo.getProgress());
-            ImplLog.d("impl_dm",implInfo.getTitle()+","+implRes.getStatusText()+","+implRes.getDescText()+","+implInfo.getProgress());
+            ImplLog.d("impl_dm", implInfo.getTitle() + "," + implRes.getStatusText() + "," + implRes.getDescText() + "," + implInfo.getProgress());
         }
 
         private void setIcon() {
@@ -226,7 +213,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         public void onChange(ImplInfo info) {
             refresh();
             ImplInfo.ImplRes implRes = implInfo.getImplRes();
-            ImplLog.d("impl_dm","onChange,"+implInfo.getTitle()+","+implRes.getStatusText()+","+implRes.getDescText()+","+(info==implInfo));
+            ImplLog.d("impl_dm", "onChange," + implInfo.getTitle() + "," + implRes.getStatusText() + "," + implRes.getDescText() + "," + (info == implInfo));
         }
     }
 }

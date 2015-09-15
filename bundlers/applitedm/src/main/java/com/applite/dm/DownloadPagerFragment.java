@@ -69,6 +69,8 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private String STATUS = "status";
     private String DELETEBTNPRESSED = "deleteBtnPressed";
 
+    private int prePosition = -1;
+
 
     public DownloadPagerFragment() {
         super();
@@ -357,6 +359,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             btnDelete.setTextAppearance(mActivity, R.style.DownloadOptButton);
         }
     }
+
 
 //    @Override
 //    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

@@ -197,7 +197,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     private void initSimilarView(View view) {
         mSimilarView = (SimilarView) view.inflate(mActivity, R.layout.similar_view, null);
         TextView t = (TextView) mSimilarView.findViewById(R.id.similar_title);
-        t.setText("大家还下载了");
+//        t.setText("大家还下载了");
+        t.setVisibility(View.GONE);
         mSimilarDataList = new ArrayList<>();
         mHttpUtils = new HttpUtils();
         RequestParams params = new RequestParams();
@@ -386,7 +387,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
 
     private void deleteItem() {
         for (int i = mImplList.size() - 1; i >= 0; i--) {
-            LogUtils.d("wanghc",i+"___"+status[i]+"");
+            LogUtils.d("wanghc", i + "___" + status[i] + "");
             if (status[i]) {
                 implAgent.remove(mImplList.get(i));
             }
