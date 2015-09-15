@@ -151,7 +151,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
 //            FeedbackAgent agent = new FeedbackAgent(mActivity);
 //            agent.startFeedbackActivity();
         } else if (R.id.ll_item3_2 == v.getId()) {//关于
-            ((OSGIServiceHost) mActivity).jumptoAbout(DefaultValue.defaultBoolean);
+            ((OSGIServiceHost) mActivity).jumptoAbout(true);
         }
 
     }
