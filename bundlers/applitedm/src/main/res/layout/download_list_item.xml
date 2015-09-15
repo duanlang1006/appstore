@@ -65,7 +65,6 @@
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/download_title"
                 android:maxLines="1"
-                android:maxWidth="140dp"
                 android:text="size_text" />
 
             <TextView
@@ -102,7 +101,7 @@
             android:focusableInTouchMode="true"
             android:visibility="gone" />
 
-        <com.applite.dm.CustomProgressBar
+        <com.applite.view.CustomProgressBar
             android:id="@+id/cpb"
             style="@style/DownloadOptButton"
             android:layout_width="wrap_content"

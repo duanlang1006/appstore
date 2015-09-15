@@ -15,6 +15,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.applite.common.DefaultValue;
 import com.applite.sharedpreferences.AppliteSPUtils;
 import com.applite.utils.DataCleanManager;
 import com.osgi.extra.OSGIBaseFragment;
@@ -31,6 +32,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     private LinearLayout ll2_1;//清除缓存
     private LinearLayout ll2_2;//删除安装包
     private LinearLayout ll2_3;//智能无图
+    private LinearLayout ll2_4;//零流量下载
     private ActionBar actionBar;
 
     public SettingFragment() {
@@ -63,6 +65,8 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         ll2_2.setOnClickListener(this);
         ll2_3 = (LinearLayout) view.findViewById(R.id.ll_item2_3);//智能无图
         ll2_3.setOnClickListener(this);
+        ll2_4 = (LinearLayout) view.findViewById(R.id.ll_item2_4);//零流量下载
+        ll2_4.setOnClickListener(this);
         view.findViewById(R.id.ll_item3_1).setOnClickListener(this);//关于
         view.findViewById(R.id.ll_item3_2).setOnClickListener(this);//意见反馈
         setAllState();
@@ -110,30 +114,35 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     }
 
     private void setAllState() {
-        ll1_1.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, true));
-        ll2_1.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.CLEAR_CACHE, true));
-        ll2_2.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.DELETE_PACKAGE, true));
-        ll2_3.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, true));
+        ll1_1.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, DefaultValue.defaultBoolean));
+        ll2_1.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.CLEAR_CACHE, DefaultValue.defaultBoolean));
+        ll2_2.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.DELETE_PACKAGE, DefaultValue.defaultBoolean));
+        ll2_3.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, DefaultValue.defaultBoolean));
+        ll2_4.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, DefaultValue.defaultBoolean));
     }
 
     @Override
     public void onClick(View v) {
         if (R.id.ll_item1_1 == v.getId()) {//更新提醒
             AppliteSPUtils.put(mActivity, AppliteSPUtils.UPDATE_REMIND,
-                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, true));
+                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, DefaultValue.defaultBoolean));
             setAllState();
         } else if (R.id.ll_item2_1 == v.getId()) {//清除缓存
             AppliteSPUtils.put(mActivity, AppliteSPUtils.CLEAR_CACHE,
-                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.CLEAR_CACHE, true));
+                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.CLEAR_CACHE, DefaultValue.defaultBoolean));
             setAllState();
             DataCleanDialog.show(mActivity);
         } else if (R.id.ll_item2_2 == v.getId()) {//删除安装包
             AppliteSPUtils.put(mActivity, AppliteSPUtils.DELETE_PACKAGE,
-                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.DELETE_PACKAGE, true));
+                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.DELETE_PACKAGE, DefaultValue.defaultBoolean));
             setAllState();
         } else if (R.id.ll_item2_3 == v.getId()) {//智能无图
             AppliteSPUtils.put(mActivity, AppliteSPUtils.NO_PICTURE,
-                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, true));
+                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, DefaultValue.defaultBoolean));
+            setAllState();
+        } else if (R.id.ll_item2_4 == v.getId()) {//零流量下载
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH,
+                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, DefaultValue.defaultBoolean));
             setAllState();
         } else if (R.id.ll_item3_1 == v.getId()) {//意见反馈
             FeedbackDialog.show(mActivity);
@@ -141,10 +150,8 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
 //            ((OSGIServiceHost) getActivity()).jumptoConversation();
 //            FeedbackAgent agent = new FeedbackAgent(mActivity);
 //            agent.startFeedbackActivity();
-        } else if (R.id.ll_item3_2 == v.getId())
-
-        {//关于
-            ((OSGIServiceHost) mActivity).jumptoAbort(true);
+        } else if (R.id.ll_item3_2 == v.getId()) {//关于
+            ((OSGIServiceHost) mActivity).jumptoAbout(DefaultValue.defaultBoolean);
         }
 
     }

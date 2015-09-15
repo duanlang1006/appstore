@@ -39,7 +39,7 @@
     <string name="no_picture">智能无图</string>
     <string name="no_picture_detail">仅WIFI下载图片</string>
     <string name="feedback">意见反馈</string>
-    <string name="abort">关于</string>
+    <string name="about">关于</string>
     <string name="help">帮助</string>
 
     <string name="testimonial_0">恭喜您抽中 10 积分</string>
