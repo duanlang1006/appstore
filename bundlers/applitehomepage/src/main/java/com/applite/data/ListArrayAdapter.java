@@ -105,8 +105,6 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     }
 
     private String luckydrawicon = "http://www.fuli365.net/applite_content_console/image/iden_icon_image_type15.png";
-    private String boxlabel;
-    private String luckytype;
     private Boolean luckyflag = false;
     @Override
     public void onClick(View v) {
@@ -115,10 +113,6 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             if (obj instanceof ViewHolder) {
                 ViewHolder vh = (ViewHolder) obj;
                 MitMobclickAgent.onEvent(mContext, "onClickButton" + vh.getItemPosition());
-
-//                boxlabel = vh.itemData.getBoxLabel();
-//                luckytype = boxlabel.substring(boxlabel.length() - 6, boxlabel.length() - 4);
-//                LogUtils.i(TAG, "luckytype = "+luckytype);
 
                 if(vh.itemData.getBoxLabel().equals(luckydrawicon)){
                     LogUtils.i(TAG, "youjiangxiazai");

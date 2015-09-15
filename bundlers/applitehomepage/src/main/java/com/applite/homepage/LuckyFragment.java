@@ -113,8 +113,8 @@ public class LuckyFragment extends OSGIBaseFragment {
 
                         //重新绘制界面
                         mStartBtn.setImageResource(R.drawable.stop);
-//                        mLuckyPanView.luckyStart(1);
-                        mLuckyPanView.luckyStart(); //随机中奖概率
+                        mLuckyPanView.luckyStart(0);
+//                        mLuckyPanView.luckyStart(); //随机中奖概率
                         mLuckyPanView.setflag(true);
                     }
                 } else {

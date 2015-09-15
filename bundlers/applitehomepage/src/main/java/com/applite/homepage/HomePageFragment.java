@@ -587,7 +587,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private EditText mEtView;
     private ImageView mSearchView;
     private ImageView mSearchView1;
-    private TextView mGameTitle;
+    private TextView mSubTitle;
     //    private String mEtViewText;
     private String[] mHint;
     private String[] mHint_PackageName;
@@ -654,7 +654,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             mSearchbarView.setVisibility(View.VISIBLE);
 
             mHideSearchbarView = (RelativeLayout) customView.findViewById(R.id.hide_search_bar);
-            mGameTitle = (TextView) customView.findViewById(R.id.game_title);
+            mSubTitle = (TextView) customView.findViewById(R.id.game_title);
             mSearchView1 = (ImageView) customView.findViewById(R.id.search_icon1);
             mSearchView1.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View paramView) {
@@ -669,9 +669,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private void refreshActionbar() {
         if (null != customView) {
             if (null != gametitle) {
-                mGameTitle.setText(gametitle);
-//                mGameTitle.setVisibility(View.VISIBLE);
-//                mSearchView1.setVisibility(View.VISIBLE);
+                mSubTitle.setText(gametitle);
                 mSearchbarView.setVisibility(View.GONE);
                 mHideSearchbarView.setVisibility(View.VISIBLE);
             }
