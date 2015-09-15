@@ -4,19 +4,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+    <RelativeLayout
+        android:id="@+id/hide_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center"
         android:visibility="gone"
+        android:layout_weight="1">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/game_title"
-        android:layout_gravity="center_vertical" />
+        android:textSize="18sp"
+        android:layout_centerVertical="true" />
+
+    <ImageView
+        android:id="@+id/search_icon1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/icon_search" />
+    </RelativeLayout>
+
 
     <RelativeLayout
         android:id="@+id/search_bar"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:gravity="center"
+        android:visibility="gone"
         android:layout_weight="1">
 
         <EditText
