@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -11,7 +11,7 @@
 
         <TextView
             android:id="@+id/update_actionbar_title"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_weight="1"
             android:gravity="center_vertical"
@@ -26,10 +26,11 @@
             android:layout_marginRight="5dp"
             android:gravity="center_vertical"
             android:text="已忽略更新"
+            android:layout_alignParentRight="true"
             android:textColor="@color/black"
             android:textSize="16sp"
             android:visibility="gone" />
-    </LinearLayout>
+    </RelativeLayout>
 
 
 </LinearLayout>

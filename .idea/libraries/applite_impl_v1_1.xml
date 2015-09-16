@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="applite-impl-v1.1">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/extras/impl/applite-impl-v1.1.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -38,20 +38,20 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
         view.findViewById(R.id.action_logo).setOnClickListener(this);
         view.findViewById(R.id.action_setting).setOnClickListener(this);
         view.findViewById(R.id.action_lucky).setOnClickListener(this);
-        mSetWifiUpdateView = (ImageView) view.findViewById(R.id.zero_flow_update);
-        mSetWifiUpdateView.setOnClickListener(this);
-        setWifiUpdateViewState();
+//        mSetWifiUpdateView = (ImageView) view.findViewById(R.id.zero_flow_update);
+//        mSetWifiUpdateView.setOnClickListener(this);
+//        setWifiUpdateViewState();
         initActionBar();
         return view;
     }
 
-    private void setWifiUpdateViewState() {
-        if ((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, true)) {
-            mSetWifiUpdateView.setSelected(true);
-        } else {
-            mSetWifiUpdateView.setSelected(false);
-        }
-    }
+//    private void setWifiUpdateViewState() {
+//        if ((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, true)) {
+//            mSetWifiUpdateView.setSelected(true);
+//        } else {
+//            mSetWifiUpdateView.setSelected(false);
+//        }
+//    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -118,11 +118,13 @@ public class PersonalFragment extends OSGIBaseFragment implements View.OnClickLi
             ((OSGIServiceHost) mActivity).jumptoUpdate(true);
         } else if (R.id.action_logo == v.getId()) {
             ((OSGIServiceHost) mActivity).jumptoMylife(true);
-        } else if (R.id.zero_flow_update == v.getId()) {
-            AppliteSPUtils.put(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH,
-                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, true));
-            setWifiUpdateViewState();
-        } else if (R.id.action_setting == v.getId()) {
+        }
+//        else if (R.id.zero_flow_update == v.getId()) {
+//            AppliteSPUtils.put(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH,
+//                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, true));
+//            setWifiUpdateViewState();
+//        }
+        else if (R.id.action_setting == v.getId()) {
             ((OSGIServiceHost) mActivity).jumptoSetting(true);
         } else if (R.id.action_lucky == v.getId()) {
             ((OSGIServiceHost) mActivity).jumptoLucky(true);

@@ -31,9 +31,8 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.applite.bean.PopupWindowBean;
-import com.applite.bean.ScreenBean;
 import com.applite.bean.HomePageDataBean;
+import com.applite.bean.PopupWindowBean;
 import com.applite.bean.ScreenBean;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
@@ -211,7 +210,6 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         LogUtils.d(TAG, "onCreateView");
 
         boolean networkState = NetworkDetector.detect(mActivity);
-        LogUtils.i(TAG, "networkState = " + networkState);
 
         rootView = (ViewGroup) mInflater.inflate(R.layout.fragment_homepage_main, container, false);
 
@@ -265,6 +263,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         mPagerSlidingTabStrip.setViewPager(mViewPager);
         mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         popupWindowPost();
+        LogUtils.i(TAG, "search hint text ");
         postSearchHint();
         return rootView;
     }
@@ -280,8 +279,12 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
                     // handle back button
+
                     getFragmentManager().popBackStackImmediate();
-                    return false;
+                    if (backflag && backflag1)
+                        return false;
+                    else
+                        return true;
                 }
                 return false;
             }
@@ -294,12 +297,18 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         MitMobclickAgent.onPageEnd(whichPage);
     }
 
+    private boolean backflag;
+    private boolean backflag1;
+
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         mHomePageListFragment = (HomePageListFragment) getChildFragmentManager().findFragmentById(R.id.pager);
         if (!hidden) {
             LogUtils.i(TAG, "重新显示ActionBar");
+            if (!backflag1)
+                backflag1 = true;
+            backflag = true;
             initActionBar();
             if (mViewPager != null) {
                 mViewPager.setCurrentItem(mTabSelect);
@@ -315,6 +324,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             }
 
         } else {
+            if (!backflag)
+                backflag1 = false;
+            backflag = false;
+
             try {
                 ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
                 actionBar.setHomeAsUpIndicator(mActivity.getResources().getDrawable(R.drawable.action_bar_back_light));
@@ -373,8 +386,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             mPopType = object.getString("use_info");
             String plaque_info = object.getString("plaque_info");
             String detail_info = object.getString("detail_info");
-            LogUtils.i(TAG, "plaque_info:" + plaque_info);
-            LogUtils.i(TAG, "detail_info:" + detail_info);
+//            LogUtils.i(TAG, "plaque_info:" + plaque_info);
+//            LogUtils.i(TAG, "detail_info:" + detail_info);
 
             JSONArray plaque_array = new JSONArray(plaque_info);
             if (plaque_array.length() != 0) {
@@ -569,8 +582,12 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
     private String mInfo;
     private ViewGroup customView;
+    private RelativeLayout mSearchbarView;
+    private RelativeLayout mHideSearchbarView;
     private EditText mEtView;
     private ImageView mSearchView;
+    private ImageView mSearchView1;
+    private TextView mSubTitle;
     //    private String mEtViewText;
     private String[] mHint;
     private String[] mHint_PackageName;
@@ -603,6 +620,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private void setSearchBar() {
         if (null == customView) {
             customView = (ViewGroup) mInflater.inflate(R.layout.actionbar_searchbar, null);
+            mSearchbarView = (RelativeLayout) customView.findViewById(R.id.search_bar);
+
             mEtView = (EditText) customView.findViewById(R.id.search_et);
             mEtView.setFocusable(false);
             mEtView.setOnClickListener(new View.OnClickListener() {
@@ -631,6 +650,41 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                     }
                 }
             });
+
+            mSearchbarView.setVisibility(View.VISIBLE);
+
+            mHideSearchbarView = (RelativeLayout) customView.findViewById(R.id.hide_search_bar);
+            mSubTitle = (TextView) customView.findViewById(R.id.game_title);
+            mSearchView1 = (ImageView) customView.findViewById(R.id.search_icon1);
+            mSearchView1.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View paramView) {
+                    ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, null, null);
+                }
+            });
+        }
+    }
+
+    private String gametitle;
+    private Boolean removetab = false;
+
+    private void refreshActionbar() {
+        if (null != customView) {
+            if (null != gametitle) {
+                mSubTitle.setText(gametitle);
+                mSearchbarView.setVisibility(View.GONE);
+                mHideSearchbarView.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    private void removeActionTabbar() {
+        if (null != customView) {
+            if (null != gametitle) {
+                mSubTitle.setText(gametitle);
+                mSearchbarView.setVisibility(View.GONE);
+                mHideSearchbarView.setVisibility(View.VISIBLE);
+            }
+            removetab = true;
         }
     }
 
@@ -649,6 +703,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
     private void initActionBar() {
         try {
+            LogUtils.i(TAG, "initActionBar");
+
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
 
             if (isHidden()) {
@@ -671,19 +727,26 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             actionBar.setDisplayShowCustomEnabled(true);
             //actionBar.setCustomView(mPagerSlidingTabStrip);
             actionBar.setCustomView(customView);
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-            actionBar.removeAllTabs();
+            if (removetab) {
+                removetab = false;
+                actionBar.removeAllTabs();
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                actionBar.show();
+            } else {
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+                actionBar.removeAllTabs();
 
-            for (int i = 0; i < mPageData.size(); i++) {
-                LogUtils.i(TAG, "actionBar.addTab getPageTitle(i) : " + mSectionsPagerAdapter.getPageTitle(i));
-                actionBar.addTab(actionBar.newTab().setTabListener(mBarTabListener));
-                ActionBar.Tab t = actionBar.getTabAt(i);
-                t.setCustomView(R.layout.actionbar_tab);
-                TextView title = (TextView) t.getCustomView().findViewById(R.id.tab_title);
-//                title.setBackgroundResource(R.drawable.edittext_bg);
-                title.setText(mSectionsPagerAdapter.getPageTitle(i));
+                for (int i = 0; i < mPageData.size(); i++) {
+                    LogUtils.i(TAG, "actionBar.addTab getPageTitle(i) : " + mSectionsPagerAdapter.getPageTitle(i));
+                    actionBar.addTab(actionBar.newTab().setTabListener(mBarTabListener));
+                    ActionBar.Tab t = actionBar.getTabAt(i);
+                    t.setCustomView(R.layout.actionbar_tab);
+                    TextView title = (TextView) t.getCustomView().findViewById(R.id.tab_title);
+                    title.setText(mSectionsPagerAdapter.getPageTitle(i));
+                }
+                actionBar.show();
             }
-            actionBar.show();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -736,7 +799,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
             //LogUtils.i(TAG, "result:" + result);
             String hint_info = object.getString("searchscroll_info");
-            LogUtils.i(TAG, "hint_info:" + hint_info);
+//            LogUtils.i(TAG, "hint_info:" + hint_info);
 
             JSONArray hint_json = new JSONArray(hint_info);
             mHint = new String[hint_json.length()];
@@ -753,7 +816,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 mHint_PackageName[i] = packagename;
                 mHint_Name[i] = name;
                 mHint_IconUrl[i] = iconurl;
-                LogUtils.e(TAG, "mHint_PackageName[" + i + "]:" + mHint_PackageName[i] + "  mHint_Name[" + i + "]:" + mHint_Name[i] + "  mHint_IconUrl[" + i + "]:" + mHint_IconUrl[i]);
+//                LogUtils.e(TAG, "mHint_PackageName[" + i + "]:" + mHint_PackageName[i] + "  mHint_Name[" + i + "]:" + mHint_Name[i] + "  mHint_IconUrl[" + i + "]:" + mHint_IconUrl[i]);
             }
             mEtView.setHint(mHint[0]);
         } catch (JSONException e) {
@@ -792,9 +855,22 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 LogUtils.i(TAG, "获取首页数据:");
                 try {
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
+//                    LogUtils.i(TAG, "获取首页数据:" + data);
                     if (1 == data.getAppKey()) {
                         mPageData = data.getSubjectData();
-                        LogUtils.i(TAG, "mPageData:" + mPageData.toString());
+                        LogUtils.i(TAG, "获取首页数据  mPageData: " + mPageData);
+
+                        if (mPageData.get(0).getS_key().equals("goods_m_game")) {
+                            gametitle = getString(R.string.gametitle);
+                            refreshActionbar();
+                        } else if (mPageData.get(0).getData().get(0).getCategorymain().equals("游戏")) {
+                            LogUtils.i(TAG, "获取首页数据  游戏数据分类: ");
+                            gametitle = mPageData.get(0).getData().get(0).getCategorysub();
+                            removeActionTabbar();
+                        } else if (!mPageData.get(0).getS_key().equals("goods")) {
+                            gametitle = mPageData.get(0).getData().get(0).getCategorysub();
+                            refreshActionbar();
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

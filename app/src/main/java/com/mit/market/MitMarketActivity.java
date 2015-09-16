@@ -3,7 +3,6 @@ package com.mit.market;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -21,7 +20,7 @@ import com.applite.common.Constant;
 import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
 import com.applite.dm.DownloadPagerFragment;
-import com.applite.homepage.AbortFragment;
+import com.applite.homepage.AboutFragment;
 import com.applite.homepage.HomePageFragment;
 import com.applite.homepage.HomePageListFragment;
 import com.applite.homepage.LuckyFragment;
@@ -382,9 +381,9 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     }
 
     @Override
-    public void jumptoAbort(boolean addToBackstack) {
-        jumpto(Constant.OSGI_SERVICE_ABORT_FRAGMENT,
-                AbortFragment.class.getName(),
+    public void jumptoAbout(boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_ABOUT_FRAGMENT,
+                AboutFragment.class.getName(),
                 null, addToBackstack);
     }
 
@@ -422,7 +421,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_LOGO_FRAGMENT, "com.mit.main.GuideFragment");
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_SETTING_FRAGMENT, "com.applite.homepage.SettingFragment");
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_LUCKY_FRAGMENT, "com.applite.homepage.LuckyFragment");
-        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_ABORT_FRAGMENT, "com.applite.homepage.AbortFragment");
+        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_ABOUT_FRAGMENT, "com.applite.homepage.AbortFragment");
     }
 
     private void unregisterClients() {
@@ -435,6 +434,6 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_LOGO_FRAGMENT);
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_SETTING_FRAGMENT);
         OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_LUCKY_FRAGMENT);
-        OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_ABORT_FRAGMENT);
+        OSGIServiceClient.getInstance().unregister(Constant.OSGI_SERVICE_ABOUT_FRAGMENT);
     }
 }
