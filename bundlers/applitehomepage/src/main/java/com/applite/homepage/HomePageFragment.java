@@ -281,10 +281,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                     // handle back button
 
                     getFragmentManager().popBackStackImmediate();
-                    if (backflag && backflag1)
-                        return false;
-                    else
-                        return true;
+                    return false;
                 }
                 return false;
             }
@@ -297,48 +294,23 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         MitMobclickAgent.onPageEnd(whichPage);
     }
 
-    private boolean backflag;
-    private boolean backflag1;
-
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         mHomePageListFragment = (HomePageListFragment) getChildFragmentManager().findFragmentById(R.id.pager);
         if (!hidden) {
             LogUtils.i(TAG, "重新显示ActionBar");
-            if (!backflag1)
-                backflag1 = true;
-            backflag = true;
             initActionBar();
             if (mViewPager != null) {
                 mViewPager.setCurrentItem(mTabSelect);
                 mSectionsPagerAdapter.notifyDataSetChanged();
             }
-//            mActivity.runOnUiThread(mRefreshRunnable);
-
-            if (mHomePageListFragment != null) {
-                LogUtils.i(TAG, "mHomePageListFragment = " + mHomePageListFragment);
-                mHomePageListFragment.play(true);
-            } else {
-                LogUtils.i(TAG, "mHomePageListFragment = null");
-            }
-
         } else {
-            if (!backflag)
-                backflag1 = false;
-            backflag = false;
-
             try {
                 ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
                 actionBar.setHomeAsUpIndicator(mActivity.getResources().getDrawable(R.drawable.action_bar_back_light));
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-            if (mHomePageListFragment != null) {
-                LogUtils.i(TAG, "mHomePageListFragment = " + mHomePageListFragment);
-                mHomePageListFragment.play(false);
-            } else {
-                LogUtils.i(TAG, "mHomePageListFragment = null");
             }
         }
     }
