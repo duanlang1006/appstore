@@ -65,14 +65,17 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     private HttpUtils mHttpUtils;
 
     private boolean checkBoxAnima = true;
+    private int i = -1;
 
     private ImplAgent implAgent;
 
     private String COUNT = "count";
     private String FLAG = "flag";
     private String LENGTH = "length";
-    private String STATUS = "status";
+    private String BTN_STATUS = "btnStatus";
     private String DELETE_BTN_PRESSED = "deleteBtnPressed";
+    private String POSITION = "position";
+
 
     private DownloadListener mDownloadListener = new DownloadListener() {
         @Override
@@ -132,28 +135,54 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     private SharedPreferences.OnSharedPreferenceChangeListener mListListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, DefaultValue.defaultBoolean)) {//由删除状态返回显示状态
+            if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
                 refresh();
             }
-            if (-1 != (int) AppliteSPUtils.get(mActivity, STATUS, DefaultValue.defaultInt)) {//全选按钮状态
-                switch ((int) AppliteSPUtils.get(mActivity, STATUS, DefaultValue.defaultInt)) {
+            if (-1 != (int) AppliteSPUtils.get(mActivity, BTN_STATUS, DefaultValue.defaultInt)) {//全选按钮状态
+                LogUtils.d("wanghc", "AppliteSPUtils.get(mActivity, BTN_STATU");
+                switch ((int) AppliteSPUtils.get(mActivity, BTN_STATUS, DefaultValue.defaultInt)) {
                     case 1:
+                        LogUtils.d("wanghc", "全选");
                         Arrays.fill(status, true);//全选
+                        checkedCount = status.length;
                         break;
                     case 0:
+                        LogUtils.d("wanghc", "全不选");
                         Arrays.fill(status, false);//全不选
+                        checkedCount = 0;
                         break;
                     default:
                         break;
                 }
-                AppliteSPUtils.put(mActivity, STATUS, -1);
+                LogUtils.d("wanghc", status[0] + "__" + status[1] + "");
+                AppliteSPUtils.put(mActivity, BTN_STATUS, -1);
                 mAdapter.notifyDataSetChanged();
             }
             if ((boolean) AppliteSPUtils.get(mActivity, DELETE_BTN_PRESSED, false)) {//删除按钮按下
                 deleteItem();
             }
+            if (i != (int) AppliteSPUtils.get(mActivity, POSITION, -1)) {//viewPager翻页
+                i = (int) AppliteSPUtils.get(mActivity, POSITION, -1);
+                AppliteSPUtils.put(mActivity, POSITION, i);
+                mAdapter.notifyDataSetChanged();
+
+            }
         }
     };
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        Bundle params = getArguments();
+        if (null != params) {
+            mStatusFlags = params.getInt("statusFilter");
+            mTitleId = params.getInt("titleId");
+        }
+        mImplAgent = ImplAgent.getInstance(activity.getApplicationContext());
+        mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
+        mBitmapHelper = new BitmapUtils(mActivity.getApplicationContext());
+        ImplLog.d(DownloadListFragment.TAG, "onAttach," + this + "," + mImplList.size());
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -254,20 +283,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
 
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        Bundle params = getArguments();
-        if (null != params) {
-            mStatusFlags = params.getInt("statusFilter");
-            mTitleId = params.getInt("titleId");
-        }
-        mImplAgent = ImplAgent.getInstance(activity.getApplicationContext());
-        mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
-        mBitmapHelper = new BitmapUtils(mActivity.getApplicationContext());
-        ImplLog.d(DownloadListFragment.TAG, "onAttach," + this + "," + mImplList.size());
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         AppliteSPUtils.registerChangeListener(mActivity, mListListener);
@@ -288,6 +303,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         });
         flagShowCheckBox = false;
         AppliteSPUtils.put(mActivity, FLAG, flagShowCheckBox);
+        AppliteSPUtils.put(mActivity, BTN_STATUS, -1);//全选按钮状态(默认)
+        AppliteSPUtils.put(mActivity, COUNT, -1);//选中的个数
 
     }
 
@@ -344,8 +361,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
             status[position] = !status[position];
             checkedCount = (status[position] == false) ? checkedCount - 1 : checkedCount + 1;
             AppliteSPUtils.put(mActivity, COUNT, checkedCount);
-            //这里要改变外面fragment中删除按钮和全选按钮状态
-            //！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -353,9 +368,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         if (!flagShowCheckBox) {
-            if (!flagShowCheckBox) {
+            if (checkBoxAnima) {
                 flagShowCheckBox = true;
+                checkBoxAnima = false;
                 AppliteSPUtils.put(mActivity, FLAG, flagShowCheckBox);
+                AppliteSPUtils.put(mActivity, LENGTH, status.length);
                 VibratorUtil.Vibrate(mActivity, 200);   //震动200ms
                 mSimilarView.setVisibility(View.GONE);
                 mSimilarView.setPadding(0, -mSimilarView.getHeight(), 0, 0);
@@ -382,14 +399,16 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
         checkBoxAnima = true;
         checkedCount = 0;
         AppliteSPUtils.put(mActivity, COUNT, checkedCount);
+        AppliteSPUtils.put(mActivity, BTN_STATUS, -1);
         AppliteSPUtils.put(mActivity, DELETE_BTN_PRESSED, false);
     }
 
     private void deleteItem() {
-        for (int i = mImplList.size() - 1; i >= 0; i--) {
-            LogUtils.d("wanghc", i + "___" + status[i] + "");
+        for (int i = status.length - 1; i >= 0; i--) {
+            LogUtils.d("wanghc", "第" + i+"条："+status[i]);
             if (status[i]) {
                 implAgent.remove(mImplList.get(i));
+                LogUtils.d("wanghc", "我删除了" + i);
             }
         }
         Toast.makeText(mActivity.getApplicationContext(), mActivity.getResources().getString(R.string.delete_message1) + checkedCount

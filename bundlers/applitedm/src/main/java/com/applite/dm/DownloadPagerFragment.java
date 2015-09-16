@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -42,7 +43,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 
-public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener, Observer {
+public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener, Observer, ViewPager.OnPageChangeListener, View.OnTouchListener {
     final static String TAG = "applite_dm";
     private ViewPager mViewPager;
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
@@ -66,8 +67,9 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private String COUNT = "count";
     private String FLAG = "flag";
     private String LENGTH = "length";
-    private String STATUS = "status";
+    private String BTN_STATUS = "btnStatus";
     private String DELETEBTNPRESSED = "deleteBtnPressed";
+    private String POSITION = "position";
 
     private int prePosition = -1;
 
@@ -108,11 +110,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         mViewPager = (ViewPager) rootView.findViewById(R.id.pager);
         mViewPager.setAdapter(new SectionsPagerAdapter(getChildFragmentManager()));
         mPagerSlidingTabStrip = PagerSlidingTabStrip.inflate(mActivity, container, false);
-//        mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         initActionBar(mPagerSlidingTabStrip);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
+        mPagerSlidingTabStrip.setOnPageChangeListener(this);
+        mViewPager.setOnTouchListener(this);
         ImplAgent.getInstance(mActivity).addObserver(this);
-
         titleBar = inflater.inflate(R.layout.cover_actionbar, null);//这里是添加的控件
         initializeView(rootView);
         layout_button = (LinearLayout) rootView.findViewById(R.id.layout_button);
@@ -124,7 +126,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         btnDelete.setOnClickListener(this);
         return rootView;
     }
-
 
     @Override
     public void onPause() {
@@ -154,6 +155,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 //            }
 //        });
         AppliteSPUtils.registerChangeListener(mActivity, mPagerListener);
+        AppliteSPUtils.put(mActivity, COUNT, -1);//选中的个数
     }
 
 
@@ -230,25 +232,15 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             }
         } else if (v.getId() == R.id.action_more) {
 
-        }
-        //        if (v.getId() == R.id.btnShare) {//分享(已不可点)
-//            flag = true;
-//            Toast.makeText(mActivity.getApplicationContext(), "分享功能尚未实现，敬请期待", Toast.LENGTH_SHORT).show();
-//        } else
-        else if (v.getId() == R.id.btnDelete) {//删除
+        } else if (v.getId() == R.id.btnDelete) {//删除
             AppliteSPUtils.put(mActivity, DELETEBTNPRESSED, true);
-//            deleteItem();
-            //通知listFragment删除应用
         } else if (v.getId() == R.id.select_allpick) {//全选
-            LogUtils.d("wanghc","LENGTH____"+(int) AppliteSPUtils.get(mActivity, LENGTH, DefaultValue.defaultInt));
             if ((int) AppliteSPUtils.get(mActivity, LENGTH, DefaultValue.defaultInt) == (int) AppliteSPUtils.get(mActivity, COUNT, DefaultValue.defaultInt)) {
-//                Arrays.fill(status, false);
-                AppliteSPUtils.put(mActivity, STATUS, 0);//全选按钮状态
+                AppliteSPUtils.put(mActivity, BTN_STATUS, 0);//全选按钮状态
                 AppliteSPUtils.put(mActivity, COUNT, 0);//选中的个数
             } else {
-//                Arrays.fill(status, true);
 //                checkedCount = mImplList.size();
-                AppliteSPUtils.put(mActivity, STATUS, 1);
+                AppliteSPUtils.put(mActivity, BTN_STATUS, 1);
                 AppliteSPUtils.put(mActivity, COUNT, (int) AppliteSPUtils.get(mActivity, LENGTH, DefaultValue.defaultInt));
             }
             setButtonStatus();
@@ -256,13 +248,15 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             hide();
             Toast.makeText(mActivity.getApplicationContext(), R.string.cancel_operator, Toast.LENGTH_SHORT).show();
         }
+//       else if (v.getId() == R.id.btnShare) {//分享(已不可点)
+//            flag = true;
+//            Toast.makeText(mActivity.getApplicationContext(), "分享功能尚未实现，敬请期待", Toast.LENGTH_SHORT).show();
+//        }
 
     }
 
     private void show() {
         if (titleBar.getVisibility() != View.VISIBLE) {
-//                flagShowCheckBox = true;
-//                    AppliteSPUtils.put(mActivity, FLAG, true);
             titleBar.setVisibility(View.VISIBLE);//显示titleBar
             layout_button.setVisibility(View.VISIBLE);//底部的布局及按钮
 //                btnShare.setVisibility(View.VISIBLE);
@@ -274,7 +268,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     private void hide() {
         titleBar.setVisibility(View.GONE);
-//            btnShare.setVisibility(View.GONE);
+//         btnShare.setVisibility(View.GONE);
         btnDelete.setVisibility(View.GONE);
         layout_button.setVisibility(View.GONE);
         AppliteSPUtils.put(mActivity, FLAG, false);
@@ -340,7 +334,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     }
 
     private void setButtonStatus() {
-
         temp = mActivity.getResources().getString(R.string.choose_message1) + AppliteSPUtils.get(mActivity, COUNT, DefaultValue.defaultInt) +
                 mActivity.getResources().getString(R.string.choose_message2);
         tvShowTotal.setText(temp);
@@ -360,24 +353,38 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         }
     }
 
+    @Override
+    public void onPageScrolled(int i, float v, int i1) {
+        if (prePosition != i) {
+            LogUtils.d("wanghc", "changed_" + prePosition + "->" + i);
+            AppliteSPUtils.put(mActivity, POSITION, i);
+            prePosition = i;
 
-//    @Override
-//    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-//        if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, DefaultValue.defaultBoolean)) {
-//            if (titleBar.getVisibility() != View.VISIBLE) {
-////                flagShowCheckBox = true;
-//                AppliteSPUtils.put(mActivity, FLAG, true);
-//                titleBar.setVisibility(View.VISIBLE);//显示titleBar
-//                layout_button.setVisibility(View.VISIBLE);//底部的布局及按钮
-////                btnShare.setVisibility(View.VISIBLE);
-////                btnShare.startAnimation(animaBt1);
-//                btnDelete.setVisibility(View.VISIBLE);
-//                btnDelete.startAnimation(animaBtDel);
-//            }
-//        }
-//        return false;
-//    }
+        }
+    }
 
+    @Override
+    public void onPageSelected(int i) {
+        if (prePosition != i) {
+            LogUtils.d("wanghc", "changed_" + prePosition + "->" + i);
+            AppliteSPUtils.put(mActivity, POSITION, i);
+            prePosition = i;
+
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int i) {
+
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {//多选删除时禁止翻页
+        if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
+            return true;
+        }
+        return false;
+    }
 
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
         int[] tabs = new int[2];
