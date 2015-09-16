@@ -87,12 +87,13 @@ public class LuckyFragment extends OSGIBaseFragment implements LuckyPanView.Call
                     mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 1000);
                     LogUtils.i(TAG, "Conunts = " + Conunts);
                     if (mLuckyPonints < 20) {
+                        //如果小于最低抽奖消耗分数20, 则弹出提示
                         if (toast == null) {
                             toast = Toast.makeText(mActivity, getString(R.string.IntegralProblem), Toast.LENGTH_SHORT);
                         }
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
-                    } else if (Conunts > 20) {
+                    } else if (Conunts > 2) {
                         //判断当天抽奖次数，如果已满3次，则弹出提示当天不允许再抽奖
                         if (toast == null) {
                             toast = Toast.makeText(mActivity, getString(R.string.beyond_limit), Toast.LENGTH_SHORT);
