@@ -25,7 +25,7 @@ import com.applite.sharedpreferences.AppliteSPUtils;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIBaseFragment;
 
-public class LuckyFragment extends OSGIBaseFragment {
+public class LuckyFragment extends OSGIBaseFragment implements LuckyPanView.CallBackInterface {
     private final String TAG = "LuckyFragment";
 
     private LuckyPanView mLuckyPanView;
@@ -45,13 +45,10 @@ public class LuckyFragment extends OSGIBaseFragment {
         super();
     }
 
-    private LuckyCallback mLuckyCallback;
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
-        mLuckyCallback = new LuckyCallback();
     }
 
     @Override
@@ -60,13 +57,10 @@ public class LuckyFragment extends OSGIBaseFragment {
 
         Conunts = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.CURRENT_TIMES, 0);
         String da = (String) AppliteSPUtils.get(mActivity, AppliteSPUtils.CURRENT_DATE, "0");
-        LogUtils.i(TAG, "da = " + da);
-        LogUtils.i(TAG, "Conunts = " + Conunts);
 
         String currdata = getDate();
 
         if (!currdata.equals(da)) {
-            LogUtils.i(TAG, "!currdata.equals(da)");
             Conunts = 0;
             AppliteSPUtils.put(mActivity, AppliteSPUtils.CURRENT_TIMES, Conunts);
             AppliteSPUtils.put(mActivity, AppliteSPUtils.CURRENT_DATE, currdata);
@@ -82,6 +76,8 @@ public class LuckyFragment extends OSGIBaseFragment {
         View view = inflater.inflate(R.layout.fragment_lucky_main, container, false);
 
         mLuckyPanView = (LuckyPanView) view.findViewById(R.id.id_luckypan);
+        mLuckyPanView.changeCallBack(this);
+
         mStartBtn = (ImageView) view.findViewById(R.id.id_start_btn);
 
         mStartBtn.setOnClickListener(new View.OnClickListener() {
@@ -96,7 +92,7 @@ public class LuckyFragment extends OSGIBaseFragment {
                         }
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
-                    } else if (Conunts > 2) {
+                    } else if (Conunts > 20) {
                         //判断当天抽奖次数，如果已满3次，则弹出提示当天不允许再抽奖
                         if (toast == null) {
                             toast = Toast.makeText(mActivity, getString(R.string.beyond_limit), Toast.LENGTH_SHORT);
@@ -200,7 +196,7 @@ public class LuckyFragment extends OSGIBaseFragment {
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         AppliteSPUtils.put(mActivity, AppliteSPUtils.CURRENT_TIMES, Conunts);
     }
@@ -226,18 +222,12 @@ public class LuckyFragment extends OSGIBaseFragment {
         }
     }
 
-    public class LuckyCallback implements LuckyPanView.MyCallInterface {
-        @Override
-        public void changePointsString() {
-            LogUtils.i(TAG, "call to change points");
-            mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
-            if (mPoints != null) {
-                mPoints.setText("积分：" + String.valueOf(mLuckyPonints));
-            } else {
-                LogUtils.i(TAG, "mPoints = null");
-            }
+    @Override
+    public void changePointsString() {
+        mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 0);
+        if (mPoints != null) {
+            mPoints.setText("积分：" + String.valueOf(mLuckyPonints));
         }
     }
-
 
 }

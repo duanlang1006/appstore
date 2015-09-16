@@ -122,8 +122,6 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
 
     private Context mContext;
 
-    private LuckyFragment mLuckyFragment;
-
     public LuckyPanView(Context context) {
         this(context, null);
     }
@@ -315,8 +313,6 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
     private final int LUCKYDRAW_4 = 4;
     private final int LUCKYDRAW_5 = 5;
 
-    private MyCallInterface mMyCallInterface;
-
     private Handler mHandler = new Handler() {
 
         @Override
@@ -335,6 +331,10 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
                     }
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
+
+                    if(mCallback != null){
+                        mCallback.changePointsString();
+                    }
                     break;
                 case LUCKYDRAW_1:
                     //50积分
@@ -397,14 +397,18 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
         }
     };
 
-    private String getString(int resId) {
-        return mContext.getResources().getString(resId);
+    private CallBackInterface mCallback;
+
+    public void changeCallBack(CallBackInterface mCallback){
+        this.mCallback = mCallback;
     }
 
-    public MyCallInterface mc;
+    public interface CallBackInterface {
+        void changePointsString();
+    }
 
-    public interface MyCallInterface {
-        public void changePointsString();
+    private String getString(int resId) {
+        return mContext.getResources().getString(resId);
     }
 
     /**
@@ -432,9 +436,9 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
             float from = 360 - (i + 1) * (360 / mItemCount);
             float to = from + 360 - (i) * (360 / mItemCount);
 
-            Log.d(TAG, "calInExactArea from = " + from + " to = " + to + " rotate = " + rotate);
+//            Log.d(TAG, "calInExactArea from = " + from + " to = " + to + " rotate = " + rotate);
             if ((rotate > from) && (rotate < to)) {
-                Log.d(TAG, "(rotate > from) && (rotate < to)");
+//                Log.d(TAG, "(rotate > from) && (rotate < to)");
                 return i;
             }
         }
