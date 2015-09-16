@@ -167,19 +167,21 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     public void onResume() {
         super.onResume();
-//        getView().setFocusableInTouchMode(true);
-//        getView().requestFocus();
-//        getView().setOnKeyListener(new View.OnKeyListener() {
-//            @Override
-//            public boolean onKey(View v, int keyCode, KeyEvent event) {
-//                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-//                    // handle back button
-//                    getFragmentManager().popBackStackImmediate();
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
+
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    if (!isHomeExist()) {
+                        ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
     }
 
     public void onPause() {
@@ -313,6 +315,13 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             ((OSGIServiceHost) mActivity).jumptoSearch(null, true, null, null, null);
             return true;
         }
+        if (android.R.id.home == item.getItemId()) {
+            if (!isHomeExist()) {
+                ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
+                return false;
+            }
+
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -342,6 +351,20 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 mOpenIntroduceView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_more));
             }
         }
+    }
+
+    /**
+     * 判断首页是否存在
+     *
+     * @return
+     */
+    private boolean isHomeExist() {
+        if (null == getFragmentManager().findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT)) {
+            LogUtils.d(TAG, "首页不存在");
+            return false;
+        }
+        LogUtils.d(TAG, "首页存在");
+        return true;
     }
 
     /**
@@ -405,12 +428,12 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     similarBean.setVersionCode(obj.getInt("versionCode"));
                     mSimilarData.add(similarBean);
                 }
-                if (null == mSimilarAdapter){
+                if (null == mSimilarAdapter) {
                     mSimilarAdapter = new MySimilarAdapter(mActivity);
-                    mSimilarAdapter.setData(mSimilarData,this);
+                    mSimilarAdapter.setData(mSimilarData, this);
                     mSimilarView.setAdapter(mSimilarAdapter);
-                }else{
-                    mSimilarAdapter.setData(mSimilarData,this);
+                } else {
+                    mSimilarAdapter.setData(mSimilarData, this);
                     mSimilarAdapter.notifyDataSetChanged();
                 }
             }

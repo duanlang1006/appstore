@@ -60,7 +60,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     private SharedPreferences.OnSharedPreferenceChangeListener mConfigListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (AppliteSPUtils.DELETE_PACKAGE.equals(key)){
+            if (AppliteSPUtils.DELETE_PACKAGE.equals(key)) {
                 configImpl();
             }
         }
@@ -83,7 +83,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
         registerClients();
 
-        AppliteSPUtils.registerChangeListener(this,mConfigListener);
+        AppliteSPUtils.registerChangeListener(this, mConfigListener);
         configImpl();
 
         FragmentManager fgm = getSupportFragmentManager();
@@ -224,7 +224,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
         //置更新数据为空
         AppliteSPUtils.put(this, AppliteSPUtils.UPDATE_DATA, "");
-        AppliteSPUtils.unregisterChangeListener(this,mConfigListener);
+        AppliteSPUtils.unregisterChangeListener(this, mConfigListener);
     }
 
 //    @Override
@@ -288,7 +288,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
             }
         }
         if (!newFragment.isAdded()) {
-            ft.add(R.id.container, newFragment);
+            ft.add(R.id.container, newFragment, targetService);
         } else {
             ft.show(newFragment);
         }
@@ -315,7 +315,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         jumpto(Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
                 DetailFragment.class.getName(),
                 DetailFragment.newBundle(packageName, name, imgUrl),
-                true);
+                addToBackstack);
     }
 
     @Override
@@ -396,8 +396,8 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         startActivity(intent);
     }
 
-    private void configImpl(){
-        boolean delete = (boolean)AppliteSPUtils.get(MitMarketActivity.this,AppliteSPUtils.DELETE_PACKAGE,false);
+    private void configImpl() {
+        boolean delete = (boolean) AppliteSPUtils.get(MitMarketActivity.this, AppliteSPUtils.DELETE_PACKAGE, false);
         ImplAgent.getInstance(MitMarketActivity.this).configDeleteAfterInstalled(delete);
     }
 

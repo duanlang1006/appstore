@@ -111,7 +111,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private boolean[] ISAPKADD = {true, true, true, true, true, true, true, true, true, true};//当前位置是否可以添加APK
     private int[] mApkShowNumber = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};//当前位置添加了几次APK
     private int MAX_APK_SHOW_NUMBER = 5;//每个位置最多显示的APK个数
-    private Animation mShakeAnimation;
     private int mDownloadQueueNumber = 0;
     private boolean mIsNotTo;
 
@@ -681,6 +680,18 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      */
     private void logoInitView() {
         mLogoIV = (ImageView) rootView.findViewById(R.id.logo_iv);
+        final String packageName = (String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_APK_PACKAGENAME, "");
+        final String name = (String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_APK_NAME, "");
+        final String iconUrl = (String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_APK_ICON_URL, "");
+        mLogoIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!TextUtils.isEmpty(packageName)) {
+                    mHandler.removeCallbacks(mThread);
+                    ((OSGIServiceHost) mActivity).jumptoDetail(packageName, name, iconUrl, false);
+                }
+            }
+        });
         long time = System.currentTimeMillis();
         long start_time = (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_START_SHOW_TIME, 0L);
         long end_time = (Long) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, 0L);
@@ -697,8 +708,12 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
             }
         }
         //判断在线LOGO的是否存在和显示时间，如果当前时间大于显示时间则删除LOGO图片
-        if (AppliteUtils.fileIsExists(path) && time > end_time)
+        if (AppliteUtils.fileIsExists(path) && time > end_time) {
             AppliteUtils.delFile(path);
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_APK_PACKAGENAME, "");
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_APK_NAME, "");
+            AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_APK_ICON_URL, "");
+        }
     }
 
     /**
@@ -725,6 +740,9 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                         String SmallImgUrl = object.getString("i_smalllogourl");
                         long StartTime = object.getLong("limit_starttime") * 1000;
                         long EndTime = object.getLong("limit_endtime") * 1000;
+                        String packageName = object.getString("packageName");
+                        String name = object.getString("name");
+                        String iconUrl = object.getString("iconUrl");
                         LogUtils.d(TAG, "BigImgUrl:" + BigImgUrl);
                         LogUtils.d(TAG, "LOGO_IMG_DOWNLOAD_URL:" + AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, ""));
                         if (!BigImgUrl.equals(AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, ""))) {
@@ -737,6 +755,9 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                         AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_START_SHOW_TIME, StartTime);
                         AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, EndTime);
                         AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, BigImgUrl);
+                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_APK_PACKAGENAME, packageName);
+                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_APK_NAME, name);
+                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_APK_ICON_URL, iconUrl);
                     }
 
                 } catch (JSONException e) {

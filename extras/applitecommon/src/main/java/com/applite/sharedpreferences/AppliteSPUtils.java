@@ -29,6 +29,11 @@ public class AppliteSPUtils {
     public static final String LOGO_END_SHOW_TIME = "logo_end_show_time";
     public static final String LOGO_IMG_SAVE_PATH = "logo_img_save_path";
     public static final String LOGO_IMG_DOWNLOAD_URL = "logo_img_download_url";
+    public static final String LOGO_APK_PACKAGENAME = "logo_apk_package_name";
+    public static final String LOGO_APK_NAME = "logo_apk_name";
+    public static final String LOGO_APK_ICON_URL = "logo_apk_icon_url";
+
+
     public static final String UPDATE_REMIND = "update_remind";//更新提醒
     public static final String CLEAR_CACHE = "clear_cache";//清除缓存
     public static final String DELETE_PACKAGE = "delete_package";//删除安装包
@@ -171,13 +176,13 @@ public class AppliteSPUtils {
         return sp.getAll();
     }
 
-    public static void registerChangeListener(Context context,SharedPreferences.OnSharedPreferenceChangeListener listener){
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME,Context.MODE_PRIVATE);
+    public static void registerChangeListener(Context context, SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         sp.registerOnSharedPreferenceChangeListener(listener);
     }
 
-    public static void unregisterChangeListener(Context context,SharedPreferences.OnSharedPreferenceChangeListener listener){
-        SharedPreferences sp = context.getSharedPreferences(FILE_NAME,Context.MODE_PRIVATE);
+    public static void unregisterChangeListener(Context context, SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        SharedPreferences sp = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         sp.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
