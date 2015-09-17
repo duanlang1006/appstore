@@ -125,7 +125,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     public void onClick(View v) {
         if (R.id.ll_item1_1 == v.getId()) {//更新提醒
             AppliteSPUtils.put(mActivity, AppliteSPUtils.UPDATE_REMIND,
-                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, DefaultValue.defaultBoolean));
+                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, DefaultValue.defauleValueUpdateRemind));
             setAllState();
         } else if (R.id.ll_item2_1 == v.getId()) {//清除缓存
             AppliteSPUtils.put(mActivity, AppliteSPUtils.CLEAR_CACHE,
@@ -134,15 +134,15 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             DataCleanDialog.show(mActivity);
         } else if (R.id.ll_item2_2 == v.getId()) {//删除安装包
             AppliteSPUtils.put(mActivity, AppliteSPUtils.DELETE_PACKAGE,
-                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.DELETE_PACKAGE, DefaultValue.defaultBoolean));
+                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.DELETE_PACKAGE, DefaultValue.defaultValueDeletePackage));
             setAllState();
         } else if (R.id.ll_item2_3 == v.getId()) {//智能无图
             AppliteSPUtils.put(mActivity, AppliteSPUtils.NO_PICTURE,
-                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, DefaultValue.defaultBoolean));
+                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, DefaultValue.defaultValueNoPic));
             setAllState();
         } else if (R.id.ll_item2_4 == v.getId()) {//零流量下载
             AppliteSPUtils.put(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH,
-                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, DefaultValue.defaultBoolean));
+                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, DefaultValue.defaultValueWIFIUpdateSwitch));
             setAllState();
         } else if (R.id.ll_item3_1 == v.getId()) {//意见反馈
             FeedbackDialog.show(mActivity);

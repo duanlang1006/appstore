@@ -29,9 +29,7 @@ import android.widget.CheckBox;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.applite.common.LogUtils;
 import com.applite.view.CustomProgressBar;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.impl.ImplAgent;
@@ -179,8 +177,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 default:
                     break;
             }
-//            LogUtils.d("wanghc", "titleView__" + implInfo.getTitle() + "");
-//            LogUtils.d("wanghc", "descView__" + implRes.getDescText() + "");
             descView.setText(implRes.getDescText());
             descView.invalidate();
             statusView.setText(implRes.getStatusText());
