@@ -455,7 +455,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                             true);
                 } else if ("detail_info".equals(mPopType)) {
                     ((OSGIServiceHost) mActivity).jumptoDetail(mPopData.getmPackageName(),
-                            mPopData.getmName(), mPopData.getmIconUrl(), true);
+                            mPopData.getmName(), mPopData.getmIconUrl(), 0, true);
                 }
             }
         }
@@ -621,7 +621,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                     }
                     int i = getHintNum(mKeyWord);
                     if (i != -1) {
-                        ((OSGIServiceHost) mActivity).jumptoDetail(mHint_PackageName[i], mHint_Name[i], mHint_IconUrl[i], true);
+                        ((OSGIServiceHost) mActivity).jumptoDetail(mHint_PackageName[i], mHint_Name[i], mHint_IconUrl[i], 0, true);
                     } else {
                         ((OSGIServiceHost) mActivity).jumptoSearch(null, true, mInfo, mKeyWord, null);
                     }

@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.applite.sharedpreferences.AppliteSPUtils;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -280,6 +282,19 @@ public class AppliteUtils {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * 是否加载网络上的图片
+     *
+     * @param mContext
+     * @return
+     */
+    public static boolean isLoadNetworkBitmap(Context mContext) {
+        boolean noPic = (boolean) AppliteSPUtils.get(mContext, AppliteSPUtils.NO_PICTURE, DefaultValue.defaultValueNoPic);
+        if (Constant.MOBILE.equals(AppliteConfig.getNetwork(mContext)) && noPic)
+            return false;
+        return true;
     }
 
     /**

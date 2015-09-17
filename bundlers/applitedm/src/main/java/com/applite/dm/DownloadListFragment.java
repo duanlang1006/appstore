@@ -338,6 +338,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
                         vh.implInfo.getPackageName(),
                         vh.implInfo.getTitle(),
                         vh.implInfo.getIconUrl(),
+                        vh.implInfo.getVersionCode(),
                         true);
             }
         } else {
@@ -400,6 +401,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements ListView.O
 
     @Override
     public void refreshDetail(SimilarBean similarBean) {
-        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), true);
+        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(),similarBean.getVersionCode(), true);
     }
 }

@@ -1,4 +1,4 @@
-package com.mit.market;
+package com.applite.common;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,17 +16,17 @@ public class AppliteConfig {
         editor.putString(KEY_NETWORK, network);
         return editor.commit();
     }
-    
+
     public static String getNetwork(Context context){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         return sp.getString(KEY_NETWORK, "none");
     }
-	
+
     public static String getUUID(Context context){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         return sp.getString("UUID", "");
     }
-    
+
     public static boolean setUUID(Context context ,String uuid){
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putString("UUID", uuid);
@@ -37,13 +37,13 @@ public class AppliteConfig {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         return sp.getString("userid", "");
     }
-    
+
     public static boolean setUserId(Context context ,String userid){
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putString("userid", userid);
         return editor.commit();
     }
-	
+
 	public static void initNetwork(Context context){
         ConnectivityManager manager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         try{
@@ -51,10 +51,10 @@ public class AppliteConfig {
             AppliteConfig.setNetwork(context, "none");
             switch(netInfo.getType()){
                 case ConnectivityManager.TYPE_WIFI:
-                    AppliteConfig.setNetwork(context, "wifi");
+                    AppliteConfig.setNetwork(context, Constant.WIFI);
                     break;
                 case ConnectivityManager.TYPE_MOBILE:
-                    AppliteConfig.setNetwork(context, "mobile");
+                    AppliteConfig.setNetwork(context, Constant.MOBILE);
                     break;
             }
         }catch(Exception e ){

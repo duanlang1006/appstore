@@ -92,7 +92,8 @@ public class IgnoreAdapter extends BaseAdapter {
                 viewholder.mDetailAllDataTv.setText(data.getUpdateInfo());
             }
         }
-        mBitmapUtil.display(viewholder.mImg, data.getIconUrl());
+        if (AppliteUtils.isLoadNetworkBitmap(mActivity))
+            mBitmapUtil.display(viewholder.mImg, data.getIconUrl());
         try {
             PackageInfo mPackageInfo = mPackageManager.getPackageInfo(data.getPackageName(), PackageManager.GET_ACTIVITIES);
             viewholder.mVersionName.setText(mPackageInfo.versionName + " -> " + data.getVersionName());

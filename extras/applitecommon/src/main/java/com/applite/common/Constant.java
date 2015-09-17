@@ -38,4 +38,7 @@ public class Constant {
     public static final String UPDATE_FRAGMENT_NOT = "show_update_fragment";
     public static final String LOGO_IMG_NAME = "logo.jpg";
 
+    public static final String WIFI = "wifi";
+    public static final String MOBILE = "mobile";
+
 }

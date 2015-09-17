@@ -78,8 +78,6 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
     };
     private RelativeLayout mStatsLayout;
-    private ImageView mStatsImgView;
-    private TextView mStatsTextView;
     private TextView mStatsButton;
     private boolean mPostStats = true;
     private ImplAgent implAgent;
@@ -98,6 +96,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private ListView mIgnoreListView;
     private TextView mActionBarTitle;
     private IgnoreAdapter mIgnoreAdapter;
+    private ImageView mNoUpdateView;
 
     public UpdateFragment() {
         super();
@@ -176,7 +175,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 mTitleLayout.setVisibility(View.VISIBLE);
                 mActionBarTitle.setVisibility(View.VISIBLE);
                 mListView.setVisibility(View.VISIBLE);
-                return false;
+                if (mUpdateApkList.size() == 0)
+                    mNoUpdateView.setVisibility(View.VISIBLE);
+                return true;
             }
         }
         return super.onOptionsItemSelected(item);
@@ -207,12 +208,13 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         } else if (v.getId() == R.id.update_post_button) {
             if (mPostStats) {
                 post();
-                setStatsLayoutVisibility(View.GONE, null);
+                setStatsLayoutVisibility(View.GONE);
             }
         } else if (v.getId() == R.id.update_actionbar_ignore_tv) {
             mTitleLayout.setVisibility(View.GONE);
             mListView.setVisibility(View.GONE);
             mActionBarTitle.setVisibility(View.GONE);
+            mNoUpdateView.setVisibility(View.GONE);
             mIgnoreListView.setVisibility(View.VISIBLE);
             if (null == mIgnoreAdapter) {
                 mIgnoreAdapter = new IgnoreAdapter(mActivity, mIgnoreList, this);
@@ -255,11 +257,10 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         mListView = (ListView) rootView.findViewById(R.id.update_listview);
         mListView.addFooterView(mSimilarView);
         mStatsLayout = (RelativeLayout) rootView.findViewById(R.id.update_stats);
-        mStatsImgView = (ImageView) rootView.findViewById(R.id.update_stats_img);
-        mStatsTextView = (TextView) rootView.findViewById(R.id.no_network_text);
         mStatsButton = (TextView) rootView.findViewById(R.id.update_post_button);
         mTitleLayout = (LinearLayout) rootView.findViewById(R.id.update_title);
         mIgnoreListView = (ListView) rootView.findViewById(R.id.update_ignore_listview);
+        mNoUpdateView = (ImageView) rootView.findViewById(R.id.update_no_update_iv);
 
         //加载中控件
         mLoadLayout = (LinearLayout) rootView.findViewById(R.id.update_loading_layout);
@@ -318,9 +319,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             public void onFailure(HttpException e, String s) {
                 setLoadLayoutVisibility(View.GONE);
                 LogUtils.i(TAG, "更新请求失败：" + s);
-                setStatsLayoutVisibility(View.VISIBLE, mActivity.getResources().getDrawable(R.drawable.post_failure));
-                mStatsTextView.setVisibility(View.VISIBLE);
-                mStatsButton.setVisibility(View.VISIBLE);
+                setStatsLayoutVisibility(View.VISIBLE);
                 mPostStats = true;
             }
 
@@ -342,19 +341,12 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 mUpdateApkList = updateData.getInstalled_update_list();
                 mSimilarDataList = updateData.getSimilar_info();
             }
-            if (null == mUpdateApkList || 0 == mUpdateApkList.size()) {
-                setStatsLayoutVisibility(View.VISIBLE, mActivity.getResources().getDrawable(R.drawable.no_update));
-                mStatsTextView.setVisibility(View.GONE);
-                mStatsButton.setVisibility(View.GONE);
-            } else {
-                setStatsLayoutVisibility(View.GONE, null);
-            }
-            if (null == mSimilarAdapter){
+            if (null == mSimilarAdapter) {
                 mSimilarAdapter = new MySimilarAdapter(mActivity);
-                mSimilarAdapter.setData(mSimilarDataList,this);
+                mSimilarAdapter.setData(mSimilarDataList, this);
                 mSimilarView.setAdapter(mSimilarAdapter);
-            }else {
-                mSimilarAdapter.setData(mSimilarDataList,this);
+            } else {
+                mSimilarAdapter.setData(mSimilarDataList, this);
                 mSimilarAdapter.notifyDataSetChanged();
             }
 
@@ -382,6 +374,12 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 mActionBarIgnore.setVisibility(View.GONE);
             }
 
+            if (null == mUpdateApkList || 0 == mUpdateApkList.size()) {
+                mNoUpdateView.setVisibility(View.VISIBLE);
+            } else {
+                mNoUpdateView.setVisibility(View.GONE);
+            }
+
             mAdapter = new UpdateAdapter(mActivity, mUpdateApkList, this);
             mListView.setAdapter(mAdapter);
             mListView.setVisibility(View.VISIBLE);
@@ -395,7 +393,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     /**
      * 判断StatsView显示状态
      */
-    private void setStatsLayoutVisibility(int visibility, Drawable drawable) {
+    private void setStatsLayoutVisibility(int visibility) {
         switch (visibility) {
             case View.GONE:
                 mStatsLayout.setVisibility(visibility);
@@ -403,7 +401,6 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 break;
             case View.VISIBLE:
                 mListView.setVisibility(View.GONE);
-                mStatsImgView.setBackground(drawable);
                 mStatsLayout.setVisibility(visibility);
                 break;
         }
@@ -428,7 +425,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
     @Override
     public void refreshDetail(SimilarBean similarBean) {
-        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), true);
+        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), similarBean.getVersionCode(), true);
     }
 
     @Override
@@ -461,6 +458,8 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
             mUpdateApkList.remove(position);
         }
+        if (mUpdateApkList.size() == 0)
+            mNoUpdateView.setVisibility(View.VISIBLE);
         mAdapter.notifyDataSetChanged();
     }
 
