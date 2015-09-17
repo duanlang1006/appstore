@@ -315,6 +315,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle(mDetailTag);
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             actionBar.show();
         } catch (Exception e) {
             e.printStackTrace();

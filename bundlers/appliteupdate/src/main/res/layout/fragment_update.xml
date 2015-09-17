@@ -10,6 +10,7 @@
         android:id="@+id/update_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/background_main"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -35,7 +36,7 @@
     <LinearLayout
         android:id="@+id/update_loading_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
         <ImageView
@@ -55,40 +56,22 @@
             android:textColor="@color/black" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/update_listview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/background_main"
-        android:divider="@color/dividing_line"
-        android:dividerHeight="0.5dp"
-        android:visibility="gone"></ListView>
-
-    <ListView
-        android:id="@+id/update_ignore_listview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/background_main"
-        android:divider="@color/dividing_line"
-        android:dividerHeight="0.5dp"
-        android:visibility="gone"></ListView>
-
     <RelativeLayout
         android:id="@+id/update_stats"
         android:layout_width="fill_parent"
-        android:layout_height="470dp"
+        android:layout_height="fill_parent"
         android:background="@color/background_main"
         android:orientation="vertical"
         android:visibility="gone">
 
-        <!-- 无更新内容时，显示图片-->
         <ImageView
             android:id="@+id/update_stats_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/no_network_text"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/no_network" />
 
         <TextView
             android:id="@+id/no_network_text"
@@ -114,5 +97,31 @@
             android:textColor="#ff585858"
             android:textSize="14sp" />
     </RelativeLayout>
+
+    <!-- 无更新内容时，显示图片-->
+    <ImageView
+        android:id="@+id/update_no_update_iv"
+        android:layout_width="fill_parent"
+        android:layout_height="250dp"
+        android:src="@drawable/no_update"
+        android:visibility="gone" />
+
+    <ListView
+        android:id="@+id/update_listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_main"
+        android:divider="@color/dividing_line"
+        android:dividerHeight="0.5dp"
+        android:visibility="gone"></ListView>
+
+    <ListView
+        android:id="@+id/update_ignore_listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_main"
+        android:divider="@color/dividing_line"
+        android:dividerHeight="0.5dp"
+        android:visibility="gone"></ListView>
 
 </LinearLayout>
