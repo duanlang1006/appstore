@@ -1,32 +1,43 @@
 package com.applite.dm;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.applite.common.Constant;
+import com.applite.common.DefaultValue;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
+import com.applite.sharedpreferences.AppliteSPUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
+
 import java.util.Observable;
 import java.util.Observer;
 
@@ -37,9 +48,45 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
     private boolean destoryView = false;
     private LayoutInflater mInflater;
+
+    private WindowManager.LayoutParams lpTop;
+    private WindowManager managerTop;
+    private View titleBar;//长按时覆盖ActionBar的控件
+    private Button btnCancel;
+    private Button btnAllpick;
+    private TextView tvShowTotal;
+
+    private LinearLayout layout_button;//盛放两个按钮的布局
+    private Button btnDelete = null;
+    //    private Button btnShare = null;
+    //    private Animation animaBt1;
+    private Animation animaBtDel;
+    private String temp = null;
+
+    private String COUNT = "count";
+    private String FLAG = "flag";
+    private String LENGTH = "length";
+    private String STATUS = "status";
+    private String DELETEBTNPRESSED = "deleteBtnPressed";
+
+    private int prePosition = -1;
+
+
     public DownloadPagerFragment() {
         super();
     }
+
+    private SharedPreferences.OnSharedPreferenceChangeListener mPagerListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if ((boolean) AppliteSPUtils.get(mActivity, FLAG, DefaultValue.defaultBoolean)) {//长按Item显示进入删除状态
+                show();
+            } else {
+                hide();
+            }
+            setButtonStatus();
+        }
+    };
 
     public void onAttach(Activity activity) {
         ImplLog.d(TAG, "onAttach," + this);
@@ -65,6 +112,16 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         initActionBar(mPagerSlidingTabStrip);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
         ImplAgent.getInstance(mActivity).addObserver(this);
+
+        titleBar = inflater.inflate(R.layout.cover_actionbar, null);//这里是添加的控件
+        initializeView(rootView);
+        layout_button = (LinearLayout) rootView.findViewById(R.id.layout_button);
+//        btnShare = (Button) view.findViewById(R.id.btnShare);
+//        animaBt1 = AnimationUtils.loadAnimation(mActivity, R.anim.btn_share_in);
+        btnDelete = (Button) rootView.findViewById(R.id.btnDelete);
+        animaBtDel = AnimationUtils.loadAnimation(mActivity, R.anim.btn_delete_in);
+//        btnShare.setOnClickListener(this);
+        btnDelete.setOnClickListener(this);
         return rootView;
     }
 
@@ -96,6 +153,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 //                return false;
 //            }
 //        });
+        AppliteSPUtils.registerChangeListener(mActivity, mPagerListener);
     }
 
 
@@ -126,13 +184,13 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main_dm,menu);
+        inflater.inflate(R.menu.menu_main_dm, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        if (null != item){
+        if (null != item) {
             item.setVisible(false);
         }
         MenuItem item_dm = menu.findItem(R.id.action_dm);
-        if(null != item_dm){
+        if (null != item_dm) {
             item_dm.setVisible(false);
         }
     }
@@ -156,7 +214,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         if (!hidden) {
             initActionBar(mPagerSlidingTabStrip);
             ImplAgent.getInstance(mActivity).addObserver(this);
-        }else{
+        } else {
             ImplAgent.getInstance(mActivity).deleteObserver(this);
         }
     }
@@ -173,8 +231,55 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         } else if (v.getId() == R.id.action_more) {
 
         }
+        //        if (v.getId() == R.id.btnShare) {//分享(已不可点)
+//            flag = true;
+//            Toast.makeText(mActivity.getApplicationContext(), "分享功能尚未实现，敬请期待", Toast.LENGTH_SHORT).show();
+//        } else
+        else if (v.getId() == R.id.btnDelete) {//删除
+            AppliteSPUtils.put(mActivity, DELETEBTNPRESSED, true);
+//            deleteItem();
+            //通知listFragment删除应用
+        } else if (v.getId() == R.id.select_allpick) {//全选
+            LogUtils.d("wanghc","LENGTH____"+(int) AppliteSPUtils.get(mActivity, LENGTH, DefaultValue.defaultInt));
+            if ((int) AppliteSPUtils.get(mActivity, LENGTH, DefaultValue.defaultInt) == (int) AppliteSPUtils.get(mActivity, COUNT, DefaultValue.defaultInt)) {
+//                Arrays.fill(status, false);
+                AppliteSPUtils.put(mActivity, STATUS, 0);//全选按钮状态
+                AppliteSPUtils.put(mActivity, COUNT, 0);//选中的个数
+            } else {
+//                Arrays.fill(status, true);
+//                checkedCount = mImplList.size();
+                AppliteSPUtils.put(mActivity, STATUS, 1);
+                AppliteSPUtils.put(mActivity, COUNT, (int) AppliteSPUtils.get(mActivity, LENGTH, DefaultValue.defaultInt));
+            }
+            setButtonStatus();
+        } else if (v.getId() == R.id.select_cancel) {//取消
+            hide();
+            Toast.makeText(mActivity.getApplicationContext(), R.string.cancel_operator, Toast.LENGTH_SHORT).show();
+        }
 
     }
+
+    private void show() {
+        if (titleBar.getVisibility() != View.VISIBLE) {
+//                flagShowCheckBox = true;
+//                    AppliteSPUtils.put(mActivity, FLAG, true);
+            titleBar.setVisibility(View.VISIBLE);//显示titleBar
+            layout_button.setVisibility(View.VISIBLE);//底部的布局及按钮
+//                btnShare.setVisibility(View.VISIBLE);
+//                btnShare.startAnimation(animaBt1);
+            btnDelete.setVisibility(View.VISIBLE);
+            btnDelete.startAnimation(animaBtDel);
+        }
+    }
+
+    private void hide() {
+        titleBar.setVisibility(View.GONE);
+//            btnShare.setVisibility(View.GONE);
+        btnDelete.setVisibility(View.GONE);
+        layout_button.setVisibility(View.GONE);
+        AppliteSPUtils.put(mActivity, FLAG, false);
+    }
+
 
     @Override
     public void update(Observable observable, Object data) {
@@ -202,6 +307,78 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         }
     }
 
+    private void initializeView(View view) {
+        if (null == lpTop) {
+            lpTop = new WindowManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    mActivity.getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material),
+                    WindowManager.LayoutParams.TYPE_APPLICATION,
+                    // 设置为无焦点状态
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, // 没有边界
+                    // 半透明效果
+                    PixelFormat.TRANSLUCENT);
+            lpTop.gravity = Gravity.TOP;
+            lpTop.windowAnimations = R.style.anim_view_top;
+            managerTop = (WindowManager) mActivity.getSystemService(Context.WINDOW_SERVICE);
+            managerTop.addView(titleBar, lpTop);
+
+            titleBar.setVisibility(View.GONE);
+            btnCancel = (Button) titleBar.findViewById(R.id.select_cancel);
+            tvShowTotal = (TextView) titleBar.findViewById(R.id.total);
+            btnAllpick = (Button) titleBar.findViewById(R.id.select_allpick);
+
+            layout_button = (LinearLayout) view.findViewById(R.id.layout_button);
+//            btnShare = (Button) view.findViewById(R.id.btnShare);
+//            animaBt1 = AnimationUtils.loadAnimation(mActivity, R.anim.btn_share_in);
+            btnDelete = (Button) view.findViewById(R.id.btnDelete);
+            animaBtDel = AnimationUtils.loadAnimation(mActivity, R.anim.btn_delete_in);
+        }
+        btnCancel.setOnClickListener(this);
+        btnAllpick.setOnClickListener(this);
+//        btnShare.setOnClickListener(this);
+        btnDelete.setOnClickListener(this);
+    }
+
+    private void setButtonStatus() {
+
+        temp = mActivity.getResources().getString(R.string.choose_message1) + AppliteSPUtils.get(mActivity, COUNT, DefaultValue.defaultInt) +
+                mActivity.getResources().getString(R.string.choose_message2);
+        tvShowTotal.setText(temp);
+        temp = null;
+        if (0 == (int) AppliteSPUtils.get(mActivity, COUNT, DefaultValue.defaultInt)) {
+            btnAllpick.setText(R.string.allpick_btn);
+            btnDelete.setEnabled(false);
+            btnDelete.setTextAppearance(mActivity, R.style.DownloadListEmpty0);
+        } else if ((int) AppliteSPUtils.get(mActivity, LENGTH, DefaultValue.defaultInt) == (int) AppliteSPUtils.get(mActivity, COUNT, DefaultValue.defaultInt)) {
+            btnAllpick.setText(R.string.nonepick_btn);
+            btnDelete.setEnabled(true);
+            btnDelete.setTextAppearance(mActivity, R.style.DownloadOptButton);
+        } else {
+            btnAllpick.setText(R.string.allpick_btn);
+            btnDelete.setEnabled(true);
+            btnDelete.setTextAppearance(mActivity, R.style.DownloadOptButton);
+        }
+    }
+
+
+//    @Override
+//    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//        if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, DefaultValue.defaultBoolean)) {
+//            if (titleBar.getVisibility() != View.VISIBLE) {
+////                flagShowCheckBox = true;
+//                AppliteSPUtils.put(mActivity, FLAG, true);
+//                titleBar.setVisibility(View.VISIBLE);//显示titleBar
+//                layout_button.setVisibility(View.VISIBLE);//底部的布局及按钮
+////                btnShare.setVisibility(View.VISIBLE);
+////                btnShare.startAnimation(animaBt1);
+//                btnDelete.setVisibility(View.VISIBLE);
+//                btnDelete.startAnimation(animaBtDel);
+//            }
+//        }
+//        return false;
+//    }
+
+
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
         int[] tabs = new int[2];
         int mChildCount = 0;
@@ -222,7 +399,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         @Override
         public Fragment getItem(int position) {
             Fragment fg = null;
-            OSGIServiceHost host = (OSGIServiceHost)mActivity;
+            OSGIServiceHost host = (OSGIServiceHost) mActivity;
             int downloadFlag = ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PAUSED
                     | ImplInfo.STATUS_FAILED | ImplInfo.STATUS_PACKAGE_INVALID;
             if (null != host) {
@@ -230,12 +407,12 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                     fg = host.newFragment(
                             Constant.OSGI_SERVICE_DM_FRAGMENT,
                             DownloadListFragment.class.getName(),
-                            DownloadListFragment.newBundle(R.string.dm_downloaded,~downloadFlag));
+                            DownloadListFragment.newBundle(R.string.dm_downloaded, ~downloadFlag));
                 } else if (R.string.dm_downloading == tabs[position]) {
                     fg = host.newFragment(
                             Constant.OSGI_SERVICE_DM_FRAGMENT,
                             DownloadListFragment.class.getName(),
-                            DownloadListFragment.newBundle(R.string.dm_downloading,downloadFlag));
+                            DownloadListFragment.newBundle(R.string.dm_downloading, downloadFlag));
                 }
             }
             return fg;

@@ -91,7 +91,8 @@ public class PreloadAdapter extends BaseAdapter {
             viewholder.mBt.setVisibility(View.VISIBLE);
             viewholder.mIcon.setVisibility(View.VISIBLE);
 
-            mBitmapUtil.display(viewholder.mIcon, data.getmImgUrl());
+            if (AppliteUtils.isLoadNetworkBitmap(mActivity))
+                mBitmapUtil.display(viewholder.mIcon, data.getmImgUrl());
             viewholder.mSize.setText(AppliteUtils.bytes2kb(Long.parseLong(data.getmApkSize())));
             viewholder.mClickItem.setClickable(true);
             viewholder.mClickItem.setOnClickListener(new View.OnClickListener() {
@@ -99,7 +100,7 @@ public class PreloadAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(),
                             data.getmName(),
-                            data.getmImgUrl(),
+                            data.getmImgUrl(), data.getmVersionCode(),
                             true);
                 }
             });
@@ -110,7 +111,7 @@ public class PreloadAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 ViewHolder vh = (ViewHolder) v.getTag();
-                ImplHelper.onClick(mActivity,vh.implInfo,vh.bean.getmDownloadUrl(),
+                ImplHelper.onClick(mActivity, vh.implInfo, vh.bean.getmDownloadUrl(),
                         vh.bean.getmName(),
                         vh.bean.getmImgUrl(),
                         Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getmName() + ".apk",
@@ -121,7 +122,7 @@ public class PreloadAdapter extends BaseAdapter {
         return convertView;
     }
 
-    class ViewHolder implements ImplChangeCallback{
+    class ViewHolder implements ImplChangeCallback {
         TextView mSize;
         TextView mName;
         ImageView mIcon;

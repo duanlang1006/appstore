@@ -4,22 +4,24 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingLeft="18dp"
+    android:paddingRight="12dp"
     tools:context=".MainActivity">
+    <!-- android:paddingBottom="@dimen/activity_vertical_margin"
+     android:paddingLeft="@dimen/activity_horizontal_margin"
+     android:paddingRight="@dimen/activity_horizontal_margin"
+     android:paddingTop="@dimen/activity_vertical_margin"-->
 
+    <!--android:layout_marginLeft="18dp"
+    android:layout_marginRight="12dp"-->
     <TextView
         style="@style/Setting_title_style"
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:gravity="bottom"
         android:text="@string/notification" />
 
-    <ImageView
-        style="@style/Divided_Line_Style"
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp" />
+    <include layout="@layout/default_line_setting"></include>
 
     <LinearLayout
         android:id="@+id/ll_item1_1"
@@ -52,18 +54,9 @@
             android:layout_marginRight="@dimen/divided_line_distance"
             android:background="@drawable/setup_wifi_click_bg"></ImageView>
 
-        <!--android:layout_marginBottom="5dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="10dp"
-        android:textSize="16sp"
-        android:layout_marginTop="5dp"-->
-
     </LinearLayout>
 
-    <ImageView
-        style="@style/Divided_Line_Style"
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp" />
+    <include layout="@layout/default_line_setting"></include>
 
     <TextView
         style="@style/Setting_title_style"
@@ -71,10 +64,7 @@
         android:layout_height="wrap_content"
         android:text="@string/other_function" />
 
-    <ImageView
-        style="@style/Divided_Line_Style"
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp" />
+    <include layout="@layout/default_line_setting"></include>
 
     <LinearLayout
         android:id="@+id/ll_item2_1"
@@ -106,19 +96,9 @@
                 android:textSize="10dp" />
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/divided_line_distance"
-            android:background="@drawable/setup_wifi_click_bg"></ImageView>
-
     </LinearLayout>
 
-
-    <ImageView
-        style="@style/Divided_Line_Style"
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp" />
+    <include layout="@layout/default_line_setting"></include>
 
     <LinearLayout
         android:id="@+id/ll_item2_2"
@@ -155,11 +135,7 @@
 
     </LinearLayout>
 
-
-    <ImageView
-        style="@style/Divided_Line_Style"
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp" />
+    <include layout="@layout/default_line_setting"></include>
 
     <LinearLayout
         android:id="@+id/ll_item2_3"
@@ -199,22 +175,58 @@
 
     </LinearLayout>
 
-    <ImageView
-        style="@style/Divided_Line_Style"
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp" />
+    <include layout="@layout/default_line_setting"></include>
+
+    <LinearLayout
+        android:id="@+id/ll_item2_4"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="50dp"
+            android:orientation="vertical">
+
+
+            <TextView
+                style="@style/Default_charactor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/zero_flow_update" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/zero_flow_update_detail"
+                android:textSize="10dp" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/divided_line_distance"
+            android:background="@drawable/setup_wifi_click_bg"></ImageView>
+
+        <!--style="@style/personalListText"-->
+
+    </LinearLayout>
+
+
+    <include layout="@layout/default_line_setting"></include>
 
     <TextView
         android:id="@+id/textViewTitle3"
         style="@style/Setting_title_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="帮助" />
+        android:text="@string/help" />
 
-    <ImageView
-        style="@style/Divided_Line_Style"
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp" />
+    <include layout="@layout/default_line_setting"></include>
 
     <LinearLayout
         android:id="@+id/ll_item3_1"
@@ -242,10 +254,7 @@
 
     </LinearLayout>
 
-    <ImageView
-        style="@style/Divided_Line_Style"
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp" />
+    <include layout="@layout/default_line_setting"></include>
 
     <LinearLayout
         android:id="@+id/ll_item3_2"
@@ -259,13 +268,10 @@
             style="@style/Default_charactor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/abort" />
+            android:text="@string/about" />
 
     </LinearLayout>
 
-    <ImageView
-        style="@style/Divided_Line_Style"
-        android:layout_width="fill_parent"
-        android:layout_height="0.3dp" />
+    <include layout="@layout/default_line_setting"></include>
 
 </LinearLayout>

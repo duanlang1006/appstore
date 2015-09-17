@@ -1,16 +1,17 @@
-package com.applite.dm;
+package com.applite.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.widget.ImageButton;
+
+import com.applite.common.R;
 
 /**
  * Created by wanghaochen on 15-8-25.
@@ -44,16 +45,15 @@ public class CustomProgressBar extends ImageButton {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        int x = Math.max(0,(getWidth() - background.getWidth())/2);
-        int y = Math.max(0,(getHeight() - background.getHeight())/2);
-
+        int x = Math.max(0, (getWidth() - background.getWidth()) / 2);
+        int y = Math.max(0, (getHeight() - background.getHeight()) / 2);
         paint.setAntiAlias(true);// 设置是否抗锯齿
         paint.setFlags(Paint.ANTI_ALIAS_FLAG);// 帮助消除锯齿
         canvas.drawBitmap(background, x, y, paint);  //画背景
         paint.setFilterBitmap(false);
 
         int sc = canvas.saveLayer(x, y, x + background.getWidth(), y + background.getHeight(),
-                null,Canvas.MATRIX_SAVE_FLAG | Canvas.CLIP_SAVE_FLAG
+                null, Canvas.MATRIX_SAVE_FLAG | Canvas.CLIP_SAVE_FLAG
                         | Canvas.HAS_ALPHA_LAYER_SAVE_FLAG
                         | Canvas.FULL_COLOR_LAYER_SAVE_FLAG
                         | Canvas.CLIP_TO_LAYER_SAVE_FLAG);

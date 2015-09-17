@@ -29,6 +29,10 @@ import android.widget.CheckBox;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.applite.common.LogUtils;
+import com.applite.view.CustomProgressBar;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;
@@ -41,7 +45,6 @@ import java.util.List;
 public class DownloadAdapter extends ArrayAdapter implements View.OnClickListener {
     private Context mContext;
     private int mLayoutId;
-
     private BitmapUtils mBitmapHelper;
     private ImplAgent implAgent;
     private DownloadListener mListener;
@@ -92,7 +95,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             }
             vh.deleteCheckBox.setVisibility(View.GONE);
         }
-        vh.refresh();
+//        vh.refresh();
         return view;
     }
 
@@ -159,6 +162,9 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             actionBtn.setText(implRes.getActionText());
             actionBtn.setEnabled(true);
             switch (implInfo.getStatus()) {
+                case ImplInfo.STATUS_PENDING://下载等待
+                    custompb.setImageResource(R.drawable.download_status_pause);
+                    break;
                 case ImplInfo.STATUS_RUNNING://下载中
                     custompb.setImageResource(R.drawable.download_status_running);
                     break;
@@ -171,15 +177,16 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                     custompb.setImageResource(R.drawable.download_status_retry);
                     break;
                 default:
-//                    Toast.makeText(mContext, "其他", Toast.LENGTH_SHORT).show();
                     break;
             }
+//            LogUtils.d("wanghc", "titleView__" + implInfo.getTitle() + "");
+//            LogUtils.d("wanghc", "descView__" + implRes.getDescText() + "");
             descView.setText(implRes.getDescText());
             descView.invalidate();
             statusView.setText(implRes.getStatusText());
             statusView.invalidate();
             custompb.setProgress(implInfo.getProgress());
-            ImplLog.d("impl_dm",implInfo.getTitle()+","+implRes.getStatusText()+","+implRes.getDescText()+","+implInfo.getProgress());
+            ImplLog.d("impl_dm", implInfo.getTitle() + "," + implRes.getStatusText() + "," + implRes.getDescText() + "," + implInfo.getProgress());
         }
 
         private void setIcon() {
@@ -206,7 +213,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         public void onChange(ImplInfo info) {
             refresh();
             ImplInfo.ImplRes implRes = implInfo.getImplRes();
-            ImplLog.d("impl_dm","onChange,"+implInfo.getTitle()+","+implRes.getStatusText()+","+implRes.getDescText()+","+(info==implInfo));
+            ImplLog.d("impl_dm", "onChange," + implInfo.getTitle() + "," + implRes.getStatusText() + "," + implRes.getDescText() + "," + (info == implInfo));
         }
     }
 }

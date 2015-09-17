@@ -100,6 +100,7 @@
     <orderEntry type="library" exported="" name="afinal_0.5.1_bin" level="project" />
     <orderEntry type="library" exported="" name="applite-common-v1.0" level="project" />
     <orderEntry type="library" exported="" name="com.umeng.fb.5.4.0" level="project" />
+    <orderEntry type="module" module-name="applitecommon" exported="" />
     <orderEntry type="module" module-name="mittheme" exported="" />
   </component>
 </module>
