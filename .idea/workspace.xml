@@ -5,86 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8043921a-d584-4222-856b-babbe1194ec2" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/drawable-hdpi/icon_search.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/java/com/applite/common/DefaultValue.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadSimilarAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/res/layout/default_line.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/res/layout/default_line_setting.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/anim/bottom_layout_in.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/anim/bottom_out.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/layout/bottom_view.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/bundlers/appliteupdate/src/main/res/drawable-hdpi/post_failure.png" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/app/src/main/java/com/mit/market/AppliteConfig.java" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/java/com/applite/common/AppliteConfig.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/CustomProgressBar.java" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/java/com/applite/view/CustomProgressBar.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/VibratorUtil.java" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/java/com/applite/common/VibratorUtil.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/drawable-xhdpi-v4/download_progress_background.png" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/res/drawable-xhdpi/download_progress_background.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/drawable-xhdpi-v4/download_progress_running.png" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/res/drawable-xhdpi/download_progress_running.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/AbortFragment.java" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/AboutFragment.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/layout/fragment_abort.xml" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/layout/fragment_about.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extras/applitecommon/src/main/res/drawable-hdpi/buffer.png" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/res/drawable-hdpi/buffer.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/mit/market/AppLiteApplication.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/mit/market/AppLiteApplication.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/mit/market/AppLiteReceiver.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/mit/market/AppLiteReceiver.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extras/applitecommon/src/main/java/com/applite/sharedpreferences/AppliteSPUtils.java" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/java/com/applite/sharedpreferences/AppliteSPUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extras/applitecommon/src/main/java/com/applite/common/AppliteUtils.java" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/java/com/applite/common/AppliteUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extras/applitecommon/src/main/java/com/applite/common/Constant.java" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/java/com/applite/common/Constant.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitedetail/src/main/java/com/mit/applite/main/DetailFragment.java" afterPath="$PROJECT_DIR$/bundlers/applitedetail/src/main/java/com/mit/applite/main/DetailFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadAdapter.java" afterPath="$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadAdapter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadListFragment.java" afterPath="$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadListFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadPagerFragment.java" afterPath="$PROJECT_DIR$/bundlers/applitedm/src/main/java/com/applite/dm/DownloadPagerFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitelogo/src/main/java/com/mit/main/GuideFragment.java" afterPath="$PROJECT_DIR$/bundlers/applitelogo/src/main/java/com/mit/main/GuideFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/bean/HomePageApkData.java" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/bean/HomePageApkData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/HomePageFragment.java" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/HomePageFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/HomePageListFragment.java" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/HomePageListFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitesearch/src/main/java/com/mit/applite/search/adapter/HotWordAdapter.java" afterPath="$PROJECT_DIR$/bundlers/applitesearch/src/main/java/com/mit/applite/search/adapter/HotWordAdapter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/appliteupdate/src/main/java/com/mit/appliteupdate/adapter/IgnoreAdapter.java" afterPath="$PROJECT_DIR$/bundlers/appliteupdate/src/main/java/com/mit/appliteupdate/adapter/IgnoreAdapter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/data/ListArrayAdapter.java" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/data/ListArrayAdapter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/LuckyFragment.java" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/LuckyFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/LuckyPanView.java" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/LuckyPanView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/mit/market/MitMarketActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/mit/market/MitMarketActivity.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/mit/market/network/NetworkReceiver.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/mit/market/network/NetworkReceiver.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extras/applitecommon/src/main/java/com/osgi/extra/OSGIServiceHost.java" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/java/com/osgi/extra/OSGIServiceHost.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/PersonalFragment.java" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/PersonalFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitesearch/src/main/java/com/mit/applite/search/adapter/PreloadAdapter.java" afterPath="$PROJECT_DIR$/bundlers/applitesearch/src/main/java/com/mit/applite/search/adapter/PreloadAdapter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitesearch/src/main/java/com/mit/applite/search/adapter/SearchApkAdapter.java" afterPath="$PROJECT_DIR$/bundlers/applitesearch/src/main/java/com/mit/applite/search/adapter/SearchApkAdapter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitesearch/src/main/java/com/mit/applite/search/main/SearchFragment.java" afterPath="$PROJECT_DIR$/bundlers/applitesearch/src/main/java/com/mit/applite/search/main/SearchFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/SettingFragment.java" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/java/com/applite/homepage/SettingFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/appliteupdate/src/main/java/com/mit/appliteupdate/adapter/UpdateAdapter.java" afterPath="$PROJECT_DIR$/bundlers/appliteupdate/src/main/java/com/mit/appliteupdate/adapter/UpdateAdapter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/appliteupdate/src/main/java/com/mit/appliteupdate/main/UpdateFragment.java" afterPath="$PROJECT_DIR$/bundlers/appliteupdate/src/main/java/com/mit/appliteupdate/main/UpdateFragment.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/mit/market/UpdateNotification.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/mit/market/UpdateNotification.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extras/applitecommon/src/main/java/kankan/wheel/widget/WheelView.java" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/java/kankan/wheel/widget/WheelView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/layout/actionbar_searchbar.xml" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/layout/actionbar_searchbar.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extras/applitecommon/applitecommon.iml" afterPath="$PROJECT_DIR$/extras/applitecommon/applitecommon.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitedetail/applitedetail.iml" afterPath="$PROJECT_DIR$/bundlers/applitedetail/applitedetail.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitedm/applitedm.iml" afterPath="$PROJECT_DIR$/bundlers/applitedm/applitedm.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/applitehomepage.iml" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/applitehomepage.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitelogo/applitelogo.iml" afterPath="$PROJECT_DIR$/bundlers/applitelogo/applitelogo.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitesearch/applitesearch.iml" afterPath="$PROJECT_DIR$/bundlers/applitesearch/applitesearch.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/appliteupdate/appliteupdate.iml" afterPath="$PROJECT_DIR$/bundlers/appliteupdate/appliteupdate.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values/arrays.xml" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values/arrays.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/build.gradle" afterPath="$PROJECT_DIR$/app/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/build.gradle" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extras/applitecommon/src/main/res/values/colors.xml" afterPath="$PROJECT_DIR$/extras/applitecommon/src/main/res/values/colors.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values/dimens.xml" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values/dimens.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/layout/download_list_item.xml" afterPath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/layout/download_list_item.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/layout/fragment_download_list.xml" afterPath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/layout/fragment_download_list.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/layout/fragment_download_pager.xml" afterPath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/layout/fragment_download_pager.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/layout/fragment_personal.xml" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/layout/fragment_personal.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/layout/fragment_setting.xml" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/layout/fragment_setting.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/appliteupdate/src/main/res/layout/fragment_update.xml" afterPath="$PROJECT_DIR$/bundlers/appliteupdate/src/main/res/layout/fragment_update.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extras/impl/impl.iml" afterPath="$PROJECT_DIR$/extras/impl/impl.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extras/mitUpdateSDK/mitUpdateSDK.iml" afterPath="$PROJECT_DIR$/extras/mitUpdateSDK/mitUpdateSDK.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/extras/mittheme/mittheme.iml" afterPath="$PROJECT_DIR$/extras/mittheme/mittheme.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values/strings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values-zh/strings.xml" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values-zh/strings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values-zh-rCN/strings.xml" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values-zh-rCN/strings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values-zh-rTW/strings.xml" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values-zh-rTW/strings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/values/styles.xml" afterPath="$PROJECT_DIR$/bundlers/applitedm/src/main/res/values/styles.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values/styles.xml" afterPath="$PROJECT_DIR$/bundlers/applitehomepage/src/main/res/values/styles.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bundlers/appliteupdate/src/main/res/layout/update_actionbar.xml" afterPath="$PROJECT_DIR$/bundlers/appliteupdate/src/main/res/layout/update_actionbar.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="applitestudio.iws" />
     <ignored path=".idea/workspace.xml" />

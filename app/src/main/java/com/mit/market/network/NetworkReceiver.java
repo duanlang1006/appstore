@@ -167,8 +167,8 @@ public class NetworkReceiver extends BroadcastReceiver {
                     mDataContents.add(bean);
                 }
                 if (0 == array.length() || null == array) {
-                    JSONArray recommendedArray = new JSONArray();
-                    UpdateNotification.getInstance().showNot(mContext, recommendedArray);
+//                    JSONArray recommendedArray = new JSONArray();
+//                    UpdateNotification.getInstance().showNot(mContext, recommendedArray);
                 } else {
                     UpdateNotification.getInstance().showNot(mContext, array.length() + "", array);
                     AppliteSPUtils.put(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, System.currentTimeMillis() + next_update_notify_times);
