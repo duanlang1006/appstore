@@ -114,12 +114,14 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private List<SimilarBean> mSimilarData = new ArrayList<SimilarBean>();
     private SimilarView mSimilarView;
     private SimilarAdapter mSimilarAdapter;
+    private ImplInfo mImplInfo;
 
-    public static Bundle newBundle(String packageName, String name, String imgUrl) {
+    public static Bundle newBundle(String packageName, String name, String imgUrl, int versionCode) {
         Bundle b = new Bundle();
         b.putString("packageName", packageName);
         b.putString("name", name);
         b.putString("imgUrl", imgUrl);
+        b.putInt("versionCode", versionCode);
         return b;
     }
 
@@ -137,8 +139,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             mPackageName = params.getString("packageName");
             mApkName = params.getString("name");
             mImgUrl = params.getString("imgUrl");
+            mVersionCode = params.getInt("versionCode");
         }
-        LogUtils.i(TAG, "mApkName:" + mApkName + "------mPackageName:" + mPackageName + "------mImgUrl:" + mImgUrl);
+        LogUtils.i(TAG, "mApkName:" + mApkName + "------mPackageName:" + mPackageName + "------mImgUrl:" + mImgUrl + "------mVersionCode:" + mVersionCode);
         initActionBar();
     }
 
@@ -159,9 +162,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
         rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         initView();
+        setProgressButtonState();
         if (!TextUtils.isEmpty(mPackageName))
             post(mPackageName);
-
         return rootView;
     }
 
@@ -266,7 +269,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
         mBitmapUtil.configDefaultLoadingImage(mActivity.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
         mBitmapUtil.configDefaultLoadFailedImage(mActivity.getResources().getDrawable(R.drawable.apk_icon_defailt_img));
-        mBitmapUtil.display(mApkImgView, mImgUrl);
+        if (AppliteUtils.isLoadNetworkBitmap(mActivity))
+            mBitmapUtil.display(mApkImgView, mImgUrl);
 
         mProgressButton.setOnProgressButtonClickListener(new ProgressButton.OnProgressButtonClickListener() {
             @Override
@@ -349,6 +353,27 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 mApkContentView.setMaxLines(DEFAULT_MAX_LINE_COUNT);
                 CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
                 mOpenIntroduceView.setImageBitmap(BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.desc_more));
+            }
+        }
+    }
+
+    /**
+     * 设置ProgressButton的状态
+     */
+    private void setProgressButtonState() {
+        if (mVersionCode != 0) {
+            mImplInfo = implAgent.getImplInfo(mPackageName, mPackageName, mVersionCode);
+            if (null != mImplInfo) {
+                ImplInfo.ImplRes res = mImplInfo.getImplRes();
+                implAgent.bindImplCallback(implCallback, mImplInfo);
+                mProgressButton.setText(res.getActionText());
+                mProgressButton.setProgress(mImplInfo.getProgress());
+                if (mProgressButton.getProgress() == 0) {
+                    mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_foreground));
+                } else {
+                    mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
+                }
+                mProgressButton.setTag(mImplInfo);
             }
         }
     }
@@ -487,21 +512,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
                 //标签
                 setApkTag(mApkTag);
-            }
 
-            ImplInfo implinfo = implAgent.getImplInfo(mPackageName, mPackageName, mVersionCode);
-            if (null != implinfo) {
-                ImplInfo.ImplRes res = implinfo.getImplRes();
-                implAgent.bindImplCallback(implCallback, implinfo);
-                implinfo.setDownloadUrl(mDownloadUrl).setIconUrl(mImgUrl).setTitle(mName);
-                mProgressButton.setText(res.getActionText());
-                mProgressButton.setProgress(implinfo.getProgress());
-                if (mProgressButton.getProgress() == 0) {
-                    mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_foreground));
-                } else {
-                    mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
-                }
-                mProgressButton.setTag(implinfo);
+                if (null == mImplInfo)
+                    setProgressButtonState();
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -594,21 +607,22 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
             mImgLl.addView(child);
             mDetailImgList.add(child);
-            bitmapUtils.display(img, mViewPagerUrlList[i], new BitmapLoadCallBack<ImageView>() {
-                @Override
-                public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
-                    if (bitmap.getWidth() > bitmap.getHeight()) {
-                        imageView.setImageBitmap(DetailUtils.rotateBitmap(bitmap, 90));
-                    } else {
-                        imageView.setImageBitmap(DetailUtils.rotateBitmap(bitmap, 0));
+            if (AppliteUtils.isLoadNetworkBitmap(mActivity))
+                bitmapUtils.display(img, mViewPagerUrlList[i], new BitmapLoadCallBack<ImageView>() {
+                    @Override
+                    public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
+                        if (bitmap.getWidth() > bitmap.getHeight()) {
+                            imageView.setImageBitmap(DetailUtils.rotateBitmap(bitmap, 90));
+                        } else {
+                            imageView.setImageBitmap(DetailUtils.rotateBitmap(bitmap, 0));
+                        }
                     }
-                }
 
-                @Override
-                public void onLoadFailed(ImageView imageView, String s, Drawable drawable) {
-                    imageView.setBackground(mActivity.getResources().getDrawable(R.drawable.detail_default_img));
-                }
-            });
+                    @Override
+                    public void onLoadFailed(ImageView imageView, String s, Drawable drawable) {
+                        imageView.setBackground(mActivity.getResources().getDrawable(R.drawable.detail_default_img));
+                    }
+                });
         }
 //        mLoadLayout.setVisibility(View.GONE);
         mDataLayout.setVisibility(View.VISIBLE);
@@ -622,7 +636,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 //        mImgUrl = bean.getmImgUrl();
 //        initActionBar();
 //        post(bean.getmPackageName());
-        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getPackageName(), bean.getName(), bean.getIconUrl(), true);
+        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getPackageName(), bean.getName(), bean.getIconUrl(), bean.getVersionCode(), true);
     }
 
     class DetailImplCallback implements ImplChangeCallback {
@@ -631,7 +645,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             refresh(implInfo);
         }
 
-        private void refresh(ImplInfo info) {
+        public void refresh(ImplInfo info) {
             ImplInfo.ImplRes res = info.getImplRes();
             LogUtils.d(TAG, "refresh" + res.getActionText() + "," + info.getStatus());
             mProgressButton.setText(res.getActionText());

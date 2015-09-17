@@ -423,7 +423,9 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
 
         child.setTag(bean);
         mAppTV.setText(bean.getName());
-        mBitmapUtil.display(mAppIV, bean.getImgurl());
+
+        if (AppliteUtils.isLoadNetworkBitmap(mActivity))
+            mBitmapUtil.display(mAppIV, bean.getImgurl());
 
         AppliteUtils.setLayout(child, (int) mX[bean.getmShowPosition()], (int) mY[bean.getmShowPosition()]);
         LogUtils.i(TAG, "mX[apkPsition]: " + mX[bean.getmShowPosition()] + " mY[apkPsition]: " + mY[bean.getmShowPosition()]);
@@ -688,7 +690,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
             public void onClick(View v) {
                 if (!TextUtils.isEmpty(packageName)) {
                     mHandler.removeCallbacks(mThread);
-                    ((OSGIServiceHost) mActivity).jumptoDetail(packageName, name, iconUrl, false);
+                    ((OSGIServiceHost) mActivity).jumptoDetail(packageName, name, iconUrl, 0, false);
                 }
             }
         });

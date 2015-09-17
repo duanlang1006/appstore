@@ -199,7 +199,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             }
 
             //app图标
-            if ((null != this.mAppIcon) && !TextUtils.isEmpty(itemData.getIconUrl()) && !removeimage) {
+            if ((null != this.mAppIcon) && !TextUtils.isEmpty(itemData.getIconUrl()) && AppliteUtils.isLoadNetworkBitmap(mContext)) {
                 mFinalBitmap.display(this.mAppIcon, itemData.getIconUrl(), defaultLoadingIcon);
             } else {
                 mAppIcon.setImageBitmap(defaultLoadingIcon);

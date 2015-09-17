@@ -425,7 +425,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
     @Override
     public void refreshDetail(SimilarBean similarBean) {
-        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), true);
+        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), similarBean.getVersionCode(), true);
     }
 
     @Override

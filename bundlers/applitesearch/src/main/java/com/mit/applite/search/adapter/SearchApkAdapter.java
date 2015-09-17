@@ -81,7 +81,8 @@ public class SearchApkAdapter extends BaseAdapter {
         final SearchBean data = mSearchBeans.get(position);
 
         viewholder.initView(data);
-        mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
+        if (AppliteUtils.isLoadNetworkBitmap(mActivity))
+            mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
         viewholder.mName.setText(data.getmName());
         viewholder.mApkSize.setText(AppliteUtils.bytes2kb(Long.parseLong(data.getmApkSize())));
         viewholder.mDownloadNumber.setText(
@@ -92,7 +93,7 @@ public class SearchApkAdapter extends BaseAdapter {
         viewholder.mToDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(), data.getmName(), data.getmImgUrl(),true);
+                ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(), data.getmName(), data.getmImgUrl(), data.getmVersionCode(), true);
             }
         });
         viewholder.mBt.setOnClickListener(new View.OnClickListener() {
@@ -114,7 +115,7 @@ public class SearchApkAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public class ViewHolder  implements ImplChangeCallback {
+    public class ViewHolder implements ImplChangeCallback {
         public LinearLayout mToDetail;
         public ImageView mImg;
         public RatingBar mXing;
