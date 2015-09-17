@@ -1,7 +1,6 @@
 package com.mit.applite.search.adapter;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +20,9 @@ import com.mit.applite.search.R;
 import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.SearchUtils;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplChangeCallback;
 import com.osgi.extra.OSGIServiceHost;
 
 import java.io.File;
@@ -93,7 +92,7 @@ public class SearchApkAdapter extends BaseAdapter {
         viewholder.mToDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(), data.getmName(), data.getmImgUrl(), data.getmVersionCode(), true);
+                ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(), data.getmName(), data.getmImgUrl(), data.getmVersionCode(), null, true);
             }
         });
         viewholder.mBt.setOnClickListener(new View.OnClickListener() {

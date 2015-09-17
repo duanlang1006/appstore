@@ -163,7 +163,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
         if (viewHolder.getLayoutStr().equals("fragment_categorylist")) {
             ((OSGIServiceHost) mActivity).jumptoHomepage(itemData.getKey(), itemData.getName(), true);
         } else if (viewHolder.getLayoutStr().equals("fragment_apklist")) {
-            ((OSGIServiceHost) mActivity).jumptoDetail(itemData.getPackageName(), itemData.getName(), itemData.getIconUrl(), itemData.getVersionCode(), true);
+            ((OSGIServiceHost) mActivity).jumptoDetail(itemData.getPackageName(), itemData.getName(), itemData.getIconUrl(), itemData.getVersionCode(), itemData.getBoxLabelvale(), true);
         }
         MitMobclickAgent.onEvent(mActivity, "onItemClick" + viewHolder.getItemPosition());
     }
@@ -434,7 +434,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
 //            mTopicView.stopPlay();
             if (topicData.getT_skiptype() == 1) {
                 MitMobclickAgent.onEvent(mActivity, "onSlideViewClick_" + topicData.getTt_packageName());
-                ((OSGIServiceHost) mActivity).jumptoDetail(topicData.getTt_packageName(), topicData.getTt_name(), topicData.getTt_iconUrl(), 0, true);
+                ((OSGIServiceHost) mActivity).jumptoDetail(topicData.getTt_packageName(), topicData.getTt_name(), topicData.getTt_iconUrl(), 0, null, true);
             } else {
                 MitMobclickAgent.onEvent(mActivity, "onSlideViewClick_" + topicData.t_key);
                 ((OSGIServiceHost) mActivity).jumptoTopic(topicData.t_key, topicData.t_info, mData.getStep(), mData.getS_datatype(), true);
