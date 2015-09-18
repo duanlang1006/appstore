@@ -310,10 +310,10 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     }
 
     @Override
-    public void jumptoDetail(String packageName, String name, String imgUrl, int versionCode, boolean addToBackstack) {
+    public void jumptoDetail(String packageName, String name, String imgUrl, int versionCode, String boxlabelvalue, boolean addToBackstack) {
         jumpto(Constant.OSGI_SERVICE_DETAIL_FRAGMENT,
                 DetailFragment.class.getName(),
-                DetailFragment.newBundle(packageName, name, imgUrl, versionCode),
+                DetailFragment.newBundle(packageName, name, imgUrl, versionCode, boxlabelvalue),
                 addToBackstack);
     }
 

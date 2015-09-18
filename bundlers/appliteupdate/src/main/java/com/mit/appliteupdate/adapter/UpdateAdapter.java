@@ -175,7 +175,7 @@ public class UpdateAdapter extends BaseAdapter {
         viewholder.mToDetailTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((OSGIServiceHost) mActivity).jumptoDetail(data.getPackageName(), data.getName(), data.getIconUrl(), data.getVersionCode(), true);
+                ((OSGIServiceHost) mActivity).jumptoDetail(data.getPackageName(), data.getName(), data.getIconUrl(), data.getVersionCode(), null, true);
             }
         });
 

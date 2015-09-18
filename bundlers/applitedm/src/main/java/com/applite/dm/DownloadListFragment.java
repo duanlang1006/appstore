@@ -356,6 +356,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                         vh.implInfo.getTitle(),
                         vh.implInfo.getIconUrl(),
                         vh.implInfo.getVersionCode(),
+                        null,
                         true);
             }
         } else {
@@ -420,7 +421,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     @Override
     public void refreshDetail(SimilarBean similarBean) {
-        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(),similarBean.getVersionCode(), true);
+        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(),similarBean.getVersionCode(), null,true);
     }
 
     @Override

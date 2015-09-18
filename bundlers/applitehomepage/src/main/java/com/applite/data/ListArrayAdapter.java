@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.applite.bean.HomePageApkData;
 import com.applite.bean.SubjectData;
@@ -269,6 +271,9 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                     int mLuckyPonints = (int) AppliteSPUtils.get(mContext, AppliteSPUtils.LUCKY_POINTS, 0);
                     mLuckyPonints += points;
                     AppliteSPUtils.put(mContext, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
+                    Toast toast = Toast.makeText(mContext, "成功下载安装有奖应用, 获得奖励 20 积分", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
                 }
                 switch (implInfo.getStatus()) {
                     case ImplInfo.STATUS_PENDING:
