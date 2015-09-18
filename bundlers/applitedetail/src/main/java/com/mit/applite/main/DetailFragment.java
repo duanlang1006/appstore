@@ -175,6 +175,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     public void onResume() {
         super.onResume();
+        setProgressButtonState();
         getView().setFocusableInTouchMode(true);
         getView().requestFocus();
         getView().setOnKeyListener(new View.OnKeyListener() {
@@ -630,6 +631,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 Toast toast = Toast.makeText(mActivity, "成功下载安装有奖应用, 获得奖励 20 积分", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
+                mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_foreground));
             }
         }
     }
