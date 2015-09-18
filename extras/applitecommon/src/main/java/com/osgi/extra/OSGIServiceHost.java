@@ -14,7 +14,7 @@ public interface OSGIServiceHost {
 
     public void jumptoHomepage(String category, String name, boolean addToBackstack);
 
-    public void jumptoDetail(String packageName, String name, String imgUrl, boolean addToBackstack);
+    public void jumptoDetail(String packageName, String name, String imgUrl, int versionCode, boolean addToBackstack);
 
     public void jumptoDetail(String httpUrl, boolean addToBackstack);
 

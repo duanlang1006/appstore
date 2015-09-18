@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.applite.search.R;
@@ -71,7 +72,8 @@ public class HotWordAdapter extends BaseAdapter {
         }
         final HotWordBean data = mHotWordBeans.get(position);
         if (data.getmType() == 0) {
-            mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
+            if (AppliteUtils.isLoadNetworkBitmap(mActivity))
+                mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
             viewholder.mImg.setVisibility(View.VISIBLE);
         } else if (data.getmType() == 1 || data.getmType() == 2) {
             viewholder.mImg.setVisibility(View.GONE);
@@ -86,7 +88,7 @@ public class HotWordAdapter extends BaseAdapter {
                     MitMobclickAgent.onEvent(mActivity, "HotWordToDetailFragment");
                     ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(),
                             data.getmName(),
-                            data.getmImgUrl(),true);
+                            data.getmImgUrl(), 0, true);
                 } else if (data.getmType() == 1) {//进入专题
                     MitMobclickAgent.onEvent(mActivity, "HotWordToSpecialFragment");
                     ((OSGIServiceHost) mActivity).jumptoTopic(data.getmPackageName(),

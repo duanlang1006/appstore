@@ -20,6 +20,9 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.util.Log;
+
+import com.applite.common.AppliteConfig;
+
 import java.util.List;
 
 public class AppLiteApplication extends Application {

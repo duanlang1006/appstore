@@ -11,7 +11,7 @@ import android.net.ConnectivityManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.applite.android.R;
-import com.mit.impl.ImplAgent;
+import com.applite.common.AppliteConfig;
 
 public class AppLiteReceiver extends BroadcastReceiver {
     private static final String TAG = "AppLiteReceiver";
