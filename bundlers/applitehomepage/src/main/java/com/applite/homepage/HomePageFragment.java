@@ -40,6 +40,7 @@ import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
 import com.applite.utils.SPUtils;
+import com.applite.view.ScreenView;
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -69,8 +70,6 @@ import java.util.List;
 
 public class HomePageFragment extends OSGIBaseFragment implements View.OnClickListener {
     private final String TAG = "homepage_PagerFragment";
-    private View popView;
-    private PopupWindow popupWindow;
     private List<ScreenBean> mScreenBeanList = new ArrayList<ScreenBean>();
     private FinalBitmap mFinalBitmap;
     private boolean mPopIsClick = false;
@@ -150,6 +149,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private ViewGroup rootView;
     private PopupWindowBean mPopData = new PopupWindowBean();
     private String mPopType;
+    private ScreenView mScreenView;
 
     public static Bundle newBundle(String category, String title) {
         Bundle bundle = new Bundle();
@@ -447,7 +447,11 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 //                                if (!(boolean)SPUtils.get(mActivity,SPUtils.POP_IMGURL_ISCLICK,false))
 //                                    initPopuWindow();
 //                            }else {
-                            initPopuWindow();
+//                            initPopuWindow();
+                            //实例化PopupWindow
+                            mScreenView = new ScreenView(mActivity, mScreenClickListener);
+                            mScreenView.showAtLocation(rootView.findViewById(R.id.homepage_content), Gravity.CENTER, 0, 0);
+                            mScreenView.setImageBitmap(AppliteUtils.getAppDir(name));
 //                            }
                         }
 //                        SPUtils.put(mActivity,SPUtils.POP_IMGURL,mPopImgUrl);
@@ -465,7 +469,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         @Override
         public void onClick(View v) {
             SPUtils.put(mActivity, SPUtils.POP_IMGURL_ISCLICK, mPopIsClick);
-            popupWindow.dismiss();
+            mScreenView.dismiss();
             LogUtils.i("lang", "v.getId() = " + v.getId());
             if (v.getId() == R.id.pop_img_exit) {
 
@@ -483,53 +487,6 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             }
         }
     };
-
-    /**
-     * 实例化PopuWindow
-     */
-    public void initPopuWindow() {
-        if (popupWindow == null) {
-            popView = mInflater.inflate(R.layout.popupwindow_img, null);
-            ImageView mExitView = (ImageView) popView.findViewById(R.id.pop_img_exit);
-            ImageView mImgView = (ImageView) popView.findViewById(R.id.pop_img_img);
-            mExitView.setOnClickListener(mScreenClickListener);
-            mImgView.setOnClickListener(mScreenClickListener);
-            mImgView.setImageBitmap(AppliteUtils.getLoacalBitmap(
-                    (String) SPUtils.get(mActivity, SPUtils.POP_IMG_SAVE_PATH, "")));
-
-            popupWindow = new PopupWindow(popView,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-        }
-        ColorDrawable cd = new ColorDrawable(0x000000);
-        popupWindow.setBackgroundDrawable(cd);
-        // 产生背景变暗效果
-        WindowManager.LayoutParams lp = mActivity.getWindow().getAttributes();
-        lp.alpha = 0.4f;
-        mActivity.getWindow().setAttributes(lp);
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.setFocusable(true);
-        popupWindow.showAtLocation(rootView.findViewById(R.id.homepage_content), Gravity.CENTER
-                | Gravity.CENTER_HORIZONTAL, 0, 0);
-
-        popupWindow.update();
-        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            // 在dismiss中恢复透明度
-            public void onDismiss() {
-                WindowManager.LayoutParams lp = mActivity.getWindow()
-                        .getAttributes();
-                lp.alpha = 1f;
-                mActivity.getWindow().setAttributes(lp);
-            }
-        });
-    }
-
-//    private void initViewPop() {
-//        ImageView mExitView = (ImageView) rootView.findViewById(R.id.pop_exit);
-//        GridView mGridView = (GridView) rootView.findViewById(R.id.pop_gv);
-//        TextView mTextView = (TextView) rootView.findViewById(R.id.pop_text);
-//        Button mButton = (Button) rootView.findViewById(R.id.pop_button);
-//    }
 
     public void onDestroyView() {
         super.onDestroyView();

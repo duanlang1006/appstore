@@ -7,11 +7,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,11 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
@@ -37,6 +31,7 @@ import com.applite.common.LogUtils;
 import com.applite.similarview.SimilarAdapter;
 import com.applite.similarview.SimilarBean;
 import com.applite.similarview.SimilarView;
+import com.applite.view.FlowLayout;
 import com.applite.view.ProgressButton;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
@@ -105,16 +100,12 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private List<View> mDetailImgList = new ArrayList<View>();
     private LinearLayout mHorDefaultLayout;
     private LinearLayout mTagStateLayout;
-    private LinearLayout mTagLayout1;
-    private TextView mTagTitleView;
-    private LinearLayout mTagLayout2;
-    private int mWidthPixels;
-    private int mHeightPixels;
 
     private List<SimilarBean> mSimilarData = new ArrayList<SimilarBean>();
     private SimilarView mSimilarView;
     private SimilarAdapter mSimilarAdapter;
     private ImplInfo mImplInfo;
+    private FlowLayout mFlowLayout;
 
     public static Bundle newBundle(String packageName, String name, String imgUrl, int versionCode) {
         Bundle b = new Bundle();
@@ -149,10 +140,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
-        DisplayMetrics mDisplayMetrics = new DisplayMetrics();
-        mActivity.getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
-        mWidthPixels = mDisplayMetrics.widthPixels;
-        mHeightPixels = mDisplayMetrics.heightPixels;
     }
 
     @Override
@@ -170,7 +157,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     public void onResume() {
         super.onResume();
-
         getView().setFocusableInTouchMode(true);
         getView().requestFocus();
         getView().setOnKeyListener(new View.OnKeyListener() {
@@ -259,11 +245,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         mHorDefaultLayout = (LinearLayout) rootView.findViewById(R.id.detail_hor_default_layout);
 
         mSimilarView = (SimilarView) rootView.findViewById(R.id.similar_view);
+        mFlowLayout = (FlowLayout) rootView.findViewById(R.id.detail_flowlayout);
 
         mTagStateLayout = (LinearLayout) rootView.findViewById(R.id.detail_state_tag_layout);
-        mTagTitleView = (TextView) rootView.findViewById(R.id.detail_tag_title);
-        mTagLayout1 = (LinearLayout) rootView.findViewById(R.id.detail_tag_layout1);
-        mTagLayout2 = (LinearLayout) rootView.findViewById(R.id.detail_tag_layout2);
 
         mName1View.setText(mApkName);
 
@@ -527,28 +511,18 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      * 设置标签
      */
     private void setApkTag(String apkTag) {
-        for (int i = 0; i < mTagLayout1.getChildCount(); i++) {
-            mTagLayout1.removeView(mTagLayout1.getChildAt(1));// 删除view
-        }
-        for (int i = 0; i < mTagLayout2.getChildCount(); i++) {
-            mTagLayout2.removeView(mTagLayout2.getChildAt(1));// 删除view
-        }
-
         LogUtils.d(TAG, "Tag：" + apkTag);
         if (TextUtils.isEmpty(apkTag)) {
             mTagStateLayout.setVisibility(View.GONE);
         } else {
             mTagStateLayout.setVisibility(View.VISIBLE);
             String[] mApkTagList = apkTag.split(",");
-
-            int mTagLayoutWidth = mWidthPixels - 20;
-            LogUtils.d(TAG, "mTagLayoutWidth：" + mTagLayoutWidth);
-
-            int[] mTagWidthList = new int[mApkTagList.length];//标签的宽度
-            int mTagLayout1Number = 0;
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//定义一个LayoutParams
+            layoutParams.setMargins(0, 0, 0, 10);
             for (int i = 0; i < mApkTagList.length; i++) {
                 final View child = mActivity.getLayoutInflater().inflate(R.layout.item_apk_tag_layout, container, false);
                 final TextView mTagView = (TextView) child.findViewById(R.id.item_tag_tv);
+                child.setLayoutParams(layoutParams);
                 mTagView.setText(mApkTagList[i]);
                 mTagView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -556,28 +530,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                         ((OSGIServiceHost) mActivity).jumptoSearch(mTagView.getText().toString(), true, null, null, null);
                     }
                 });
-
-                mTagWidthList[i] = AppliteUtils.getWidth(child);
-                LogUtils.d(TAG, "mTagWidthList[i]：" + mTagWidthList[i]);
-
-                int mTagLayout1Width = 0;
-                for (int j = 0; j < mTagWidthList.length; j++) {
-                    mTagLayout1Width += mTagWidthList[j];
-                }
-                LogUtils.d(TAG, "mTagLayout1Width：" + mTagLayout1Width);
-
-                if (mTagLayout1Width <= mTagLayoutWidth) {//标签加入第一行
-                    mTagLayout1.addView(child);
-                    mTagLayout1Number = i;
-                } else {
-                    int mTagLayout2Width = 0;
-                    for (int w = mTagLayout1Number + 1; w < mTagWidthList.length; w++) {
-                        mTagLayout2Width += mTagWidthList[w];
-                    }
-                    LogUtils.d(TAG, "mTagLayout2Width：" + mTagLayout2Width);
-                    if (mTagLayout2Width <= mTagLayoutWidth)
-                        mTagLayout2.addView(child);
-                }
+                mFlowLayout.addView(child);
             }
         }
     }
