@@ -385,6 +385,15 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     @Override
     public void onPageSelected(int i) {
+        if (prePosition != i) {
+            prePosition = i;
+            if (0 == prePosition) {
+                AppliteSPUtils.put(mActivity, POSITION, R.string.dm_downloading);
+            } else if (1 == prePosition) {
+                AppliteSPUtils.put(mActivity, POSITION, R.string.dm_downloaded);
+            }
+            setButtonStatus();
+        }
     }
 
     @Override
