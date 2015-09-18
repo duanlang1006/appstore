@@ -22,7 +22,7 @@
         <!-- toolbar（actionbar）颜色 -->
         <item name="colorPrimary">#FFffffff</item>
         <!-- 状态栏颜色 -->
-        <!--<item name="colorPrimaryDark">#FFdddddd</item>-->
+        <item name="colorPrimaryDark">#ff000000</item>
         <!-- 窗口的背景颜色 -->
         <item name="android:windowBackground">@android:color/transparent</item>
         <!-- SearchView -->
