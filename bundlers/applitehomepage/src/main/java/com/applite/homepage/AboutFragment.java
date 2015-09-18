@@ -92,6 +92,7 @@ public class AboutFragment extends OSGIBaseFragment {
         actionBar.setDisplayShowCustomEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowCustomEnabled(false);
+
         actionBar.show();
     }
 
