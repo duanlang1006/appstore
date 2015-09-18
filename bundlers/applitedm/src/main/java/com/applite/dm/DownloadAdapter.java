@@ -30,6 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.applite.common.AppliteUtils;
 import com.applite.view.CustomProgressBar;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.impl.ImplAgent;
@@ -188,7 +189,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         private void setIcon() {
             Bitmap resBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.file_type_apk);
             String url = implInfo.getIconUrl();
-            if (null != url && !TextUtils.isEmpty(url)) {
+            if (null != url && !TextUtils.isEmpty(url)&& AppliteUtils.isLoadNetworkBitmap(mContext)) {
                 int width = (int) mContext.getResources().getDimension(R.dimen.list_item_icon_size);
                 int height = width;
                 mBitmapHelper.configDefaultBitmapMaxSize(width, height);
