@@ -127,14 +127,13 @@ public class UpdateAdapter extends BaseAdapter {
                 MitMobclickAgent.onEvent(mActivity, "onClickButton" + vh.position);
 
                 String path = Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getName() + ".apk";
-                LogUtils.d("UpdateFragment", "打开");
                 ImplHelper.onClick(mActivity,
                         vh.implInfo,
                         vh.bean.getrDownloadUrl(),
                         vh.bean.getName(),
                         vh.bean.getIconUrl(),
                         path,
-                        null,
+                        vh.bean.getApkMd5(),
                         vh);
             }
         });

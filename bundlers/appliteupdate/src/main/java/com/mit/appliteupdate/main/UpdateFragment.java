@@ -431,15 +431,14 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             return;
         }
         String path = Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk";
-        if (!AppliteUtils.isPackageOk(mActivity, path))
-            ImplHelper.updateImpl(mActivity,
-                    implInfo,
-                    bean.getrDownloadUrl(),
-                    bean.getName(),
-                    bean.getIconUrl(),
-                    path,
-                    null,
-                    null);
+        ImplHelper.updateImpl(mActivity,
+                implInfo,
+                bean.getrDownloadUrl(),
+                bean.getName(),
+                bean.getIconUrl(),
+                path,
+                bean.getApkMd5(),
+                null);
     }
 
     @Override
