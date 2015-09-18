@@ -149,7 +149,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                         mSimilarView.setPadding(0, -mSimilarView.getHeight(), 0, 0);
                     } else if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, false) && View.GONE == mSimilarView.getVisibility()) {
                         mSimilarView.setVisibility(View.VISIBLE);
-                        mSimilarView.setPadding(0, 0, 0, 0);
+                        mSimilarView.setPadding(0, 1, 0, 0);
                     }
                 }
             }
@@ -286,6 +286,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
         });
         mSimilarView.setVisibility(View.VISIBLE);
+        mSimilarView.setPadding(0, 1, 0, 0);
     }
 
     @Override
@@ -394,7 +395,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     private void reSet() {
         if (null != mSimilarView && View.VISIBLE != mSimilarView.getVisibility()) {
             mSimilarView.setVisibility(View.VISIBLE);
-            mSimilarView.setPadding(0, 0, 0, 0);
+            mSimilarView.setPadding(0, 1, 0, 0);
         }
         Arrays.fill(status, false);//status数组复位
         checkBoxAnima = true;

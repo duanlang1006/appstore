@@ -10,7 +10,10 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:choiceMode="singleChoice"
-        android:dividerHeight="0dp" />
+        android:divider="#00FFFFFF"
+        android:dividerHeight="0dp"
+        android:footerDividersEnabled="true"/>
+    <!--android:footerDividersEnabled="false"-->
 
     <TextView
         android:id="@+id/empty"
