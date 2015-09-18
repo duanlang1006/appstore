@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -169,14 +170,19 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (android.R.id.home == item.getItemId()) {
-            if (mIgnoreListView.getVisibility() == View.VISIBLE) {
-                mIgnoreListView.setVisibility(View.GONE);
-                mTitleLayout.setVisibility(View.VISIBLE);
-                mActionBarTitle.setVisibility(View.VISIBLE);
-                mListView.setVisibility(View.VISIBLE);
-                if (mUpdateApkList.size() == 0)
-                    mNoUpdateView.setVisibility(View.VISIBLE);
+            if (!isHomeExist()) {
+                ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
                 return true;
+            } else {
+                if (mIgnoreListView.getVisibility() == View.VISIBLE) {
+                    mIgnoreListView.setVisibility(View.GONE);
+                    mTitleLayout.setVisibility(View.VISIBLE);
+                    mActionBarTitle.setVisibility(View.VISIBLE);
+                    mListView.setVisibility(View.VISIBLE);
+                    if (mUpdateApkList.size() == 0)
+                        mNoUpdateView.setVisibility(View.VISIBLE);
+                    return true;
+                }
             }
         }
         return super.onOptionsItemSelected(item);
@@ -272,6 +278,20 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
         mStatsButton.setOnClickListener(this);
         mAllUpdateView.setOnClickListener(this);
+    }
+
+    /**
+     * 判断首页是否存在
+     *
+     * @return
+     */
+    private boolean isHomeExist() {
+        if (null == getFragmentManager().findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT)) {
+            LogUtils.d(TAG, "首页不存在");
+            return false;
+        }
+        LogUtils.d(TAG, "首页存在");
+        return true;
     }
 
     /**
