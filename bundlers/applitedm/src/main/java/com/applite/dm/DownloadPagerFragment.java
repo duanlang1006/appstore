@@ -37,8 +37,6 @@ import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -84,6 +82,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                     hide();
                 }
             } else if (key.equals(COUNT_DOWNLOADED) || key.equals(COUNT_DOWNLOADING)) {
+
                 setButtonStatus();
             }
         }
@@ -122,8 +121,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         btnDelete = (Button) rootView.findViewById(R.id.btnDelete);
         animaBtDel = AnimationUtils.loadAnimation(mActivity, R.anim.btn_delete_in);
         btnDelete.setOnClickListener(this);
+
         AppliteSPUtils.registerChangeListener(mActivity, mPagerListener);
-        //初始化
+        AppliteSPUtils.put(mActivity, COUNT_DOWNLOADING, 0);
+        AppliteSPUtils.put(mActivity, COUNT_DOWNLOADED, 0);
+
         return rootView;
     }
 
@@ -141,25 +143,15 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onResume() {
         super.onResume();
-//        getView().setFocusableInTouchMode(true);
-//        getView().requestFocus();
-//        getView().setOnKeyListener(new View.OnKeyListener() {
-//            @Override
-//            public boolean onKey(View v, int keyCode, KeyEvent event) {
-//                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-//                    // handle back button
-//                    getFragmentManager().popBackStackImmediate();
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
     }
 
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (null != managerTop) {
+            managerTop.removeView(titleBar);
+        }
         destoryView = true;
         ImplLog.d(TAG, "onDestroyView," + this + "," + destoryView);
         ImplAgent.getInstance(mActivity).deleteObserver(this);
@@ -241,13 +233,15 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             int totalDelete = ((int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) + (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0));
             for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
                 IDownloadOperator operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, i);
-                LogUtils.d("wanghc", "operator:" + operator);
                 if (null != operator) {
-                    LogUtils.d("wanghc", "删除 第" + i + "次循环");
                     operator.onClickDelete();
                 }
             }
-            hide();
+            IDownloadOperator operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
+            if (0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) && 0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0)) {
+                hide();
+                operator.resetFlag();
+            }
             Toast.makeText(mActivity.getApplicationContext(), mActivity.getResources().getString(R.string.delete_message1)
                             + totalDelete + mActivity.getResources().getString(R.string.delete_message2),
                     Toast.LENGTH_SHORT).show();
@@ -262,7 +256,9 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             }
         } else if (v.getId() == R.id.select_cancel) {//取消
             hide();
-            AppliteSPUtils.put(mActivity, FLAG, false);//长按标志位复位
+            IDownloadOperator operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
+            operator.resetFlag();
+
             Toast.makeText(mActivity.getApplicationContext(), R.string.cancel_operator, Toast.LENGTH_SHORT).show();
         }
     }
@@ -389,12 +385,10 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     @Override
     public void onPageSelected(int i) {
-
     }
 
     @Override
     public void onPageScrollStateChanged(int i) {
-
     }
 
 
@@ -435,7 +429,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                             DownloadListFragment.class.getName(),
                             DownloadListFragment.newBundle(R.string.dm_downloading, downloadFlag));
                 }
-                LogUtils.d("wanghc", "fg:" + fg);
             }
             return fg;
         }
@@ -478,5 +471,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         public void onClickSeleteAll();
 
         public void onClickDeselectAll();
+
+        public void resetFlag();
     }
 }

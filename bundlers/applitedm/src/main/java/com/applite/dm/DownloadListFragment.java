@@ -134,12 +134,23 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             if (key.equals(FLAG)) {
                 if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
                     checkBoxAnima = false;
-                } else {
-                    reSet();
+//                    if (R.string.dm_downloaded == (int) AppliteSPUtils.get(mActivity, POSITION, -1)) {
+//                        mSimilarView.setVisibility(View.GONE);
+//                        mSimilarView.setPadding(0, -mSimilarView.getHeight(), 0, 0);
+//                    }
                 }
             } else if (key.equals(POSITION)) {
                 if (mTitleId == (int) AppliteSPUtils.get(mActivity, POSITION, -1)) {
                     AppliteSPUtils.put(mActivity, LENGTH, mImplList.size());
+                }
+                if (R.string.dm_downloading == (int) AppliteSPUtils.get(mActivity, POSITION, -1)) {
+                    if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false) && View.VISIBLE == mSimilarView.getVisibility()) {
+                        mSimilarView.setVisibility(View.GONE);
+                        mSimilarView.setPadding(0, -mSimilarView.getHeight(), 0, 0);
+                    } else if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, false) && View.GONE == mSimilarView.getVisibility()) {
+                        mSimilarView.setVisibility(View.VISIBLE);
+                        mSimilarView.setPadding(0, 0, 0, 0);
+                    }
                 }
             }
         }
@@ -173,8 +184,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         View view = mInflater.inflate(R.layout.fragment_download_list, container, false);
         mListview = (ListView) view.findViewById(android.R.id.list);
         mListview.setEmptyView(view.findViewById(R.id.empty));
-        initSimilarView(view);
-        if (mTitleId == R.string.dm_downloaded) {
+        if (mTitleId == R.string.dm_downloading) {
+            initSimilarView(view);
             mListview.addFooterView(mSimilarView);
         }
         mListview.setOnItemClickListener(this);
@@ -191,8 +202,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
             mListview.setAdapter(mAdapter);
         }
-        AppliteSPUtils.registerChangeListener(mActivity, mListListener);
+
         //初始化
+        AppliteSPUtils.registerChangeListener(mActivity, mListListener);
         count(0);//当前页选中项目数
         AppliteSPUtils.put(mActivity, FLAG, false);
         AppliteSPUtils.put(mActivity, LENGTH, 0);
@@ -287,6 +299,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
                     if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
                         reSet();
+                        AppliteSPUtils.put(mActivity, FLAG, false);
                         return true;
                     }
                     return false;
@@ -356,13 +369,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
+            AppliteSPUtils.put(mActivity, FLAG, true);
             if (checkBoxAnima) {
-                AppliteSPUtils.put(mActivity, FLAG, true);
                 VibratorUtil.Vibrate(mActivity, 200);   //震动200ms
-                if (R.string.dm_downloaded == mTitleId) {
-                    mSimilarView.setVisibility(View.GONE);
-                    mSimilarView.setPadding(0, -mSimilarView.getHeight(), 0, 0);
-                }
+            }
+            if (R.string.dm_downloading == mTitleId) {
+                mSimilarView.setVisibility(View.GONE);
+                mSimilarView.setPadding(0, -mSimilarView.getHeight(), 0, 0);
+
             }
             mAdapter.notifyDataSetChanged();
         }
@@ -377,39 +391,31 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
 
     private void reSet() {
-        mSimilarView.setVisibility(View.VISIBLE);
-        mSimilarView.setPadding(0, 0, 0, 0);
+        if (null != mSimilarView && View.VISIBLE != mSimilarView.getVisibility()) {
+            mSimilarView.setVisibility(View.VISIBLE);
+            mSimilarView.setPadding(0, 0, 0, 0);
+        }
         Arrays.fill(status, false);//status数组复位
         checkBoxAnima = true;
-        AppliteSPUtils.put(mActivity, FLAG, false);//长按标志位复位
         count(0);//当前页选中项目数
         AppliteSPUtils.put(mActivity, LENGTH, 0);
         AppliteSPUtils.put(mActivity, POSITION, 0);
-        try {
+        if (null != mAdapter) {
             mAdapter.notifyDataSetChanged();
-        } catch (NullPointerException e) {
-
         }
     }
 
     private void deleteItem() {
         List<Long> tempList = new ArrayList<>();
-        LogUtils.d("wanghc", "ListFragment");
-        LogUtils.d("wanghc", "长度" + status.length);
         for (int i = status.length - 1; i >= 0; i--) {
             if (status[i]) {
-                LogUtils.d("wanghc", "mTitleId:" + mTitleId);
                 tempList.add(mImplList.get(i).getId());
             }
         }
-//        Long temp[] = tempList.toArray(new Long[count()]);
         implAgent.remove(tempList);
-        if (mTitleId == R.string.dm_downloading) {
-            AppliteSPUtils.put(mActivity, COUNT_DOWNLOADING, tempList.size());
-        } else if (mTitleId == R.string.dm_downloaded) {
-            AppliteSPUtils.put(mActivity, COUNT_DOWNLOADED, tempList.size());
-        }
+        count(0);
     }
+
 
     @Override
     public void refreshDetail(SimilarBean similarBean) {
@@ -434,6 +440,12 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         Arrays.fill(status, false);
         count(0);
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void resetFlag() {
+        reSet();
+        AppliteSPUtils.put(mActivity, FLAG, false);
     }
 
 }

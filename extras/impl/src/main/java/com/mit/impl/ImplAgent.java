@@ -453,11 +453,12 @@ public class ImplAgent extends Observable {
     }
 
     private void notifyObserverUpdate(String event) {
-        if (Looper.getMainLooper() == Looper.myLooper()) {
-            mUpdateTask.run();
-        } else {
-            mMainHandler.post(mUpdateTask);
-        }
+//        if (Looper.getMainLooper() == Looper.myLooper()) {
+//            mUpdateTask.run();
+//        } else {
+        mMainHandler.removeCallbacks(mUpdateTask);
+        mMainHandler.postDelayed(mUpdateTask, 10);
+//        }
     }
 
     private class ImplAgentCallback extends ImplListener {
