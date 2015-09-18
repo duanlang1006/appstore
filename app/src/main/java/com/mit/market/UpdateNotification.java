@@ -65,7 +65,7 @@ public class UpdateNotification {
 
     /**
      * 显示通知栏
-     * 推荐应用信息
+     * 推荐应用信息(已废弃)
      *
      * @param context
      */

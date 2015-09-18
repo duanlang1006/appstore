@@ -17,7 +17,6 @@ import com.applite.common.Constant;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.SearchBean;
-import com.mit.applite.search.utils.SearchUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplHelper;
@@ -100,7 +99,9 @@ public class PreloadAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(),
                             data.getmName(),
-                            data.getmImgUrl(), data.getmVersionCode(),
+                            data.getmImgUrl(),
+                            data.getmVersionCode(),
+                            null,
                             true);
                 }
             });

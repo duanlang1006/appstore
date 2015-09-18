@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,11 +24,13 @@ import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.applite.sharedpreferences.AppliteSPUtils;
 import com.applite.similarview.SimilarAdapter;
 import com.applite.similarview.SimilarBean;
 import com.applite.similarview.SimilarView;
@@ -45,9 +48,9 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.applite.utils.DetailUtils;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
-import com.mit.impl.ImplChangeCallback;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
@@ -74,6 +77,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private String mPackageName;
     private String mName;
     private String mImgUrl;
+    private String mBoxlabelValue;
     private ProgressButton mProgressButton;
     private int mVersionCode;
     private RelativeLayout no_network;
@@ -107,12 +111,17 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private ImplInfo mImplInfo;
     private FlowLayout mFlowLayout;
 
-    public static Bundle newBundle(String packageName, String name, String imgUrl, int versionCode) {
+    private int points;
+    private boolean luckyflag = false;
+
+
+    public static Bundle newBundle(String packageName, String name, String imgUrl, int versionCode, String boxlabelvalue) {
         Bundle b = new Bundle();
         b.putString("packageName", packageName);
         b.putString("name", name);
         b.putString("imgUrl", imgUrl);
         b.putInt("versionCode", versionCode);
+        b.putString("boxlabelvalue", boxlabelvalue);
         return b;
     }
 
@@ -131,8 +140,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             mApkName = params.getString("name");
             mImgUrl = params.getString("imgUrl");
             mVersionCode = params.getInt("versionCode");
+            mBoxlabelValue = params.getString("boxlabelvalue");
         }
         LogUtils.i(TAG, "mApkName:" + mApkName + "------mPackageName:" + mPackageName + "------mImgUrl:" + mImgUrl + "------mVersionCode:" + mVersionCode);
+        LogUtils.i(TAG, "mBoxlabelValue:" + mBoxlabelValue);
         initActionBar();
     }
 
@@ -140,6 +151,13 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());
+
+        if (!TextUtils.isEmpty(mBoxlabelValue)) {
+            luckyflag = true;
+            points = Integer.parseInt(mBoxlabelValue);
+        } else
+            luckyflag = false;
+        LogUtils.d(TAG, "points = " + points + " luckyflag = " + luckyflag);
     }
 
     @Override
@@ -589,7 +607,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 //        mImgUrl = bean.getmImgUrl();
 //        initActionBar();
 //        post(bean.getmPackageName());
-        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getPackageName(), bean.getName(), bean.getIconUrl(), bean.getVersionCode(), true);
+        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getPackageName(), bean.getName(), bean.getIconUrl(), bean.getVersionCode(), null, true);
     }
 
     class DetailImplCallback implements ImplChangeCallback {
@@ -601,8 +619,18 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         public void refresh(ImplInfo info) {
             ImplInfo.ImplRes res = info.getImplRes();
             LogUtils.d(TAG, "refresh" + res.getActionText() + "," + info.getStatus());
+
             mProgressButton.setText(res.getActionText());
             mProgressButton.setProgress(info.getProgress());
+            if ((info.getStatus() == info.STATUS_INSTALLED) && luckyflag) {
+                luckyflag = false;
+                int mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 0);
+                mLuckyPonints += points;
+                AppliteSPUtils.put(mActivity, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
+                Toast toast = Toast.makeText(mActivity, "成功下载安装有奖应用, 获得奖励 20 积分", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
         }
     }
 }

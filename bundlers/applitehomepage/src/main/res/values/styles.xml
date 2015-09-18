@@ -106,5 +106,11 @@
         <item name="android:layout_weight">1</item>
         <item name="android:gravity">center_vertical</item>
     </style>
+    
+    <style name="TwoLineStyle">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_marginBottom">@dimen/divided_line_distance</item>
+        
+    </style>
 
 </resources>

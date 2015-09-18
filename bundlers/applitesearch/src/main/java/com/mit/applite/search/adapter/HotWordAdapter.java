@@ -14,7 +14,6 @@ import com.applite.common.BitmapHelper;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.applite.search.R;
 import com.mit.applite.search.bean.HotWordBean;
-import com.mit.applite.search.utils.SearchUtils;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.osgi.extra.OSGIServiceHost;
 
@@ -88,7 +87,10 @@ public class HotWordAdapter extends BaseAdapter {
                     MitMobclickAgent.onEvent(mActivity, "HotWordToDetailFragment");
                     ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(),
                             data.getmName(),
-                            data.getmImgUrl(), 0, true);
+                            data.getmImgUrl(),
+                            0,
+                            null,
+                            true);
                 } else if (data.getmType() == 1) {//进入专题
                     MitMobclickAgent.onEvent(mActivity, "HotWordToSpecialFragment");
                     ((OSGIServiceHost) mActivity).jumptoTopic(data.getmPackageName(),

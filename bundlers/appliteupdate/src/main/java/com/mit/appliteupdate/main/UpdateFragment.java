@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.ActionBar;
@@ -445,7 +444,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
     @Override
     public void refreshDetail(SimilarBean similarBean) {
-        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), similarBean.getVersionCode(), true);
+        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), similarBean.getVersionCode(), null, true);
     }
 
     @Override
