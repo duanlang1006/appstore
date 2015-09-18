@@ -175,6 +175,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     public void onResume() {
         super.onResume();
+        setProgressButtonState();
         getView().setFocusableInTouchMode(true);
         getView().requestFocus();
         getView().setOnKeyListener(new View.OnKeyListener() {
