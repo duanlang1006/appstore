@@ -1,7 +1,6 @@
 package com.applite.homepage;
 
 import android.app.Activity;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -20,14 +19,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -670,14 +667,17 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
                 actionBar.removeAllTabs();
 
-                for (int i = 0; i < mPageData.size(); i++) {
+                if (mPageData != null && mPageData.size() > 0) {
+                    for (int i = 0; i < mPageData.size(); i++) {
 //                    LogUtils.i(TAG, "actionBar.addTab getPageTitle(i) : " + mSectionsPagerAdapter.getPageTitle(i));
-                    actionBar.addTab(actionBar.newTab().setTabListener(mBarTabListener));
-                    ActionBar.Tab t = actionBar.getTabAt(i);
-                    t.setCustomView(R.layout.actionbar_tab);
-                    TextView title = (TextView) t.getCustomView().findViewById(R.id.tab_title);
-                    title.setText(mSectionsPagerAdapter.getPageTitle(i));
+                        actionBar.addTab(actionBar.newTab().setTabListener(mBarTabListener));
+                        ActionBar.Tab t = actionBar.getTabAt(i);
+                        t.setCustomView(R.layout.actionbar_tab);
+                        TextView title = (TextView) t.getCustomView().findViewById(R.id.tab_title);
+                        title.setText(mSectionsPagerAdapter.getPageTitle(i));
+                    }
                 }
+
                 actionBar.show();
             }
 
