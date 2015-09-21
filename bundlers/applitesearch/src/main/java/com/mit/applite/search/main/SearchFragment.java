@@ -667,7 +667,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mPreloadListView.setVisibility(View.GONE);
                 isHotWordLayoutVisibility(View.GONE);
                 mListView.setVisibility(View.VISIBLE);
-                mListView.addFooterView(moreView);
+                if (mListView.getFooterViewsCount() == 0)
+                    mListView.addFooterView(moreView);
 
                 if (null == mAdapter) {
                     mAdapter = new SearchApkAdapter(mActivity, mSearchApkContents, this);
