@@ -31,6 +31,11 @@
         <item name="actionOverflowButtonStyle">@style/MyActionBarOverflow</item>
         <item name="actionBarTabStyle">@style/MyActionBarTabStyle</item>
         <!--<item name="android:buttonStyle">@style/App.ButtonStyle</item>-->
+
+        <!-- actionbar上的Item按下效果 -->
+        <item name="selectableItemBackground">@null</item>
+        <!--<item name="selectableItemBackgroundBorderless">@null</item>-->
+
         <!--<item name="actionButtonStyle">@style/MyActionButtonStyle</item>-->
     </style>
     <!--<style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
