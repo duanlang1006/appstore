@@ -12,12 +12,12 @@ import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.applite.bean.ApkBean;
 import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.applite.search.R;
-import com.mit.applite.search.bean.SearchBean;
 import com.mit.applite.search.utils.SearchUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
@@ -35,7 +35,7 @@ public class SearchApkAdapter extends BaseAdapter {
 
     private final UpdateInatsllButtonText mListener;
     private BitmapUtils mBitmapUtil;
-    private List<SearchBean> mSearchBeans;
+    private List<ApkBean> mSearchBeans;
     private Context mActivity;
     private ImplAgent implAgent;
 
@@ -43,7 +43,7 @@ public class SearchApkAdapter extends BaseAdapter {
         void updateText();
     }
 
-    public SearchApkAdapter(Context context, List<SearchBean> mSearchBeans, UpdateInatsllButtonText listener) {
+    public SearchApkAdapter(Context context, List<ApkBean> mSearchBeans, UpdateInatsllButtonText listener) {
         mListener = listener;
         this.mSearchBeans = mSearchBeans;
         mActivity = context;
@@ -77,22 +77,22 @@ public class SearchApkAdapter extends BaseAdapter {
         } else {
             viewholder = (ViewHolder) convertView.getTag();
         }
-        final SearchBean data = mSearchBeans.get(position);
+        final ApkBean data = mSearchBeans.get(position);
 
         viewholder.initView(data);
         if (AppliteUtils.isLoadNetworkBitmap(mActivity))
-            mBitmapUtil.display(viewholder.mImg, data.getmImgUrl());
-        viewholder.mName.setText(data.getmName());
-        viewholder.mApkSize.setText(AppliteUtils.bytes2kb(Long.parseLong(data.getmApkSize())));
+            mBitmapUtil.display(viewholder.mImg, data.getIconUrl());
+        viewholder.mName.setText(data.getName());
+        viewholder.mApkSize.setText(AppliteUtils.bytes2kb(data.getApkSize()));
         viewholder.mDownloadNumber.setText(
-                SearchUtils.getDownloadNumber(mActivity, Integer.parseInt(data.getmDownloadNumber())) +
+                SearchUtils.getDownloadNumber(mActivity, Integer.parseInt(data.getDownloadTimes())) +
                         mActivity.getResources().getString(R.string.download_number));
         viewholder.mVersionName.setText(mActivity.getResources().getString(R.string.version) +
-                data.getmVersionName());
+                data.getVersionName());
         viewholder.mToDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(), data.getmName(), data.getmImgUrl(), data.getmVersionCode(), null, true);
+                ((OSGIServiceHost) mActivity).jumptoDetail(data.getPackageName(), data.getName(), data.getIconUrl(), data.getVersionCode(), null, true);
             }
         });
         viewholder.mBt.setOnClickListener(new View.OnClickListener() {
@@ -102,15 +102,15 @@ public class SearchApkAdapter extends BaseAdapter {
                 ViewHolder vh = (ViewHolder) v.getTag();
                 ImplHelper.onClick(mActivity,
                         vh.implInfo,
-                        vh.bean.getmDownloadUrl(),
-                        vh.bean.getmName(),
-                        vh.bean.getmImgUrl(),
-                        Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getmName() + ".apk",
+                        vh.bean.getrDownloadUrl(),
+                        vh.bean.getName(),
+                        vh.bean.getIconUrl(),
+                        Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getName() + ".apk",
                         null,
                         vh);
             }
         });
-        viewholder.mXing.setRating(Float.parseFloat(data.getmXing()) / 2.0f);
+        viewholder.mXing.setRating(Float.parseFloat(data.getRating()) / 2.0f);
         return convertView;
     }
 
@@ -124,7 +124,7 @@ public class SearchApkAdapter extends BaseAdapter {
         public TextView mVersionName;
         public Button mBt;
         private ImplInfo implInfo;
-        private SearchBean bean;
+        private ApkBean bean;
 
         public ViewHolder(View v) {
             this.mToDetail = (LinearLayout) v.findViewById(R.id.list_item_to_detail);
@@ -137,11 +137,11 @@ public class SearchApkAdapter extends BaseAdapter {
             this.mBt = (Button) v.findViewById(R.id.list_item_bt);
         }
 
-        public void initView(SearchBean data) {
+        public void initView(ApkBean data) {
             this.bean = data;
-            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName(), data.getmVersionCode());
+            this.implInfo = implAgent.getImplInfo(data.getPackageName(), data.getPackageName(), data.getVersionCode());
             if (null != this.implInfo) {
-                this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
+                this.implInfo.setDownloadUrl(data.getrDownloadUrl()).setIconUrl(data.getIconUrl()).setTitle(data.getName());
                 implAgent.bindImplCallback(this, implInfo);
             }
             mBt.setTag(this);

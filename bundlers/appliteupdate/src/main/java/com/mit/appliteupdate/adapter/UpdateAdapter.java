@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.applite.bean.ApkBean;
 import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
@@ -23,7 +24,6 @@ import com.applite.common.LogUtils;
 import com.applite.sharedpreferences.AppliteSPUtils;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.appliteupdate.R;
-import com.mit.appliteupdate.bean.ApkData;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
@@ -43,7 +43,7 @@ public class UpdateAdapter extends BaseAdapter {
     private final PackageManager mPackageManager;
     private UpdateSuccessListener mListener;
     private Context mActivity;
-    private List<ApkData> mDatas;
+    private List<ApkBean> mDatas;
     private ImplAgent implAgent;
     private int mCheckedItemPosition = -1;
 
@@ -53,7 +53,7 @@ public class UpdateAdapter extends BaseAdapter {
         void ignoreDataPosition(String packageName);//忽略数据
     }
 
-    public UpdateAdapter(Context context, List<ApkData> mDatas, UpdateSuccessListener mListener) {
+    public UpdateAdapter(Context context, List<ApkBean> mDatas, UpdateSuccessListener mListener) {
         this.mDatas = mDatas;
         this.mListener = mListener;
         mActivity = context;
@@ -88,7 +88,7 @@ public class UpdateAdapter extends BaseAdapter {
         } else {
             viewholder = (ViewHolder) convertView.getTag();
         }
-        final ApkData data = mDatas.get(position);
+        final ApkBean data = mDatas.get(position);
         viewholder.initView(data, position);
         if (mCheckedItemPosition == position) {
             viewholder.mShowDefault.setVisibility(View.GONE);
@@ -201,7 +201,7 @@ public class UpdateAdapter extends BaseAdapter {
         private TextView mApkSize;
         private TextView mVersionName;
         private Button mBt;
-        private ApkData bean;
+        private ApkBean bean;
         private ImplInfo implInfo;
         private int position;
 
@@ -234,7 +234,7 @@ public class UpdateAdapter extends BaseAdapter {
             this.mToDetailTv = (TextView) v.findViewById(R.id.item_update_detail_but);
         }
 
-        public void initView(ApkData bean, int position) {
+        public void initView(ApkBean bean, int position) {
             this.bean = bean;
             this.position = position;
             this.implInfo = implAgent.getImplInfo(bean.getPackageName(), bean.getPackageName(), bean.getVersionCode());
