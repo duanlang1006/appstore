@@ -789,10 +789,10 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 //                LogUtils.i(TAG, "获取首页数据:");
                 try {
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
-//                    LogUtils.i(TAG, "获取首页数据:" + data);
+                    LogUtils.i(TAG, "获取首页数据:" + data);
                     if (1 == data.getAppKey()) {
                         mPageData = data.getSubjectData();
-//                        LogUtils.i(TAG, "获取首页数据  mPageData: " + mPageData);
+                        LogUtils.i(TAG, "获取首页数据  mPageData: " + mPageData);
                         if (!mPageData.get(0).getS_key().equals("goods")) {
                             homeflag = false;
                             LogUtils.i(TAG, "首页分类  goods homeflag = " + homeflag);
