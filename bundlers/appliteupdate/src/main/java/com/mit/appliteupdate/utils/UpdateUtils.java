@@ -1,8 +1,7 @@
 package com.mit.appliteupdate.utils;
 
-import com.applite.sharedpreferences.AppliteSPUtils;
+import com.applite.bean.ApkBean;
 import com.applite.similarview.SimilarBean;
-import com.mit.appliteupdate.bean.ApkData;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,7 +14,7 @@ import java.util.List;
  */
 public class UpdateUtils {
 
-    public static String listTojson(List<ApkData> mUpdateApkList, List<SimilarBean> mSimilarDataList) {
+    public static String listTojson(List<ApkBean> mUpdateApkList, List<SimilarBean> mSimilarDataList) {
         JSONObject object = new JSONObject();
         try {
             JSONArray array = new JSONArray();

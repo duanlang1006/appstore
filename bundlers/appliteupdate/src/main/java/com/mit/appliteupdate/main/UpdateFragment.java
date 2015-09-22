@@ -10,7 +10,6 @@ import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applite.bean.ApkBean;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
@@ -45,7 +45,6 @@ import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.adapter.IgnoreAdapter;
 import com.mit.appliteupdate.adapter.MySimilarAdapter;
 import com.mit.appliteupdate.adapter.UpdateAdapter;
-import com.mit.appliteupdate.bean.ApkData;
 import com.mit.appliteupdate.bean.UpdateData;
 import com.mit.appliteupdate.utils.UpdateUtils;
 import com.mit.impl.ImplAgent;
@@ -67,7 +66,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private View rootView;
     private TextView mAllUpdateView;
     private ListView mListView;
-    private List<ApkData> mUpdateApkList;
+    private List<ApkBean> mUpdateApkList;
     private SimilarView mSimilarView;
     private SimilarAdapter mSimilarAdapter;
     private List<SimilarBean> mSimilarDataList;
@@ -91,7 +90,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private LayoutInflater mInflater;
     private ViewGroup customView;
     private TextView mActionBarIgnore;
-    private List<ApkData> mIgnoreList = new ArrayList<>();
+    private List<ApkBean> mIgnoreList = new ArrayList<>();
     private LinearLayout mTitleLayout;
     private ListView mIgnoreListView;
     private TextView mActionBarTitle;
@@ -201,7 +200,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         if (v.getId() == R.id.update_all_update) {
             if (null != mUpdateApkList && !mUpdateApkList.isEmpty()) {
                 MitMobclickAgent.onEvent(mActivity, "onClickButtonAllUpdate");
-                ApkData data = null;
+                ApkBean data = null;
                 for (int i = 0; i < mUpdateApkList.size(); i++) {
                     data = mUpdateApkList.get(i);
                     download(data);
@@ -372,7 +371,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             //删除已经忽略的APK
             Iterator iter = mUpdateApkList.iterator();
             while (iter.hasNext()) {
-                ApkData data = (ApkData) iter.next();
+                ApkBean data = (ApkBean) iter.next();
                 boolean isKeyExist = AppliteSPUtils.contains(mActivity, data.getPackageName());
                 if (isKeyExist) {
                     int VersionCode = (int) AppliteSPUtils.get(mActivity, data.getPackageName(), 0);
@@ -425,7 +424,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
     }
 
-    private void download(ApkData bean) {
+    private void download(ApkBean bean) {
         ImplInfo implInfo = implAgent.getImplInfo(bean.getPackageName(), bean.getPackageName(), bean.getVersionCode());
         if (null == implInfo) {
             return;

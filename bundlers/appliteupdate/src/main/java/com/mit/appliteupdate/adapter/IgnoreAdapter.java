@@ -13,11 +13,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.applite.bean.ApkBean;
 import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.appliteupdate.R;
-import com.mit.appliteupdate.bean.ApkData;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class IgnoreAdapter extends BaseAdapter {
     private final Context mActivity;
-    private final List<ApkData> mDatas;
+    private final List<ApkBean> mDatas;
     private final BitmapUtils mBitmapUtil;
     private final PackageManager mPackageManager;
     private final CancelIgnoreListener mListener;
@@ -36,7 +36,7 @@ public class IgnoreAdapter extends BaseAdapter {
         void cancelIgnoreListener(String PackageName);
     }
 
-    public IgnoreAdapter(Context context, List<ApkData> mDatas, CancelIgnoreListener mListener) {
+    public IgnoreAdapter(Context context, List<ApkBean> mDatas, CancelIgnoreListener mListener) {
         this.mDatas = mDatas;
         this.mListener = mListener;
         mActivity = context;
@@ -70,7 +70,7 @@ public class IgnoreAdapter extends BaseAdapter {
         } else {
             viewholder = (ViewHolder) convertView.getTag();
         }
-        final ApkData data = mDatas.get(position);
+        final ApkBean data = mDatas.get(position);
         if (mCheckedItemPosition == position) {
             viewholder.mShowDefault.setVisibility(View.GONE);
             viewholder.mShrink.setVisibility(View.VISIBLE);

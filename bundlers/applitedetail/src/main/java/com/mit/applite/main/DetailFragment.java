@@ -26,6 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applite.bean.ApkBean;
 import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
@@ -36,6 +37,7 @@ import com.applite.similarview.SimilarBean;
 import com.applite.similarview.SimilarView;
 import com.applite.view.FlowLayout;
 import com.applite.view.ProgressButton;
+import com.google.gson.Gson;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
@@ -46,6 +48,7 @@ import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
+import com.mit.applite.bean.DetailData;
 import com.mit.applite.utils.DetailUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
@@ -53,10 +56,6 @@ import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -66,7 +65,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     private static final String TAG = "DetailFragment";
     private View rootView;
-    private String mApkName;
     private TextView mName1View;
     private TextView mApkSizeAndCompanyView;
     private TextView mApkContentView;
@@ -74,33 +72,39 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private ImageView mApkImgView;
     private ViewGroup container;
     private LinearLayout mImgLl;
+
+    //APK信息
+    private List<ApkBean> mApkDatas = new ArrayList<ApkBean>();
+    private String mApkName;
     private String mPackageName;
-    private String mName;
     private String mImgUrl;
+    private String mViewPagerUrl;
+    private String mApkTag;
+    private int mVersionCode;
+    private String mRating;
+    private long mApkSize;
+    private String mDescription;
+    private String mDownloadUrl;
+    private String mDeveloper;
+
     private String mBoxlabelValue;
     private ProgressButton mProgressButton;
-    private int mVersionCode;
     private RelativeLayout no_network;
     private Button refreshButton;
     private ImplAgent implAgent;
     private ImplChangeCallback implCallback;
     private BitmapUtils mBitmapUtil;
-    private String mDownloadUrl;
     private LinearLayout mDataLayout;
     //    private LinearLayout mLoadLayout;
 //    private ImageView mLoadView;
 //    private Animation LoadingAnimation;
-    private String mDescription;
-    private String mUpdateLog;
     private ImageView mOpenIntroduceView;
     private int DEFAULT_MAX_LINE_COUNT = 3;//应用介绍、更新日志默认最多显示3行
     private int COLLAPSIBLE_STATE_NONE = 0;//少于3行状态
     private int COLLAPSIBLE_STATE_SHRINKUP = 1;//收缩状态
     private int COLLAPSIBLE_STATE_SPREAD = 2;//展开状态
     private int CONTENT_STATE = COLLAPSIBLE_STATE_NONE;
-    private int UPDATE_LOG_STATE = COLLAPSIBLE_STATE_NONE;
     private Handler mHandler = new Handler();
-    private BitmapUtils bitmapUtils;
     private List<View> mDetailImgList = new ArrayList<View>();
     private LinearLayout mHorDefaultLayout;
     private LinearLayout mTagStateLayout;
@@ -113,7 +117,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     private int points;
     private boolean luckyflag = false;
-
 
     public static Bundle newBundle(String packageName, String name, String imgUrl, int versionCode, String boxlabelvalue) {
         Bundle b = new Bundle();
@@ -284,7 +287,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                         ImplHelper.onClick(mActivity,
                                 implinfo,
                                 mDownloadUrl,
-                                mName,
+                                mApkName,
                                 mImgUrl,
                                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + mApkName + ".apk",
                                 null,
@@ -432,29 +435,12 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      */
     private void setData(String data) {
         try {
-            JSONObject object = new JSONObject(data);
-            String app_key = object.getString("app_key");
-            String detail_info = object.getString("detail_info");
-            LogUtils.i(TAG, "应用详情网络请求成功detail_info:" + detail_info);
-
-            String similar_info = object.getString("similar_info");
-            LogUtils.i(TAG, "应用详情网络请求成功similar_info:" + similar_info);
-
-            if (!mSimilarData.isEmpty())
-                mSimilarData.clear();
-            JSONArray similar_json = new JSONArray(similar_info);
-            SimilarBean similarBean = null;
-            if (similar_json.length() != 0 && similar_json != null) {
-                for (int i = 0; i < 4; i++) {
-                    similarBean = new SimilarBean();
-                    JSONObject obj = new JSONObject(similar_json.get(i).toString());
-                    similarBean.setName(obj.getString("name"));
-                    similarBean.setPackageName(obj.getString("packageName"));
-                    similarBean.setIconUrl(obj.getString("iconUrl"));
-                    similarBean.setrDownloadUrl(obj.getString("rDownloadUrl"));
-                    similarBean.setVersionCode(obj.getInt("versionCode"));
-                    mSimilarData.add(similarBean);
-                }
+            Gson gson = new Gson();
+            DetailData detailData = gson.fromJson(data, DetailData.class);
+            if (null != detailData) {
+                int app_key = detailData.getApp_key();
+                mSimilarData = detailData.getSimilar_info();
+                LogUtils.i(TAG, "应用详情similar_info:" + mSimilarData);
                 if (null == mSimilarAdapter) {
                     mSimilarAdapter = new MySimilarAdapter(mActivity);
                     mSimilarAdapter.setData(mSimilarData, this);
@@ -463,35 +449,27 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     mSimilarAdapter.setData(mSimilarData, this);
                     mSimilarAdapter.notifyDataSetChanged();
                 }
-            }
 
-            String mViewPagerUrl = null;
-            String mApkTag = null;
-            JSONArray json = new JSONArray(detail_info);
-            if (json.length() != 0 && json != null) {
-                for (int i = 0; i < json.length(); i++) {
-                    JSONObject obj = new JSONObject(json.get(i).toString());
-                    mPackageName = obj.getString("packageName");
-                    mName = obj.getString("name");
-                    mImgUrl = obj.getString("iconUrl");
-                    String mVersionName = obj.getString("versionName");
-                    mVersionCode = obj.getInt("versionCode");
-                    String xing = obj.getString("rating");
-                    mDownloadUrl = obj.getString("rDownloadUrl");
-                    long size = obj.getLong("apkSize");
-                    String mDownloadNumber = obj.getString("downloadTimes");
-                    mDescription = obj.getString("description");
-                    mViewPagerUrl = obj.getString("screenshotsUrl");
-                    String developer = obj.getString("developer");
-                    mUpdateLog = obj.getString("updateInfo");
-                    mApkTag = obj.getString("tag");
+                mApkDatas = detailData.getDetail_info();
+                LogUtils.i(TAG, "应用详情detail_info:" + mApkDatas);
+                ApkBean bean = mApkDatas.get(0);
+                mPackageName = bean.getPackageName();
+                mApkName = bean.getName();
+                mImgUrl = bean.getIconUrl();
+                mVersionCode = bean.getVersionCode();
+                mRating = bean.getRating();
+                mDownloadUrl = bean.getrDownloadUrl();
+                mApkSize = bean.getApkSize();
+                mDescription = bean.getDescription();
+                mViewPagerUrl = bean.getScreenshotsUrl();
+                mApkTag = bean.getTag();
+                mDeveloper = bean.getDeveloper();
+                String mVersionName = bean.getVersionName();
+                String mDownloadNumber = bean.getDownloadTimes();
+                String mUpdateLog = bean.getUpdateInfo();
 
-                    mName1View.setText(mName);
-                    mXingView.setRating(Float.parseFloat(xing) / 2.0f);
-//                    mBitmapUtil.display(mApkImgView, mImgUrl);
-                    mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(size) + " | " + developer);
-                }
-//                LogUtils.i(TAG, "应用介绍：" + mDescription);
+                mXingView.setRating(Float.parseFloat(mRating) / 2.0f);
+                mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(mApkSize) + " | " + mDeveloper);
                 if (TextUtils.isEmpty(mDescription)) {
                     mApkContentView.setText(mActivity.getResources().getText(R.string.no_app_detail));
                 } else {
@@ -508,17 +486,12 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                         }
                     }
                 }, 500);
-
-                //应用图片介绍
                 setPreViewImg(mViewPagerUrl);
-
-                //标签
                 setApkTag(mApkTag);
-
                 if (null == mImplInfo)
                     setProgressButtonState();
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             LogUtils.e(TAG, "应用详情JSON解析失败");
         }
@@ -557,19 +530,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      * 设置应用介绍的图片
      */
     private void setPreViewImg(String mViewPagerUrl) {
-        if (null == bitmapUtils) {
-            bitmapUtils = new BitmapUtils(mActivity);
-        }
-        if (!mDetailImgList.isEmpty()) {
-            LogUtils.i(TAG, "删除原来的详情介绍图片");
-            for (int i = 0; i < mDetailImgList.size(); i++) {
-                ViewGroup parent = (ViewGroup) mDetailImgList.get(i).getParent();
-                if (parent != null) {
-                    parent.removeView(mDetailImgList.get(i));// 删除点击了的view
-                }
-            }
-            mDetailImgList.clear();
-        }
         String[] mViewPagerUrlList = mViewPagerUrl.split(",");
         mHorDefaultLayout.setVisibility(View.GONE);
         for (int i = 0; i < mViewPagerUrlList.length; i++) {
@@ -578,7 +538,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
             mImgLl.addView(child);
             mDetailImgList.add(child);
-            if (AppliteUtils.isLoadNetworkBitmap(mActivity))
+            if (AppliteUtils.isLoadNetworkBitmap(mActivity)) {
+                BitmapUtils bitmapUtils = new BitmapUtils(mActivity);
                 bitmapUtils.display(img, mViewPagerUrlList[i], new BitmapLoadCallBack<ImageView>() {
                     @Override
                     public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
@@ -594,6 +555,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                         imageView.setBackground(mActivity.getResources().getDrawable(R.drawable.detail_default_img));
                     }
                 });
+            }
         }
 //        mLoadLayout.setVisibility(View.GONE);
         mDataLayout.setVisibility(View.VISIBLE);

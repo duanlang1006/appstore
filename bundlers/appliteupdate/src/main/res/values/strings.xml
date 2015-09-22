@@ -38,5 +38,6 @@
     <string name="detail">Detail</string>
     <string name="cancel_ignore">Cancel ignore</string>
     <string name="ignore_update">Ignore update</string>
+    <string name="application_upgrade">Application upgrade</string>
 
 </resources>
