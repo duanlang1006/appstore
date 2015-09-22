@@ -582,7 +582,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 }
             });
 
-            mSearchbarView.setVisibility(View.VISIBLE);
+//            mSearchbarView.setVisibility(View.VISIBLE);
 
             mHideSearchbarView = (RelativeLayout) customView.findViewById(R.id.hide_search_bar);
             mSubTitle = (TextView) customView.findViewById(R.id.game_title);
@@ -595,13 +595,13 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         }
     }
 
-    private String gametitle;
+    private String actionbartitle;
     private Boolean removetab = false;
 
     private void refreshActionbar() {
         if (null != customView) {
-            if (null != gametitle) {
-                mSubTitle.setText(gametitle);
+            if (null != actionbartitle) {
+                mSubTitle.setText(actionbartitle);
                 mSearchbarView.setVisibility(View.GONE);
                 mHideSearchbarView.setVisibility(View.VISIBLE);
             }
@@ -610,8 +610,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
     private void removeActionTabbar() {
         if (null != customView) {
-            if (null != gametitle) {
-                mSubTitle.setText(gametitle);
+            if (null != actionbartitle) {
+                mSubTitle.setText(actionbartitle);
                 mSearchbarView.setVisibility(View.GONE);
                 mHideSearchbarView.setVisibility(View.VISIBLE);
             }
@@ -796,20 +796,31 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                         if (!mPageData.get(0).getS_key().equals("goods")) {
                             homeflag = false;
                             LogUtils.i(TAG, "首页分类  goods homeflag = " + homeflag);
-
                         }
 
-                        if (mPageData.get(0).getS_key().equals("goods_m_game")) {
-                            gametitle = getString(R.string.gametitle);
-                            refreshActionbar();
-                        } else if (mPageData.get(0).getData().get(0).getCategorymain().equals("游戏")) {
-                            LogUtils.i(TAG, "获取首页数据  游戏数据分类: ");
-                            gametitle = mPageData.get(0).getData().get(0).getCategorysub();
-                            removeActionTabbar();
-                        } else if (!mPageData.get(0).getS_key().equals("goods")) {
-                            gametitle = mPageData.get(0).getData().get(0).getCategorysub();
-                            refreshActionbar();
+                        String S_key = mPageData.get(0).getS_key();
+                        if (S_key.equals("goods")) {
+                            //首页
+                            mSearchbarView.setVisibility(View.VISIBLE);
+                        } else {
+                            //一级分类列表判断
+                            if (mPageData.get(0).getS_key().equals("goods_m_game")) {
+                                //游戏类
+                                actionbartitle = getString(R.string.gametitle);
+                                refreshActionbar();
+                            } else {
+                                actionbartitle = mPageData.get(0).getData().get(0).getCategorysub();
+                                S_key = S_key.substring(0, 5);
+                                if (S_key.equals("goods")) {
+                                    //软件类
+                                    refreshActionbar();
+                                } else {
+                                    //游戏分类
+                                    removeActionTabbar();
+                                }
+                            }
                         }
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
