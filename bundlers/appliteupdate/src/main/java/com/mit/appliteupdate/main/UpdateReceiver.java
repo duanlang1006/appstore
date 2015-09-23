@@ -92,7 +92,7 @@ public class UpdateReceiver extends BroadcastReceiver {
             params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mContext, Constant.META_DATA_MIT));
             params.addBodyParameter("packagename", mContext.getPackageName());
             params.addBodyParameter("type", "update_management");
-            params.addBodyParameter("protocol_version", "1.0");
+            params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
             params.addBodyParameter("update_info", AppliteUtils.encodePackages(packageInfos));
             mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
                 @Override
