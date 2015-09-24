@@ -1,8 +1,6 @@
 package com.applite.homepage;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -11,13 +9,9 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.applite.common.DefaultValue;
 import com.applite.sharedpreferences.AppliteSPUtils;
-import com.applite.utils.DataCleanManager;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
@@ -53,7 +47,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 //        return super.onCreateView(inflater, container, savedInstanceState);
-        actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+
         initActionBar();
 
         View view = inflater.inflate(R.layout.fragment_setting, container, false);
@@ -71,46 +65,6 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         view.findViewById(R.id.ll_item3_2).setOnClickListener(this);//意见反馈
         setAllState();
         return view;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
     }
 
     private void setAllState() {
@@ -153,7 +107,6 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         } else if (R.id.ll_item3_2 == v.getId()) {//关于
             ((OSGIServiceHost) mActivity).jumptoAbout(true);
         }
-
     }
 
     @Override
@@ -165,6 +118,9 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     }
 
     private void initActionBar() {
+        if (null == actionBar) {
+            actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+        }
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mActivity.getResources().getString(R.string.setting));
@@ -178,29 +134,6 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         menu.findItem(R.id.action_search).setVisible(false);
         super.onPrepareOptionsMenu(menu);
     }
-
-//    private static long getEnvironmentSize() {
-//        File localFile = Environment.getDataDirectory();
-//        long l1;
-//        if (null == localFile) {
-//            l1 = 0L;
-//        }
-//        while (true) {
-//            String str = localFile.getPath();
-//            StatFs localStatFs = new StatFs(str);
-//            long l2 = localStatFs.getBlockSize();
-//            l1 = localStatFs.getBlockCount() * l2;
-//            return l1;
-//        }
-//    }
-//
-//    private void getAllMemory() throws Exception{
-//        PackageManager pm = getActivity().getPackageManager();
-//        Class[] arrayOfClass = new Class[2];
-//        Class localClass2 = Long.TYPE;
-//        arrayOfClass[0] = localClass2;
-//        arrayOfClass[1] = IPackageDataObserver.class;
-//    }
 
     /**
      * 删除方法 这里只会删除某个文件夹下的文件，如果传入的directory是个文件，将不做处理
