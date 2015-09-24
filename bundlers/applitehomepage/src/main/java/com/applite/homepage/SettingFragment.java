@@ -29,8 +29,9 @@ import java.io.File;
 public class SettingFragment extends OSGIBaseFragment implements View.OnClickListener, DataCleanDialog.CallBackInterface {
     private final String TAG = "SettingsPreference";
 
-    private Activity mActivity;
     private ActionBar actionBar;
+    private LayoutInflater mInflater;
+    private ViewGroup rootView;
 
     private LinearLayout clean_cache;       //清除缓存
     private LinearLayout download_path;       //清除缓存
@@ -53,8 +54,8 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
 
     @Override
     public void onAttach(Activity activity) {
-        mActivity = activity;
         super.onAttach(activity);
+        mInflater = LayoutInflater.from(mActivity);
         mDataCleanDialog = new DataCleanDialog();
     }
 
@@ -66,21 +67,19 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        initActionBar();
-
-        View view = inflater.inflate(R.layout.fragment_setting, container, false);
+        rootView = (ViewGroup) mInflater.inflate(R.layout.fragment_setting, container, false);
 
         mDataCleanDialog.CallBack(this);
 
-        smart_show = (ImageView) view.findViewById(R.id.smart_show);                    //智能无图
-        smart_download = (ImageView) view.findViewById(R.id.smart_download);            //零流量下载
-        update_notification = (ImageView) view.findViewById(R.id.update_notification);  //更新提醒
-        delete_apk = (ImageView) view.findViewById(R.id.delete_apk);                    //删除安装包
-        clean_cache = (LinearLayout) view.findViewById(R.id.clean_cache);               //清除缓存
+        smart_show = (ImageView) rootView.findViewById(R.id.smart_show);                    //智能无图
+        smart_download = (ImageView) rootView.findViewById(R.id.smart_download);            //零流量下载
+        update_notification = (ImageView) rootView.findViewById(R.id.update_notification);  //更新提醒
+        delete_apk = (ImageView) rootView.findViewById(R.id.delete_apk);                    //删除安装包
+        clean_cache = (LinearLayout) rootView.findViewById(R.id.clean_cache);               //清除缓存
 
-        download_path = (LinearLayout) view.findViewById(R.id.download_path);
-        save_path = (TextView) view.findViewById(R.id.save_path);
-        cache_size = (TextView) view.findViewById(R.id.cache_size);
+        download_path = (LinearLayout) rootView.findViewById(R.id.download_path);
+        save_path = (TextView) rootView.findViewById(R.id.save_path);
+        cache_size = (TextView) rootView.findViewById(R.id.cache_size);
 
         smart_show.setOnClickListener(this);
         smart_download.setOnClickListener(this);
@@ -88,14 +87,16 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         delete_apk.setOnClickListener(this);
         clean_cache.setOnClickListener(this);
 
-        view.findViewById(R.id.feedback).setOnClickListener(this);//意见反馈
-        view.findViewById(R.id.about).setOnClickListener(this);//关于
+        rootView.findViewById(R.id.feedback).setOnClickListener(this);//意见反馈
+        rootView.findViewById(R.id.about).setOnClickListener(this);//关于
+
+        initActionBar();
 
         setSavePath();
         setCacheSize();
 
         setAllState();
-        return view;
+        return rootView;
     }
 
     private void setAllState() {

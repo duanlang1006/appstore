@@ -16,15 +16,15 @@ import android.widget.TextView;
 import com.osgi.extra.OSGIBaseFragment;
 
 import kankan.wheel.widget.WheelView;
-import kankan.wheel.widget.adapters.ArrayWheelAdapter;
 
 /**
  * Created by wanghaochen on 15-9-6.
  */
 public class AboutFragment extends OSGIBaseFragment {
-    private Activity mActivity;
-    private View view = null;
+
     private LayoutInflater mInflater;
+    private ViewGroup rootView;
+
     private ActionBar actionBar;
     private WheelView wheelView;
     private PackageInfo info;
@@ -38,8 +38,8 @@ public class AboutFragment extends OSGIBaseFragment {
 
     @Override
     public void onAttach(Activity activity) {
-        mActivity = activity;
         super.onAttach(activity);
+        mInflater = LayoutInflater.from(mActivity);
     }
 
     @Override
@@ -56,23 +56,24 @@ public class AboutFragment extends OSGIBaseFragment {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
-        initActionBar();
-        view = inflater.inflate(R.layout.fragment_about, container, false);
-        mInflater = LayoutInflater.from(mActivity);
 
-        wheelView = (WheelView) view.findViewById(R.id.aa);
-        String ss[] = mActivity.getResources().getStringArray(R.array.team);
-        wheelView.setViewAdapter(new ArrayWheelAdapter<>(this.getActivity(), ss));
-        wheelView.setCyclic(true);
-        wheelView.setScaleX(scale);
-        wheelView.setScaleY(scale);
-        wheelView.setMinimumHeight(distance);
-        wheelView.setVisibility(View.GONE);
+        rootView = (ViewGroup) mInflater.inflate(R.layout.fragment_about, container, false);
 
-        tv_app_version = (TextView) view.findViewById(R.id.app_version_code);
+//        wheelView = (WheelView) rootView.findViewById(R.id.aa);
+//        String ss[] = mActivity.getResources().getStringArray(R.array.team);
+//        wheelView.setViewAdapter(new ArrayWheelAdapter<>(this.getActivity(), ss));
+//        wheelView.setCyclic(true);
+//        wheelView.setScaleX(scale);
+//        wheelView.setScaleY(scale);
+//        wheelView.setMinimumHeight(distance);
+//        wheelView.setVisibility(View.GONE);
+
+        tv_app_version = (TextView) rootView.findViewById(R.id.app_version_code);
         tv_app_version.setText(info.versionName);
-        return view;
+
+        initActionBar();
+
+        return rootView;
     }
 
     @Override
@@ -87,6 +88,9 @@ public class AboutFragment extends OSGIBaseFragment {
     }
 
     private void initActionBar() {
+        if(null == actionBar){
+            actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
+        }
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mActivity.getResources().getString(R.string.about));
