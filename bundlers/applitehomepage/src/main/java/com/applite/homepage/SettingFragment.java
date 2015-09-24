@@ -132,7 +132,6 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         }
     }
 
-
     @Override
     public void refreshCacheSize() {
         String showsize;
@@ -144,7 +143,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             if (null != cache_size) {
                 if ((numtrans < 60.00) && (unit.equals("KB"))) {
                     cache_size.setText("0.00KB");
-                }else{
+                } else {
                     cache_size.setText(showsize);
                 }
             }
@@ -153,7 +152,6 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void onClick(View v) {

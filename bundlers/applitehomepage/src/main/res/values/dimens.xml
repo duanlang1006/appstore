@@ -40,7 +40,7 @@
     <dimen name="setting_title_size">13dp</dimen>
     <dimen name="divided_line_distance">6dp</dimen>
     <dimen name="default_size">10dp</dimen>
-    <dimen name="default_test_size">14sp</dimen>
+    <dimen name="default_text_size">14sp</dimen>
     <dimen name="default_title_margintop">5dp</dimen>
     <dimen name="default_title_marginBottom">5dp</dimen>
     <dimen name="settings_item_min_height">50dp</dimen>
