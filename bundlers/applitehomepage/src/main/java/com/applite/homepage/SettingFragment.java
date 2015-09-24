@@ -12,10 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.applite.common.Constant;
 import com.applite.common.DefaultValue;
-import com.applite.common.LogUtils;
 import com.applite.sharedpreferences.AppliteSPUtils;
 import com.applite.utils.DataCleanManager;
 import com.osgi.extra.OSGIBaseFragment;
@@ -114,9 +114,16 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     }
 
     private void setCacheSize() {
+        String showsize1;
         try {
             size = DataCleanManager.getTotalCacheSize(mActivity);
-            LogUtils.i(TAG, "size = " + size);
+            String num = size.substring(0, size.length() - 2);
+            Double numtrans = Double.valueOf(num);
+            String unit = size.substring(size.length() - 2, size.length());
+
+            if ((numtrans < 60.00) && (unit.equals("KB"))) {
+                size = "0.00KB";
+            }
             if (null != cache_size) {
                 cache_size.setText(size);
             }
@@ -124,6 +131,29 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             e.printStackTrace();
         }
     }
+
+
+    @Override
+    public void refreshCacheSize() {
+        String showsize;
+        try {
+            showsize = DataCleanManager.getTotalCacheSize(mActivity);
+            String num = showsize.substring(0, showsize.length() - 2);
+            Double numtrans = Double.valueOf(num);
+            String unit = showsize.substring(showsize.length() - 2, showsize.length());
+            if (null != cache_size) {
+                if ((numtrans < 60.00) && (unit.equals("KB"))) {
+                    cache_size.setText("0.00KB");
+                }else{
+                    cache_size.setText(showsize);
+                }
+            }
+            Toast.makeText(mActivity, "释放了" + size + "空间", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -180,30 +210,5 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         super.onPrepareOptionsMenu(menu);
     }
 
-    /**
-     * 删除方法 这里只会删除某个文件夹下的文件，如果传入的directory是个文件，将不做处理
-     * <p/>
-     * * @param directory
-     */
-    private static void deleteFilesByDirectory(File directory) {
-        if (directory != null && directory.exists() && directory.isDirectory()) {
-            for (File item : directory.listFiles()) {
-                item.delete();
-            }
-        }
-    }
-
-    @Override
-    public void refreshCacheSize() {
-        try {
-            size = DataCleanManager.getTotalCacheSize(mActivity);
-            LogUtils.i(TAG, "size = " + size);
-            if (null != cache_size) {
-                cache_size.setText(size);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
 

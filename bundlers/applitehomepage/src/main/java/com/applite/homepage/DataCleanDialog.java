@@ -3,7 +3,6 @@ package com.applite.homepage;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.widget.Toast;
 
 import com.applite.utils.DataCleanManager;
 
@@ -57,7 +56,6 @@ public class DataCleanDialog {
                                 DataCleanManager.cleanAllCache(context);
                                 if(null != mCallback)
                                 mCallback.refreshCacheSize();
-                                Toast.makeText(context, "清除成功", Toast.LENGTH_SHORT).show();
                             }
                         })
                 .show();

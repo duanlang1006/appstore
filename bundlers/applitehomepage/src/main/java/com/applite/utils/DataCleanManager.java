@@ -14,6 +14,7 @@ import java.math.BigDecimal;
  * 本应用数据清除管理器
  */
 public class DataCleanManager {
+
     /**
      * 清除本应用内部缓存
      *
@@ -43,6 +44,7 @@ public class DataCleanManager {
     public static void cleanAllCache(Context context) {
         cleanInternalCache(context);
         cleanExternalCache(context);
+        cleanBitMapCache();
     }
 
     /**
@@ -58,11 +60,16 @@ public class DataCleanManager {
         }
     }
 
+    public static void cleanBitMapCache() {
+        deleteFilesByDirectory(new File("/sdcard/Android/data/com.shly.appstore/cache/xBitmapCache"));
+    }
+
     public static String getTotalCacheSize(Context context) throws Exception {
         long cacheSize = getFolderSize(context.getCacheDir());
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             cacheSize += getFolderSize(context.getExternalCacheDir());
         }
+        cacheSize += getFolderSize(new File("/sdcard/Android/data/com.shly.appstore/cache/xBitmapCache"));
         return getFormatSize(cacheSize);
     }
 
