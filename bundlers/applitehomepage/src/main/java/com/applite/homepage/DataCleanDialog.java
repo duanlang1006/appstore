@@ -15,7 +15,18 @@ import com.applite.utils.DataCleanManager;
  * 清除缓存Dialog
  */
 public class DataCleanDialog {
-    public static void show(final Context context) {
+
+    private CallBackInterface mCallback;
+
+    public void CallBack(CallBackInterface mCallback){
+        this.mCallback = mCallback;
+    }
+
+    public interface CallBackInterface {
+        void refreshCacheSize();
+    }
+
+    public void show(final Context context) {
 //        LayoutInflater inflater = LayoutInflater.from(context);
 //        View layout = inflater.inflate(R.layout.dialog_dataclean, null);
 //        new AlertDialog.Builder(context)
@@ -44,11 +55,12 @@ public class DataCleanDialog {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 DataCleanManager.cleanAllCache(context);
+                                if(null != mCallback)
+                                mCallback.refreshCacheSize();
                                 Toast.makeText(context, "清除成功", Toast.LENGTH_SHORT).show();
                             }
                         })
                 .show();
-
-
     }
+
 }

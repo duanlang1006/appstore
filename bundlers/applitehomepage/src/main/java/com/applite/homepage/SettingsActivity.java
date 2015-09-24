@@ -14,7 +14,7 @@ import com.applite.sharedpreferences.AppliteSPUtils;
 /**
  * Created by android153 on 9/23/15.
  */
-public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
+public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener, DataCleanDialog.CallBackInterface {
     private final String TAG = "SettingsPreference";
 
     private android.app.ActionBar actionBar;
@@ -28,6 +28,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     private Preference clean_cache;
     private Preference feedback;
     private Preference about;
+
+    private DataCleanDialog mDataCleanDialog;
 
     //省流量设置
     private static final String KEY_SMART_UPDATE = "smart_update";    //零流量更新
@@ -50,6 +52,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 //        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         super.onCreate(savedInstanceState);
 
+        mDataCleanDialog = new DataCleanDialog();
+        mDataCleanDialog.CallBack(this);
 //        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.setting_title);
 
         addPreferencesFromResource(R.xml.settings);
@@ -200,7 +204,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             LogUtils.d(TAG, "preference.getKey() = kEY_DOWNLOAD_THREAD");
         } else if (preference.getKey().equals(KEY_CLEAN_CACHE)) {
             LogUtils.d(TAG, "preference.getKey() = KEY_CLEAN_CACHE");
-            DataCleanDialog.show(this);
+            mDataCleanDialog.show(this);
         } else if (preference.getKey().equals(KEY_ONEKEY_FEEDBACK)) {
             LogUtils.d(TAG, "preference.getKey() = KEY_ONEKEY_FEEDBACK");
             FeedbackDialog.show(this);
@@ -210,5 +214,10 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         }
 
         return false;
+    }
+
+    @Override
+    public void refreshCacheSize() {
+
     }
 }

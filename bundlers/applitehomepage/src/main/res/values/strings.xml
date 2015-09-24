@@ -75,6 +75,7 @@
 
 
     <!-- 设置模块字符串资源 -->
+    <string name="zero_flow_update_detail">零流量下载</string>
     <string name="data_throughput_setting">省流量设置</string>
     <string name="smart_update">零流量更新</string>
     <string name="smart_update_detail">WIFI下自动更新</string>
