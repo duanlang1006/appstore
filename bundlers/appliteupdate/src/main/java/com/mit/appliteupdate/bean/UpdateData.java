@@ -1,6 +1,7 @@
 package com.mit.appliteupdate.bean;
 
 
+import com.applite.bean.ApkBean;
 import com.applite.similarview.SimilarBean;
 
 import java.util.List;
@@ -10,14 +11,14 @@ import java.util.List;
  */
 public class UpdateData {
     private int app_key;
-    private List<ApkData> installed_update_list;
+    private List<ApkBean> installed_update_list;
     private List<SimilarBean> similar_info;
 
     public int getApp_key() {
         return app_key;
     }
 
-    public List<ApkData> getInstalled_update_list() {
+    public List<ApkBean> getInstalled_update_list() {
         return installed_update_list;
     }
 
@@ -29,7 +30,7 @@ public class UpdateData {
         this.app_key = app_key;
     }
 
-    public void setInstalled_update_list(List<ApkData> installed_update_list) {
+    public void setInstalled_update_list(List<ApkBean> installed_update_list) {
         this.installed_update_list = installed_update_list;
     }
 
