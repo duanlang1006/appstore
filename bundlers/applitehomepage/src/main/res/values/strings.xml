@@ -73,4 +73,21 @@
     <string name="testimonial_4">恭喜您抽中手机一台</string>
     <string name="testimonial_5">谢谢参与</string>
 
+
+    <!-- 设置模块字符串资源 -->
+    <string name="data_throughput_setting">省流量设置</string>
+    <string name="smart_update">零流量更新</string>
+    <string name="smart_update_detail">WIFI下自动更新</string>
+    <string name="smart_show">智能无图</string>
+    <string name="smart_show_detail">2G/3G/4G网络下切换无图模式</string>
+
+    <string name="app_settings">应用设置</string>
+    <string name="push_notification">允许推送更新提示</string>
+    <string name="delete_apkfile">安装后自动删除安装包</string>
+    <string name="download_path">下载存储路径</string>
+    <string name="download_thread">最多同时下载任务</string>
+
+    <string name="update">检查更新</string>
+    <string name="onekey_feedback">一键反馈</string>
+
 </resources>

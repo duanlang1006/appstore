@@ -372,6 +372,8 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         jumpto(Constant.OSGI_SERVICE_SETTING_FRAGMENT,
                 SettingFragment.class.getName(),
                 null, true);
+//        Intent intent = new Intent(this, SettingsActivity.class);
+//        startActivity(intent);
     }
 
     public void jumptoLucky(boolean addToBackstack) {

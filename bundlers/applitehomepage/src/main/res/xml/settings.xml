@@ -1,4 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="settings">
+
+    <PreferenceCategory
+        android:key="data_throughput_setting"
+        android:title="@string/data_throughput_setting" >
+
+        <SwitchPreference
+            android:key="smart_update"
+            android:title="@string/smart_update"
+            android:summary="@string/smart_update_detail"
+            android:persistent="false" />
+
+        <SwitchPreference
+            android:key="smart_show"
+            android:title="@string/smart_show"
+            android:summary="@string/smart_show_detail"
+            android:persistent="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="app_settings"
+        android:title="@string/app_settings" >
+
+        <SwitchPreference
+            android:key="push_notification"
+            android:title="@string/push_notification"
+            android:persistent="false" />
+
+        <SwitchPreference
+            android:key="delete_apkfile"
+            android:title="@string/delete_apkfile"
+            android:persistent="false" />
+
+        <PreferenceScreen
+            android:key="apk_savepath"
+            android:title="@string/download_path" />
+
+        <PreferenceScreen
+            android:key="download_thread"
+            android:title="@string/download_thread" />
+
+        <PreferenceScreen
+            android:key="clean_cache"
+            android:title="@string/clean_cache" />
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:key="help"
+        android:title="@string/help" >
+
+        <PreferenceScreen
+            android:key="feedback"
+            android:title="@string/onekey_feedback" />
+
+        <PreferenceScreen
+            android:key="about"
+            android:title="@string/about" />
+
+    </PreferenceCategory>
 
 </PreferenceScreen>

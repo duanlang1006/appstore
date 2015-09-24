@@ -82,8 +82,8 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
                     !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, DefaultValue.defauleValueUpdateRemind));
             setAllState();
         } else if (R.id.ll_item2_1 == v.getId()) {//清除缓存
-            AppliteSPUtils.put(mActivity, AppliteSPUtils.CLEAR_CACHE,
-                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.CLEAR_CACHE, DefaultValue.defaultBoolean));
+//            AppliteSPUtils.put(mActivity, AppliteSPUtils.CLEAR_CACHE,
+//                    !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.CLEAR_CACHE, DefaultValue.defaultBoolean));
             setAllState();
             DataCleanDialog.show(mActivity);
         } else if (R.id.ll_item2_2 == v.getId()) {//删除安装包
