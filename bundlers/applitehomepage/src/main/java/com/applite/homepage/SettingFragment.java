@@ -26,6 +26,9 @@ import com.osgi.extra.OSGIServiceHost;
 
 import java.io.File;
 
+import kankan.wheel.widget.WheelView;
+import kankan.wheel.widget.adapters.ArrayWheelAdapter;
+
 /**
  * Created by wanghaochen on 15-9-1.
  */
@@ -35,6 +38,8 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     private ActionBar actionBar;
     private LayoutInflater mInflater;
     private ViewGroup rootView;
+
+    private WheelView mWheelView;
 
     private LinearLayout clean_cache;       //清除缓存
 //    private LinearLayout download_path;       //下载存储路径
@@ -53,6 +58,9 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     private TextView cache_size;
     private String path;
     private String size;
+
+    private float scale = 0.75f;
+    private int distance = 25;
 
     private DataCleanDialog mDataCleanDialog;
 
@@ -94,6 +102,14 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         thread_btn2 = (ImageButton) rootView.findViewById(R.id.thread_btn2);
         thread_btn3 = (ImageButton) rootView.findViewById(R.id.thread_btn3);
 
+        mWheelView = (WheelView) rootView.findViewById(R.id.max_size);
+        String sizelist[] = mActivity.getResources().getStringArray(R.array.sizelist);
+        mWheelView.setViewAdapter(new ArrayWheelAdapter<>(this.getActivity(), sizelist));
+        mWheelView.setCyclic(true);
+        mWheelView.setScaleX(scale);
+        mWheelView.setScaleY(scale);
+        mWheelView.setMinimumHeight(distance);
+
         smart_show.setOnClickListener(this);
         smart_download.setOnClickListener(this);
         update_notification.setOnClickListener(this);
@@ -131,6 +147,11 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             thread_btn2.setBackgroundResource(R.drawable.setting_button_unselected);
             thread_btn3.setBackgroundResource(R.drawable.setting_button_selected);
         }
+    }
+
+    private void getDownloadSize() {
+        long i = ImplConfig.getMaxOverSize(mActivity);
+
     }
 
 

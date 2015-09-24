@@ -87,6 +87,7 @@
     <string name="delete_apkfile">安装后自动删除安装包</string>
     <string name="download_path">下载存储路径</string>
     <string name="download_thread">最多同时下载任务</string>
+    <string name="download_size">下载最大限制</string>
 
     <string name="update">检查更新</string>
     <string name="onekey_feedback">一键反馈</string>
