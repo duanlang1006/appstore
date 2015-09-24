@@ -11,12 +11,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.applite.bean.ApkBean;
 import com.applite.common.AppliteUtils;
 import com.applite.common.BitmapHelper;
 import com.applite.common.Constant;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.applite.search.R;
-import com.mit.applite.search.bean.SearchBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplHelper;
@@ -36,9 +36,9 @@ public class PreloadAdapter extends BaseAdapter {
     private ImplAgent implAgent;
     private int SHOW_ICON_NUMBER;
     private LayoutInflater mInflater;
-    private List<SearchBean> mPreloadData;
+    private List<ApkBean> mPreloadData;
 
-    public PreloadAdapter(Context context, List<SearchBean> data, int i) {
+    public PreloadAdapter(Context context, List<ApkBean> data, int i) {
         mPreloadData = data;
         mActivity = context;
         mInflater = LayoutInflater.from(context);
@@ -75,7 +75,7 @@ public class PreloadAdapter extends BaseAdapter {
             // 不为空则直接使用已有的封装类
             viewholder = (ViewHolder) convertView.getTag();
         }
-        final SearchBean data = mPreloadData.get(position);
+        final ApkBean data = mPreloadData.get(position);
         viewholder.initView(data, position);
 
         if (position + 1 > SHOW_ICON_NUMBER) {
@@ -91,31 +91,31 @@ public class PreloadAdapter extends BaseAdapter {
             viewholder.mIcon.setVisibility(View.VISIBLE);
 
             if (AppliteUtils.isLoadNetworkBitmap(mActivity))
-                mBitmapUtil.display(viewholder.mIcon, data.getmImgUrl());
-            viewholder.mSize.setText(AppliteUtils.bytes2kb(Long.parseLong(data.getmApkSize())));
+                mBitmapUtil.display(viewholder.mIcon, data.getIconUrl());
+            viewholder.mSize.setText(AppliteUtils.bytes2kb(data.getApkSize()));
             viewholder.mClickItem.setClickable(true);
             viewholder.mClickItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((OSGIServiceHost) mActivity).jumptoDetail(data.getmPackageName(),
-                            data.getmName(),
-                            data.getmImgUrl(),
-                            data.getmVersionCode(),
+                    ((OSGIServiceHost) mActivity).jumptoDetail(data.getPackageName(),
+                            data.getName(),
+                            data.getIconUrl(),
+                            data.getVersionCode(),
                             null,
                             true);
                 }
             });
         }
-        viewholder.mName.setText(data.getmName());
+        viewholder.mName.setText(data.getName());
         viewholder.mBt.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 ViewHolder vh = (ViewHolder) v.getTag();
-                ImplHelper.onClick(mActivity, vh.implInfo, vh.bean.getmDownloadUrl(),
-                        vh.bean.getmName(),
-                        vh.bean.getmImgUrl(),
-                        Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getmName() + ".apk",
+                ImplHelper.onClick(mActivity, vh.implInfo, vh.bean.getrDownloadUrl(),
+                        vh.bean.getName(),
+                        vh.bean.getIconUrl(),
+                        Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getName() + ".apk",
                         null,
                         vh);
             }
@@ -129,7 +129,7 @@ public class PreloadAdapter extends BaseAdapter {
         ImageView mIcon;
         Button mBt;
         LinearLayout mClickItem;
-        private SearchBean bean;
+        private ApkBean bean;
         private ImplInfo implInfo;
         private int mPosition;
 
@@ -141,12 +141,12 @@ public class PreloadAdapter extends BaseAdapter {
             this.mClickItem = (LinearLayout) view.findViewById(R.id.item_pre_click_layout);
         }
 
-        public void initView(SearchBean data, int position) {
+        public void initView(ApkBean data, int position) {
             this.bean = data;
             this.mPosition = position;
-            this.implInfo = implAgent.getImplInfo(data.getmPackageName(), data.getmPackageName(), data.getmVersionCode());
+            this.implInfo = implAgent.getImplInfo(data.getPackageName(), data.getPackageName(), data.getVersionCode());
             if (null != this.implInfo) {
-                this.implInfo.setDownloadUrl(data.getmDownloadUrl()).setIconUrl(data.getmImgUrl()).setTitle(data.getmName());
+                this.implInfo.setDownloadUrl(data.getrDownloadUrl()).setIconUrl(data.getIconUrl()).setTitle(data.getName());
                 implAgent.bindImplCallback(this, implInfo);
             }
             mBt.setTag(this);

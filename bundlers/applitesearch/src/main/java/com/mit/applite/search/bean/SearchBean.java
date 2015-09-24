@@ -1,135 +1,47 @@
 package com.mit.applite.search.bean;
 
-import com.mit.impl.ImplInfo;
+import com.applite.bean.ApkBean;
+
+import java.util.List;
 
 /**
  * Created by LSY on 15-5-27.
  */
 public class SearchBean {
-    private int _id;
-    private String mName;
-    private String mPackageName;
-    private String mImgUrl;
-    private String mVersionName;
-    private int mVersionCode;
-    private String mDownloadUrl;
-    private String mDownloadNumber;
-    private String mApkSize;
-    private String mXing;
-
-//    private String mShowButtonText;
-    private ImplInfo mImplInfo;
-
-//    public String getmShowButtonText() {
-//        return mShowButtonText;
-//    }
-//
-//    public void setmShowButtonText(String mShowButtonText) {
-//        this.mShowButtonText = mShowButtonText;
-//    }
+    private int app_key;
+    private List<ApkBean> search_info;
+    private boolean istoend;
 
     @Override
     public String toString() {
         return "SearchBean{" +
-                "_id=" + _id +
-                ", mName='" + mName + '\'' +
-                ", mPackageName='" + mPackageName + '\'' +
-                ", mImgUrl='" + mImgUrl + '\'' +
-                ", mVersionName='" + mVersionName + '\'' +
-                ", mVersionCode='" + mVersionCode + '\'' +
-                ", mDownloadUrl='" + mDownloadUrl + '\'' +
-                ", mDownloadNumber='" + mDownloadNumber + '\'' +
-                ", mApkSize='" + mApkSize + '\'' +
-                ", mXing='" + mXing + '\'' +
+                "app_key=" + app_key +
+                ", search_info=" + search_info +
+                ", istoend=" + istoend +
                 '}';
     }
 
-    public String getmVersionName() {
-        return mVersionName;
+    public int getApp_key() {
+        return app_key;
     }
 
-    public void setmVersionName(String mVersionName) {
-        this.mVersionName = mVersionName;
+    public void setApp_key(int app_key) {
+        this.app_key = app_key;
     }
 
-    public String getmXing() {
-        return mXing;
+    public List<ApkBean> getSearch_info() {
+        return search_info;
     }
 
-    public void setmXing(String mXing) {
-        this.mXing = mXing;
+    public void setSearch_info(List<ApkBean> search_info) {
+        this.search_info = search_info;
     }
 
-    public int get_id() {
-        return _id;
+    public boolean getIstoend() {
+        return istoend;
     }
 
-    public void set_id(int _id) {
-        this._id = _id;
-    }
-
-    public String getmName() {
-        return mName;
-    }
-
-    public void setmName(String mName) {
-        this.mName = mName;
-    }
-
-    public String getmPackageName() {
-        return mPackageName;
-    }
-
-    public void setmPackageName(String mPackageName) {
-        this.mPackageName = mPackageName;
-    }
-
-    public String getmImgUrl() {
-        return mImgUrl;
-    }
-
-    public void setmImgUrl(String mImgUrl) {
-        this.mImgUrl = mImgUrl;
-    }
-
-    public int getmVersionCode() {
-        return mVersionCode;
-    }
-
-    public void setmVersionCode(int mVersionCode) {
-        this.mVersionCode = mVersionCode;
-    }
-
-    public String getmDownloadUrl() {
-        return mDownloadUrl;
-    }
-
-    public void setmDownloadUrl(String mDownloadUrl) {
-        this.mDownloadUrl = mDownloadUrl;
-    }
-
-    public String getmDownloadNumber() {
-        return mDownloadNumber;
-    }
-
-    public void setmDownloadNumber(String mDownloadNumber) {
-        this.mDownloadNumber = mDownloadNumber;
-    }
-
-    public String getmApkSize() {
-        return mApkSize;
-    }
-
-    public void setmApkSize(String mApkSize) {
-        this.mApkSize = mApkSize;
-    }
-
-    public void setImplInfo(ImplInfo mImplInfo) {
-        this.mImplInfo = mImplInfo;
-    }
-
-    public ImplInfo getImplInfo() {
-
-        return mImplInfo;
+    public void setIstoend(boolean istoend) {
+        this.istoend = istoend;
     }
 }

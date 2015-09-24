@@ -30,9 +30,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applite.bean.ApkBean;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
@@ -65,7 +67,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private ImageView mSearchView;
     private LinearLayout mHotWordLL;
     private ListView mListView;
-    private List<SearchBean> mSearchApkContents = new ArrayList<SearchBean>();
+    private List<ApkBean> mSearchApkContents = new ArrayList<ApkBean>();
     private SearchApkAdapter mAdapter;
     private View rootView;
 
@@ -82,7 +84,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private TextView mHotChangeView;
 
     private ListView mPreloadListView;
-    private List<SearchBean> mPreloadData = new ArrayList<SearchBean>();
+    private List<ApkBean> mPreloadData = new ArrayList<ApkBean>();
     private boolean isShowPreload = true;//是否显示预加载
     private int mPostPreloadNumber = 0;
     private PreloadAdapter mPreloadAdapter;
@@ -167,6 +169,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private ImageView mLoadingImgView;
     private Animation LoadingAnimation;
     private String[] mHint;
+    private Gson mGson = new Gson();
 
     //    private Handler mHandler = new Handler();
 //    private Runnable mRunnable = new Runnable() {
@@ -389,7 +392,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mPreloadListView.setVisibility(View.GONE);
-                mEtViewModifyPostSearch(mPreloadData.get(position).getmName(), false);
+                mEtViewModifyPostSearch(mPreloadData.get(position).getName(), false);
             }
         });
 
@@ -639,33 +642,19 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mAdapter.notifyDataSetChanged();
             }
         }
-        SearchBean bean = null;
         try {
-            JSONObject object = new JSONObject(data);
-            int app_key = object.getInt("app_key");
-            String json = object.getString("search_info");
-            ISTOEND = object.getBoolean("istoend");
-            if (!TextUtils.isEmpty(json)) {
-                JSONArray array = new JSONArray(json);
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject obj = new JSONObject(array.get(i).toString());
-                    bean = new SearchBean();
-//                    bean.set_id(i);
-                    bean.setmPackageName(obj.getString("packageName"));
-                    bean.setmName(obj.getString("name"));
-                    bean.setmImgUrl(obj.getString("iconUrl"));
-                    bean.setmApkSize(obj.getString("apkSize"));
-                    bean.setmDownloadNumber(obj.getString("downloadTimes"));
-                    bean.setmXing(obj.getString("rating"));
-                    bean.setmVersionName(obj.getString("versionName"));
-                    bean.setmVersionCode(obj.getInt("versionCode"));
-                    bean.setmDownloadUrl(obj.getString("rDownloadUrl"));
-
-                    mSearchApkContents.add(bean);
+            SearchBean searchBean = mGson.fromJson(data, SearchBean.class);
+            if (null != searchBean) {
+                int app_key = searchBean.getApp_key();
+                ISTOEND = searchBean.getIstoend();
+                List<ApkBean> contents = searchBean.getSearch_info();
+                if (null != contents) {
+                    mSearchApkContents.addAll(contents);
                 }
 
                 mPreloadListView.setVisibility(View.GONE);
                 isHotWordLayoutVisibility(View.GONE);
+                LogUtils.d(TAG, "ListView显示");
                 mListView.setVisibility(View.VISIBLE);
                 if (mListView.getFooterViewsCount() == 0)
                     mListView.addFooterView(moreView);
@@ -687,7 +676,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                     }, 200);//ListView设置显示条目位置，需要延时一会。因为ListView没有显示之前，设置不了显示位置
                 }
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             LogUtils.e(TAG, "搜索JSON解析失败");
         }
@@ -738,26 +727,13 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mPreloadAdapter.notifyDataSetChanged();
             }
         }
-        SearchBean bean = null;
         try {
-            JSONObject object = new JSONObject(result);
-            int app_key = object.getInt("app_key");
-            String json = object.getString("search_info");
-            JSONArray array = new JSONArray(json);
-            if (array.length() != 0) {
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject obj = new JSONObject(array.get(i).toString());
-                    bean = new SearchBean();
-                    bean.setmPackageName(obj.getString("packageName"));
-                    bean.setmName(obj.getString("name"));
-                    bean.setmImgUrl(obj.getString("iconUrl"));
-                    bean.setmApkSize(obj.getString("apkSize"));
-                    bean.setmDownloadNumber(obj.getString("downloadTimes"));
-                    bean.setmXing(obj.getString("rating"));
-                    bean.setmVersionName(obj.getString("versionName"));
-                    bean.setmVersionCode(obj.getInt("versionCode"));
-                    bean.setmDownloadUrl(obj.getString("rDownloadUrl"));
-                    mPreloadData.add(bean);
+            SearchBean searchBean = mGson.fromJson(result, SearchBean.class);
+            if (null != searchBean) {
+                int app_key = searchBean.getApp_key();
+                List<ApkBean> contents = searchBean.getSearch_info();
+                if (null != contents) {
+                    mPreloadData.addAll(contents);
                 }
 
                 if (!TextUtils.isEmpty(mEtView.getText().toString())) {
@@ -776,7 +752,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                     }
                 }
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             LogUtils.e(TAG, "搜索预加载JSON解析失败");
         }
@@ -938,29 +914,16 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      * @param data
      */
     private void resolveDetailTagData(String data) {
-        SearchBean bean;
         try {
-            JSONObject object = new JSONObject(data);
-            int app_key = object.getInt("app_key");
-            String json = object.getString("search_info");
-            ISTOEND = object.getBoolean("istoend");
-            if (!TextUtils.isEmpty(json)) {
-                JSONArray array = new JSONArray(json);
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject obj = new JSONObject(array.get(i).toString());
-                    bean = new SearchBean();
-                    bean.setmPackageName(obj.getString("packageName"));
-                    bean.setmName(obj.getString("name"));
-                    bean.setmImgUrl(obj.getString("iconUrl"));
-                    bean.setmApkSize(obj.getString("apkSize"));
-                    bean.setmDownloadNumber(obj.getString("downloadTimes"));
-                    bean.setmXing(obj.getString("rating"));
-                    bean.setmVersionName(obj.getString("versionName"));
-                    bean.setmVersionCode(obj.getInt("versionCode"));
-                    bean.setmDownloadUrl(obj.getString("rDownloadUrl"));
-
-                    mSearchApkContents.add(bean);
+            SearchBean searchBean = mGson.fromJson(data, SearchBean.class);
+            if (null != searchBean) {
+                int app_key = searchBean.getApp_key();
+                ISTOEND = searchBean.getIstoend();
+                List<ApkBean> contents = searchBean.getSearch_info();
+                if (null != contents) {
+                    mSearchApkContents.addAll(contents);
                 }
+
                 if (null == mAdapter) {
                     mAdapter = new SearchApkAdapter(mActivity, mSearchApkContents, this);
                     mListView.setAdapter(mAdapter);
@@ -970,7 +933,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mLoadingLayout.setVisibility(View.GONE);
                 mListView.setVisibility(View.VISIBLE);
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             LogUtils.e(TAG, "详情点击标签返回JSON解析失败");
         }
