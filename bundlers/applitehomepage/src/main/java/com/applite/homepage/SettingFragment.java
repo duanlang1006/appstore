@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,8 +17,10 @@ import android.widget.Toast;
 
 import com.applite.common.Constant;
 import com.applite.common.DefaultValue;
+import com.applite.common.LogUtils;
 import com.applite.sharedpreferences.AppliteSPUtils;
 import com.applite.utils.DataCleanManager;
+import com.mit.impl.ImplConfig;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
@@ -34,12 +37,17 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     private ViewGroup rootView;
 
     private LinearLayout clean_cache;       //清除缓存
-    private LinearLayout download_path;       //清除缓存
+//    private LinearLayout download_path;       //下载存储路径
+//    private LinearLayout download_thread;       //最大下载线程数
 
     private ImageView smart_show;           //智能无图
     private ImageView smart_download;       //零流量下载
     private ImageView update_notification;  //更新提醒
     private ImageView delete_apk;           //删除安装包
+
+    private ImageButton thread_btn1;
+    private ImageButton thread_btn2;
+    private ImageButton thread_btn3;
 
     private TextView save_path;
     private TextView cache_size;
@@ -54,6 +62,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
 
     @Override
     public void onAttach(Activity activity) {
+        LogUtils.d(TAG, "onAttach ");
         super.onAttach(activity);
         mInflater = LayoutInflater.from(mActivity);
         mDataCleanDialog = new DataCleanDialog();
@@ -77,9 +86,13 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         delete_apk = (ImageView) rootView.findViewById(R.id.delete_apk);                    //删除安装包
         clean_cache = (LinearLayout) rootView.findViewById(R.id.clean_cache);               //清除缓存
 
-        download_path = (LinearLayout) rootView.findViewById(R.id.download_path);
+//        download_path = (LinearLayout) rootView.findViewById(R.id.download_path);           //下载存储路径
         save_path = (TextView) rootView.findViewById(R.id.save_path);
         cache_size = (TextView) rootView.findViewById(R.id.cache_size);
+
+        thread_btn1 = (ImageButton) rootView.findViewById(R.id.thread_btn1);
+        thread_btn2 = (ImageButton) rootView.findViewById(R.id.thread_btn2);
+        thread_btn3 = (ImageButton) rootView.findViewById(R.id.thread_btn3);
 
         smart_show.setOnClickListener(this);
         smart_download.setOnClickListener(this);
@@ -87,17 +100,39 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         delete_apk.setOnClickListener(this);
         clean_cache.setOnClickListener(this);
 
+        thread_btn1.setOnClickListener(this);
+        thread_btn2.setOnClickListener(this);
+        thread_btn3.setOnClickListener(this);
+
         rootView.findViewById(R.id.feedback).setOnClickListener(this);//意见反馈
         rootView.findViewById(R.id.about).setOnClickListener(this);//关于
 
         initActionBar();
-
+        getDownloadThreadNum();
         setSavePath();
         setCacheSize();
 
         setAllState();
         return rootView;
     }
+
+    private void getDownloadThreadNum() {
+        int i = ImplConfig.getDownloadThreadNum(mActivity);
+        if (i == 1) {
+            thread_btn1.setBackgroundResource(R.drawable.setting_button_selected);
+            thread_btn2.setBackgroundResource(R.drawable.setting_button_unselected);
+            thread_btn3.setBackgroundResource(R.drawable.setting_button_unselected);
+        } else if (i == 2) {
+            thread_btn1.setBackgroundResource(R.drawable.setting_button_unselected);
+            thread_btn2.setBackgroundResource(R.drawable.setting_button_selected);
+            thread_btn3.setBackgroundResource(R.drawable.setting_button_unselected);
+        } else if (i == 3) {
+            thread_btn1.setBackgroundResource(R.drawable.setting_button_unselected);
+            thread_btn2.setBackgroundResource(R.drawable.setting_button_unselected);
+            thread_btn3.setBackgroundResource(R.drawable.setting_button_selected);
+        }
+    }
+
 
     private void setAllState() {
         update_notification.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, DefaultValue.defaultBoolean));
@@ -115,7 +150,6 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     }
 
     private void setCacheSize() {
-        String showsize1;
         try {
             size = DataCleanManager.getTotalCacheSize(mActivity);
             String num = size.substring(0, size.length() - 2);
@@ -180,6 +214,24 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             FeedbackDialog.show(mActivity);
         } else if (R.id.about == v.getId()) {           //关于
             ((OSGIServiceHost) mActivity).jumptoAbout(true);
+        } else if (R.id.thread_btn1 == v.getId()) {
+            LogUtils.d(TAG, "thread_btn1 ");
+            ImplConfig.setDownloadThreadNum(mActivity, 1);
+            thread_btn1.setBackgroundResource(R.drawable.setting_button_selected);
+            thread_btn2.setBackgroundResource(R.drawable.setting_button_unselected);
+            thread_btn3.setBackgroundResource(R.drawable.setting_button_unselected);
+        } else if (R.id.thread_btn2 == v.getId()) {
+            LogUtils.d(TAG, "thread_btn2 ");
+            ImplConfig.setDownloadThreadNum(mActivity, 2);
+            thread_btn1.setBackgroundResource(R.drawable.setting_button_unselected);
+            thread_btn2.setBackgroundResource(R.drawable.setting_button_selected);
+            thread_btn3.setBackgroundResource(R.drawable.setting_button_unselected);
+        } else if (R.id.thread_btn3 == v.getId()) {
+            LogUtils.d(TAG, "thread_btn3 ");
+            ImplConfig.setDownloadThreadNum(mActivity, 3);
+            thread_btn1.setBackgroundResource(R.drawable.setting_button_unselected);
+            thread_btn2.setBackgroundResource(R.drawable.setting_button_unselected);
+            thread_btn3.setBackgroundResource(R.drawable.setting_button_selected);
         }
     }
 

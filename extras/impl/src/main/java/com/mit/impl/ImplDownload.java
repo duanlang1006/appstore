@@ -25,7 +25,7 @@ import java.util.concurrent.Executors;
 public class ImplDownload {
     private static final String TAG = "impl_download";
     private SparseArray<Method> mCmdList = new SparseArray<Method>();
-    private int maxDownloadThread = 3;
+    private int maxDownloadThread;
     //    private DownloadManager dm;
     private boolean inited = false;
     private Context mContext;
@@ -58,6 +58,9 @@ public class ImplDownload {
             mContext.startService(downloadSvr);
         }
         inited = true;
+        if(maxDownloadThread == 0)
+        maxDownloadThread = ImplConfig.getDownloadThreadNum(context);
+        ImplLog.d(TAG, "maxDownloadThread = " + maxDownloadThread);
     }
 
     void fillImplInfo(ImplInfo implInfo) {

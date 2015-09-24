@@ -203,7 +203,60 @@
         </LinearLayout>
 
         <include layout="@layout/default_line_setting"></include>
-        <!-- 最多同时喜爱在任务-->
+
+        <!-- 最多同时下载任务-->
+        <LinearLayout
+            android:id="@+id/download_thread"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingRight="10dp">
+
+            <TextView
+                style="@style/Default_charactor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="@dimen/settings_item_min_height"
+                android:paddingLeft="@dimen/settings_item_string_padding_left"
+                android:text="@string/download_thread" />
+
+
+
+            <LinearLayout
+                android:id="@+id/download_thread_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/thread_btn1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/select_thread_bg"
+                    android:text="1" />
+
+                <ImageButton
+                    android:id="@+id/thread_btn2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/select_thread_bg"
+                    android:text="2" />
+
+                <ImageButton
+                    android:id="@+id/thread_btn3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/select_thread_bg"
+                    android:text="3" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <include layout="@layout/default_line_setting"></include>
 
         <!-- 清除缓存-->
         <LinearLayout
@@ -231,6 +284,7 @@
                 android:paddingRight="@dimen/settings_item_string_padding_right" />
 
         </LinearLayout>
+
 
         <TextView
             style="@style/Setting_title_style"
