@@ -1,4 +1,4 @@
-package com.applite.dm;
+package com.applite.dm.main;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -13,10 +13,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.VibratorUtil;
+import com.applite.dm.adapter.DownloadAdapter;
+import com.applite.dm.adapter.DownloadSimilarAdapter;
+import com.applite.dm.R;
 import com.applite.sharedpreferences.AppliteSPUtils;
 import com.applite.similarview.SimilarAdapter;
 import com.applite.similarview.SimilarBean;
@@ -45,8 +49,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class DownloadListFragment extends OSGIBaseFragment implements DownloadPagerFragment.IDownloadOperator,
-        ListView.OnItemClickListener,
-        AdapterView.OnItemLongClickListener, SimilarAdapter.SimilarAPKDetailListener {
+        ListView.OnItemClickListener, AdapterView.OnItemLongClickListener,
+        View.OnClickListener, SimilarAdapter.SimilarAPKDetailListener {
     final static String TAG = "applite_dm";
     private ListView mListview;
     private DownloadAdapter mAdapter;
@@ -55,23 +59,35 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     private int mTitleId;
     private ImplAgent mImplAgent;
     private List<ImplInfo> mImplList;
-    private BitmapUtils mBitmapHelper;
 
+    private BitmapUtils mBitmapHelper;
     private SimilarView mSimilarView;
     private List<SimilarBean> mSimilarDataList;
     private SimilarAdapter mSimilarAdapter;
+
     private HttpUtils mHttpUtils;
-
     private boolean checkBoxAnima = true;
-
-    private ImplAgent implAgent;
     private int temp = 0;
 
     private String COUNT_DOWNLOADING = "count downloading";
     private String COUNT_DOWNLOADED = "count downloaded";
     private String FLAG = "flag";
-    private String LENGTH = "length";
     private String POSITION = "position";
+
+//    /**
+//     * Notification构造器
+//     */
+//    private NotificationCompat.Builder mBuilder;
+//    /**
+//     * Notification的ID
+//     */
+////    int notifyId = 100;
+//    int notifyId0 = 100;
+//    int notifyId1 = 101;
+//    /**
+//     * Notification管理
+//     */
+//    public NotificationManager mNotificationManager;
 
     private DownloadListener mDownloadListener = new DownloadListener() {
         @Override
@@ -134,15 +150,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             if (key.equals(FLAG)) {
                 if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
                     checkBoxAnima = false;
-//                    if (R.string.dm_downloaded == (int) AppliteSPUtils.get(mActivity, POSITION, -1)) {
-//                        mSimilarView.setVisibility(View.GONE);
-//                        mSimilarView.setPadding(0, -mSimilarView.getHeight(), 0, 0);
-//                    }
                 }
             } else if (key.equals(POSITION)) {
-                if (mTitleId == (int) AppliteSPUtils.get(mActivity, POSITION, -1)) {
-                    AppliteSPUtils.put(mActivity, LENGTH, mImplList.size());
-                }
                 if (R.string.dm_downloading == (int) AppliteSPUtils.get(mActivity, POSITION, -1)) {
                     if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false) && View.VISIBLE == mSimilarView.getVisibility()) {
                         mSimilarView.setVisibility(View.GONE);
@@ -153,6 +162,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                     }
                 }
             }
+//            else if (key.equals(COUNT_DOWNLOADING)) {
+//                    showIntentActivityNotify();//这里是显示 点击返回的提示
+//            } else if (key.equals(COUNT_DOWNLOADED)) {
+//                    showIntentApkNotify();//这里是显示 点击安装的提示
+//            }
         }
     };
 
@@ -172,8 +186,12 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
         super.onCreate(savedInstanceState);
+        //SharePreference初始化
+        AppliteSPUtils.registerChangeListener(mActivity, mListListener);
+        count(0);//当前页选中项目数
+        AppliteSPUtils.put(mActivity, FLAG, false);
+//        initNotify();//通知栏提示初始化
     }
 
     @Override
@@ -183,10 +201,17 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         LayoutInflater mInflater = inflater;
         View view = mInflater.inflate(R.layout.fragment_download_list, container, false);
         mListview = (ListView) view.findViewById(android.R.id.list);
-        mListview.setEmptyView(view.findViewById(R.id.empty));
+        TextView emptyText = (TextView) view.findViewById(R.id.empty);
+        mListview.setEmptyView(emptyText);
         if (mTitleId == R.string.dm_downloading) {
             initSimilarView(view);
             mListview.addFooterView(mSimilarView);
+//            emptyText.setText(mActivity.getResources().getString(R.string.back_to_homepage));
+//            emptyText.setEnabled(true);
+//            Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher);
+//            drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+//            emptyText.setCompoundDrawables(null, drawable, null, null);
+//            emptyText.setOnClickListener(this);
         }
         mListview.setOnItemClickListener(this);
         status = new boolean[mImplList.size()];
@@ -203,13 +228,99 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             mListview.setAdapter(mAdapter);
         }
 
-        //初始化
-        AppliteSPUtils.registerChangeListener(mActivity, mListListener);
-        count(0);//当前页选中项目数
-        AppliteSPUtils.put(mActivity, FLAG, false);
-        AppliteSPUtils.put(mActivity, LENGTH, 0);
         return view;
     }
+
+//    /**
+//     * 初始化通知栏
+//     */
+//    private void initNotify() {
+//        LogUtils.d("wanghc", "我执行了initNotify");
+//        mBuilder = new NotificationCompat.Builder(mActivity);
+//        mBuilder.setContentTitle("测试标题")
+//                .setContentText("测试内容")
+//                .setContentIntent(getDefalutIntent(Notification.FLAG_AUTO_CANCEL))
+////				.setNumber(number)//显示数量
+//                .setTicker("测试通知来啦")//通知首次出现在通知栏，带上升动画效果的
+//                .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示
+//                .setPriority(Notification.PRIORITY_DEFAULT)//设置该通知优先级
+////				.setAutoCancel(true)//设置这个标志当用户单击面板就可以让通知将自动取消
+//                .setOngoing(false)//ture，设置他为一个正在进行的通知。
+//                        // 他们通常是用来表示一个后台任务,用户积极参与(如播放音乐)或以某种方式正在等待,因此占用设备(如一个文件下载,同步操作,主动网络连接)
+////                .setDefaults(Notification.DEFAULT_VIBRATE)//向通知添加声音、闪灯和振动效果的最简单、最一致的方式是使用当前的用户默认设置，
+//                        // 使用defaults属性，可以组合：
+//                        //Notification.DEFAULT_ALL  Notification.DEFAULT_SOUND 添加声音 // requires VIBRATE permission
+//                .setSmallIcon(R.drawable.ic_launcher);
+//        mNotificationManager = (NotificationManager) mActivity.getSystemService(mActivity.NOTIFICATION_SERVICE);
+//    }
+//
+//    /**
+//     * @获取默认的pendingIntent,为了防止2.3及以下版本报错
+//     * @flags属性: 在顶部常驻:Notification.FLAG_ONGOING_EVENT
+//     * 点击去除： Notification.FLAG_AUTO_CANCEL
+//     */
+//    public PendingIntent getDefalutIntent(int flags) {
+//        LogUtils.d("wanghc", "我执行了getDefalutIntent");
+//        PendingIntent pendingIntent = PendingIntent.getActivity(mActivity, 1, new Intent(), flags);
+//        return pendingIntent;
+//    }
+//
+////    /** 显示通知栏 */
+////    public void showNotify(){
+////        mBuilder.setContentTitle("测试标题")
+////                .setContentText("测试内容")
+//////				.setNumber(number)//显示数量
+////                .setTicker("测试通知来啦");//通知首次出现在通知栏，带上升动画效果的
+////        mNotificationManager.notify(notifyId, mBuilder.build());
+//////		mNotification.notify(getResources().getString(R.string.app_name), notiId, mBuilder.build());
+////    }
+//
+//    /**
+//     * 显示通知栏点击跳转到指定Activity
+//     */
+//    public void showIntentActivityNotify() {
+//        LogUtils.d("wanghc", "我执行了showIntentActivityNotify");
+//        // Notification.FLAG_ONGOING_EVENT --设置常驻 Flag;Notification.FLAG_AUTO_CANCEL 通知栏上点击此通知后自动清除此通知
+////		notification.flags = Notification.FLAG_AUTO_CANCEL; //在通知栏上点击此通知后自动清除此通知
+//        mBuilder.setAutoCancel(true)//点击后让通知将消失
+//                .setContentTitle("您有" + mImplList.size() + "个应用正在下载")
+//                .setContentText("点击查看");
+////                .setTicker("点我");
+//        //点击的意图ACTION是跳转到Intent
+////        Intent resultIntent = new Intent(this, MainActivity.class);
+//        Intent resultIntent = new Intent();
+//        resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(mActivity, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        mBuilder.setContentIntent(pendingIntent);
+//        mNotificationManager.notify(notifyId0, mBuilder.build());
+//    }
+//
+//    /**
+//     * 显示通知栏点击打开Apk
+//     */
+//    public void showIntentApkNotify() {
+//        LogUtils.d("wanghc", "我执行了showIntentApkNotify");
+//        // Notification.FLAG_ONGOING_EVENT --设置常驻 Flag;Notification.FLAG_AUTO_CANCEL 通知栏上点击此通知后自动清除此通知
+////		notification.flags = Notification.FLAG_AUTO_CANCEL; //在通知栏上点击此通知后自动清除此通知
+//        mBuilder.setAutoCancel(true)//点击后让通知将消失
+//                .setContentTitle("您有" + mImplList.size() + "个应用下载完成")
+//                .setContentText("点击安装");
+////                .setTicker("下载完成！");
+//        //我们这里需要做的是打开一个安装包
+//        Intent apkIntent = new Intent();
+//        apkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        apkIntent.setAction(android.content.Intent.ACTION_VIEW);
+//        //注意：这里的这个APK是放在assets文件夹下，获取路径不能直接读取的，要通过COYP出去在读或者直接读取自己本地的PATH，这边只是做一个跳转APK，实际打不开的
+//        String apk_path = "file:///android_asset/cs.apk";
+////		Uri uri = Uri.parse(apk_path);
+//        Uri uri = Uri.fromFile(new File(apk_path));
+//        apkIntent.setDataAndType(uri, "application/vnd.android.package-archive");
+//        // context.startActivity(intent);
+//        PendingIntent contextIntent = PendingIntent.getActivity(mActivity, 0, apkIntent, 0);
+//        mBuilder.setContentIntent(contextIntent);
+//        mNotificationManager.notify(notifyId1, mBuilder.build());
+//    }
+
 
     //当前页选中项目数
     private void count(int number) {
@@ -310,7 +421,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         });
     }
 
-
     @Override
     public void onPause() {
         super.onPause();
@@ -346,6 +456,15 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
     }
 
+    @Override
+    public void onClick(View v) {
+
+//        getFragmentManager().popBackStack();
+//        if () {
+//        ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
+//        }
+//        Toast.makeText(mActivity, "我点了返回", Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -363,7 +482,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         } else {
             status[position] = !status[position];
             temp = count();
-            AppliteSPUtils.put(mActivity, LENGTH, status.length);//本页长度
             count((status[position] == false) ? temp - 1 : temp + 1);//当前页选中项目数
             mAdapter.notifyDataSetChanged();
         }
@@ -401,7 +519,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         Arrays.fill(status, false);//status数组复位
         checkBoxAnima = true;
         count(0);//当前页选中项目数
-        AppliteSPUtils.put(mActivity, LENGTH, 0);
         AppliteSPUtils.put(mActivity, POSITION, 0);
         if (null != mAdapter) {
             mAdapter.notifyDataSetChanged();
@@ -415,14 +532,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                 tempList.add(mImplList.get(i).getId());
             }
         }
-        implAgent.remove(tempList);
+        mImplAgent.remove(tempList);
         count(0);
     }
 
 
     @Override
     public void refreshDetail(SimilarBean similarBean) {
-        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(),similarBean.getVersionCode(), null,true);
+        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), similarBean.getVersionCode(), null, true);
     }
 
     @Override
@@ -450,5 +567,25 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         reSet();
         AppliteSPUtils.put(mActivity, FLAG, false);
     }
+
+    //获取本页下载项的个数
+    @Override
+    public int getLength() {
+        return status.length;
+    }
+
+    //ListFragment和适配器传递数据
+    public interface DownloadListener {
+        boolean getFlag1();
+
+        boolean getStatus(int position);
+
+        int getTitleId();
+
+        boolean getFlag2();
+
+        void setFlag2(boolean b);
+    }
+
 
 }

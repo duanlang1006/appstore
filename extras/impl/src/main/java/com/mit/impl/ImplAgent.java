@@ -1,14 +1,18 @@
 package com.mit.impl;
 
 import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
@@ -42,6 +46,21 @@ public class ImplAgent extends Observable {
     private final static String IMPL_ACTION_SYSTEM_DELETE_RESULT = "com.installer.system.delete.result";
 
     private static final HandlerThread sWorkerThread = new HandlerThread("impl-worker");
+
+    /**
+     * Notification构造器
+     */
+    private static NotificationCompat.Builder mBuilder;
+    /**
+     * Notification的ID
+     */
+    private static int notifyId_base = 100;
+    /**
+     * Notification管理
+     */
+    public static NotificationManager mNotificationManager;
+
+
     private final static Handler mMainHandler = new Handler();
 
     static {
@@ -76,7 +95,7 @@ public class ImplAgent extends Observable {
     private final Map<ImplInfo, List<WeakReference<ImplChangeCallback>>> mWeakCallbackMap;
     private UpdateObserverRunnable mUpdateTask;
 
-    private ImplAgent(Context context) {
+    private ImplAgent(final Context context) {
         long current = System.currentTimeMillis();
         mContext = context;
         mDownloader = ImplDownload.getInstance(mContext);
@@ -107,7 +126,6 @@ public class ImplAgent extends Observable {
                     mInstaller.fillImplInfo(implInfo);
                     implInfo.initImplRes(mContext);
                 }
-
                 mDownloader.kickDownload(mImplList, mImplCallback);
                 mDownloader.onNetworkChanged(mImplList, mImplCallback);
                 mUpdateTask = new UpdateObserverRunnable();
@@ -283,6 +301,59 @@ public class ImplAgent extends Observable {
         implInfo.setAutoLaunch(autoLauncher);
         mDownloader.addDownload(implInfo, fullname, md5, mImplCallback);
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionAdd");
+
+//        showDownloadNotify(mContext, ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PAUSED
+//                | ImplInfo.STATUS_FAILED | ImplInfo.STATUS_PACKAGE_INVALID);
+
+    }
+
+    private static void showDownloadNotify(Context context, int position) {
+        initNotify(context);
+        ImplAgent mImplAgent = ImplAgent.getInstance(context.getApplicationContext());
+//        if (R.string.downloading == position) {
+        showIntentActivityNotify(context, mImplAgent.getImplInfoCount(position) + 1, notifyId_base + 1);
+        //这里是显示 点击返回的提示
+//        } else {
+//            showIntentActivityNotify(context, mImplAgent.getImplInfoCount(position) + 1, notifyId_base + 2);
+//        }
+
+    }
+
+    private static void initNotify(Context context) {
+        mBuilder = new NotificationCompat.Builder(context);
+        mBuilder.setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示
+                .setPriority(Notification.PRIORITY_DEFAULT)//设置该通知优先级
+//				.setAutoCancel(true)//设置这个标志当用户单击面板就可以让通知将自动取消
+                .setOngoing(false)//ture，设置他为一个正在进行的通知。
+                .setSmallIcon(R.drawable.ic_launcher);
+        mNotificationManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+    }
+
+    /**
+     * 显示通知栏点击跳转到指定Activity
+     */
+    public static void showIntentActivityNotify(Context context, int count, int notify) {
+        // Notification.FLAG_ONGOING_EVENT --设置常驻 Flag;
+        // Notification.FLAG_AUTO_CANCEL 通知栏上点击此通知后自动清除此通知
+//		notification.flags = Notification.FLAG_AUTO_CANCEL; //在通知栏上点击此通知后自动清除此通知
+        String temp = null;
+        if (notifyId_base + 1 == notify) {
+            temp = "您有" + count + "个应用正在下载";
+        } else {
+            temp = "您有" + count + "个应用已下载完成";
+        }
+        mBuilder.setAutoCancel(true)//点击后让通知将消失
+                .setContentTitle(temp)
+                .setContentText("点击查看");
+//
+//        Intent clickIntent = new Intent(context, ClickReceiver.class); //点击 Intent
+//        clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        clickIntent.putExtra("notify", notify);
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        mBuilder.setContentIntent(pendingIntent);
+        mNotificationManager.notify(notifyId_base + 1, mBuilder.build());
+//        ((OSGIServiceHost) context).jumptoDownloadManager(true);
+
     }
 
     public void pauseDownload(ImplInfo implInfo) {
