@@ -46,10 +46,11 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="~我~们~的~队~伍~像~太~阳~"
-        android:textColor="@color/star_color" />
+        android:layout_height="160dp"
+        android:gravity="center"
+        android:text="我 · 们 · 的 · 团 · 队"
+        android:textColor="@color/star_color"
+        android:textSize="17sp"/>
 
     <kankan.wheel.widget.WheelView
         android:id="@+id/aa"
@@ -69,6 +70,5 @@
         android:layout_height="wrap_content"
         android:text="Copyright © 2015 Aplite. All Right Reserved"
         android:textColor="@color/black"
-        android:textSize="@dimen/apkList_nameText_size"
-        android:textStyle="bold" />
+        android:textSize="@dimen/apkList_nameText_size" />
 </LinearLayout>

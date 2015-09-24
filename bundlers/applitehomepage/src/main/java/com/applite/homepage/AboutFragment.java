@@ -68,6 +68,7 @@ public class AboutFragment extends OSGIBaseFragment {
         wheelView.setScaleX(scale);
         wheelView.setScaleY(scale);
         wheelView.setMinimumHeight(distance);
+        wheelView.setVisibility(View.GONE);
 
         tv_app_version = (TextView) view.findViewById(R.id.app_version_code);
         tv_app_version.setText(info.versionName);
