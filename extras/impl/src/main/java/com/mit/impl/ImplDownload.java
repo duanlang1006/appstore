@@ -283,12 +283,12 @@ public class ImplDownload {
 //        }
 //    }
 
-    void addDownload(ImplInfo implInfo, String fullname, String md5, ImplListener callback) {
-        if (null == implInfo.getDownloadUrl()) {
+    void addDownload(ImplInfo implInfo,String fullname,String md5,ImplListener callback){
+        if (null == implInfo.getDownloadUrl() || null == implInfo.getFileSavePath()){
             if (null != callback) {
                 implInfo.setLocalPath(null);
                 implInfo.setStatus(ImplInfo.STATUS_FAILED);
-                callback.onFailure(implInfo, null, "download url is null");
+                callback.onFailure(implInfo, null, "download url or savepath is null");
             }
             return;
         }
@@ -327,7 +327,11 @@ public class ImplDownload {
         resumeImpl(implInfo, callback);
     }
 
-    private void resumeImpl(ImplInfo implInfo, ImplListener callback) {
+    private void resumeImpl(ImplInfo implInfo,ImplListener callback){
+        if (null == implInfo.getDownloadUrl() || null == implInfo.getFileSavePath()){
+            return;
+        }
+
         HttpUtils http = new HttpUtils();
         http.configRequestThreadPoolSize(maxDownloadThread);
         DownloadCallback<File> downloadCallback = new DownloadCallback<File>(implInfo, callback);
