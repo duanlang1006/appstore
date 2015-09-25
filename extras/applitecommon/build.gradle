@@ -24,11 +24,11 @@ dependencies {
     provided files('../../app/reflibs/xUtils-2.6.14.jar')
     provided files('../../extras/impl/applite-impl-v1.1.jar')
     provided files('../../extras/mitUpdateSDK/mit-update-v1.0.jar')
-    compile project(':extras:mittheme')
 }
 
 task clearJar(type: Delete) {
-    delete "../../app/libs/applite-common-v${android.defaultConfig.versionName}.jar"
+    delete "./applite-common-v${android.defaultConfig.versionName}.jar"
+    delete "./applite-common-v${android.defaultConfig.versionName}.aar"
 }
 
 task makeJar(type: Copy) {
@@ -36,6 +36,12 @@ task makeJar(type: Copy) {
     into('./')
     include('classes.jar')
     rename ('classes.jar', "applite-common-v${android.defaultConfig.versionName}.jar")
+
+    from('build/outputs/aar/')
+    into('./')
+    include('applitecommon-release.aar')
+    rename ('applitecommon-release.aar', "applite-common-v${android.defaultConfig.versionName}.aar")
+
 }
 
 makeJar.dependsOn(clearJar, assembleRelease)

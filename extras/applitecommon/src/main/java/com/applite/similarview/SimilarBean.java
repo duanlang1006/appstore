@@ -5,7 +5,7 @@ package com.applite.similarview;
  */
 public class SimilarBean {
 
-    private int _id;
+    private String _id;
     private String name;
     private String packageName;
     private String iconUrl;
@@ -24,7 +24,7 @@ public class SimilarBean {
                 '}';
     }
 
-    public int get_id() {
+    public String get_id() {
         return _id;
     }
 
@@ -48,7 +48,7 @@ public class SimilarBean {
         return rDownloadUrl;
     }
 
-    public void set_id(int _id) {
+    public void set_id(String _id) {
         this._id = _id;
     }
 

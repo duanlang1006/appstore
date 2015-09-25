@@ -48,6 +48,7 @@ import com.mit.appliteupdate.adapter.UpdateAdapter;
 import com.mit.appliteupdate.bean.UpdateData;
 import com.mit.appliteupdate.utils.UpdateUtils;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.mitupdatesdk.MitMobclickAgent;
@@ -353,59 +354,55 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private void resolve(String result) {
         if (!TextUtils.isEmpty(mUpdateData))
             setLoadLayoutVisibility(View.GONE);
-        try {
-            UpdateData updateData = mGson.fromJson(result, UpdateData.class);
-            if (null != updateData) {
-                mUpdateApkList = updateData.getInstalled_update_list();
-                mSimilarDataList = updateData.getSimilar_info();
-            }
-            if (null == mSimilarAdapter) {
-                mSimilarAdapter = new MySimilarAdapter(mActivity);
-                mSimilarAdapter.setData(mSimilarDataList, this);
-                mSimilarView.setAdapter(mSimilarAdapter);
-            } else {
-                mSimilarAdapter.setData(mSimilarDataList, this);
-                mSimilarAdapter.notifyDataSetChanged();
-            }
+        UpdateData updateData = mGson.fromJson(result, UpdateData.class);
+        if (null != updateData) {
+            mUpdateApkList = updateData.getInstalled_update_list();
+            LogUtils.d(TAG, "mUpdateApkList：" + mUpdateApkList);
+            mSimilarDataList = updateData.getSimilar_info();
+            LogUtils.d(TAG, "mSimilarDataList：" + mSimilarDataList);
+        }
+        if (null == mSimilarAdapter) {
+            mSimilarAdapter = new MySimilarAdapter(mActivity);
+            mSimilarAdapter.setData(mSimilarDataList, this, 4);
+            mSimilarView.setAdapter(mSimilarAdapter);
+        } else {
+            mSimilarAdapter.setData(mSimilarDataList, this, 4);
+            mSimilarAdapter.notifyDataSetChanged();
+        }
 
-            //删除已经忽略的APK
-            Iterator iter = mUpdateApkList.iterator();
-            while (iter.hasNext()) {
-                ApkBean data = (ApkBean) iter.next();
-                boolean isKeyExist = AppliteSPUtils.contains(mActivity, data.getPackageName());
-                if (isKeyExist) {
-                    int VersionCode = (int) AppliteSPUtils.get(mActivity, data.getPackageName(), 0);
-                    if (data.getVersionCode() == VersionCode) {
-                        LogUtils.d(TAG, "忽略的Name：" + data.getName());
-                        iter.remove();
-                        mUpdateApkList.remove(iter);
-                        mIgnoreList.add(data);
-                    } else {
-                        AppliteSPUtils.remove(mActivity, data.getPackageName());
-                    }
+        //删除已经忽略的APK
+        Iterator iter = mUpdateApkList.iterator();
+        while (iter.hasNext()) {
+            ApkBean data = (ApkBean) iter.next();
+            boolean isKeyExist = AppliteSPUtils.contains(mActivity, data.getPackageName());
+            if (isKeyExist) {
+                int VersionCode = (int) AppliteSPUtils.get(mActivity, data.getPackageName(), 0);
+                if (data.getVersionCode() == VersionCode) {
+                    LogUtils.d(TAG, "忽略的Name：" + data.getName());
+                    iter.remove();
+                    mUpdateApkList.remove(iter);
+                    mIgnoreList.add(data);
+                } else {
+                    AppliteSPUtils.remove(mActivity, data.getPackageName());
                 }
             }
-            if (mIgnoreList.size() > 0) {//有忽略的才显示，不然就隐藏
-                mActionBarIgnore.setText(mActivity.getResources().getString(R.string.ignore_update) + "(" + mIgnoreList.size() + ")");
-                mActionBarIgnore.setVisibility(View.VISIBLE);
-            } else {
-                mActionBarIgnore.setVisibility(View.GONE);
-            }
-
-            if (null == mUpdateApkList || 0 == mUpdateApkList.size()) {
-                mNoUpdateView.setVisibility(View.VISIBLE);
-            } else {
-                mNoUpdateView.setVisibility(View.GONE);
-            }
-
-            mAdapter = new UpdateAdapter(mActivity, mUpdateApkList, this);
-            mListView.setAdapter(mAdapter);
-            mListView.setVisibility(View.VISIBLE);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogUtils.i(TAG, "更新管理返回的JSON解析失败");
         }
+        if (mIgnoreList.size() > 0) {//有忽略的才显示，不然就隐藏
+            mActionBarIgnore.setText(mActivity.getResources().getString(R.string.ignore_update) + "(" + mIgnoreList.size() + ")");
+            mActionBarIgnore.setVisibility(View.VISIBLE);
+        } else {
+            mActionBarIgnore.setVisibility(View.GONE);
+        }
+
+        if (null == mUpdateApkList || 0 == mUpdateApkList.size()) {
+            mNoUpdateView.setVisibility(View.VISIBLE);
+        } else {
+            mNoUpdateView.setVisibility(View.GONE);
+        }
+
+        mAdapter = new UpdateAdapter(mActivity, mUpdateApkList, this);
+        mListView.setAdapter(mAdapter);
+        mListView.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -441,8 +438,35 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     @Override
-    public void refreshDetail(SimilarBean similarBean) {
-        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), similarBean.getVersionCode(), null, true);
+    public void onClickIcon(Object... params) {
+        SimilarBean bean = (SimilarBean) params[0];
+        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getPackageName(), bean.getName(), bean.getIconUrl(), bean.getVersionCode(), null, true);
+    }
+
+    @Override
+    public void onClickName(Object... params) {
+        SimilarBean bean = (SimilarBean) params[0];
+        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getPackageName(), bean.getName(), bean.getIconUrl(), bean.getVersionCode(), null, true);
+    }
+
+    @Override
+    public void onClickButton(Object... params) {
+        ImplInfo implInfo = (ImplInfo) params[0];
+        SimilarBean bean = (SimilarBean) params[1];
+        ImplChangeCallback implChangeCallback = (ImplChangeCallback) params[2];
+        ImplHelper.onClick(mActivity,
+                implInfo,
+                bean.getrDownloadUrl(),
+                bean.getName(),
+                bean.getIconUrl(),
+                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
+                null,
+                implChangeCallback);
+    }
+
+    @Override
+    public void dataLess(int i) {
+
     }
 
     @Override

@@ -30,4 +30,11 @@
         <attr name="wheelShadows" format="reference" />
     </declare-styleable>
 
+    <declare-styleable name="SimilarView">
+        <attr name="similarTitleView" format="reference" />
+        <attr name="similarChangeView" format="reference" />
+        <attr name="similarGridView" format="reference" />
+        <attr name="similarDateNullView" format="reference" />
+    </declare-styleable>
+
 </resources>
