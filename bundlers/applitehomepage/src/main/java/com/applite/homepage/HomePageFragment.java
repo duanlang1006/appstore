@@ -34,6 +34,7 @@ import com.applite.bean.ScreenBean;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.applite.common.DefaultValue;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
 import com.applite.utils.SPUtils;
@@ -403,7 +404,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private void download(final String name, String url) {
         HttpHandler mHttpHandler = mFinalHttp.download(url, //这里是下载的路径
                 AppliteUtils.getAppDir(name), //这是保存到本地的路径
-                true,//true:断点续传 false:不断点续传（全新下载）
+                DefaultValue.defaultValueHTTPSuport,//true:断点续传 false:不断点续传（全新下载）
                 new AjaxCallBack<File>() {
 
                     @Override
