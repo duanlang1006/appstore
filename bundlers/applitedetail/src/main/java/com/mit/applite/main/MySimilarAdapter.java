@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.applite.common.Constant;
 import com.applite.similarview.SimilarAdapter;
 import com.applite.similarview.SimilarBean;
@@ -15,9 +16,9 @@ import com.mit.impl.ImplInfo;
 import java.io.File;
 
 /**
-* Created by LSY on 15-8-12.
-*/
-public class MySimilarAdapter extends SimilarAdapter {
+ * Created by LSY on 15-8-12.
+ */
+public class MySimilarAdapter extends SimilarAdapter<SimilarBean> {
     private final ImplAgent implAgent;
 
     public MySimilarAdapter(Context context) {
@@ -26,13 +27,8 @@ public class MySimilarAdapter extends SimilarAdapter {
     }
 
     @Override
-    public SimilarAdapter.ViewHolder newViewHolder(View convertView) {
+    public ViewHolder newViewHolder(View convertView) {
         return new MyViewHolder(convertView);
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        return super.getView(position, convertView, parent);
     }
 
     class MyViewHolder extends SimilarAdapter.ViewHolder implements ImplChangeCallback {
@@ -40,24 +36,38 @@ public class MySimilarAdapter extends SimilarAdapter {
 
         public MyViewHolder(View view) {
             super(view);
-            mTv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ImplHelper.onClick(getContext(),
-                            implInfo,
-                            bean.getrDownloadUrl(),
-                            bean.getName(),
-                            bean.getIconUrl(),
-                            Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
-                            null,
-                            (ImplChangeCallback) v.getTag());
-                }
-            });
+//            mTv.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    SimilarBean date = (SimilarBean)bean;
+//                    ImplHelper.onClick(getContext(),
+//                            implInfo,
+//                            date.getrDownloadUrl(),
+//                            date.getName(),
+//                            date.getIconUrl(),
+//                            Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + date.getName() + ".apk",
+//                            null,
+//                            (ImplChangeCallback) v.getTag());
+//                }
+//            });
         }
 
         @Override
-        public void initView(SimilarBean data) {
-            implInfo = implAgent.getImplInfo(data.getPackageName(), data.getPackageName(), data.getVersionCode());
+        public void onClick(View v) {
+            if (v.getId() == R.id.item_similar_img) {
+                mSimilarAPKDetailListener.onClickIcon(bean);
+            } else if (v.getId() == R.id.item_similar_name) {
+                mSimilarAPKDetailListener.onClickName(bean);
+            } else if (v.getId() == R.id.item_similar_install_tv) {
+                SimilarBean date = (SimilarBean) bean;
+                mSimilarAPKDetailListener.onClickButton(implInfo, date, (ImplChangeCallback) v.getTag());
+            }
+        }
+
+        @Override
+        public void initView(Object data) {
+            SimilarBean bean = (SimilarBean) data;
+            implInfo = implAgent.getImplInfo(bean.getPackageName(), bean.getPackageName(), bean.getVersionCode());
             if (null != implInfo) {
                 implAgent.bindImplCallback(this, implInfo);
             }

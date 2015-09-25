@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import com.applite.bean.ApkBean;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.applite.common.DefaultValue;
 import com.applite.common.LogUtils;
 import com.applite.sharedpreferences.AppliteSPUtils;
 import com.lidroid.xutils.HttpUtils;
@@ -78,12 +79,10 @@ public class NetworkReceiver extends BroadcastReceiver {
                 //获取当前wifi名称
                 LogUtils.d(TAG, "连接到WIFI:" + wifiInfo.getSSID());
 
-                LogUtils.d(TAG, "零流量更新状态:" + AppliteSPUtils.get(mContext, AppliteSPUtils.WIFI_UPDATE_SWITCH, true));
                 LogUtils.d(TAG, "当前时间:" + System.currentTimeMillis());
                 LogUtils.d(TAG, "下次请求时间:" + AppliteSPUtils.get(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, 0L));
-                if ((boolean) AppliteSPUtils.get(mContext, AppliteSPUtils.WIFI_UPDATE_SWITCH, true))
-                    if (System.currentTimeMillis() > (long) AppliteSPUtils.get(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, 0L))
-                        post();
+                if (System.currentTimeMillis() > (long) AppliteSPUtils.get(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, 0L))
+                    post();
             } else {
                 LogUtils.d(TAG, "无网络连接");
             }
@@ -170,7 +169,8 @@ public class NetworkReceiver extends BroadcastReceiver {
 //                    JSONArray recommendedArray = new JSONArray();
 //                    UpdateNotification.getInstance().showNot(mContext, recommendedArray);
                 } else {
-                    UpdateNotification.getInstance().showNot(mContext, array.length() + "", array);
+                    if ((boolean) AppliteSPUtils.get(mContext, AppliteSPUtils.UPDATE_REMIND, DefaultValue.defauleValueUpdateRemind))
+                        UpdateNotification.getInstance().showNot(mContext, array.length() + "", array);
                     AppliteSPUtils.put(mContext, AppliteSPUtils.UPDATE_NOT_SHOW, System.currentTimeMillis() + next_update_notify_times);
 
                     SimpleDateFormat sDateFormat = new SimpleDateFormat("hh:mm:ss");
@@ -183,7 +183,9 @@ public class NetworkReceiver extends BroadcastReceiver {
                         time_end = time_end + 24 * 60 * 60 * 1000;
 
                     if (time > time_start && time < time_end) {//当前时间正好在闲时
-                        downloadAll();
+                        boolean bool = (boolean) AppliteSPUtils.get(mContext, AppliteSPUtils.WIFI_UPDATE_SWITCH, DefaultValue.defaultValueWIFIUpdateSwitch);
+                        if (bool)
+                            downloadAll();
                     } else if (time < time_start) {
                         long startTime = time_start - time + System.currentTimeMillis();
                         AlarmManager am = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);

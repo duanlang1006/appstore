@@ -654,7 +654,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 
                 mPreloadListView.setVisibility(View.GONE);
                 isHotWordLayoutVisibility(View.GONE);
-                LogUtils.d(TAG, "ListView显示");
                 mListView.setVisibility(View.VISIBLE);
                 mListView.removeFooterView(moreView);
 

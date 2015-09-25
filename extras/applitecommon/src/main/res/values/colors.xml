@@ -4,6 +4,10 @@
     <color name="slidetab_indicator_color">#FF773E</color>
     <color name="slidetab_underline_color">#ff7700</color>
     <color name="slidetab_divider_color">#00000000</color>
+    <color name="slidetab_text_color_disable_light">#66000000</color>
+    <color name="slidetab_text_color_pressed_light">#ffe6691e</color>
+    <color name="slidetab_text_color_selected_light">#ffe6691e</color>
+    <color name="slidetab_text_color_normal_light">#66000000</color>
 
     <color name="progress_background">#a0a0a0</color>
     <color name="progress_foreground">#00CC00</color>
@@ -13,4 +17,7 @@
     <color name="theme">#FFFFFF</color>
 
     <color name="dividing_line">#b7b6b7</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+
 </resources>

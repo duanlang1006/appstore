@@ -553,29 +553,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      */
     private void shakeAnimator(View view) {
         GuideUtils.setAnimation(view.findViewById(R.id.guide_app_iv));
-//        DisplayMetrics dm = new DisplayMetrics();
-//        mActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
-//        if (dm != null) {
-//            float mDensity = dm.density;
-//            GuideUtils.shakeAnimation(view, mDensity);
-//        }
-//        AnimationSet animationSet = new AnimationSet(true);
-//        RotateAnimation rotateAnimation = new RotateAnimation(0.0f, 10.0f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//        rotateAnimation.setDuration(300);
-//        rotateAnimation.setRepeatCount(-1);
-//        rotateAnimation.setRepeatMode(Animation.REVERSE);
-//        rotateAnimation.setInterpolator(new AccelerateInterpolator());
-//        animationSet.addAnimation(rotateAnimation);
-//        view.startAnimation(animationSet);
-//        Animation shake = AnimationUtils.loadAnimation(mActivity, R.anim.my_shake);
-//        shake.reset();
-//        shake.setFillAfter(true);
-//        view.startAnimation(shake);
-//        ObjectAnimator a = GuideUtils.tada(view, 1f);
-//        a.start();
-//        if (null == mShakeAnimation)
-//            mShakeAnimation = AnimationUtils.loadAnimation(mActivity, R.anim.shake);//加载动画资源文件
-//        view.startAnimation(mShakeAnimation);
     }
 
     /**

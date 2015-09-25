@@ -3,6 +3,7 @@ package com.applite.dm;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -30,6 +31,8 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.impl.ImplAgent;
+import com.mit.impl.ImplChangeCallback;
+import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
@@ -39,6 +42,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -267,10 +271,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                         }
                         if (null == mSimilarAdapter) {
                             mSimilarAdapter = new DownloadSimilarAdapter(mActivity);
-                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this);
+                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
                             mSimilarView.setAdapter(mSimilarAdapter);
                         } else {
-                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this);
+                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
                             mSimilarAdapter.notifyDataSetChanged();
                         }
                     }
@@ -419,10 +423,36 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         count(0);
     }
 
+    @Override
+    public void onClickIcon(Object... params) {
+        SimilarBean bean = (SimilarBean) params[0];
+        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getPackageName(), bean.getName(), bean.getIconUrl(), bean.getVersionCode(), null, true);
+    }
 
     @Override
-    public void refreshDetail(SimilarBean similarBean) {
-        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(),similarBean.getVersionCode(), null,true);
+    public void onClickName(Object... params) {
+        SimilarBean bean = (SimilarBean) params[0];
+        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getPackageName(), bean.getName(), bean.getIconUrl(), bean.getVersionCode(), null, true);
+    }
+
+    @Override
+    public void onClickButton(Object... params) {
+        ImplInfo implInfo = (ImplInfo) params[0];
+        SimilarBean bean = (SimilarBean) params[1];
+        ImplChangeCallback implChangeCallback = (ImplChangeCallback) params[2];
+        ImplHelper.onClick(mActivity,
+                implInfo,
+                bean.getrDownloadUrl(),
+                bean.getName(),
+                bean.getIconUrl(),
+                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
+                null,
+                implChangeCallback);
+    }
+
+    @Override
+    public void dataLess(int i) {
+
     }
 
     @Override
