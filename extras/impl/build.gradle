@@ -29,7 +29,8 @@ dependencies {
 }
 
 task clearJar(type: Delete) {
-    delete "../../app/libs/applite-impl-v${android.defaultConfig.versionName}.jar"
+    delete "./applite-impl-v${android.defaultConfig.versionName}.jar"
+    delete "./applite-impl-v${android.defaultConfig.versionName}.aar"
 }
 
 task makeJar(type: Copy) {
@@ -37,6 +38,11 @@ task makeJar(type: Copy) {
     into('./')
     include('classes.jar')
     rename ('classes.jar', "applite-impl-v${android.defaultConfig.versionName}.jar")
+
+    from('build/outputs/aar/')
+    into('./')
+    include('impl-release.aar')
+    rename ('impl-release.aar', "applite-impl-v${android.defaultConfig.versionName}.aar")
 }
 
 makeJar.dependsOn(clearJar, assembleRelease)
