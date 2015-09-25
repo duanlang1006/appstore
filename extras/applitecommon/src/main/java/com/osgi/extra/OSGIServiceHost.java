@@ -36,5 +36,7 @@ public interface OSGIServiceHost {
 
     public void jumptoAbout(boolean addToBackstack);
 
+    public void jumptoDownloadSizeLimit(boolean addToBackstack);
+
     public void jumptoConversation();
 }

@@ -7,13 +7,13 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_gravity="center"
         android:layout_marginTop="15dp"
         android:gravity="center_horizontal"
         android:text="@string/dialog_feedback_title"
         android:textColor="#EE7600"
-        android:textSize="22dp" />
+        android:textSize="18dp" />
 
     <RadioGroup
         android:id="@+id/dialog_feedback_rg1"
@@ -56,6 +56,8 @@
         android:id="@+id/dialog_feedback_rg2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:orientation="horizontal">
 
         <RadioButton
@@ -95,15 +97,21 @@
         android:layout_height="100dp"
         android:layout_marginLeft="6dp"
         android:layout_marginRight="6dp"
+        android:layout_marginBottom="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
         android:background="@drawable/edittext_shape"
         android:gravity="start"
         android:hint="@string/dialog_feedback_hint"
         android:singleLine="true"
-        android:textSize="20dp" />
+        android:textSize="16dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:orientation="horizontal">
 
         <TextView
@@ -131,6 +139,7 @@
         android:id="@+id/dialog_feedback_et2"
         android:layout_width="match_parent"
         android:layout_height="36dp"
+        android:paddingLeft="5dp"
         android:layout_marginLeft="6dp"
         android:layout_marginRight="6dp"
         android:background="@drawable/edittext_shape"

@@ -46,8 +46,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     private SubjectData mData = null;
     private FinalBitmap mFinalBitmap;
     private Bitmap defaultLoadingIcon;
+    private Bitmap defaultExternIcon;
     private ImplAgent implAgent;
-    private boolean removeimage;
 
     int layoutResourceId = 0;
 
@@ -66,9 +66,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             e.printStackTrace();
         }
         defaultLoadingIcon = BitmapFactory.decodeResource(mResource, R.drawable.buffer);
+        defaultExternIcon = BitmapFactory.decodeResource(mResource, R.drawable.extern_bg);
         implAgent = ImplAgent.getInstance(mContext.getApplicationContext());
-        removeimage = (boolean)AppliteSPUtils.get(mContext, AppliteSPUtils.NO_PICTURE, false);
-        LogUtils.i(TAG, "removeimage = "+removeimage);
     }
 
     @Override
@@ -111,7 +110,6 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         return convertView;
     }
 
-    private String luckydrawicon = "http://www.fuli365.net/applite_content_console/image/iden_icon_image_type15.png";
     private String boxLabel_value;
     private int points;
     private boolean luckyflag = false;
@@ -127,12 +125,12 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 boxLabel_value = vh.itemData.getBoxLabelvale();
                 LogUtils.d(TAG, "boxLabel_value = " + boxLabel_value);
 
-                if(!TextUtils.isEmpty(boxLabel_value)){
+                if (!TextUtils.isEmpty(boxLabel_value)) {
                     luckyflag = true;
                     points = Integer.parseInt(boxLabel_value);
                 } else
                     luckyflag = false;
-                LogUtils.d(TAG, "points = " + points+" luckyflag = "+luckyflag);
+                LogUtils.d(TAG, "points = " + points + " luckyflag = " + luckyflag);
 
                 ImplHelper.onClick(mContext,
                         vh.implInfo,
@@ -226,8 +224,12 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             }
 
             //app角标
-            if ((null != this.mExtentIcon) && !TextUtils.isEmpty(itemData.getBoxLabel())) {
-                mFinalBitmap.display(this.mExtentIcon, itemData.getBoxLabel());
+            if (null != this.mExtentIcon) {
+                if(!TextUtils.isEmpty(itemData.getBoxLabel())){
+                    mFinalBitmap.display(this.mExtentIcon, itemData.getBoxLabel(), defaultExternIcon);
+                }else{
+                    mExtentIcon.setImageBitmap(defaultExternIcon);
+                }
             }
 
             //app介绍

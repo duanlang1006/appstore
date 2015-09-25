@@ -19,11 +19,6 @@
 
 package kankan.wheel.widget;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import kankan.wheel.widget.adapters.AbstractWheelTextAdapter;
-import kankan.wheel.widget.adapters.WheelViewAdapter;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
@@ -44,6 +39,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.applite.common.R;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import kankan.wheel.widget.adapters.AbstractWheelTextAdapter;
+import kankan.wheel.widget.adapters.WheelViewAdapter;
 
 /**
  * Numeric wheel view.
@@ -482,7 +483,7 @@ public class WheelView extends View {
 			// valuePaint.density = getResources().getDisplayMetrics().density;
 			valuePaint.setShadowLayer(0.1f, 0, 0.1f, 0xFFC0C0C0);
 		}
-//		setBackgroundResource(R.drawable.wheel_bg);
+		setBackgroundResource(R.drawable.wheel_bg);
 	}
 
 	/**

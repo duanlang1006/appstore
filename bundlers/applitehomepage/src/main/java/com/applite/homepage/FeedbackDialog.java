@@ -43,20 +43,19 @@ public class FeedbackDialog {
         final RadioButton rb5 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb5);
         final RadioButton rb6 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb6);
         AlertDialog.Builder mDialog = new AlertDialog.Builder(context);
-        mDialog
-//                .setCancelable(false)
-                .setView(layout).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");
-                    field.setAccessible(true);
-                    field.set(dialog, true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        })
+        mDialog.setView(layout)
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");
+                            field.setAccessible(true);
+                            field.set(dialog, true);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                })
                 .setPositiveButton("提交", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
