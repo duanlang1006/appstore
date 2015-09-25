@@ -58,9 +58,6 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     private String path;
     private String size;
 
-    private float scale = 0.5f;
-    private int distance = 25;
-
     private DataCleanDialog mDataCleanDialog;
 
     public SettingFragment() {
@@ -94,9 +91,8 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         clean_cache = (LinearLayout) rootView.findViewById(R.id.clean_cache);               //清除缓存
         download_size = (LinearLayout) rootView.findViewById(R.id.download_size);               //清除缓存
 
-//        download_path = (LinearLayout) rootView.findViewById(R.id.download_path);           //下载存储路径
         save_path = (TextView) rootView.findViewById(R.id.save_path);
-//        cache_size = (TextView) rootView.findViewById(R.id.cache_size);
+        cache_size = (TextView) rootView.findViewById(R.id.cache_size);
 
         thread_btn1 = (ImageView) rootView.findViewById(R.id.thread_btn1);
         thread_btn2 = (ImageView) rootView.findViewById(R.id.thread_btn2);
