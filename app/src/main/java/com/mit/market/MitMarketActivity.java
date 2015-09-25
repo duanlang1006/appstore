@@ -21,6 +21,7 @@ import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
 import com.applite.dm.DownloadPagerFragment;
 import com.applite.homepage.AboutFragment;
+import com.applite.homepage.DownloadSizeLimit;
 import com.applite.homepage.HomePageFragment;
 import com.applite.homepage.HomePageListFragment;
 import com.applite.homepage.LuckyFragment;
@@ -382,6 +383,12 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
                 null, addToBackstack);
     }
 
+    public void jumptoDownloadSizeLimit(boolean addToBackstack) {
+        jumpto(Constant.OSGI_SERVICE_SIZELIMIT_FRAGMENT,
+                DownloadSizeLimit.class.getName(),
+                null, addToBackstack);
+    }
+
     @Override
     public void jumptoAbout(boolean addToBackstack) {
         jumpto(Constant.OSGI_SERVICE_ABOUT_FRAGMENT,
@@ -423,7 +430,8 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_LOGO_FRAGMENT, "com.mit.main.GuideFragment");
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_SETTING_FRAGMENT, "com.applite.homepage.SettingFragment");
         OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_LUCKY_FRAGMENT, "com.applite.homepage.LuckyFragment");
-        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_ABOUT_FRAGMENT, "com.applite.homepage.AbortFragment");
+        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_ABOUT_FRAGMENT, "com.applite.homepage.AboutFragment");
+        OSGIServiceClient.getInstance().register(Constant.OSGI_SERVICE_SIZELIMIT_FRAGMENT, "com.applite.homepage.sizelimit");
     }
 
     private void unregisterClients() {

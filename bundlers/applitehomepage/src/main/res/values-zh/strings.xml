@@ -63,10 +63,20 @@
     <string name="delete_apkfile">安装后自动删除安装包</string>
     <string name="download_path">下载存储路径</string>
     <string name="download_thread">最多同时下载任务</string>
+    <string name="download_size">数据网络下载限制</string>
+    <string name="download_limit_onoff">使用下载限制功能</string>
+    <string name="download_limit_detail">数据网络下载提示</string>
 
     <string name="update">检查更新</string>
     <string name="onekey_feedback">一键反馈</string>
 
-
+    <string name="select_no_limit">允许数据网络下载任何大小文件</string>
+    <string name="select_20_limit">大于20MB的文件，等待有WLAN时下载</string>
+    <string name="select_10_limit">大于10MB的文件，等待有WLAN时下载</string>
+    <string name="select_5_limit">大于5MB的文件，等待有WLAN时下载</string>
+    <string name="select_2_limit">大于2MB的文件，等待有WLAN时下载</string>
+    <string name="select_1_limit">大于1MB的文件，等待有WLAN时下载</string>
+    <string name="select_less_1_limit">大于512KB的文件，等待有WLAN时下载</string>
+    <string name="select_all_limit">使用数据网络下载任何大小文件都等待WALAN网络</string>
 
 </resources>

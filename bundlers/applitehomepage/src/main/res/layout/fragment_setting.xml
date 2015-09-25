@@ -231,25 +231,26 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <ImageButton
+                <ImageView
                     android:id="@+id/thread_btn1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/select_thread_bg"
+                    android:layout_marginRight="5dp"
                     android:text="1" />
 
-                <ImageButton
+                <ImageView
                     android:id="@+id/thread_btn2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/select_thread_bg"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
                     android:text="2" />
 
-                <ImageButton
+                <ImageView
                     android:id="@+id/thread_btn3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/select_thread_bg"
+                    android:layout_marginLeft="5dp"
                     android:text="3" />
             </LinearLayout>
 
@@ -275,12 +276,14 @@
                 android:paddingLeft="@dimen/settings_item_string_padding_left"
                 android:text="@string/download_size" />
 
-            <kankan.wheel.widget.WheelView
-                android:id="@+id/max_size"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-
+            <ImageView
+                style="@style/personalListText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/back"
+                android:visibility="visible" />
         </LinearLayout>
 
 

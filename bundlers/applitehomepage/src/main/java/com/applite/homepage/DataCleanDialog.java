@@ -17,7 +17,7 @@ public class DataCleanDialog {
 
     private CallBackInterface mCallback;
 
-    public void CallBack(CallBackInterface mCallback){
+    public void CallBack(CallBackInterface mCallback) {
         this.mCallback = mCallback;
     }
 
@@ -41,7 +41,7 @@ public class DataCleanDialog {
 //                .show();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setIcon(R.drawable.warning)
+        builder.setIcon(R.drawable.popup_icon_warning)
                 .setTitle(R.string.dialog_dataclean_title)
                 .setMessage(R.string.dialog_dataclean_content)
                 .setNegativeButton("取消",
@@ -54,8 +54,8 @@ public class DataCleanDialog {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 DataCleanManager.cleanAllCache(context);
-                                if(null != mCallback)
-                                mCallback.refreshCacheSize();
+                                if (null != mCallback)
+                                    mCallback.refreshCacheSize();
                             }
                         })
                 .show();

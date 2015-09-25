@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,7 +26,6 @@ import com.osgi.extra.OSGIServiceHost;
 import java.io.File;
 
 import kankan.wheel.widget.WheelView;
-import kankan.wheel.widget.adapters.ArrayWheelAdapter;
 
 /**
  * Created by wanghaochen on 15-9-1.
@@ -44,22 +42,23 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     private LinearLayout clean_cache;       //清除缓存
 //    private LinearLayout download_path;       //下载存储路径
 //    private LinearLayout download_thread;       //最大下载线程数
+    private LinearLayout download_size;       //最大下载线程数
 
     private ImageView smart_show;           //智能无图
     private ImageView smart_download;       //零流量下载
     private ImageView update_notification;  //更新提醒
     private ImageView delete_apk;           //删除安装包
 
-    private ImageButton thread_btn1;
-    private ImageButton thread_btn2;
-    private ImageButton thread_btn3;
+    private ImageView thread_btn1;
+    private ImageView thread_btn2;
+    private ImageView thread_btn3;
 
     private TextView save_path;
     private TextView cache_size;
     private String path;
     private String size;
 
-    private float scale = 0.75f;
+    private float scale = 0.5f;
     private int distance = 25;
 
     private DataCleanDialog mDataCleanDialog;
@@ -93,28 +92,22 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         update_notification = (ImageView) rootView.findViewById(R.id.update_notification);  //更新提醒
         delete_apk = (ImageView) rootView.findViewById(R.id.delete_apk);                    //删除安装包
         clean_cache = (LinearLayout) rootView.findViewById(R.id.clean_cache);               //清除缓存
+        download_size = (LinearLayout) rootView.findViewById(R.id.download_size);               //清除缓存
 
 //        download_path = (LinearLayout) rootView.findViewById(R.id.download_path);           //下载存储路径
         save_path = (TextView) rootView.findViewById(R.id.save_path);
-        cache_size = (TextView) rootView.findViewById(R.id.cache_size);
+//        cache_size = (TextView) rootView.findViewById(R.id.cache_size);
 
-        thread_btn1 = (ImageButton) rootView.findViewById(R.id.thread_btn1);
-        thread_btn2 = (ImageButton) rootView.findViewById(R.id.thread_btn2);
-        thread_btn3 = (ImageButton) rootView.findViewById(R.id.thread_btn3);
-
-        mWheelView = (WheelView) rootView.findViewById(R.id.max_size);
-        String sizelist[] = mActivity.getResources().getStringArray(R.array.sizelist);
-        mWheelView.setViewAdapter(new ArrayWheelAdapter<>(this.getActivity(), sizelist));
-        mWheelView.setCyclic(true);
-        mWheelView.setScaleX(scale);
-        mWheelView.setScaleY(scale);
-        mWheelView.setMinimumHeight(distance);
+        thread_btn1 = (ImageView) rootView.findViewById(R.id.thread_btn1);
+        thread_btn2 = (ImageView) rootView.findViewById(R.id.thread_btn2);
+        thread_btn3 = (ImageView) rootView.findViewById(R.id.thread_btn3);
 
         smart_show.setOnClickListener(this);
         smart_download.setOnClickListener(this);
         update_notification.setOnClickListener(this);
         delete_apk.setOnClickListener(this);
         clean_cache.setOnClickListener(this);
+        download_size.setOnClickListener(this);
 
         thread_btn1.setOnClickListener(this);
         thread_btn2.setOnClickListener(this);
@@ -135,25 +128,19 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     private void getDownloadThreadNum() {
         int i = ImplConfig.getDownloadThreadNum(mActivity);
         if (i == 1) {
-            thread_btn1.setBackgroundResource(R.drawable.setting_button_selected);
-            thread_btn2.setBackgroundResource(R.drawable.setting_button_unselected);
-            thread_btn3.setBackgroundResource(R.drawable.setting_button_unselected);
+            thread_btn1.setImageResource(R.drawable.setting_button1_selected);
+            thread_btn2.setImageResource(R.drawable.setting_button2_unselected);
+            thread_btn3.setImageResource(R.drawable.setting_button3_unselected);
         } else if (i == 2) {
-            thread_btn1.setBackgroundResource(R.drawable.setting_button_unselected);
-            thread_btn2.setBackgroundResource(R.drawable.setting_button_selected);
-            thread_btn3.setBackgroundResource(R.drawable.setting_button_unselected);
+            thread_btn1.setImageResource(R.drawable.setting_button1_unselected);
+            thread_btn2.setImageResource(R.drawable.setting_button2_selected);
+            thread_btn3.setBackgroundResource(R.drawable.setting_button3_unselected);
         } else if (i == 3) {
-            thread_btn1.setBackgroundResource(R.drawable.setting_button_unselected);
-            thread_btn2.setBackgroundResource(R.drawable.setting_button_unselected);
-            thread_btn3.setBackgroundResource(R.drawable.setting_button_selected);
+            thread_btn1.setImageResource(R.drawable.setting_button1_unselected);
+            thread_btn2.setImageResource(R.drawable.setting_button2_unselected);
+            thread_btn3.setImageResource(R.drawable.setting_button3_selected);
         }
     }
-
-    private void getDownloadSize() {
-        long i = ImplConfig.getMaxOverSize(mActivity);
-
-    }
-
 
     private void setAllState() {
         update_notification.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, DefaultValue.defaultBoolean));
@@ -235,24 +222,26 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             FeedbackDialog.show(mActivity);
         } else if (R.id.about == v.getId()) {           //关于
             ((OSGIServiceHost) mActivity).jumptoAbout(true);
-        } else if (R.id.thread_btn1 == v.getId()) {
+        } else if (R.id.download_size == v.getId()) {           //数据网络下载最大限制
+            ((OSGIServiceHost) mActivity).jumptoDownloadSizeLimit(true);
+        }else if (R.id.thread_btn1 == v.getId()) {
             LogUtils.d(TAG, "thread_btn1 ");
             ImplConfig.setDownloadThreadNum(mActivity, 1);
-            thread_btn1.setBackgroundResource(R.drawable.setting_button_selected);
-            thread_btn2.setBackgroundResource(R.drawable.setting_button_unselected);
-            thread_btn3.setBackgroundResource(R.drawable.setting_button_unselected);
+            thread_btn1.setImageResource(R.drawable.setting_button1_selected);
+            thread_btn2.setImageResource(R.drawable.setting_button2_unselected);
+            thread_btn3.setImageResource(R.drawable.setting_button3_unselected);
         } else if (R.id.thread_btn2 == v.getId()) {
             LogUtils.d(TAG, "thread_btn2 ");
             ImplConfig.setDownloadThreadNum(mActivity, 2);
-            thread_btn1.setBackgroundResource(R.drawable.setting_button_unselected);
-            thread_btn2.setBackgroundResource(R.drawable.setting_button_selected);
-            thread_btn3.setBackgroundResource(R.drawable.setting_button_unselected);
+            thread_btn1.setImageResource(R.drawable.setting_button1_unselected);
+            thread_btn2.setImageResource(R.drawable.setting_button2_selected);
+            thread_btn3.setImageResource(R.drawable.setting_button3_unselected);
         } else if (R.id.thread_btn3 == v.getId()) {
             LogUtils.d(TAG, "thread_btn3 ");
             ImplConfig.setDownloadThreadNum(mActivity, 3);
-            thread_btn1.setBackgroundResource(R.drawable.setting_button_unselected);
-            thread_btn2.setBackgroundResource(R.drawable.setting_button_unselected);
-            thread_btn3.setBackgroundResource(R.drawable.setting_button_selected);
+            thread_btn1.setImageResource(R.drawable.setting_button1_unselected);
+            thread_btn2.setImageResource(R.drawable.setting_button2_unselected);
+            thread_btn3.setImageResource(R.drawable.setting_button3_selected);
         }
     }
 

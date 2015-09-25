@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/setting_main"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingLeft="18dp"
+        android:orientation="vertical">
+
+        <!-- 下载限制功能开关 -->
+        <LinearLayout
+            android:id="@+id/download_limit_onoff_title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/settings_item_min_height"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Default_charactor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/settings_item_string_padding_left"
+                android:text="@string/download_limit_onoff" />
+
+            <ImageView
+                android:id="@+id/download_limit_onoff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/divided_line_distance"
+                android:background="@drawable/setup_wifi_click_bg"
+                android:gravity="center_vertical"></ImageView>
+        </LinearLayout>
+
+        <!--<include layout="@layout/default_line_setting"></include>-->
+
+        <!-- 数据网络下载提示 -->
+        <LinearLayout
+            android:id="@+id/download_limit_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:gravity="center_vertical"
+                android:paddingLeft="@dimen/settings_item_string_padding_left"
+                android:text="@string/download_limit_detail" />
+
+            <TextView
+                android:id="@+id/select_limit_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/settings_item_string_padding_left"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <include layout="@layout/default_line_setting"></include>
+
+    <kankan.wheel.widget.WheelView
+        android:id="@+id/max_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/left_accordion_mask" />
+
+</LinearLayout>
