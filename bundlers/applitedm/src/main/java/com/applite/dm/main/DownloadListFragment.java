@@ -1,4 +1,4 @@
-package com.applite.dm;
+package com.applite.dm.main;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -17,6 +17,9 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.VibratorUtil;
+import com.applite.dm.adapter.DownloadAdapter;
+import com.applite.dm.adapter.DownloadSimilarAdapter;
+import com.applite.dm.R;
 import com.applite.sharedpreferences.AppliteSPUtils;
 import com.applite.similarview.SimilarAdapter;
 import com.applite.similarview.SimilarBean;
@@ -45,8 +48,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class DownloadListFragment extends OSGIBaseFragment implements DownloadPagerFragment.IDownloadOperator,
-        ListView.OnItemClickListener,
-        AdapterView.OnItemLongClickListener, SimilarAdapter.SimilarAPKDetailListener {
+        ListView.OnItemClickListener, AdapterView.OnItemLongClickListener, SimilarAdapter.SimilarAPKDetailListener {
     final static String TAG = "applite_dm";
     private ListView mListview;
     private DownloadAdapter mAdapter;
@@ -55,22 +57,19 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     private int mTitleId;
     private ImplAgent mImplAgent;
     private List<ImplInfo> mImplList;
-    private BitmapUtils mBitmapHelper;
 
+    private BitmapUtils mBitmapHelper;
     private SimilarView mSimilarView;
     private List<SimilarBean> mSimilarDataList;
     private SimilarAdapter mSimilarAdapter;
+
     private HttpUtils mHttpUtils;
-
     private boolean checkBoxAnima = true;
-
-    private ImplAgent implAgent;
     private int temp = 0;
 
     private String COUNT_DOWNLOADING = "count downloading";
     private String COUNT_DOWNLOADED = "count downloaded";
     private String FLAG = "flag";
-    private String LENGTH = "length";
     private String POSITION = "position";
 
     private DownloadListener mDownloadListener = new DownloadListener() {
@@ -134,15 +133,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             if (key.equals(FLAG)) {
                 if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
                     checkBoxAnima = false;
-//                    if (R.string.dm_downloaded == (int) AppliteSPUtils.get(mActivity, POSITION, -1)) {
-//                        mSimilarView.setVisibility(View.GONE);
-//                        mSimilarView.setPadding(0, -mSimilarView.getHeight(), 0, 0);
-//                    }
                 }
             } else if (key.equals(POSITION)) {
-                if (mTitleId == (int) AppliteSPUtils.get(mActivity, POSITION, -1)) {
-                    AppliteSPUtils.put(mActivity, LENGTH, mImplList.size());
-                }
                 if (R.string.dm_downloading == (int) AppliteSPUtils.get(mActivity, POSITION, -1)) {
                     if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false) && View.VISIBLE == mSimilarView.getVisibility()) {
                         mSimilarView.setVisibility(View.GONE);
@@ -172,8 +164,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        implAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
         super.onCreate(savedInstanceState);
+        //SharePreference初始化
+        AppliteSPUtils.registerChangeListener(mActivity, mListListener);
+        count(0);//当前页选中项目数
+        AppliteSPUtils.put(mActivity, FLAG, false);
     }
 
     @Override
@@ -183,10 +178,17 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         LayoutInflater mInflater = inflater;
         View view = mInflater.inflate(R.layout.fragment_download_list, container, false);
         mListview = (ListView) view.findViewById(android.R.id.list);
-        mListview.setEmptyView(view.findViewById(R.id.empty));
+        TextView emptyText = (TextView) view.findViewById(R.id.empty);
+        mListview.setEmptyView(emptyText);
         if (mTitleId == R.string.dm_downloading) {
             initSimilarView(view);
             mListview.addFooterView(mSimilarView);
+//            emptyText.setText(mActivity.getResources().getString(R.string.back_to_homepage));
+//            emptyText.setEnabled(true);
+//            Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher);
+//            drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+//            emptyText.setCompoundDrawables(null, drawable, null, null);
+//            emptyText.setOnClickListener(this);
         }
         mListview.setOnItemClickListener(this);
         status = new boolean[mImplList.size()];
@@ -202,12 +204,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
             mListview.setAdapter(mAdapter);
         }
-
-        //初始化
-        AppliteSPUtils.registerChangeListener(mActivity, mListListener);
-        count(0);//当前页选中项目数
-        AppliteSPUtils.put(mActivity, FLAG, false);
-        AppliteSPUtils.put(mActivity, LENGTH, 0);
         return view;
     }
 
@@ -310,7 +306,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         });
     }
 
-
     @Override
     public void onPause() {
         super.onPause();
@@ -363,7 +358,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         } else {
             status[position] = !status[position];
             temp = count();
-            AppliteSPUtils.put(mActivity, LENGTH, status.length);//本页长度
             count((status[position] == false) ? temp - 1 : temp + 1);//当前页选中项目数
             mAdapter.notifyDataSetChanged();
         }
@@ -401,7 +395,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         Arrays.fill(status, false);//status数组复位
         checkBoxAnima = true;
         count(0);//当前页选中项目数
-        AppliteSPUtils.put(mActivity, LENGTH, 0);
         AppliteSPUtils.put(mActivity, POSITION, 0);
         if (null != mAdapter) {
             mAdapter.notifyDataSetChanged();
@@ -415,14 +408,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                 tempList.add(mImplList.get(i).getId());
             }
         }
-        implAgent.remove(tempList);
+        mImplAgent.remove(tempList);
         count(0);
     }
 
 
     @Override
     public void refreshDetail(SimilarBean similarBean) {
-        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(),similarBean.getVersionCode(), null,true);
+        ((OSGIServiceHost) mActivity).jumptoDetail(similarBean.getPackageName(), similarBean.getName(), similarBean.getIconUrl(), similarBean.getVersionCode(), null, true);
     }
 
     @Override
@@ -450,5 +443,25 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         reSet();
         AppliteSPUtils.put(mActivity, FLAG, false);
     }
+
+    //获取本页下载项的个数
+    @Override
+    public int getLength() {
+        return status.length;
+    }
+
+    //ListFragment和适配器传递数据
+    public interface DownloadListener {
+        boolean getFlag1();
+
+        boolean getStatus(int position);
+
+        int getTitleId();
+
+        boolean getFlag2();
+
+        void setFlag2(boolean b);
+    }
+
 
 }

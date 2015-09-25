@@ -26,7 +26,7 @@ public class AboutFragment extends OSGIBaseFragment {
     private ViewGroup rootView;
 
     private ActionBar actionBar;
-    private WheelView wheelView;
+//    private WheelView wheelView;
     private PackageInfo info;
     private TextView tv_app_version;
     private float scale = 0.75f;
@@ -57,7 +57,9 @@ public class AboutFragment extends OSGIBaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+
         rootView = (ViewGroup) mInflater.inflate(R.layout.fragment_about, container, false);
+
 
 //        wheelView = (WheelView) rootView.findViewById(R.id.aa);
 //        String ss[] = mActivity.getResources().getStringArray(R.array.team);

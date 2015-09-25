@@ -37,7 +37,6 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-
     <ImageView
         style="@style/Divided_Line_Style"
         android:layout_width="fill_parent"
@@ -50,13 +49,6 @@
         android:text="我 · 们 · 的 · 团 · 队"
         android:textColor="@color/star_color"
         android:textSize="17sp" />
-
-    <!--<kankan.wheel.widget.WheelView-->
-        <!--android:id="@+id/aa"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginBottom="20dp"-->
-        <!--android:layout_marginTop="20dp" />-->
 
     <ImageView
         style="@style/Divided_Line_Style"

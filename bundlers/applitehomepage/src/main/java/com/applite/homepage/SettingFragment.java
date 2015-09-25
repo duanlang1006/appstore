@@ -190,6 +190,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     @Override

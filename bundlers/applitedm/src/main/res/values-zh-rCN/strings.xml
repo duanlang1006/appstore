@@ -15,4 +15,5 @@
     <string name="delete_message2">条下载</string>
     <string name="choose_message1">选中了</string>
     <string name="choose_message2">个安装包</string>
+    <string name="back_to_homepage">列表这么空,点我回首页看看吧</string>
 </resources>

@@ -19,7 +19,7 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
-import com.applite.dm.DownloadPagerFragment;
+import com.applite.dm.main.DownloadPagerFragment;
 import com.applite.homepage.AboutFragment;
 import com.applite.homepage.DownloadSizeLimit;
 import com.applite.homepage.HomePageFragment;
