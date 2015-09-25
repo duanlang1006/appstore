@@ -101,7 +101,7 @@
             android:layout_height="50dp"
             android:layout_marginLeft="18dp"
             android:gravity="center_vertical"
-            android:src="@drawable/icon_favorite" />
+            android:src="@drawable/icon_oneday" />
 
         <TextView
             style="@style/personalListText"
