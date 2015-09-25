@@ -1,9 +1,13 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.mit.impl">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.mit.impl" >
 
-    <application android:allowBackup="true" android:label="@string/app_name">
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name" >
         <receiver
-            android:name="com.mit.impl.ImplReceiver"
-            android:exported="true">
+            android:name=".ImplReceiver"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
@@ -12,16 +16,25 @@
                 <action android:name="com.installer.system.delete.result" />
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>
-            <intent-filter android:priority="1000">
+            <intent-filter android:priority="1000" >
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
                 <action android:name="android.intent.action.PACKAGE_CHANGED" />
+
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
+
         <service
-            android:name="com.mit.impl.DownloadService"
-            android:exported="false"/>
+            android:name=".DownloadService"
+            android:exported="false" />
+
+        <receiver
+            android:name=".ClickReceiver"
+            android:enabled="true"
+            android:exported="true" />
+
+
     </application>
 
 </manifest>

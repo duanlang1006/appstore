@@ -655,7 +655,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mPreloadListView.setVisibility(View.GONE);
                 isHotWordLayoutVisibility(View.GONE);
                 mListView.setVisibility(View.VISIBLE);
-                mListView.removeFooterView(moreView);
+                if (mListView.getFooterViewsCount() == 0)
+                    mListView.addFooterView(moreView);
 
                 if (null == mAdapter) {
                     mAdapter = new SearchApkAdapter(mActivity, mSearchApkContents, this);
@@ -663,6 +664,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 } else {
                     mAdapter.notifyDataSetChanged();
                 }
+                mListView.removeFooterView(moreView);
+
                 if (mSearchPostPage == 0) {
                     new Handler().postDelayed(new Runnable() {
                         @Override

@@ -22,25 +22,26 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ImplDownload  {
+public class ImplDownload {
     private static final String TAG = "impl_download";
     private SparseArray<Method> mCmdList = new SparseArray<Method>();
-    private int maxDownloadThread = 3;
-//    private DownloadManager dm;
+    private int maxDownloadThread;
+    //    private DownloadManager dm;
     private boolean inited = false;
     private Context mContext;
     private final static ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
 
     private static ImplDownload mInstance = null;
-    private static synchronized void initInstance(Context context){
-        if (null == mInstance ){
+
+    private static synchronized void initInstance(Context context) {
+        if (null == mInstance) {
             mInstance = new ImplDownload(context);
         }
     }
 
-    static ImplDownload getInstance(Context context){
-        if (null == mInstance){
+    static ImplDownload getInstance(Context context) {
+        if (null == mInstance) {
             initInstance(context);
         }
         return mInstance;
@@ -53,13 +54,16 @@ public class ImplDownload  {
 //            dm = DownloadService.getDownloadManager(mContext.getApplicationContext());
 //        }
         if (!DownloadService.isServiceRunning(mContext)) {
-            Intent downloadSvr = new Intent(mContext,DownloadService.class);
+            Intent downloadSvr = new Intent(mContext, DownloadService.class);
             mContext.startService(downloadSvr);
         }
         inited = true;
+        if(maxDownloadThread == 0)
+        maxDownloadThread = ImplConfig.getDownloadThreadNum(context);
+        ImplLog.d(TAG, "maxDownloadThread = " + maxDownloadThread);
     }
 
-    void fillImplInfo(ImplInfo implInfo){
+    void fillImplInfo(ImplInfo implInfo) {
 //        if (null == implInfo){
 //            return;
 //        }
@@ -95,13 +99,13 @@ public class ImplDownload  {
 //        }
     }
 
-    private class AddDownloadAsync extends AsyncTask<Object,Object,File>{
+    private class AddDownloadAsync extends AsyncTask<Object, Object, File> {
         private String fullname;
         private String md5;
         private ImplListener callback;
         private ImplInfo implInfo;
 
-        private AddDownloadAsync(ImplInfo implInfo,String fullname, String md5, ImplListener callback) {
+        private AddDownloadAsync(ImplInfo implInfo, String fullname, String md5, ImplListener callback) {
             this.fullname = fullname;
             this.md5 = md5;
             this.callback = callback;
@@ -113,9 +117,9 @@ public class ImplDownload  {
             File file = new File(fullname);
             if (file.exists()
                     && null != md5 && !TextUtils.isEmpty(md5)
-                    && md5.equals(ImplHelper.getFileMD5(file))){
+                    && md5.equals(ImplHelper.getFileMD5(file))) {
                 return file;
-            }else if (file.exists()){
+            } else if (file.exists()) {
                 file.delete();
             }
             return null;
@@ -124,15 +128,15 @@ public class ImplDownload  {
         @Override
         protected void onPostExecute(File file) {
             super.onPostExecute(file);
-            ImplLog.d(TAG,"AddDownloadAsync::onPostExecute,"+implInfo.getTitle()+","+implInfo.getStatus());
-            if (null != file){
+            ImplLog.d(TAG, "AddDownloadAsync::onPostExecute," + implInfo.getTitle() + "," + implInfo.getStatus());
+            if (null != file) {
                 implInfo.setFileSavePath(file.getAbsolutePath());
                 implInfo.setLocalPath(file.getAbsolutePath());
                 implInfo.setCurrent(file.length());
                 implInfo.setTotal(file.length());
                 implInfo.setStatus(ImplInfo.STATUS_SUCCESSFUL);
-                callback.onSuccess(this.implInfo,file);
-            }else{
+                callback.onSuccess(this.implInfo, file);
+            } else {
                 implInfo.setAutoRename(true);
                 implInfo.setAutoResume(true);
                 implInfo.setFileSavePath(fullname);
@@ -279,8 +283,8 @@ public class ImplDownload  {
 //        }
 //    }
 
-    void addDownload(ImplInfo implInfo,String fullname,String md5,ImplListener callback){
-        if (null == implInfo.getDownloadUrl()){
+    void addDownload(ImplInfo implInfo, String fullname, String md5, ImplListener callback) {
+        if (null == implInfo.getDownloadUrl()) {
             if (null != callback) {
                 implInfo.setLocalPath(null);
                 implInfo.setStatus(ImplInfo.STATUS_FAILED);
@@ -294,19 +298,19 @@ public class ImplDownload  {
         new AddDownloadAsync(implInfo, fullname, md5, callback).execute();
     }
 
-    void pause(ImplInfo implInfo,ImplListener callback){
+    void pause(ImplInfo implInfo, ImplListener callback) {
         implInfo.setCause(ImplInfo.CAUSE_PAUSED_BY_APP);
-        pauseImpl(implInfo,callback);
+        pauseImpl(implInfo, callback);
     }
 
-    private void pauseImpl(ImplInfo implInfo,ImplListener baseCallback){
+    private void pauseImpl(ImplInfo implInfo, ImplListener baseCallback) {
         RequestCallBack<File> downloadCallback = null;
         HttpHandler<File> handler = implInfo.getHandler();
         if (handler != null) {
             if (!handler.isCancelled()) {
                 handler.cancel();
-            }else{
-                downloadCallback = (null != handler.getRequestCallBack())?handler.getRequestCallBack():new DownloadCallback<File>(implInfo, baseCallback);
+            } else {
+                downloadCallback = (null != handler.getRequestCallBack()) ? handler.getRequestCallBack() : new DownloadCallback<File>(implInfo, baseCallback);
             }
         } else {
             implInfo.setState(HttpHandler.State.CANCELLED);
@@ -318,29 +322,31 @@ public class ImplDownload  {
         }
     }
 
-    void resume(ImplInfo implInfo,ImplListener callback){
+    void resume(ImplInfo implInfo, ImplListener callback) {
         implInfo.setUserContinue(true);
-        resumeImpl(implInfo,callback);
+        resumeImpl(implInfo, callback);
     }
 
-    private void resumeImpl(ImplInfo implInfo,ImplListener callback){
+    private void resumeImpl(ImplInfo implInfo, ImplListener callback) {
         HttpUtils http = new HttpUtils();
         http.configRequestThreadPoolSize(maxDownloadThread);
         DownloadCallback<File> downloadCallback = new DownloadCallback<File>(implInfo, callback);
-        HttpHandler<File> handler = http.download(
-                implInfo.getDownloadUrl(),
-                implInfo.getFileSavePath(),
-                implInfo.isAutoResume(),
-                implInfo.isAutoRename(),
-                downloadCallback);
-        implInfo.setHandler(handler);
-        implInfo.setState(handler.getState());
+        if ((implInfo.getDownloadUrl() != null) && (implInfo.getFileSavePath() != null)) {
+            HttpHandler<File> handler = http.download(
+                    implInfo.getDownloadUrl(),
+                    implInfo.getFileSavePath(),
+                    implInfo.isAutoResume(),
+                    implInfo.isAutoRename(),
+                    downloadCallback);
+            implInfo.setHandler(handler);
+            implInfo.setState(handler.getState());
+        }
         downloadCallback.onPending();
     }
 
-    void pauseAll(List<ImplInfo> implList,ImplListener callback){
-        for (ImplInfo implInfo : implList){
-            switch(implInfo.getStatus()){
+    void pauseAll(List<ImplInfo> implList, ImplListener callback) {
+        for (ImplInfo implInfo : implList) {
+            switch (implInfo.getStatus()) {
                 case ImplInfo.STATUS_PENDING:
                 case ImplInfo.STATUS_RUNNING:
                     pause(implInfo, callback);
@@ -355,9 +361,9 @@ public class ImplDownload  {
         }
     }
 
-    void resumeAll(List<ImplInfo> implList,ImplListener callback){
-        for (ImplInfo implInfo : implList){
-            switch(implInfo.getStatus()){
+    void resumeAll(List<ImplInfo> implList, ImplListener callback) {
+        for (ImplInfo implInfo : implList) {
+            switch (implInfo.getStatus()) {
                 case ImplInfo.STATUS_PENDING:
                 case ImplInfo.STATUS_RUNNING:
                 case ImplInfo.STATUS_PAUSED:
@@ -368,14 +374,14 @@ public class ImplDownload  {
         }
     }
 
-    void remove(ImplInfo implInfo){
+    void remove(ImplInfo implInfo) {
         HttpHandler<File> handler = implInfo.getHandler();
         if (handler != null) {
             if (!handler.isCancelled()) {
                 handler.cancel();
-            }else{
+            } else {
                 final RequestCallBack callback = handler.getRequestCallBack();
-                if (null != callback){
+                if (null != callback) {
                     callback.onCancelled();
                 }
             }
@@ -419,10 +425,10 @@ public class ImplDownload  {
         this.maxDownloadThread = maxDownloadThread;
     }
 
-    boolean needKick(ImplInfo implInfo){
+    boolean needKick(ImplInfo implInfo) {
         boolean ret = false;
         if (null != implInfo && null == implInfo.getHandler()) {
-            switch (implInfo.getState()){
+            switch (implInfo.getState()) {
                 case WAITING:
                 case STARTED:
                 case LOADING:
@@ -433,47 +439,47 @@ public class ImplDownload  {
         return ret;
     }
 
-    void kickDownload(List<ImplInfo> implList,ImplListener implCallback){
+    void kickDownload(List<ImplInfo> implList, ImplListener implCallback) {
         ImplInfo implInfo = null;
-        for (int i = 0 ;i < implList.size();i++){
+        for (int i = 0; i < implList.size(); i++) {
             implInfo = implList.get(i);
             if (implInfo.getStatus() == ImplInfo.STATUS_PAUSED
-                    && implInfo.getCause() == ImplInfo.CAUSE_PAUSED_BY_APP){
+                    && implInfo.getCause() == ImplInfo.CAUSE_PAUSED_BY_APP) {
                 continue;
             }
-            if (needKick(implInfo)){
+            if (needKick(implInfo)) {
                 resumeImpl(implInfo, implCallback);
             }
         }
     }
 
-    private boolean overSizePause(ImplInfo implInfo,ImplListener callback){
+    private boolean overSizePause(ImplInfo implInfo, ImplListener callback) {
         boolean ret = false;
         if ("mobile".equals(ImplReceiver.getNetwork(mContext))
                 && implInfo.getTotal() > ImplConfig.getMaxOverSize(mContext)) {
-            if (implInfo.isUserContinue()){
+            if (implInfo.isUserContinue()) {
                 return ret;
             }
 
-            if(ImplInfo.STATUS_PENDING == implInfo.getStatus()
-                || ImplInfo.STATUS_RUNNING == implInfo.getStatus()
-                || (ImplInfo.STATUS_PAUSED == implInfo.getStatus()
-                        && ImplInfo.CAUSE_PAUSED_BY_APP != implInfo.getCause()) ) {
+            if (ImplInfo.STATUS_PENDING == implInfo.getStatus()
+                    || ImplInfo.STATUS_RUNNING == implInfo.getStatus()
+                    || (ImplInfo.STATUS_PAUSED == implInfo.getStatus()
+                    && ImplInfo.CAUSE_PAUSED_BY_APP != implInfo.getCause())) {
                 implInfo.setStatus(ImplInfo.STATUS_PAUSED);
                 implInfo.setCause(ImplInfo.CAUSE_PAUSED_BY_OVERSIZE);
-                pauseImpl(implInfo,callback);
+                pauseImpl(implInfo, callback);
                 ret = true;
             }
         }
         return ret;
     }
 
-    void onNetworkChanged(List<ImplInfo> implList,ImplListener callback){
+    void onNetworkChanged(List<ImplInfo> implList, ImplListener callback) {
         String network = ImplReceiver.getNetwork(mContext);
         ImplInfo implInfo = null;
-        for (int i = 0;i < implList.size();i++) {
+        for (int i = 0; i < implList.size(); i++) {
             implInfo = implList.get(i);
-            switch(network){
+            switch (network) {
                 case "none":
                     if (ImplInfo.STATUS_PAUSED == implInfo.getStatus()
                             && implInfo.getCause() != ImplInfo.CAUSE_PAUSED_BY_APP) {
@@ -490,7 +496,7 @@ public class ImplDownload  {
                     }
                     break;
                 case "mobile":
-                    overSizePause(implInfo,callback);
+                    overSizePause(implInfo, callback);
                     break;
             }
         }
@@ -500,27 +506,27 @@ public class ImplDownload  {
         private ImplInfo implInfo;
         private ImplListener baseCallback;
 
-        DownloadCallback(ImplInfo implInfo,ImplListener callback) {
+        DownloadCallback(ImplInfo implInfo, ImplListener callback) {
             this.implInfo = implInfo;
             this.baseCallback = callback;
         }
 
-        public void onEnqued(long downloadId){
+        public void onEnqued(long downloadId) {
             implInfo.setStatus(ImplInfo.STATUS_PENDING);
             implInfo.setUserContinue(false);
             implInfo.setLastMod(System.currentTimeMillis());
-            if (null != baseCallback){
+            if (null != baseCallback) {
                 baseCallback.onEnqued(implInfo);
             }
-            ImplLog.d(TAG,implInfo.getTitle()+",onEnqued,"+implInfo);
+            ImplLog.d(TAG, implInfo.getTitle() + ",onEnqued," + implInfo);
         }
 
-        public void onPending(){
+        public void onPending() {
             implInfo.setStatus(ImplInfo.STATUS_PENDING);
-            if (null != baseCallback){
+            if (null != baseCallback) {
                 baseCallback.onPending(implInfo);
             }
-            ImplLog.d(TAG,implInfo.getTitle()+",onPending,"+implInfo);
+            ImplLog.d(TAG, implInfo.getTitle() + ",onPending," + implInfo);
         }
 
         @Override
@@ -533,11 +539,11 @@ public class ImplDownload  {
             }
             implInfo.setTotal(total);
             implInfo.setCurrent(current);
-            if (!overSizePause(implInfo,baseCallback)) {
+            if (!overSizePause(implInfo, baseCallback)) {
                 implInfo.setStatus(ImplInfo.STATUS_RUNNING);
             }
 
-            if (null != baseCallback){
+            if (null != baseCallback) {
                 baseCallback.onLoading(implInfo, total, current, isUploading);
             }
         }
@@ -553,10 +559,10 @@ public class ImplDownload  {
             }
             implInfo.setStatus(ImplInfo.STATUS_PAUSED);
 
-            if (null != baseCallback){
+            if (null != baseCallback) {
                 baseCallback.onCancelled(implInfo);
             }
-            ImplLog.d(TAG,implInfo.getTitle()+",onCancelled,"+implInfo);
+            ImplLog.d(TAG, implInfo.getTitle() + ",onCancelled," + implInfo);
         }
 
         @Override
@@ -568,10 +574,10 @@ public class ImplDownload  {
             }
             implInfo.setStatus(ImplInfo.STATUS_RUNNING);
 
-            if (null != baseCallback){
+            if (null != baseCallback) {
                 baseCallback.onStart(implInfo);
             }
-            ImplLog.d(TAG,implInfo.getTitle()+",onStart,"+implInfo);
+            ImplLog.d(TAG, implInfo.getTitle() + ",onStart," + implInfo);
         }
 
         @Override
@@ -580,21 +586,21 @@ public class ImplDownload  {
             if (handler != null) {
                 implInfo.setState(handler.getState());
             }
-            java.io.File file = (java.io.File)fileResponseInfo.result;
+            java.io.File file = (java.io.File) fileResponseInfo.result;
             if (null != file && file.exists()) {
                 implInfo.setLocalPath(file.getAbsolutePath());
                 implInfo.setStatus(ImplInfo.STATUS_SUCCESSFUL);
-                if (null != baseCallback){
-                    baseCallback.onSuccess(implInfo,file);
+                if (null != baseCallback) {
+                    baseCallback.onSuccess(implInfo, file);
                 }
-            }else{
+            } else {
                 implInfo.setLocalPath(file.getAbsolutePath());
                 implInfo.setStatus(ImplInfo.STATUS_FAILED);
-                if (null != baseCallback){
+                if (null != baseCallback) {
                     baseCallback.onFailure(implInfo, null, "download file not exist");
                 }
             }
-            ImplLog.d(TAG,implInfo.getTitle()+",onSuccess,"+implInfo);
+            ImplLog.d(TAG, implInfo.getTitle() + ",onSuccess," + implInfo);
         }
 
         @Override
@@ -604,19 +610,19 @@ public class ImplDownload  {
                 implInfo.setState(handler.getState());
             }
             ImplReceiver.initNetwork(mContext);
-            if ("none".equals(ImplReceiver.getNetwork(mContext))){
+            if ("none".equals(ImplReceiver.getNetwork(mContext))) {
                 implInfo.setStatus(ImplInfo.STATUS_PAUSED);
                 implInfo.setCause(ImplInfo.CAUSE_PAUSED_BY_NETWORK);
-                if (null != baseCallback){
+                if (null != baseCallback) {
                     baseCallback.onCancelled(implInfo);
                 }
-            }else {
+            } else {
                 implInfo.setStatus(ImplInfo.STATUS_FAILED);
-                if (null != baseCallback){
-                    baseCallback.onFailure(implInfo,e,s);
+                if (null != baseCallback) {
+                    baseCallback.onFailure(implInfo, e, s);
                 }
             }
-            ImplLog.d(TAG,"onFailure,"+e.getCause()+","+e.getMessage()+","+e.getExceptionCode()+","+e.getClass());
+            ImplLog.d(TAG, "onFailure," + e.getCause() + "," + e.getMessage() + "," + e.getExceptionCode() + "," + e.getClass());
         }
     }
 
@@ -624,14 +630,14 @@ public class ImplDownload  {
 
         @Override
         public HttpHandler.State getFieldValue(Cursor cursor, int index) {
-            ImplLog.d(TAG,"getFieldValue:"+HttpHandler.State.valueOf(cursor.getInt(index)));
+            ImplLog.d(TAG, "getFieldValue:" + HttpHandler.State.valueOf(cursor.getInt(index)));
             return HttpHandler.State.valueOf(cursor.getInt(index));
         }
 
         @Override
         public HttpHandler.State getFieldValue(String fieldStringValue) {
             if (fieldStringValue == null) return null;
-            ImplLog.d(TAG,"getFieldValue:"+fieldStringValue);
+            ImplLog.d(TAG, "getFieldValue:" + fieldStringValue);
             return HttpHandler.State.valueOf(fieldStringValue);
         }
 

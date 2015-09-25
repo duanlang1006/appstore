@@ -66,7 +66,7 @@ public class LuckyFragment extends OSGIBaseFragment implements LuckyPanView.Call
             AppliteSPUtils.put(mActivity, AppliteSPUtils.CURRENT_DATE, currdata);
         }
 
-        mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 1000);
+        mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 0);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class LuckyFragment extends OSGIBaseFragment implements LuckyPanView.Call
             @Override
             public void onClick(View v) {
                 if (!mLuckyPanView.isStart()) {
-                    mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 1000);
+                    mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 0);
                     LogUtils.i(TAG, "Conunts = " + Conunts);
                     if (mLuckyPonints < 20) {
                         //如果小于最低抽奖消耗分数20, 则弹出提示
