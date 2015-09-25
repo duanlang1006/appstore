@@ -114,11 +114,11 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     }
 
     private void setAllState() {
-        ll1_1.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, DefaultValue.defaultBoolean));
-        ll2_1.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.CLEAR_CACHE, DefaultValue.defaultBoolean));
-        ll2_2.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.DELETE_PACKAGE, DefaultValue.defaultBoolean));
-        ll2_3.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, DefaultValue.defaultBoolean));
-        ll2_4.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, DefaultValue.defaultBoolean));
+        ll1_1.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_REMIND, DefaultValue.defauleValueUpdateRemind));//更新提醒
+        ll2_1.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.CLEAR_CACHE, DefaultValue.defaultBoolean));//清除缓存
+        ll2_2.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.DELETE_PACKAGE, DefaultValue.defaultValueDeletePackage));//删除安装包
+        ll2_3.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.NO_PICTURE, DefaultValue.defaultValueNoPic));//智能无图
+        ll2_4.setSelected((boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, DefaultValue.defaultValueWIFIUpdateSwitch));//零流量下载
     }
 
     @Override

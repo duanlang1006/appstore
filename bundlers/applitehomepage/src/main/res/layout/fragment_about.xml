@@ -17,7 +17,7 @@
             android:id="@+id/logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_launcher_0" />
+            android:background="@drawable/ic_launcher" />
 
 
         <TextView
@@ -35,16 +35,31 @@
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:textSize="@dimen/default_size"
+            android:text="app_version_cod"
             android:textStyle="bold" />
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/logo1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_launcher"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/logo2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_launcher"
+        android:visibility="invisible" />
 
     <ImageView
         style="@style/Divided_Line_Style"
         android:layout_width="fill_parent"
         android:layout_height="0.3dp" />
 
-    <TextView
+
+    <!--<TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
@@ -61,7 +76,7 @@
     <ImageView
         style="@style/Divided_Line_Style"
         android:layout_width="fill_parent"
-        android:layout_height="0.3dp" />
+        android:layout_height="0.3dp" />-->
 
     <TextView
         android:id="@+id/copyright"

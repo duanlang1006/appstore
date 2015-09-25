@@ -1,4 +1,4 @@
-package com.applite.dm;
+package com.applite.dm.adapter;
 
 import android.content.Context;
 import android.os.Environment;

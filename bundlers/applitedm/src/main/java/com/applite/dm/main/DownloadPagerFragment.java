@@ -1,4 +1,4 @@
-package com.applite.dm;
+package com.applite.dm.main;
 
 import android.app.Activity;
 import android.content.Context;
@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
+import com.applite.dm.R;
 import com.applite.sharedpreferences.AppliteSPUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
@@ -64,9 +65,10 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private String COUNT_DOWNLOADING = "count downloading";
     private String COUNT_DOWNLOADED = "count downloaded";
     private String FLAG = "flag";
-    private String LENGTH = "length";
     private String POSITION = "position";
-    private int prePosition = -1;
+
+    private int prePosition = 0;
+    private IDownloadOperator operator = null;
 
     public DownloadPagerFragment() {
         super();
@@ -82,7 +84,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                     hide();
                 }
             } else if (key.equals(COUNT_DOWNLOADED) || key.equals(COUNT_DOWNLOADING)) {
-
                 setButtonStatus();
             }
         }
@@ -189,8 +190,21 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             menu.findItem(R.id.dm_action_pause_all).setEnabled(false);
             menu.findItem(R.id.dm_action_resume_all).setEnabled(false);
         } else {
-            menu.findItem(R.id.dm_action_pause_all).setEnabled(true);
-            menu.findItem(R.id.dm_action_resume_all).setEnabled(true);
+            operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
+            if (null != operator) {
+                try {
+                    if (0 == operator.getLength()) {
+                        menu.findItem(R.id.dm_action_pause_all).setEnabled(false);
+                        menu.findItem(R.id.dm_action_resume_all).setEnabled(false);
+                    } else {
+                        menu.findItem(R.id.dm_action_pause_all).setEnabled(true);
+                        menu.findItem(R.id.dm_action_resume_all).setEnabled(true);
+                    }
+                } catch (Exception e) {
+                    menu.findItem(R.id.dm_action_pause_all).setEnabled(false);
+                    menu.findItem(R.id.dm_action_resume_all).setEnabled(false);
+                }
+            }
         }
     }
 
@@ -232,12 +246,12 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         } else if (v.getId() == R.id.btnDelete) {//删除
             int totalDelete = ((int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) + (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0));
             for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
-                IDownloadOperator operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, i);
+                operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, i);
                 if (null != operator) {
                     operator.onClickDelete();
                 }
             }
-            IDownloadOperator operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
+            operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
             if (0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) && 0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0)) {
                 hide();
                 operator.resetFlag();
@@ -246,9 +260,9 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                             + totalDelete + mActivity.getResources().getString(R.string.delete_message2),
                     Toast.LENGTH_SHORT).show();
         } else if (v.getId() == R.id.select_allpick) {
-            IDownloadOperator operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
+            operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
             if (null != operator) {
-                if ((int) AppliteSPUtils.get(mActivity, LENGTH, 0) == count()) {//全选=>全不选
+                if (operator.getLength() == count()) {
                     operator.onClickDeselectAll();
                 } else {
                     operator.onClickSeleteAll();
@@ -256,7 +270,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             }
         } else if (v.getId() == R.id.select_cancel) {//取消
             hide();
-            IDownloadOperator operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
+            operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
             operator.resetFlag();
 
             Toast.makeText(mActivity.getApplicationContext(), R.string.cancel_operator, Toast.LENGTH_SHORT).show();
@@ -342,7 +356,8 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         tvShowTotal.setText(temp);
 
         //全选按钮
-        if ((int) AppliteSPUtils.get(mActivity, LENGTH, 0) == count()) {//全不选
+        operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
+        if (operator.getLength() == count()) {
             btnAllpick.setText(R.string.nonepick_btn);
         } else {//其他状态
             btnAllpick.setText(R.string.allpick_btn);
@@ -431,7 +446,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                             Constant.OSGI_SERVICE_DM_FRAGMENT,
                             DownloadListFragment.class.getName(),
                             DownloadListFragment.newBundle(R.string.dm_downloaded, ~downloadFlag));
-
                 } else if (R.string.dm_downloading == tabs[position]) {
                     fg = (DownloadListFragment) host.newFragment(
                             Constant.OSGI_SERVICE_DM_FRAGMENT,
@@ -475,12 +489,14 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     }
 
     public interface IDownloadOperator {
-        public void onClickDelete();
+        void onClickDelete();
 
-        public void onClickSeleteAll();
+        void onClickSeleteAll();
 
-        public void onClickDeselectAll();
+        void onClickDeselectAll();
 
-        public void resetFlag();
+        void resetFlag();
+
+        int getLength();
     }
 }

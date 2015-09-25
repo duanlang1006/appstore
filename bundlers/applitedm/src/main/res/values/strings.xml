@@ -15,4 +15,5 @@
     <string name="delete_message2"> Downloads</string>
     <string name="choose_message1">You have choose </string>
     <string name="choose_message2"> package</string>
+    <string name="back_to_homepage">List so empty,Click me and Return homepage</string>
 </resources>

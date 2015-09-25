@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.applite.dm;
+package com.applite.dm.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -31,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.applite.common.AppliteUtils;
+import com.applite.dm.R;
+import com.applite.dm.main.DownloadListFragment;
 import com.applite.view.CustomProgressBar;
 import com.lidroid.xutils.BitmapUtils;
 import com.mit.impl.ImplAgent;
@@ -46,13 +48,13 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
     private int mLayoutId;
     private BitmapUtils mBitmapHelper;
     private ImplAgent implAgent;
-    private DownloadListener mListener;
+    private DownloadListFragment.DownloadListener mListener;
 
     public DownloadAdapter(Context context,
                            int resource,
                            List<ImplInfo> implInfoList,
                            BitmapUtils bitmapHelper,
-                           DownloadListener listener) {
+                           DownloadListFragment.DownloadListener listener) {
         super(context, resource, implInfoList);
         mContext = context;
         mBitmapHelper = bitmapHelper;
@@ -112,7 +114,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
     }
 
 
-    class ViewHolder implements ImplChangeCallback {
+    public class ViewHolder implements ImplChangeCallback {
         CustomProgressBar custompb;
         TextView titleView;
         TextView descView;
@@ -120,7 +122,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         TextView actionBtn;
         CheckBox deleteCheckBox;
         ImageView iconView;
-        ImplInfo implInfo;
+        public ImplInfo implInfo;
         Animation animaCheckBox;
 
 
