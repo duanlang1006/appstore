@@ -1,278 +1,389 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical"
-    android:paddingLeft="18dp"
-    android:paddingRight="12dp"
+    android:background="@color/setting_main"
     tools:context=".MainActivity">
 
-    <TextView
-        style="@style/Setting_title_style"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="bottom"
-        android:text="@string/notification" />
-
-    <include layout="@layout/default_line_setting"></include>
-
     <LinearLayout
-        android:id="@+id/ll_item1_1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="50dp"
-            android:orientation="vertical">
-
-
-            <TextView
-                style="@style/Default_charactor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/update_notification" />
-
-
-        </LinearLayout>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/divided_line_distance"
-            android:background="@drawable/setup_wifi_click_bg"></ImageView>
-
-    </LinearLayout>
-
-    <include layout="@layout/default_line_setting"></include>
-
-    <TextView
-        style="@style/Setting_title_style"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/other_function" />
-
-    <include layout="@layout/default_line_setting"></include>
-
-    <LinearLayout
-        android:id="@+id/ll_item2_1"
-        style="@style/TwoLineStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="50dp"
-            android:orientation="vertical">
-
-
-            <TextView
-                style="@style/Default_charactor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/clean_cache" />
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/clean_cache_detail"
-                android:textSize="10dp" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <include layout="@layout/default_line_setting"></include>
-
-    <LinearLayout
-        android:id="@+id/ll_item2_2"
-        style="@style/TwoLineStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="50dp"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/Default_charactor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/delete_package" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/delete_package_detail"
-                android:textSize="10dp" />
-        </LinearLayout>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/divided_line_distance"
-            android:background="@drawable/setup_wifi_click_bg"></ImageView>
-
-    </LinearLayout>
-
-    <include layout="@layout/default_line_setting"></include>
-
-    <LinearLayout
-        android:id="@+id/ll_item2_3"
-        style="@style/TwoLineStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="50dp"
-            android:orientation="vertical">
-
-
-            <TextView
-                style="@style/Default_charactor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/no_picture" />
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/no_picture_detail"
-                android:textSize="10dp" />
-        </LinearLayout>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/divided_line_distance"
-            android:background="@drawable/setup_wifi_click_bg"></ImageView>
-
-    </LinearLayout>
-
-    <include layout="@layout/default_line_setting"></include>
-
-    <LinearLayout
-        android:id="@+id/ll_item2_4"
-        style="@style/TwoLineStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="50dp"
-            android:orientation="vertical">
-
-
-            <TextView
-                style="@style/Default_charactor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/zero_flow_update" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/zero_flow_update_detail"
-                android:textSize="10dp" />
-        </LinearLayout>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/divided_line_distance"
-            android:background="@drawable/setup_wifi_click_bg"></ImageView>
-
-        <!--style="@style/personalListText"-->
-
-    </LinearLayout>
-
-
-    <include layout="@layout/default_line_setting"></include>
-
-    <TextView
-        android:id="@+id/textViewTitle3"
-        style="@style/Setting_title_style"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/help" />
-
-    <include layout="@layout/default_line_setting"></include>
-
-    <LinearLayout
-        android:id="@+id/ll_item3_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:minHeight="50dp"
-            android:orientation="vertical">
-
-
-            <TextView
-                style="@style/Default_charactor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/feedback" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <include layout="@layout/default_line_setting"></include>
-
-    <LinearLayout
-        android:id="@+id/ll_item3_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="50dp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="18dp"
+        android:paddingRight="10dp">
 
         <TextView
-            style="@style/Default_charactor"
-            android:layout_width="wrap_content"
+            style="@style/Setting_title_style"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/about" />
+            android:gravity="bottom"
+            android:text="@string/data_throughput_setting" />
 
-        <ImageView
-            style="@style/personalListText"
-            android:layout_width="wrap_content"
+        <!-- 智能无图 -->
+        <LinearLayout
+            android:id="@+id/smart_show_title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/settings_item_min_height"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/Default_charactor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/settings_item_string_padding_left"
+                    android:text="@string/smart_show" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/settings_item_string_padding_left"
+                    android:text="@string/smart_show_detail"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/smart_show"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/divided_line_distance"
+                android:background="@drawable/setup_wifi_click_bg"
+                android:gravity="center_vertical"></ImageView>
+        </LinearLayout>
+
+        <include layout="@layout/default_line_setting"></include>
+
+        <!-- 零流量更新 -->
+        <LinearLayout
+            android:id="@+id/smart_download_title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/settings_item_min_height"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/Default_charactor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/settings_item_string_padding_left"
+                    android:text="@string/smart_update" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/settings_item_string_padding_left"
+                    android:text="@string/smart_update_detail"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/smart_download"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/divided_line_distance"
+                android:background="@drawable/setup_wifi_click_bg"></ImageView>
+        </LinearLayout>
+
+
+        <TextView
+            style="@style/Setting_title_style"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/back"
-            android:visibility="visible" />
+            android:text="@string/app_settings" />
+
+        <!--  允许推送更新-->
+        <LinearLayout
+            android:id="@+id/update_notification_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/settings_item_min_height"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/Default_charactor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/settings_item_string_padding_left"
+                    android:text="@string/push_notification" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/update_notification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/divided_line_distance"
+                android:background="@drawable/setup_wifi_click_bg"></ImageView>
+
+        </LinearLayout>
+
+        <include layout="@layout/default_line_setting"></include>
+
+        <!-- 安装后自动删除apk -->
+        <LinearLayout
+            android:id="@+id/delete_apk_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/settings_item_min_height"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/Default_charactor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/settings_item_string_padding_left"
+                    android:text="@string/delete_apkfile" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/delete_apk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/divided_line_distance"
+                android:background="@drawable/setup_wifi_click_bg"></ImageView>
+
+        </LinearLayout>
+
+        <include layout="@layout/default_line_setting"></include>
+
+        <!-- 下载路径  -->
+        <LinearLayout
+            android:id="@+id/download_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/settings_item_min_height"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Default_charactor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/settings_item_string_padding_left"
+                android:text="@string/download_path" />
+
+            <TextView
+                android:id="@+id/save_path"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="@dimen/settings_item_string_padding_right" />
+
+        </LinearLayout>
+
+        <include layout="@layout/default_line_setting"></include>
+
+        <!-- 最多同时下载任务-->
+        <LinearLayout
+            android:id="@+id/download_thread"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingRight="10dp">
+
+            <TextView
+                style="@style/Default_charactor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="@dimen/settings_item_min_height"
+                android:paddingLeft="@dimen/settings_item_string_padding_left"
+                android:text="@string/download_thread" />
+
+
+            <LinearLayout
+                android:id="@+id/download_thread_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/thread_btn1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:text="1" />
+
+                <ImageView
+                    android:id="@+id/thread_btn2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:text="2" />
+
+                <ImageView
+                    android:id="@+id/thread_btn3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="3" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <include layout="@layout/default_line_setting"></include>
+
+        <!-- 最多同时下载任务-->
+        <LinearLayout
+            android:id="@+id/download_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/settings_item_min_height"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Default_charactor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/settings_item_string_padding_left"
+                android:text="@string/download_size" />
+
+            <ImageView
+                style="@style/personalListText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/back"
+                android:visibility="visible" />
+        </LinearLayout>
+
+
+        <include layout="@layout/default_line_setting"></include>
+
+
+        <!-- 清除缓存-->
+        <LinearLayout
+            android:id="@+id/clean_cache"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/settings_item_min_height"
+            android:orientation="horizontal">
+
+
+            <TextView
+                style="@style/Default_charactor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/settings_item_string_padding_left"
+                android:text="@string/clean_cache" />
+
+            <TextView
+                android:id="@+id/cache_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="@dimen/settings_item_string_padding_right" />
+
+        </LinearLayout>
+
+
+        <TextView
+            style="@style/Setting_title_style"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help" />
+
+        <!-- 一键反馈 -->
+        <LinearLayout
+            android:id="@+id/feedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/settings_item_min_height"
+            android:orientation="horizontal">
+
+
+            <TextView
+                style="@style/Default_charactor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/settings_item_string_padding_left"
+                android:text="@string/onekey_feedback" />
+
+            <ImageView
+                style="@style/personalListText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/back"
+                android:visibility="visible" />
+        </LinearLayout>
+
+        <include layout="@layout/default_line_setting"></include>
+
+        <!-- 关于 -->
+        <LinearLayout
+            android:id="@+id/about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/settings_item_min_height"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Default_charactor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/settings_item_string_padding_left"
+                android:text="@string/about" />
+
+            <ImageView
+                style="@style/personalListText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/back"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
-
-    <include layout="@layout/default_line_setting"></include>
-
-</LinearLayout>
+</ScrollView>

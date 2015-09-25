@@ -1,7 +1,5 @@
 package com.applite.common;
 
-import android.app.DownloadManager;
-
 public class Constant {
     public static final String URL = "http://www.fuli365.net/app_interface/app_main_interface.php";
 
@@ -18,6 +16,7 @@ public class Constant {
     public static final String OSGI_SERVICE_UPDATE_FRAGMENT = "osgi.service.update.fragment";
     public static final String OSGI_SERVICE_LUCKY_FRAGMENT = "osgi.service.lucky.fragment";
     public static final String OSGI_SERVICE_ABOUT_FRAGMENT = "osgi.service.about.fragment";
+    public static final String OSGI_SERVICE_SIZELIMIT_FRAGMENT = "osgi.service.sizelimit.fragment";
 
     public static final String OSGI_SERVICE_IMPL_LISTENER = "osgi.service.impl.listener";
 
