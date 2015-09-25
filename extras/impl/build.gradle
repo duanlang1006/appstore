@@ -26,10 +26,10 @@ android {
 dependencies {
     provided files('../../app/reflibs/xUtils-2.6.14.jar')
     provided files('../../extras/mitUpdateSDK/mit-update-v1.0.jar')
-    provided files('../../app/reflibs/android-support-v4.jar')
-    provided files('../../extras/applitecommon/applite-common-v1.0.jar')
-    compile project(':bundlers:applitedm')
-    compile 'com.android.support:appcompat-v7:21.0.3'
+//    provided files('../../app/reflibs/android-support-v4.jar')
+//    provided files('../../extras/applitecommon/applite-common-v1.0.jar')
+//    compile project(':bundlers:applitedm')
+//    compile 'com.android.support:appcompat-v7:21.0.3'
 }
 
 task clearJar(type: Delete) {
