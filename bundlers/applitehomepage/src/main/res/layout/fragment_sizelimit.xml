@@ -73,7 +73,6 @@
     <kankan.wheel.widget.WheelView
         android:id="@+id/max_size"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/left_accordion_mask" />
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
