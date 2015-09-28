@@ -553,7 +553,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
                     @Override
                     public void onLoadFailed(ImageView imageView, String s, Drawable drawable) {
-                        imageView.setBackground(mActivity.getResources().getDrawable(R.drawable.detail_default_img));
+//                        imageView.setBackground(mActivity.getResources().getDrawable(R.drawable.detail_default_img));
+                        imageView.setImageResource(R.drawable.detail_default_img);
                     }
                 });
             }
