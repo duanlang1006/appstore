@@ -3,14 +3,13 @@ package com.applite.homepage;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
-//import com.applite.utils.ButtonHandler;
 import com.umeng.fb.FeedbackAgent;
 import com.umeng.fb.SyncListener;
 import com.umeng.fb.model.Conversation;
@@ -18,6 +17,8 @@ import com.umeng.fb.model.Reply;
 
 import java.lang.reflect.Field;
 import java.util.List;
+
+//import com.applite.utils.ButtonHandler;
 
 
 /**
@@ -28,20 +29,19 @@ import java.util.List;
  * 意见反馈Dialog
  */
 public class FeedbackDialog {
-    public static void show(final Context context) {
+    public void show(final Context context) {
         final Conversation mComversation = new FeedbackAgent(context).getDefaultConversation();
         LayoutInflater inflater = LayoutInflater.from(context);
         final View layout = inflater.inflate(R.layout.dialog_feedback, null);
         final EditText et_feedback = (EditText) layout.findViewById(R.id.dialog_feedback_et1);
         final EditText et_contact = (EditText) layout.findViewById(R.id.dialog_feedback_et2);
-        final RadioGroup rg1 = (RadioGroup) layout.findViewById(R.id.dialog_feedback_rg1);
-        final RadioGroup rg2 = (RadioGroup) layout.findViewById(R.id.dialog_feedback_rg2);
-        final RadioButton rb1 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb1);
-        final RadioButton rb2 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb2);
-        final RadioButton rb3 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb3);
-        final RadioButton rb4 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb4);
-        final RadioButton rb5 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb5);
-        final RadioButton rb6 = (RadioButton) layout.findViewById(R.id.dialog_feedback_rb6);
+        final CheckBox rb1 = (CheckBox) layout.findViewById(R.id.dialog_feedback_btn1);
+        final CheckBox rb2 = (CheckBox) layout.findViewById(R.id.dialog_feedback_btn2);
+        final CheckBox rb3 = (CheckBox) layout.findViewById(R.id.dialog_feedback_btn3);
+        final CheckBox rb4 = (CheckBox) layout.findViewById(R.id.dialog_feedback_btn4);
+        final CheckBox rb5 = (CheckBox) layout.findViewById(R.id.dialog_feedback_btn5);
+        final CheckBox rb6 = (CheckBox) layout.findViewById(R.id.dialog_feedback_btn6);
+
         AlertDialog.Builder mDialog = new AlertDialog.Builder(context);
         mDialog.setView(layout)
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -59,37 +59,31 @@ public class FeedbackDialog {
                 .setPositiveButton("提交", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String reason;
+                        String reason = "";
                         String feedback = et_feedback.getText().toString();
                         String contact = et_contact.getText().toString();
                         if (rb1.isChecked()) {
-                            reason = rb1.getTag().toString();
-                        } else if (rb2.isChecked()) {
-                            reason = rb2.getTag().toString();
-                        } else if (rb3.isChecked()) {
-                            reason = rb3.getTag().toString();
-                        } else if (rb4.isChecked()) {
-                            reason = rb4.getTag().toString();
-                        } else if (rb5.isChecked()) {
-                            reason = rb5.getTag().toString();
-                        } else if (rb6.isChecked()) {
-                            reason = rb6.getTag().toString();
-                        } else {
-                            reason = "没有理由";
+                            reason = reason + rb1.getTag().toString();
                         }
-                        if (reason.equals("没有理由") && feedback.isEmpty()) {
-//                            try {
-//                                Field field = dialog.getClass().getDeclaredField("mAlert");
-//                                field.setAccessible(true);
-//                                //获得mAlert变量的值
-//                                Object obj = field.get(dialog);
-//                                field = obj.getClass().getDeclaredField("mHandler");
-//                                field.setAccessible(true);
-//                                //修改mHandler变量的值，使用新的ButtonHandler类
-//                                field.set(obj, new ButtonHandler(dialog));
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
+                        if (rb2.isChecked()) {
+                            reason = reason + "," + rb2.getTag().toString();
+                        }
+                        if (rb3.isChecked()) {
+                            reason = reason + "," + rb3.getTag().toString();
+                        }
+                        if (rb4.isChecked()) {
+                            reason = reason + "," + rb4.getTag().toString();
+                        }
+                        if (rb5.isChecked()) {
+                            reason = reason + "," + rb5.getTag().toString();
+                        }
+                        if (rb6.isChecked()) {
+                            reason = reason + "," + rb6.getTag().toString();
+                        }
+                        if (!(rb1.isChecked()) && (rb2.isChecked()) && (rb3.isChecked()) && (rb4.isChecked()) && (rb5.isChecked()) && (rb6.isChecked())) {
+                            reason = "";
+                        }
+                        if (TextUtils.isEmpty(reason) && feedback.isEmpty()) {
                             try {
                                 Field field = dialog.getClass()
                                         .getSuperclass().getDeclaredField(
@@ -127,37 +121,6 @@ public class FeedbackDialog {
                     }
                 })
                 .show();
-        RadioGroup.OnCheckedChangeListener lis = new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (R.id.dialog_feedback_rb1 == group.getCheckedRadioButtonId()) {
-                    if (rb1.isChecked()) {
-                        rg2.clearCheck();
-                    }
-                } else if (R.id.dialog_feedback_rb2 == group.getCheckedRadioButtonId()) {
-                    if (rb2.isChecked()) {
-                        rg2.clearCheck();
-                    }
-                } else if (R.id.dialog_feedback_rb3 == group.getCheckedRadioButtonId()) {
-                    if (rb3.isChecked()) {
-                        rg2.clearCheck();
-                    }
-                } else if (R.id.dialog_feedback_rb4 == group.getCheckedRadioButtonId()) {
-                    if (rb4.isChecked()) {
-                        rg1.clearCheck();
-                    }
-                } else if (R.id.dialog_feedback_rb5 == group.getCheckedRadioButtonId()) {
-                    if (rb5.isChecked()) {
-                        rg1.clearCheck();
-                    }
-                } else if (R.id.dialog_feedback_rb6 == group.getCheckedRadioButtonId()) {
-                    if (rb6.isChecked()) {
-                        rg1.clearCheck();
-                    }
-                }
-            }
-        };
-        rg1.setOnCheckedChangeListener(lis);
-        rg2.setOnCheckedChangeListener(lis);
     }
+
 }

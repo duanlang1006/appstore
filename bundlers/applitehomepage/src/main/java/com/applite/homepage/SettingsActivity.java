@@ -30,6 +30,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     private Preference about;
 
     private DataCleanDialog mDataCleanDialog;
+    private FeedbackDialog mFeedbackDialog;
 
     //省流量设置
     private static final String KEY_SMART_UPDATE = "smart_update";    //零流量更新
@@ -54,6 +55,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 
         mDataCleanDialog = new DataCleanDialog();
         mDataCleanDialog.CallBack(this);
+
+        mFeedbackDialog = new FeedbackDialog();
 //        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.setting_title);
 
         addPreferencesFromResource(R.xml.settings);
@@ -207,7 +210,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             mDataCleanDialog.show(this);
         } else if (preference.getKey().equals(KEY_ONEKEY_FEEDBACK)) {
             LogUtils.d(TAG, "preference.getKey() = KEY_ONEKEY_FEEDBACK");
-            FeedbackDialog.show(this);
+            mFeedbackDialog.show(this);
         } else if (preference.getKey().equals(KEY_ABOUT)) {
             LogUtils.d(TAG, "preference.getKey() = KEY_ABOUT");
 //            ((OSGIServiceHost) mActivity).jumptoAbout(true);
