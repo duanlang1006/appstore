@@ -199,7 +199,7 @@ public class ImplAgent extends Observable {
 
     public boolean onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.d(TAG, "onReceive," + action);
+        ImplLog.d(TAG, "onReceive," + action);
         if (IMPL_ACTION_PACKAGE_ADDED.equals(action)) {
             final String packageName = intent.getData().getSchemeSpecificPart();
             mWorkHandler.post(new Runnable() {
@@ -235,13 +235,33 @@ public class ImplAgent extends Observable {
             });
         } else if (IMPL_ACTION_SYSTEM_INSTALL_RESULT.equals(action)) {
             final String packageName = intent.getStringExtra("name");
+            final String fileName = intent.getStringExtra("filename");
             final int result = intent.getIntExtra("result", 0);
             mWorkHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     ImplInfo implInfo = findImplInfoByPackageName(packageName);
+                    if (null == implInfo){
+                        implInfo = findImplInfoByFilename(fileName);
+                    }
                     if (null != implInfo) {
                         mInstaller.onSystemInstallResult(implInfo, result, mImplCallback);
+                        ImplLog.d(TAG, "com.installer.system.install.result,result," + result + ",packagename:"+packageName+",filename="+fileName);
+                    }else{
+                        ImplLog.d(TAG, "com.installer.system.install.result,implInfo == null");
+                        for (int i = 0; i < mImplList.size(); i++) {
+                            implInfo = mImplList.get(i);
+                            if (ImplInfo.STATUS_PRIVATE_INSTALLING != implInfo.getStatus()){
+                                continue;
+                            }
+                            String path = implInfo.getLocalPath();
+                            if (null == path || TextUtils.isEmpty(path)){
+                                path = implInfo.getFileSavePath();
+                            }
+                            if (null == path || TextUtils.isEmpty(path) || !new File(path).exists()){
+                                mInstaller.onSystemInstallResult(implInfo, result, mImplCallback);
+                            }
+                        }
                     }
                 }
             });
@@ -514,13 +534,31 @@ public class ImplAgent extends Observable {
 
     private ImplInfo findImplInfoByPackageName(String packageName) {
         ImplInfo implInfo = null;
+        if (null == packageName){
+            return implInfo;
+        }
         for (int i = 0; i < mImplList.size(); i++) {
-            if (mImplList.get(i).getPackageName().equals(packageName)) {
-                implInfo = mImplList.get(i);
-                break;
+            implInfo = mImplList.get(i);
+            if (packageName.equals(implInfo.getPackageName())) {
+                return implInfo;
             }
         }
-        return implInfo;
+        return null;
+    }
+
+    private ImplInfo findImplInfoByFilename(String fileName) {
+        ImplInfo implInfo = null;
+        if (null == fileName){
+            return implInfo;
+        }
+        for (int i = 0; i < mImplList.size(); i++) {
+            implInfo = mImplList.get(i);
+            if (fileName.equals(implInfo.getLocalPath())
+                    || fileName.equals(implInfo.getFileSavePath())) {
+                return implInfo;
+            }
+        }
+        return null;
     }
 
     private void notifyObserverUpdate(String event) {
