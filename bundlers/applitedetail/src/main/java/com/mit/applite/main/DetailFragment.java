@@ -435,68 +435,62 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      * @param data
      */
     private void setData(String data) {
-        try {
-            Gson gson = new Gson();
-            DetailData detailData = gson.fromJson(data, DetailData.class);
-            if (null != detailData) {
-                int app_key = detailData.getApp_key();
-                mSimilarData = detailData.getSimilar_info();
-                LogUtils.i(TAG, "应用详情similar_info:" + mSimilarData);
-                if (null == mSimilarAdapter) {
-                    mSimilarAdapter = new MySimilarAdapter(mActivity);
-                    mSimilarAdapter.setData(mSimilarData, this);
-                    mSimilarView.setAdapter(mSimilarAdapter);
-                } else {
-                    mSimilarAdapter.setData(mSimilarData, this);
-                    mSimilarAdapter.notifyDataSetChanged();
-                }
-
-                mApkDatas = detailData.getDetail_info();
-                LogUtils.i(TAG, "应用详情detail_info:" + mApkDatas);
-                ApkBean bean = mApkDatas.get(0);
-                mPackageName = bean.getPackageName();
-                mApkName = bean.getName();
-                mImgUrl = bean.getIconUrl();
-                mVersionCode = bean.getVersionCode();
-                mRating = bean.getRating();
-                mDownloadUrl = bean.getrDownloadUrl();
-                mApkSize = bean.getApkSize();
-                mDescription = bean.getDescription();
-                mViewPagerUrl = bean.getScreenshotsUrl();
-                mApkTag = bean.getTag();
-                mDeveloper = bean.getDeveloper();
-                String mVersionName = bean.getVersionName();
-                String mDownloadNumber = bean.getDownloadTimes();
-                String mUpdateLog = bean.getUpdateInfo();
-
-                mXingView.setRating(Float.parseFloat(mRating) / 2.0f);
-                mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(mApkSize) + " | " + mDeveloper);
-                if (TextUtils.isEmpty(mDescription)) {
-                    mApkContentView.setText(mActivity.getResources().getText(R.string.no_app_detail));
-                } else {
-                    mApkContentView.setText(mDescription);
-                }
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mApkContentView.getLineCount() <= DEFAULT_MAX_LINE_COUNT) {
-                            mOpenIntroduceView.setVisibility(View.GONE);
-                        } else {
-                            mApkContentView.setLines(DEFAULT_MAX_LINE_COUNT);
-                            CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
-                        }
-                    }
-                }, 500);
-                setPreViewImg(mViewPagerUrl);
-                setApkTag(mApkTag);
-                if (null == mImplInfo)
-                    setProgressButtonState();
+        Gson gson = new Gson();
+        DetailData detailData = gson.fromJson(data, DetailData.class);
+        if (null != detailData) {
+            int app_key = detailData.getApp_key();
+            mSimilarData = detailData.getSimilar_info();
+            LogUtils.i(TAG, "应用详情similar_info:" + mSimilarData);
+            if (null == mSimilarAdapter) {
+                mSimilarAdapter = new MySimilarAdapter(mActivity);
+                mSimilarAdapter.setData(mSimilarData, this, mSimilarView.getNumColumns());
+                mSimilarView.setAdapter(mSimilarAdapter);
+            } else {
+                mSimilarAdapter.setData(mSimilarData, this, mSimilarView.getNumColumns());
+                mSimilarAdapter.notifyDataSetChanged();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogUtils.e(TAG, "应用详情JSON解析失败");
-        }
 
+            mApkDatas = detailData.getDetail_info();
+            LogUtils.i(TAG, "应用详情detail_info:" + mApkDatas);
+            ApkBean bean = mApkDatas.get(0);
+            mPackageName = bean.getPackageName();
+            mApkName = bean.getName();
+            mImgUrl = bean.getIconUrl();
+            mVersionCode = bean.getVersionCode();
+            mRating = bean.getRating();
+            mDownloadUrl = bean.getrDownloadUrl();
+            mApkSize = bean.getApkSize();
+            mDescription = bean.getDescription();
+            mViewPagerUrl = bean.getScreenshotsUrl();
+            mApkTag = bean.getTag();
+            mDeveloper = bean.getDeveloper();
+            String mVersionName = bean.getVersionName();
+            String mDownloadNumber = bean.getDownloadTimes();
+            String mUpdateLog = bean.getUpdateInfo();
+
+            mXingView.setRating(Float.parseFloat(mRating) / 2.0f);
+            mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(mApkSize) + " | " + mDeveloper);
+            if (TextUtils.isEmpty(mDescription)) {
+                mApkContentView.setText(mActivity.getResources().getText(R.string.no_app_detail));
+            } else {
+                mApkContentView.setText(mDescription);
+            }
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (mApkContentView.getLineCount() <= DEFAULT_MAX_LINE_COUNT) {
+                        mOpenIntroduceView.setVisibility(View.GONE);
+                    } else {
+                        mApkContentView.setLines(DEFAULT_MAX_LINE_COUNT);
+                        CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
+                    }
+                }
+            }, 500);
+            setPreViewImg(mViewPagerUrl);
+            setApkTag(mApkTag);
+            if (null == mImplInfo)
+                setProgressButtonState();
+        }
     }
 
     /**
@@ -564,14 +558,35 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     @Override
-    public void refreshDetail(SimilarBean bean) {
-//        mLoadLayout.setVisibility(View.VISIBLE);
-//        mApkName = bean.getmName();
-//        mPackageName = bean.getmPackageName();
-//        mImgUrl = bean.getmImgUrl();
-//        initActionBar();
-//        post(bean.getmPackageName());
+    public void onClickIcon(Object... params) {
+        SimilarBean bean = (SimilarBean) params[0];
         ((OSGIServiceHost) mActivity).jumptoDetail(bean.getPackageName(), bean.getName(), bean.getIconUrl(), bean.getVersionCode(), null, true);
+    }
+
+    @Override
+    public void onClickName(Object... params) {
+        SimilarBean bean = (SimilarBean) params[0];
+        ((OSGIServiceHost) mActivity).jumptoDetail(bean.getPackageName(), bean.getName(), bean.getIconUrl(), bean.getVersionCode(), null, true);
+    }
+
+    @Override
+    public void onClickButton(Object... params) {
+        ImplInfo implInfo = (ImplInfo) params[0];
+        SimilarBean bean = (SimilarBean) params[1];
+        ImplChangeCallback implChangeCallback = (ImplChangeCallback) params[2];
+        ImplHelper.onClick(mActivity,
+                implInfo,
+                bean.getrDownloadUrl(),
+                bean.getName(),
+                bean.getIconUrl(),
+                Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
+                null,
+                implChangeCallback);
+    }
+
+    @Override
+    public void dataLess(int i) {
+
     }
 
     class DetailImplCallback implements ImplChangeCallback {
