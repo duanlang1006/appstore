@@ -259,6 +259,8 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             Toast.makeText(mActivity.getApplicationContext(), mActivity.getResources().getString(R.string.delete_message1)
                             + totalDelete + mActivity.getResources().getString(R.string.delete_message2),
                     Toast.LENGTH_SHORT).show();
+//            temp = mActivity.getResources().getString(R.string.delete_message, totalDelete);
+//            Toast.makeText(mActivity, temp, Toast.LENGTH_SHORT).show();
         } else if (v.getId() == R.id.select_allpick) {
             operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
             if (null != operator) {
@@ -351,9 +353,12 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
         //textView
         temp = mActivity.getResources().getString(R.string.choose_message1) +
-                (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) + " | " + (int) (AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0)) +
+                ((int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) + (int) (AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0))) +
                 mActivity.getResources().getString(R.string.choose_message2);
         tvShowTotal.setText(temp);
+//        temp = mActivity.getResources().getString(R.string.choose_message,
+//                ((int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0) + (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0)));
+//        tvShowTotal.setText(temp);
 
         //全选按钮
         operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
