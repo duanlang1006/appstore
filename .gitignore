@@ -13,4 +13,5 @@ bundlers/**/*.iml
 extras/**/build/
 extras/**/*.iml
 extras/**/*.jar
+extras/**/*.aar
 

@@ -12,4 +12,16 @@
         <item>"Garry"</item>
         <item>"蚂蚁"</item>
     </string-array>
+
+    <string-array name="sizelist">
+        <item>"没有限制"</item>
+        <item>"20MB"</item>
+        <item>"10MB"</item>
+        <item>"5MB"</item>
+        <item>"2MB"</item>
+        <item>"1MB"</item>
+        <item>"512KB"</item>
+        <item>"不允许下载"</item>
+    </string-array>
+
 </resources>

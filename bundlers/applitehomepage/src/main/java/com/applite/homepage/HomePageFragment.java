@@ -1,7 +1,6 @@
 package com.applite.homepage;
 
 import android.app.Activity;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -20,14 +19,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -37,6 +34,7 @@ import com.applite.bean.ScreenBean;
 import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
+import com.applite.common.DefaultValue;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
 import com.applite.utils.SPUtils;
@@ -406,7 +404,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private void download(final String name, String url) {
         HttpHandler mHttpHandler = mFinalHttp.download(url, //这里是下载的路径
                 AppliteUtils.getAppDir(name), //这是保存到本地的路径
-                true,//true:断点续传 false:不断点续传（全新下载）
+                DefaultValue.defaultValueHTTPSuport,//true:断点续传 false:不断点续传（全新下载）
                 new AjaxCallBack<File>() {
 
                     @Override
@@ -585,7 +583,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 }
             });
 
-            mSearchbarView.setVisibility(View.VISIBLE);
+//            mSearchbarView.setVisibility(View.VISIBLE);
 
             mHideSearchbarView = (RelativeLayout) customView.findViewById(R.id.hide_search_bar);
             mSubTitle = (TextView) customView.findViewById(R.id.game_title);
@@ -598,13 +596,13 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         }
     }
 
-    private String gametitle;
+    private String actionbartitle;
     private Boolean removetab = false;
 
     private void refreshActionbar() {
         if (null != customView) {
-            if (null != gametitle) {
-                mSubTitle.setText(gametitle);
+            if (null != actionbartitle) {
+                mSubTitle.setText(actionbartitle);
                 mSearchbarView.setVisibility(View.GONE);
                 mHideSearchbarView.setVisibility(View.VISIBLE);
             }
@@ -613,8 +611,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
     private void removeActionTabbar() {
         if (null != customView) {
-            if (null != gametitle) {
-                mSubTitle.setText(gametitle);
+            if (null != actionbartitle) {
+                mSubTitle.setText(actionbartitle);
                 mSearchbarView.setVisibility(View.GONE);
                 mHideSearchbarView.setVisibility(View.VISIBLE);
             }
@@ -670,14 +668,17 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
                 actionBar.removeAllTabs();
 
-                for (int i = 0; i < mPageData.size(); i++) {
+                if (mPageData != null && mPageData.size() > 0) {
+                    for (int i = 0; i < mPageData.size(); i++) {
 //                    LogUtils.i(TAG, "actionBar.addTab getPageTitle(i) : " + mSectionsPagerAdapter.getPageTitle(i));
-                    actionBar.addTab(actionBar.newTab().setTabListener(mBarTabListener));
-                    ActionBar.Tab t = actionBar.getTabAt(i);
-                    t.setCustomView(R.layout.actionbar_tab);
-                    TextView title = (TextView) t.getCustomView().findViewById(R.id.tab_title);
-                    title.setText(mSectionsPagerAdapter.getPageTitle(i));
+                        actionBar.addTab(actionBar.newTab().setTabListener(mBarTabListener));
+                        ActionBar.Tab t = actionBar.getTabAt(i);
+                        t.setCustomView(R.layout.actionbar_tab);
+                        TextView title = (TextView) t.getCustomView().findViewById(R.id.tab_title);
+                        title.setText(mSectionsPagerAdapter.getPageTitle(i));
+                    }
                 }
+
                 actionBar.show();
             }
 
@@ -789,27 +790,38 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 //                LogUtils.i(TAG, "获取首页数据:");
                 try {
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
-//                    LogUtils.i(TAG, "获取首页数据:" + data);
+                    LogUtils.i(TAG, "获取首页数据:" + data);
                     if (1 == data.getAppKey()) {
                         mPageData = data.getSubjectData();
-//                        LogUtils.i(TAG, "获取首页数据  mPageData: " + mPageData);
+                        LogUtils.i(TAG, "获取首页数据  mPageData: " + mPageData);
                         if (!mPageData.get(0).getS_key().equals("goods")) {
                             homeflag = false;
                             LogUtils.i(TAG, "首页分类  goods homeflag = " + homeflag);
-
                         }
 
-                        if (mPageData.get(0).getS_key().equals("goods_m_game")) {
-                            gametitle = getString(R.string.gametitle);
-                            refreshActionbar();
-                        } else if (mPageData.get(0).getData().get(0).getCategorymain().equals("游戏")) {
-                            LogUtils.i(TAG, "获取首页数据  游戏数据分类: ");
-                            gametitle = mPageData.get(0).getData().get(0).getCategorysub();
-                            removeActionTabbar();
-                        } else if (!mPageData.get(0).getS_key().equals("goods")) {
-                            gametitle = mPageData.get(0).getData().get(0).getCategorysub();
-                            refreshActionbar();
+                        String S_key = mPageData.get(0).getS_key();
+                        if (S_key.equals("goods")) {
+                            //首页
+                            mSearchbarView.setVisibility(View.VISIBLE);
+                        } else {
+                            //一级分类列表判断
+                            if (mPageData.get(0).getS_key().equals("goods_m_game")) {
+                                //游戏类
+                                actionbartitle = getString(R.string.gametitle);
+                                refreshActionbar();
+                            } else {
+                                actionbartitle = mPageData.get(0).getData().get(0).getCategorysub();
+                                S_key = S_key.substring(0, 5);
+                                if (S_key.equals("goods")) {
+                                    //软件类
+                                    refreshActionbar();
+                                } else {
+                                    //游戏分类
+                                    removeActionTabbar();
+                                }
+                            }
                         }
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
