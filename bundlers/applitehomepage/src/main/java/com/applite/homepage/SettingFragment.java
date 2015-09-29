@@ -159,9 +159,10 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             size = DataCleanManager.getTotalCacheSize(mActivity);
             String num = size.substring(0, size.length() - 2);
             Double numtrans = Double.valueOf(num);
+            LogUtils.i(TAG, "numtrans :" + numtrans);
             String unit = size.substring(size.length() - 2, size.length());
 
-            if ((numtrans < 60.00) && (unit.equals("KB"))) {
+            if ((numtrans < 70.00) && (unit.equals("KB"))) {
                 size = "0.00KB";
             }
             if (null != cache_size) {
@@ -179,9 +180,10 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             showsize = DataCleanManager.getTotalCacheSize(mActivity);
             String num = showsize.substring(0, showsize.length() - 2);
             Double numtrans = Double.valueOf(num);
+            LogUtils.i(TAG, "numtrans :" + numtrans);
             String unit = showsize.substring(showsize.length() - 2, showsize.length());
             if (null != cache_size) {
-                if ((numtrans < 60.00) && (unit.equals("KB"))) {
+                if ((numtrans < 70.00) && (unit.equals("KB"))) {
                     cache_size.setText("0.00KB");
                 } else {
                     cache_size.setText(showsize);
