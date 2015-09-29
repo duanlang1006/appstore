@@ -590,6 +590,9 @@ public class ImplAgent extends Observable {
             callbackImpl(info);
             saveImplInfo(info);
             notifyObserverUpdate("onEnqued");
+            for (int i = 0; i < mPackageListener.size(); i ++){
+                mPackageListener.get(i).onDownloadEnqued(info);
+            }
             ImplLog.d(TAG, info.getTitle() + ",onEnqued");
         }
 
@@ -638,6 +641,9 @@ public class ImplAgent extends Observable {
             callbackImpl(info);
             notifyObserverUpdate("onSuccess");
             saveImplInfo(info);
+            for (int i = 0; i < mPackageListener.size(); i ++){
+                mPackageListener.get(i).onDownloadSucess(info);
+            }
             ImplLog.d(TAG, info.getTitle() + ",onSuccess");
         }
 
@@ -656,6 +662,9 @@ public class ImplAgent extends Observable {
             MitMobclickAgent.onEvent(mContext, "impl_InstallSuccess");
             callbackImpl(info);
             saveImplInfo(info);
+            for (int i = 0; i < mPackageListener.size(); i ++){
+                mPackageListener.get(i).onPackageAdded(info);
+            }
             ImplLog.d(TAG, info.getTitle() + ",onInstallSuccess");
         }
 
@@ -685,6 +694,9 @@ public class ImplAgent extends Observable {
             saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onUninstallSuccess");
             notifyObserverUpdate("uninstalled");
+            for (int i = 0; i < mPackageListener.size(); i ++){
+                mPackageListener.get(i).onPackageRemoved(info);
+            }
         }
 
         @Override
@@ -793,10 +805,12 @@ public class ImplAgent extends Observable {
     }
 
     public static class SimplePackageListener{
-        public void onPackageAdded(String packageName){}
-        public void onPackageRemoved(String packageName){}
-        public void onPackageChanged(String packageName){}
-        public void onSystemInstallResult(String packageName,int result){}
-        public void onSystemRemoveResult(String packageName,int result){}
+        public void onDownloadEnqued(ImplInfo implInfo){}
+        public void onDownloadSucess(ImplInfo implInfo){}
+        public void onPackageAdded(ImplInfo implInfo){}
+        public void onPackageRemoved(ImplInfo implInfo){}
+        public void onPackageChanged(ImplInfo implInfo){}
+        public void onSystemInstallResult(ImplInfo implInfo,int result){}
+        public void onSystemRemoveResult(ImplInfo implInfo,int result){}
     }
 }
