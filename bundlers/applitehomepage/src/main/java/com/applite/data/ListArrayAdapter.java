@@ -10,7 +10,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -24,12 +23,12 @@ import com.applite.bean.SubjectData;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
+import com.applite.homepage.R;
 import com.applite.sharedpreferences.AppliteSPUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
-import com.applite.homepage.R;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 
 import net.tsz.afinal.FinalBitmap;
@@ -67,6 +66,9 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
         defaultLoadingIcon = BitmapFactory.decodeResource(mResource, R.drawable.buffer);
         defaultExternIcon = BitmapFactory.decodeResource(mResource, R.drawable.extern_bg);
+
+        LogUtils.i(TAG, mData + "");
+
         implAgent = ImplAgent.getInstance(mContext.getApplicationContext());
     }
 
@@ -106,6 +108,11 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
             HomePageApkData itemData = mData.getData().get(position);
             viewHolder.initView(itemData, mData.getS_datatype(), position);
+            if(mData.getS_name().equals("排行")){
+                viewHolder.setAppIdVisible();
+            }else{
+                viewHolder.setAppIdInVisible();
+            }
         }
         return convertView;
     }
@@ -147,6 +154,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     public class ViewHolder implements ImplChangeCallback {
         //不变控件
         private ImageView mAppIcon;
+        private TextView mAppId;
         private TextView mAppName;
         private TextView mCategorySub;
         private TextView mAppSize;
@@ -163,11 +171,10 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private HomePageApkData itemData;
         private int position;
 
-        private boolean showimage;
-
         ViewHolder(View mView) {
             this.pullDownView = (LinearLayout) mView.findViewById(R.id.pullDownView);
             this.mAppIcon = (ImageView) mView.findViewById(R.id.imageViewName);
+            this.mAppId = (TextView) mView.findViewById(R.id.apkId);
             this.mAppName = (TextView) mView.findViewById(R.id.apkName);
             this.mCategorySub = (TextView) mView.findViewById(R.id.categorySub);
             this.mAppSize = (TextView) mView.findViewById(R.id.apkSize);
@@ -208,6 +215,17 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             //app名称
             if ((null != this.mAppName) && !TextUtils.isEmpty(itemData.getName())) {
                 this.mAppName.setText(itemData.getName());
+                if (null != this.mAppId) {
+                    setAppIdVisible();
+                    if ((position == 0) || (position == 1) || (position == 2)) {
+//                        this.mAppId.setBackgroundColor(Color.RED);
+                        this.mAppId.setBackgroundResource(R.drawable.ranking_top_bg);
+                    } else {
+//                        this.mAppId.setBackgroundColor(Color.TRANSPARENT);
+                        this.mAppId.setBackgroundResource(R.drawable.ranking_normal_bg);
+                    }
+                    this.mAppId.setText(String.valueOf(position + 1));
+                }
             }
 
             //app分类
@@ -308,6 +326,18 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
         public int getItemPosition() {
             return this.position;
+        }
+
+        public void setAppIdVisible(){
+            if(null != mAppId){
+                this.mAppId.setVisibility(View.VISIBLE);
+            }
+        }
+
+        public void setAppIdInVisible(){
+            if(null != mAppId){
+                this.mAppId.setVisibility(View.GONE);
+            }
         }
     }
 }
