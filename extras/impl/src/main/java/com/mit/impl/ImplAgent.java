@@ -21,6 +21,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,7 @@ public class ImplAgent extends Observable {
 
     static final Handler mWorkHandler = new Handler(sWorkerThread.getLooper());
     private static ImplAgent mInstance = null;
+
 
     private static synchronized void initInstance(Context context) {
         if (null == mInstance) {
@@ -282,6 +284,7 @@ public class ImplAgent extends Observable {
         ImplLog.d(TAG, "newDownload," + title + "," + implInfo.getStatus());
         bindImplCallback(appCallback, implInfo);
         implInfo.setDownloadUrl(downloadUrl);
+        implInfo.setFileSavePath(fullname);
         if (null != title) {
             implInfo.setTitle(title);
         } else if (null == implInfo.getTitle()) {
@@ -296,6 +299,7 @@ public class ImplAgent extends Observable {
         implInfo.setMd5(md5);
         implInfo.setAutoLaunch(autoLauncher);
         mDownloader.addDownload(implInfo, fullname, md5, mImplCallback);
+        saveImplInfo(implInfo);
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionAdd");
 
 //        showDownloadNotify(mContext, ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PAUSED
@@ -528,6 +532,14 @@ public class ImplAgent extends Observable {
 //        }
     }
 
+    private void saveImplInfo(ImplInfo implInfo) {
+        try {
+            db.saveOrUpdate(implInfo);
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+    }
+
     private class ImplAgentCallback extends ImplListener {
         private ImplAgentCallback() {
             super();
@@ -632,7 +644,9 @@ public class ImplAgent extends Observable {
             super.onUninstallSuccess(info);
             MitMobclickAgent.onEvent(mContext, "impl_UninstallSuccess");
             callbackImpl(info);
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onUninstallSuccess");
+            notifyObserverUpdate("uninstalled");
         }
 
         @Override
@@ -651,14 +665,6 @@ public class ImplAgent extends Observable {
             callbackImpl(info);
             saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onUninstalling");
-        }
-
-        private void saveImplInfo(ImplInfo implInfo) {
-            try {
-                db.saveOrUpdate(implInfo);
-            } catch (DbException e) {
-                e.printStackTrace();
-            }
         }
 
         private void callbackImpl(ImplInfo info) {
@@ -728,5 +734,31 @@ public class ImplAgent extends Observable {
             setChanged();
             notifyObservers();
         }
+    }
+
+
+    private final static List<SimplePackageListener> mPackageListener = new ArrayList<>();
+    public void registerPackageListener(SimplePackageListener listener){
+        synchronized (mPackageListener){
+            if (!mPackageListener.contains(listener)) {
+                mPackageListener.add(listener);
+            }
+        }
+    }
+
+    public void unregisterPackageListener(SimplePackageListener listener){
+        synchronized (mPackageListener){
+            if (mPackageListener.contains(listener)) {
+                mPackageListener.remove(listener);
+            }
+        }
+    }
+
+    public static class SimplePackageListener{
+        public void onPackageAdded(String packageName){}
+        public void onPackageRemoved(String packageName){}
+        public void onPackageChanged(String packageName){}
+        public void onSystemInstallResult(String packageName,int result){}
+        public void onSystemRemoveResult(String packageName,int result){}
     }
 }
