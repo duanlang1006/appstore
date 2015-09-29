@@ -11,11 +11,7 @@
     <string name="allpick_btn">All Pick</string>
     <string name="nonepick_btn">None Pick</string>
     <string name="cancel_operator">Cancel</string>
-    <string name="delete_message1">You hava delete </string>
-    <string name="delete_message2"> Downloads</string>
     <string name="delete_message">You hava delete %1$d Downloads</string>
-    <string name="choose_message1">You have choose </string>
-    <string name="choose_message2"> package</string>
     <string name="choose_message">You hava choose %1$d Downloads</string>
     <string name="back_to_homepage">List so empty,Click me and Return homepage</string>
 </resources>

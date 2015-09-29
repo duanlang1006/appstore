@@ -11,11 +11,7 @@
     <string name="allpick_btn">全选</string>
     <string name="nonepick_btn">全不选</string>
     <string name="cancel_operator">取消操作</string>
-    <string name="delete_message1">成功删除了</string>
-    <string name="delete_message2">条下载</string>
     <string name="delete_message">成功删除了 %1$d 个安装包</string>
-    <string name="choose_message1">选中了</string>
-    <string name="choose_message2">个安装包</string>
     <string name="choose_message">选中了 %1$d 个安装包</string>
     <string name="back_to_homepage">列表这么空,点我回首页看看吧</string>
 </resources>

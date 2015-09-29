@@ -60,7 +60,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private LinearLayout layout_button;//盛放两个按钮的布局
     private Button btnDelete = null;
     private Animation animaBtDel;
-    private String temp = null;
 
     private String COUNT_DOWNLOADING = "count downloading";
     private String COUNT_DOWNLOADED = "count downloaded";
@@ -256,11 +255,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                 hide();
                 operator.resetFlag();
             }
-            Toast.makeText(mActivity.getApplicationContext(), mActivity.getResources().getString(R.string.delete_message1)
-                            + totalDelete + mActivity.getResources().getString(R.string.delete_message2),
-                    Toast.LENGTH_SHORT).show();
-//            temp = mActivity.getResources().getString(R.string.delete_message, totalDelete);
-//            Toast.makeText(mActivity, temp, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, mActivity.getResources().getString(R.string.delete_message, totalDelete), Toast.LENGTH_SHORT).show();
         } else if (v.getId() == R.id.select_allpick) {
             operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
             if (null != operator) {
@@ -352,13 +347,8 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private void setButtonStatus() {
 
         //textView
-        temp = mActivity.getResources().getString(R.string.choose_message1) +
-                ((int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) + (int) (AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0))) +
-                mActivity.getResources().getString(R.string.choose_message2);
-        tvShowTotal.setText(temp);
-//        temp = mActivity.getResources().getString(R.string.choose_message,
-//                ((int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0) + (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0)));
-//        tvShowTotal.setText(temp);
+        tvShowTotal.setText(mActivity.getResources().getString(R.string.choose_message,
+                ((int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0) + (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0))));
 
         //全选按钮
         operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
