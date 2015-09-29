@@ -77,7 +77,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         long current = System.currentTimeMillis();
         MitMobclickAgent.openActivityDurationTrack(false);//禁止默认的页面统计方式
         MitMobclickAgent.updateOnlineConfig(this);
-        MitUpdateAgent.setDebug(true);
+        MitUpdateAgent.setDebug(false);
 
         LogUtils.d(TAG, "onCreate take " + (System.currentTimeMillis() - current) + " ms");
 

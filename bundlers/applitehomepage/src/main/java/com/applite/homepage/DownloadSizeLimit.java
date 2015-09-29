@@ -62,7 +62,7 @@ public class DownloadSizeLimit extends OSGIBaseFragment implements View.OnClickL
 
         rootView = (ViewGroup) mInflater.inflate(R.layout.fragment_sizelimit, container, false);
 
-        limitOnoffTitle = (LinearLayout)rootView.findViewById(R.id.download_limit_onoff_title);
+        limitOnoffTitle = (LinearLayout) rootView.findViewById(R.id.download_limit_onoff_title);
         download_limit_onoff = (ImageView) rootView.findViewById(R.id.download_limit_onoff);
         download_limit_onoff.setOnClickListener(this);
         limitOnoffTitle.setVisibility(View.GONE);
@@ -148,9 +148,16 @@ public class DownloadSizeLimit extends OSGIBaseFragment implements View.OnClickL
                 limitdetail = getString(R.string.select_10_limit);
                 break;
         }
-        ImplConfig.setMaxOverSize(mActivity, size);
+//        ImplConfig.setMaxOverSize(mActivity, size);
         if (null != select_limit_detail)
             select_limit_detail.setText(limitdetail);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LogUtils.d(TAG, "onPause size: " + size);
+        ImplConfig.setMaxOverSize(mActivity, size);
     }
 
     private int getLimitSize() {
