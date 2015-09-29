@@ -173,7 +173,8 @@ public class SimilarView extends LinearLayout implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v.getId() == mChangeId) {
-            mAdapter.change();
+            if (null != mAdapter.mSimilarBeans && mAdapter.mSimilarBeans.size() > 0)
+                mAdapter.change();
         }
     }
 }
