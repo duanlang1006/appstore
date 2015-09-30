@@ -18,13 +18,13 @@
     <string name="gametitle">游戏</string>
     <string name="IntegralProblem">对不起，剩余积分不足</string>
     <string name="rules_title">抽奖规则</string>
-    <string name="rules_no1">1、首次进入应用商店赠送一次抽奖机会。</string>
-    <string name="rules_no2">2、首次抽中虚拟奖品（例如流量）和实物奖品（例如手机），需要分享才能领取。</string>
-    <string name="rules_no3">3、只有已验证过的账号可兑换和领取奖品（手机号码注册或安全手机的账号为已验证账号）。</string>
-    <string name="rules_no4">4、每个账号每周只能兑换一次话费或者实物。</string>
-    <string name="rules_no5">5、抽中虚拟奖品（例如流量）和实物奖品（例如手机）用户需填写手机号码，工作人员与之取得联系确认兑奖方式。</string>
-    <string name="rules_no6">6、每天最多能够参与3次抽奖。</string>
-    <string name="rules_no7">7、每次抽奖消耗20积分。</string>
+    <string name="rules_no1">首次进入应用商店赠送一次抽奖机会。</string>
+    <string name="rules_no2">首次抽中虚拟奖品（例如流量）和实物奖品（例如手机），需要分享才能领取。</string>
+    <string name="rules_no3">只有已验证过的账号可兑换和领取奖品（手机号码注册或安全手机的账号为已验证账号）。</string>
+    <string name="rules_no4">每个账号每周只能兑换一次话费或者实物。</string>
+    <string name="rules_no5">抽中虚拟奖品（例如流量）和实物奖品（例如手机）用户需填写手机号码，工作人员与之取得联系确认兑奖方式。</string>
+    <string name="rules_no6">每天最多能够参与3次抽奖。</string>
+    <string name="rules_no7">每次抽奖消耗20积分。</string>
     <string name="rules_else">其他：
 若发现违规行为（包括但不限作弊、倒卖奖品、利用漏洞刷积分等），应用商店有权取消兑奖资格，并有权清空非法获得的积分。</string>
     <string name="rules_end">积分规则和兑换规则的最终解释权归应用商店所有！</string>
