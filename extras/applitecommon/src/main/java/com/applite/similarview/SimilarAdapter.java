@@ -110,6 +110,7 @@ public abstract class SimilarAdapter<T> extends BaseAdapter {
         mSimilarAPKDetailListener = listener;
         mNumColumns = NumColumns;
         mShowSimilarBeans.clear();
+        mSimilarAPKDetailListener.dataLess(mSimilarBeans.size());
         if (mSimilarBeans.size() > mNumColumns) {//判断数据的个数    是否大于一行个个数
             for (int i = 0; i < NumColumns; i++) {
                 mShowSimilarBeans.add(mSimilarBeans.get(i));
