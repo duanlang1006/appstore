@@ -101,7 +101,7 @@
     <string name="select_2_limit">大于2MB的文件，等待有WLAN时下载</string>
     <string name="select_1_limit">大于1MB的文件，等待有WLAN时下载</string>
     <string name="select_less_1_limit">大于512KB的文件，等待有WLAN时下载</string>
-    <string name="select_all_limit">使用数据网络下载任何大小文件都等待WALAN网络</string>
+    <string name="select_all_limit">使用数据网络下载任何大小文件都等待WLAN网络</string>
 
 
 

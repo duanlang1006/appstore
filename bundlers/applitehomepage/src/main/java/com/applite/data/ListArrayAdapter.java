@@ -225,9 +225,9 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
             //app角标
             if (null != this.mExtentIcon) {
-                if(!TextUtils.isEmpty(itemData.getBoxLabel())){
+                if (!TextUtils.isEmpty(itemData.getBoxLabel())) {
                     mFinalBitmap.display(this.mExtentIcon, itemData.getBoxLabel(), defaultExternIcon);
-                }else{
+                } else {
                     mExtentIcon.setImageBitmap(defaultExternIcon);
                 }
             }

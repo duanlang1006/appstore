@@ -268,6 +268,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
         mSimilarView = (SimilarView) rootView.findViewById(R.id.similar_view);
         mFlowLayout = (FlowLayout) rootView.findViewById(R.id.detail_flowlayout);
+//        mSimilarView.setVisibility(View.INVISIBLE);
 
         mTagStateLayout = (LinearLayout) rootView.findViewById(R.id.detail_state_tag_layout);
 
@@ -449,6 +450,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 mSimilarAdapter.setData(mSimilarData, this, mSimilarView.getNumColumns());
                 mSimilarAdapter.notifyDataSetChanged();
             }
+//            mSimilarView.setVisibility(View.VISIBLE);
 
             mApkDatas = detailData.getDetail_info();
             LogUtils.i(TAG, "应用详情detail_info:" + mApkDatas);
@@ -468,6 +470,9 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             String mDownloadNumber = bean.getDownloadTimes();
             String mUpdateLog = bean.getUpdateInfo();
 
+            Bitmap bmp = BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.ratingbar_star_small_off_light);
+            mXingView.setMinimumHeight(bmp.getHeight());
+            LogUtils.d("duanlang", "bmp.getHeight() = " + bmp.getHeight());
             mXingView.setRating(Float.parseFloat(mRating) / 2.0f);
             mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(mApkSize) + " | " + mDeveloper);
             if (TextUtils.isEmpty(mDescription)) {
@@ -547,7 +552,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
                     @Override
                     public void onLoadFailed(ImageView imageView, String s, Drawable drawable) {
-                        imageView.setBackground(mActivity.getResources().getDrawable(R.drawable.detail_default_img));
+//                        imageView.setBackground(mActivity.getResources().getDrawable(R.drawable.detail_default_img));
+                        imageView.setImageResource(R.drawable.detail_default_img);
                     }
                 });
             }

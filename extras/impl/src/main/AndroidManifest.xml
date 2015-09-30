@@ -29,12 +29,6 @@
             android:name=".DownloadService"
             android:exported="false" />
 
-        <receiver
-            android:name=".ClickReceiver"
-            android:enabled="true"
-            android:exported="true" />
-
-
     </application>
 
 </manifest>

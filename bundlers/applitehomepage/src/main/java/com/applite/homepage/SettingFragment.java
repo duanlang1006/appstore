@@ -59,6 +59,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
     private String size;
 
     private DataCleanDialog mDataCleanDialog;
+    private FeedbackDialog mFeedbackDialog;
 
     public SettingFragment() {
         super();
@@ -70,6 +71,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
         super.onAttach(activity);
         mInflater = LayoutInflater.from(mActivity);
         mDataCleanDialog = new DataCleanDialog();
+        mFeedbackDialog = new FeedbackDialog();
     }
 
     @Override
@@ -157,9 +159,10 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             size = DataCleanManager.getTotalCacheSize(mActivity);
             String num = size.substring(0, size.length() - 2);
             Double numtrans = Double.valueOf(num);
+            LogUtils.i(TAG, "numtrans :" + numtrans);
             String unit = size.substring(size.length() - 2, size.length());
 
-            if ((numtrans < 60.00) && (unit.equals("KB"))) {
+            if ((numtrans < 70.00) && (unit.equals("KB"))) {
                 size = "0.00KB";
             }
             if (null != cache_size) {
@@ -177,9 +180,10 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
             showsize = DataCleanManager.getTotalCacheSize(mActivity);
             String num = showsize.substring(0, showsize.length() - 2);
             Double numtrans = Double.valueOf(num);
+            LogUtils.i(TAG, "numtrans :" + numtrans);
             String unit = showsize.substring(showsize.length() - 2, showsize.length());
             if (null != cache_size) {
-                if ((numtrans < 60.00) && (unit.equals("KB"))) {
+                if ((numtrans < 70.00) && (unit.equals("KB"))) {
                     cache_size.setText("0.00KB");
                 } else {
                     cache_size.setText(showsize);
@@ -215,7 +219,7 @@ public class SettingFragment extends OSGIBaseFragment implements View.OnClickLis
                     !(boolean) AppliteSPUtils.get(mActivity, AppliteSPUtils.WIFI_UPDATE_SWITCH, DefaultValue.defaultValueWIFIUpdateSwitch));
             setAllState();
         } else if (R.id.feedback == v.getId()) {        //意见反馈
-            FeedbackDialog.show(mActivity);
+            mFeedbackDialog.show(mActivity);
         } else if (R.id.about == v.getId()) {           //关于
             ((OSGIServiceHost) mActivity).jumptoAbout(true);
         } else if (R.id.download_size == v.getId()) {           //数据网络下载最大限制
