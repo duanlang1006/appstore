@@ -268,7 +268,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
         mSimilarView = (SimilarView) rootView.findViewById(R.id.similar_view);
         mFlowLayout = (FlowLayout) rootView.findViewById(R.id.detail_flowlayout);
-//        mSimilarView.setVisibility(View.INVISIBLE);
+        mSimilarView.setVisibility(View.INVISIBLE);
 
         mTagStateLayout = (LinearLayout) rootView.findViewById(R.id.detail_state_tag_layout);
 
@@ -450,7 +450,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 mSimilarAdapter.setData(mSimilarData, this, mSimilarView.getNumColumns());
                 mSimilarAdapter.notifyDataSetChanged();
             }
-//            mSimilarView.setVisibility(View.VISIBLE);
+            mSimilarView.setVisibility(View.VISIBLE);
 
             mApkDatas = detailData.getDetail_info();
             LogUtils.i(TAG, "应用详情detail_info:" + mApkDatas);
