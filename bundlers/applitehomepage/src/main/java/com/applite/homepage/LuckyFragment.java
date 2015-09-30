@@ -179,7 +179,8 @@ public class LuckyFragment extends OSGIBaseFragment implements LuckyPanView.Call
         String rules_else = getString(R.string.rules_else);
         String rules_end = getString(R.string.rules_end);
 
-        mRulesStr = rules_no1 + "\n" + rules_no2 + "\n" + rules_no3 + "\n" + rules_no4 + "\n" + rules_no5 + "\n" + rules_no6 + "\n" + rules_no7 + "\n\n\n" + rules_else + "\n\n" + rules_end;
+//        mRulesStr = rules_no1 + "\n" + rules_no2 + "\n" + rules_no3 + "\n" + rules_no4 + "\n" + rules_no5 + "\n" + rules_no6 + "\n" + rules_no7 + "\n\n\n" + rules_else + "\n\n" + rules_end;
+        mRulesStr = "1、" + rules_no6 + "\n" + "2、" + rules_no7 + "\n\n\n" + rules_else + "\n\n" + rules_end;
     }
 
     @Override

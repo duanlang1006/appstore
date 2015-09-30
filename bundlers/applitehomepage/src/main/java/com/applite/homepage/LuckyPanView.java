@@ -471,7 +471,7 @@ public class LuckyPanView extends SurfaceView implements Callback, Runnable {
         Rect rect = new Rect(x - imgWidth / 2, y - imgWidth / 2, x + imgWidth
                 / 2, y + imgWidth / 2);
 
-        mCanvas.drawBitmap(mImgsBitmap[i], null, rect, null);
+//        mCanvas.drawBitmap(mImgsBitmap[i], null, rect, null);
 
     }
 
