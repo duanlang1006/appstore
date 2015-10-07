@@ -165,6 +165,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private ImageView mExtentIcon;
         private String layoutStr;
         private LinearLayout pullDownView;
+        private LinearLayout apkidarea;
 
         //可变数据
         private ImplInfo implInfo;
@@ -173,6 +174,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
         ViewHolder(View mView) {
             this.pullDownView = (LinearLayout) mView.findViewById(R.id.pullDownView);
+            this.apkidarea = (LinearLayout) mView.findViewById(R.id.apkidarea);
             this.mAppIcon = (ImageView) mView.findViewById(R.id.imageViewName);
             this.mAppId = (TextView) mView.findViewById(R.id.apkId);
             this.mAppName = (TextView) mView.findViewById(R.id.apkName);
@@ -218,10 +220,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 if (null != this.mAppId) {
                     setAppIdVisible();
                     if ((position == 0) || (position == 1) || (position == 2)) {
-//                        this.mAppId.setBackgroundColor(Color.RED);
                         this.mAppId.setBackgroundResource(R.drawable.ranking_top_bg);
                     } else {
-//                        this.mAppId.setBackgroundColor(Color.TRANSPARENT);
                         this.mAppId.setBackgroundResource(R.drawable.ranking_normal_bg);
                     }
                     this.mAppId.setText(String.valueOf(position + 1));
@@ -329,14 +329,14 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         }
 
         public void setAppIdVisible(){
-            if(null != mAppId){
-                this.mAppId.setVisibility(View.VISIBLE);
+            if(null != apkidarea){
+                this.apkidarea.setVisibility(View.VISIBLE);
             }
         }
 
         public void setAppIdInVisible(){
-            if(null != mAppId){
-                this.mAppId.setVisibility(View.GONE);
+            if(null != apkidarea){
+                this.apkidarea.setVisibility(View.GONE);
             }
         }
     }
