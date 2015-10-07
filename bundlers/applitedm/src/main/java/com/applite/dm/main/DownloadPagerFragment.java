@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -35,6 +36,7 @@ import com.applite.sharedpreferences.AppliteSPUtils;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
+import com.mit.market.MitMarketActivity;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
@@ -45,22 +47,24 @@ import java.util.Observer;
 public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener, Observer, ViewPager.OnPageChangeListener {
     final static String TAG = "applite_dm";
     private ViewPager mViewPager;
+
     private SectionsPagerAdapter mViewPagerAdapter;
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
     private boolean destoryView = false;
     private LayoutInflater mInflater;
-
     private WindowManager.LayoutParams lpTop;
+
     private WindowManager managerTop;
     private View titleBar;//长按时覆盖ActionBar的控件
     private Button btnCancel;
     private Button btnAllpick;
     private TextView tvShowTotal;
-
     private LinearLayout layout_button;//盛放两个按钮的布局
+
     private Button btnDelete = null;
     private Animation animaBtDel;
 
+    private String OSGI_SERVICE_DM_LIST_FRAGMENT = "osgi.service.dmlist.fragment";
     private String COUNT_DOWNLOADING = "count downloading";
     private String COUNT_DOWNLOADED = "count downloaded";
     private String FLAG = "flag";
@@ -436,14 +440,25 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             int downloadFlag = ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PAUSED
                     | ImplInfo.STATUS_FAILED | ImplInfo.STATUS_PACKAGE_INVALID;
             if (null != host) {
+//                if (R.string.dm_downloaded == tabs[position]) {
+//                    fg = (DownloadListFragment) host.newFragment(
+//                            Constant.OSGI_SERVICE_DM_FRAGMENT,
+//                            DownloadListFragment.class.getName(),
+//                            DownloadListFragment.newBundle(R.string.dm_downloaded, ~downloadFlag));
+//                } else if (R.string.dm_downloading == tabs[position]) {
+//                    fg = (DownloadListFragment) host.newFragment(
+//                            Constant.OSGI_SERVICE_DM_FRAGMENT,
+//                            DownloadListFragment.class.getName(),
+//                            DownloadListFragment.newBundle(R.string.dm_downloading, downloadFlag));
+//                }
                 if (R.string.dm_downloaded == tabs[position]) {
                     fg = (DownloadListFragment) host.newFragment(
-                            Constant.OSGI_SERVICE_DM_FRAGMENT,
+                            OSGI_SERVICE_DM_LIST_FRAGMENT,
                             DownloadListFragment.class.getName(),
                             DownloadListFragment.newBundle(R.string.dm_downloaded, ~downloadFlag));
                 } else if (R.string.dm_downloading == tabs[position]) {
                     fg = (DownloadListFragment) host.newFragment(
-                            Constant.OSGI_SERVICE_DM_FRAGMENT,
+                            OSGI_SERVICE_DM_LIST_FRAGMENT,
                             DownloadListFragment.class.getName(),
                             DownloadListFragment.newBundle(R.string.dm_downloading, downloadFlag));
                 }

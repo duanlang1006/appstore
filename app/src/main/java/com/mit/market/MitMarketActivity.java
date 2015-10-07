@@ -357,7 +357,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     public void jumptoDownloadManager(boolean addToBackstack) {
         jumpto(Constant.OSGI_SERVICE_DM_FRAGMENT,
                 DownloadPagerFragment.class.getName(),
-                null, true);
+                null, addToBackstack);
     }
 
     @Override
