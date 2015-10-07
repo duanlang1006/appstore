@@ -297,7 +297,8 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         if (addToBackStack) {
             ft.addToBackStack(targetService);
         }
-        ft.commit();
+//        ft.commit();      //报错java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
+        ft.commitAllowingStateLoss();
     }
 
     @Override
