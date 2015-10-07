@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
@@ -21,7 +20,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -111,6 +109,7 @@ public class ImplAgent extends Observable {
             public void run() {
                 db = ImplDbHelper.getDbUtils(mContext.getApplicationContext());
                 try {
+                    if(null != db)
                     mImplList = db.findAll(Selector.from(ImplInfo.class));
                 } catch (DbException e) {
                     LogUtils.e(e.getMessage(), e);
@@ -425,6 +424,7 @@ public class ImplAgent extends Observable {
             mImplList.remove(implInfo);
             mDownloader.remove(implInfo);
             try {
+                if(null != db)
                 db.delete(implInfo);
             } catch (DbException e) {
                 e.printStackTrace();
@@ -443,6 +443,7 @@ public class ImplAgent extends Observable {
             mImplList.remove(implInfo);
             mDownloader.remove(implInfo);
             try {
+                if(null != db)
                 db.delete(implInfo);
             } catch (DbException e) {
                 e.printStackTrace();
@@ -572,6 +573,7 @@ public class ImplAgent extends Observable {
 
     private void saveImplInfo(ImplInfo implInfo) {
         try {
+            if(null != db)
             db.saveOrUpdate(implInfo);
         } catch (DbException e) {
             e.printStackTrace();
