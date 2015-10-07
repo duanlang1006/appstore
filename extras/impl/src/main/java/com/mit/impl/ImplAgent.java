@@ -587,12 +587,12 @@ public class ImplAgent extends Observable {
         public void onEnqued(ImplInfo info) {
             super.onEnqued(info);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadEnqued");
-            callbackImpl(info);
-            saveImplInfo(info);
-            notifyObserverUpdate("onEnqued");
             for (int i = 0; i < mPackageListener.size(); i ++){
                 mPackageListener.get(i).onDownloadEnqued(info);
             }
+            callbackImpl(info);
+            saveImplInfo(info);
+            notifyObserverUpdate("onEnqued");
             ImplLog.d(TAG, info.getTitle() + ",onEnqued");
         }
 
@@ -638,12 +638,12 @@ public class ImplAgent extends Observable {
                 //安装
                 mInstaller.install(info, true, this);
             }
-            callbackImpl(info);
-            notifyObserverUpdate("onSuccess");
-            saveImplInfo(info);
             for (int i = 0; i < mPackageListener.size(); i ++){
                 mPackageListener.get(i).onDownloadSucess(info);
             }
+            callbackImpl(info);
+            notifyObserverUpdate("onSuccess");
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onSuccess");
         }
 
@@ -660,11 +660,11 @@ public class ImplAgent extends Observable {
         public void onInstallSuccess(ImplInfo info) {
             super.onInstallSuccess(info);
             MitMobclickAgent.onEvent(mContext, "impl_InstallSuccess");
-            callbackImpl(info);
-            saveImplInfo(info);
             for (int i = 0; i < mPackageListener.size(); i ++){
                 mPackageListener.get(i).onPackageAdded(info);
             }
+            callbackImpl(info);
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onInstallSuccess");
         }
 
@@ -690,13 +690,13 @@ public class ImplAgent extends Observable {
         public void onUninstallSuccess(ImplInfo info) {
             super.onUninstallSuccess(info);
             MitMobclickAgent.onEvent(mContext, "impl_UninstallSuccess");
+            for (int i = 0; i < mPackageListener.size(); i ++){
+                mPackageListener.get(i).onPackageRemoved(info);
+            }
             callbackImpl(info);
             saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onUninstallSuccess");
             notifyObserverUpdate("uninstalled");
-            for (int i = 0; i < mPackageListener.size(); i ++){
-                mPackageListener.get(i).onPackageRemoved(info);
-            }
         }
 
         @Override
