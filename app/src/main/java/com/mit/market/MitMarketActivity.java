@@ -287,10 +287,12 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
                 ft.hide(current);
             }
         }
-        if (!newFragment.isAdded()) {
-            ft.add(R.id.container, newFragment, targetService);
-        } else {
-            ft.show(newFragment);
+        if (null != newFragment) {
+            if (!newFragment.isAdded()) {
+                ft.add(R.id.container, newFragment, targetService);
+            } else {
+                ft.show(newFragment);
+            }
         }
         if (addToBackStack) {
             ft.addToBackStack(targetService);
