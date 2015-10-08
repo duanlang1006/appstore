@@ -305,7 +305,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mX[3] = (mFLayoutWidth * 2 / 10 - 30) * mFLayoutWidthScale;
         mX[4] = (mFLayoutWidth * 6 / 10 + 20) * mFLayoutWidthScale;
         mX[5] = (mFLayoutWidth * 7 / 10) * mFLayoutWidthScale;
-        mX[6] = (mFLayoutWidth * 2 / 10) * mFLayoutWidthScale;
+        mX[6] = (mFLayoutWidth * 1 / 10 - 40) * mFLayoutWidthScale;
         mX[7] = (mFLayoutWidth * 3 / 10 - 30) * mFLayoutWidthScale;
         mX[8] = (mFLayoutWidth * 6 / 10) * mFLayoutWidthScale;
         mX[9] = (mFLayoutWidth * 5 / 10 + 40) * mFLayoutWidthScale;
@@ -316,7 +316,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mY[3] = (mFLayoutHeight * 7 / 20) * mFLayoutWidthScale;
         mY[4] = (mFLayoutHeight * 9 / 20 + 20) * mFLayoutWidthScale;
         mY[5] = (mFLayoutHeight * 11 / 20 - 30) * mFLayoutWidthScale;
-        mY[6] = (mFLayoutHeight * 12 / 20 - 30) * mFLayoutWidthScale;
+        mY[6] = (mFLayoutHeight * 12 / 20 + 30) * mFLayoutWidthScale;
         mY[7] = (mFLayoutHeight * 14 / 20 - 30) * mFLayoutWidthScale;
         mY[8] = (mFLayoutHeight * 16 / 20 - 20) * mFLayoutWidthScale;
         mY[9] = (mFLayoutHeight * 18 / 20 - 40) * mFLayoutWidthScale;
