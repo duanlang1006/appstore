@@ -9,8 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingLeft="18dp"
-        android:paddingRight="10dp">
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp">
 
         <TextView
             style="@style/Setting_title_style"
