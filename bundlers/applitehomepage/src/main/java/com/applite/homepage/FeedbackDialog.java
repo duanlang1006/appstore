@@ -10,6 +10,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.applite.common.AppliteConfig;
 import com.umeng.fb.FeedbackAgent;
 import com.umeng.fb.SyncListener;
 import com.umeng.fb.model.Conversation;
@@ -97,26 +98,30 @@ public class FeedbackDialog {
                             }
                             Toast.makeText(context, "您还未提出意见或建议", Toast.LENGTH_SHORT).show();
                         } else {
-                            try {
-                                Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");
-                                field.setAccessible(true);
-                                field.set(dialog, true);
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                            if (AppliteConfig.getNetwork(context).equals("none")) {
+                                Toast.makeText(context, "没有网络，提交失败", Toast.LENGTH_SHORT).show();
+                            } else {
+                                try {
+                                    Field field = dialog.getClass().getSuperclass().getDeclaredField("mShowing");
+                                    field.setAccessible(true);
+                                    field.set(dialog, true);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                mComversation.addUserReply("反馈原因:" + reason + "\t意见建议:" + feedback + "\t联系方式:" + contact);
+                                mComversation.sync(new SyncListener() {
+                                    @Override
+                                    public void onReceiveDevReply(List<Reply> list) {
+
+                                    }
+
+                                    @Override
+                                    public void onSendUserReply(List<Reply> list) {
+
+                                    }
+                                });
+                                Toast.makeText(context, "提交成功", Toast.LENGTH_SHORT).show();
                             }
-                            mComversation.addUserReply("反馈原因:" + reason + "\t意见建议:" + feedback + "\t联系方式:" + contact);
-                            mComversation.sync(new SyncListener() {
-                                @Override
-                                public void onReceiveDevReply(List<Reply> list) {
-
-                                }
-
-                                @Override
-                                public void onSendUserReply(List<Reply> list) {
-
-                                }
-                            });
-                            Toast.makeText(context, "提交成功", Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
