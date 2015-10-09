@@ -46,8 +46,8 @@
 
     <style name="apkListRating" parent="@android:style/Widget.RatingBar">
         <item name="android:progressDrawable">@drawable/rating_bar_full</item>
-        <item name="android:minHeight">32px</item>
-        <item name="android:maxHeight">32px</item>
+        <item name="android:minHeight">16dp</item>
+        <item name="android:maxHeight">20dp</item>
     </style>
 
     <style name="apkListButton" parent="@android:style/Widget.Button">

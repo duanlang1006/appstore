@@ -472,7 +472,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
             Bitmap bmp = BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.ratingbar_star_small_off_light);
             mXingView.setMinimumHeight(bmp.getHeight());
-            LogUtils.d("duanlang", "bmp.getHeight() = " + bmp.getHeight());
             mXingView.setRating(Float.parseFloat(mRating) / 2.0f);
             mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(mApkSize) + " | " + mDeveloper);
             if (TextUtils.isEmpty(mDescription)) {
