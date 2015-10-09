@@ -14,4 +14,6 @@
     <string name="delete_message">成功删除了 %1$d 个安装包</string>
     <string name="choose_message">选中了 %1$d 个安装包</string>
     <string name="back_to_homepage">列表这么空,点我回首页看看吧</string>
+    <string name="similar_title">大家还下载了</string>
+    <string name="similar_change">换一换</string>
 </resources>

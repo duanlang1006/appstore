@@ -62,10 +62,12 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private Animation animaBtDel;
 
     private String OSGI_SERVICE_DM_LIST_FRAGMENT = "osgi.service.dmlist.fragment";
+
     private String COUNT_DOWNLOADING = "count downloading";
     private String COUNT_DOWNLOADED = "count downloaded";
     private String FLAG = "flag";
     private String POSITION = "position";
+    private String SIMILAR_BUTTON_PRESSED = "similar button pressed";
 
     private int prePosition = 0;
     private IDownloadOperator operator = null;
@@ -126,6 +128,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         AppliteSPUtils.registerChangeListener(mActivity, mPagerListener);
         AppliteSPUtils.put(mActivity, COUNT_DOWNLOADING, 0);
         AppliteSPUtils.put(mActivity, COUNT_DOWNLOADED, 0);
+        AppliteSPUtils.put(mActivity, SIMILAR_BUTTON_PRESSED, false);
 
         return rootView;
     }
@@ -270,7 +273,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             hide();
             operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
             operator.resetFlag();
-
             Toast.makeText(mActivity.getApplicationContext(), R.string.cancel_operator, Toast.LENGTH_SHORT).show();
         }
     }
@@ -295,7 +297,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         if (null == mViewPager || null == mViewPager.getAdapter()) {
             return;
         }
-        mViewPager.getAdapter().notifyDataSetChanged();
+        if ((boolean) AppliteSPUtils.get(mActivity, SIMILAR_BUTTON_PRESSED, false)) {
+            AppliteSPUtils.put(mActivity, SIMILAR_BUTTON_PRESSED, false);
+        } else {
+            mViewPager.getAdapter().notifyDataSetChanged();
+        }
     }
 
     private void initActionBar(View tabStrip) {
@@ -494,5 +500,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         void resetFlag();
 
         int getLength();
+
     }
 }

@@ -14,4 +14,6 @@
     <string name="delete_message">You hava delete %1$d Downloads</string>
     <string name="choose_message">You hava choose %1$d Downloads</string>
     <string name="back_to_homepage">List so empty,Click me and Return homepage</string>
+    <string name="similar_title">Others have also downloaded</string>
+    <string name="similar_change">Change</string>
 </resources>

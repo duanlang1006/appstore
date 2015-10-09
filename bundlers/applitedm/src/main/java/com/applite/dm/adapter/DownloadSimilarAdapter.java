@@ -81,7 +81,7 @@ public class DownloadSimilarAdapter extends SimilarAdapter {
 
         @Override
         public void refresh() {
-            super.refresh();
+//            super.refresh();
             if (null != mTv && null != this.implInfo) {
                 ImplInfo.ImplRes res = implInfo.getImplRes();
                 switch (implInfo.getStatus()) {

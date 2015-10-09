@@ -52,7 +52,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class DownloadListFragment extends OSGIBaseFragment implements DownloadPagerFragment.IDownloadOperator,
-        ListView.OnItemClickListener, AdapterView.OnItemLongClickListener, SimilarAdapter.SimilarAPKDetailListener {
+        ListView.OnItemClickListener, AdapterView.OnItemLongClickListener, SimilarAdapter.SimilarAPKDetailListener, View.OnClickListener {
     final static String TAG = "applite_dm";
     private ListView mListview;
     private DownloadAdapter mAdapter;
@@ -70,11 +70,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     private HttpUtils mHttpUtils;
     private boolean checkBoxAnima = true;
     private int temp = 0;
+    private TextView textViewSimilarTitle = null;
+    private TextView textViewSimilarChange = null;
 
     private String COUNT_DOWNLOADING = "count downloading";
     private String COUNT_DOWNLOADED = "count downloaded";
     private String FLAG = "flag";
     private String POSITION = "position";
+    private String SIMILAR_BUTTON_PRESSED = "similar button pressed";
 
     private DownloadListener mDownloadListener = new DownloadListener() {
         @Override
@@ -232,9 +235,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     private void initSimilarView(View view) {
         mSimilarView = (SimilarView) view.inflate(mActivity, R.layout.similar_view, null);
-        TextView t = (TextView) mSimilarView.findViewById(R.id.similar_title);
-//        t.setText("大家还下载了");
-        t.setVisibility(View.GONE);
+        if (null == textViewSimilarTitle) {
+            textViewSimilarTitle = (TextView) mSimilarView.findViewById(R.id.similar_title);
+            textViewSimilarChange = (TextView) mSimilarView.findViewById(R.id.similar_change);
+            textViewSimilarChange.setOnClickListener(this);
+        }
+        textViewSimilarTitle.setText(getResources().getString(R.string.similar_title));
+        textViewSimilarChange.setText(getResources().getString(R.string.similar_change));
+//        t.setVisibility(View.INVISIBLE);
         mSimilarDataList = new ArrayList<>();
         mHttpUtils = new HttpUtils();
         RequestParams params = new RequestParams();
@@ -433,6 +441,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         ImplInfo implInfo = (ImplInfo) params[0];
         SimilarBean bean = (SimilarBean) params[1];
         ImplChangeCallback implChangeCallback = (ImplChangeCallback) params[2];
+        AppliteSPUtils.put(mActivity, SIMILAR_BUTTON_PRESSED, true);
         ImplHelper.onClick(mActivity,
                 implInfo,
                 bean.getrDownloadUrl(),
@@ -441,6 +450,20 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
                 null,
                 implChangeCallback);
+        if (ImplInfo.STATUS_INIT == implInfo.getStatus()) {
+            mImplList.add(implInfo);
+
+////            mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
+////                    mImplList, mBitmapHelper, mDownloadListener);
+////            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
+////            mListview.setAdapter(mAdapter);
+//
+            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
+            mAdapter.notifyDataSetChanged();
+//
+////            Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
+////            mAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -477,6 +500,13 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     @Override
     public int getLength() {
         return status.length;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (R.id.similar_change == v.getId()) {
+            initSimilarView(v);
+        }
     }
 
     //ListFragment和适配器传递数据
