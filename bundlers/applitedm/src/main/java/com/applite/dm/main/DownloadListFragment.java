@@ -408,12 +408,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         count(0);//当前页选中项目数
         AppliteSPUtils.put(mActivity, POSITION, 0);
         if (null != mAdapter) {
-            mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
-            mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
-                    mImplList, mBitmapHelper, mDownloadListener);
-            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
-//            mAdapter.notifyDataSetChanged();
-            mListview.setAdapter(mAdapter);
+            mAdapter.notifyDataSetChanged();
         }
     }
 
@@ -457,8 +452,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     @Override
     public void dataLess(int i) {
-//        post();
-//        mSimilarView.mChangeView.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -521,11 +514,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             return;
         } else {
             mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
-            mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
-                    mImplList, mBitmapHelper, mDownloadListener);
+            mAdapter.clear();
+            for (int i = 0; i < mImplList.size(); i++) {
+                mAdapter.add(mImplList.get(i));
+            }
+//            mAdapter.addAll(mImplList);
             mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
-//            mAdapter.notifyDataSetChanged();
-            mListview.setAdapter(mAdapter);
+            mAdapter.notifyDataSetChanged();
+
         }
     }
 
