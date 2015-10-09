@@ -41,6 +41,7 @@ public class ImplInfo {
     public final static int CAUSE_PAUSED_BY_APP = 1;        //用户主动暂停
     public final static int CAUSE_PAUSED_BY_NETWORK = 2;    //没有网络暂停
     public final static int CAUSE_PAUSED_BY_OVERSIZE = 3;   //数据网络，超过允许下载大小暂停
+    public final static int CAUSE_FAILED_BY_SPACE_NOT_ENOUGH = 4;   //空间不足
 
     private long _id;               //数据库绑定自增ID
     private String key;             //唯一主键

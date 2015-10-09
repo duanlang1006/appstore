@@ -28,6 +28,8 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader.TileMode;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+
 import com.applite.common.R;
 
 public class ThemeManager {
@@ -232,7 +234,9 @@ public class ThemeManager {
         paint.setAntiAlias(true); // 消除锯齿
         paint.setXfermode(new PorterDuffXfermode(Mode.DST_IN));
         canvas.drawBitmap(mIconMask, 0, 0, paint);
-        canvas.setBitmap(null);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB_MR2) {
+            canvas.setBitmap(null);
+        }
         if (retIcon != bitmap){
             retIcon.recycle();
         }
@@ -258,7 +262,9 @@ public class ThemeManager {
             if(null != mIconFg){
                 canvas.drawBitmap(mIconFg, 0, 0, null);
             }
-            canvas.setBitmap(null);
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB_MR2) {
+                canvas.setBitmap(null);
+            }
         }else {
             retIcon = getIconBitmapWithTheme(icon,mIconWidth,mIconHeight);
         }
