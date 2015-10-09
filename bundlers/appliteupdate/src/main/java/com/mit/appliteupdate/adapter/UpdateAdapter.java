@@ -261,14 +261,15 @@ public class UpdateAdapter extends BaseAdapter {
                         mBt.setText(implInfo.getProgress() + "%");
                         break;
                     case ImplInfo.STATUS_FAILED:
-                        if (null == toast) {
-                            toast = Toast.makeText(mActivity, "网络连接服务器发生错误或存储空间异常，请稍候重试！", Toast.LENGTH_SHORT);
-                        } else {
-                            toast.setText("网络连接服务器发生错误或存储空间异常，请稍候重试！");
+                        if (implInfo.getCause() == ImplInfo.CAUSE_FAILED_BY_SPACE_NOT_ENOUGH) {
+                            if (null == toast) {
+                                toast = Toast.makeText(mActivity, "存储空间不足，请释放空间！", Toast.LENGTH_SHORT);
+                            } else {
+                                toast.setText("存储空间不足，请释放空间！");
+                            }
+                            toast.setGravity(Gravity.BOTTOM, 0, 80);
+                            toast.show();
                         }
-                        toast.setGravity(Gravity.BOTTOM, 0, 80);
-                        toast.show();
-                        break;
                     default:
                         mBt.setText(res.getActionText());
                         break;

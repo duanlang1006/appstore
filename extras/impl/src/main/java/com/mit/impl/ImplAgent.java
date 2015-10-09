@@ -109,7 +109,6 @@ public class ImplAgent extends Observable {
             public void run() {
                 db = ImplDbHelper.getDbUtils(mContext.getApplicationContext());
                 try {
-                    if(null != db)
                     mImplList = db.findAll(Selector.from(ImplInfo.class));
                 } catch (DbException e) {
                     LogUtils.e(e.getMessage(), e);
@@ -424,7 +423,6 @@ public class ImplAgent extends Observable {
             mImplList.remove(implInfo);
             mDownloader.remove(implInfo);
             try {
-                if(null != db)
                 db.delete(implInfo);
             } catch (DbException e) {
                 e.printStackTrace();
@@ -443,7 +441,6 @@ public class ImplAgent extends Observable {
             mImplList.remove(implInfo);
             mDownloader.remove(implInfo);
             try {
-                if(null != db)
                 db.delete(implInfo);
             } catch (DbException e) {
                 e.printStackTrace();
@@ -573,7 +570,6 @@ public class ImplAgent extends Observable {
 
     private void saveImplInfo(ImplInfo implInfo) {
         try {
-            if(null != db)
             db.saveOrUpdate(implInfo);
         } catch (DbException e) {
             e.printStackTrace();
