@@ -8,11 +8,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
-import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.util.LogUtils;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 
@@ -21,7 +18,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -109,10 +105,10 @@ public class ImplAgent extends Observable {
         mWorkHandler.post(new Runnable() {
             @Override
             public void run() {
-                db = ImplDbHelper.getDbUtils(mContext.getApplicationContext());
                 try {
+                    db = ImplDbHelper.getDbUtils(mContext.getApplicationContext());
                     mImplList = db.findAll(Selector.from(ImplInfo.class));
-                } catch (DbException e) {
+                } catch (Exception e) {
                     LogUtils.e(e.getMessage(), e);
                 }
                 if (null == mImplList) {
@@ -426,7 +422,7 @@ public class ImplAgent extends Observable {
             mDownloader.remove(implInfo);
             try {
                 db.delete(implInfo);
-            } catch (DbException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -444,7 +440,7 @@ public class ImplAgent extends Observable {
             mDownloader.remove(implInfo);
             try {
                 db.delete(implInfo);
-            } catch (DbException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -573,7 +569,7 @@ public class ImplAgent extends Observable {
     private void saveImplInfo(ImplInfo implInfo) {
         try {
             db.saveOrUpdate(implInfo);
-        } catch (DbException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -587,12 +583,12 @@ public class ImplAgent extends Observable {
         public void onEnqued(ImplInfo info) {
             super.onEnqued(info);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadEnqued");
-            callbackImpl(info);
-            saveImplInfo(info);
-            notifyObserverUpdate("onEnqued");
             for (int i = 0; i < mPackageListener.size(); i ++){
                 mPackageListener.get(i).onDownloadEnqued(info);
             }
+            callbackImpl(info);
+            saveImplInfo(info);
+            notifyObserverUpdate("onEnqued");
             ImplLog.d(TAG, info.getTitle() + ",onEnqued");
         }
 
@@ -638,12 +634,12 @@ public class ImplAgent extends Observable {
                 //安装
                 mInstaller.install(info, true, this);
             }
-            callbackImpl(info);
-            notifyObserverUpdate("onSuccess");
-            saveImplInfo(info);
             for (int i = 0; i < mPackageListener.size(); i ++){
                 mPackageListener.get(i).onDownloadSucess(info);
             }
+            callbackImpl(info);
+            notifyObserverUpdate("onSuccess");
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onSuccess");
         }
 
@@ -660,11 +656,11 @@ public class ImplAgent extends Observable {
         public void onInstallSuccess(ImplInfo info) {
             super.onInstallSuccess(info);
             MitMobclickAgent.onEvent(mContext, "impl_InstallSuccess");
-            callbackImpl(info);
-            saveImplInfo(info);
             for (int i = 0; i < mPackageListener.size(); i ++){
                 mPackageListener.get(i).onPackageAdded(info);
             }
+            callbackImpl(info);
+            saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onInstallSuccess");
         }
 
@@ -690,13 +686,13 @@ public class ImplAgent extends Observable {
         public void onUninstallSuccess(ImplInfo info) {
             super.onUninstallSuccess(info);
             MitMobclickAgent.onEvent(mContext, "impl_UninstallSuccess");
+            for (int i = 0; i < mPackageListener.size(); i ++){
+                mPackageListener.get(i).onPackageRemoved(info);
+            }
             callbackImpl(info);
             saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onUninstallSuccess");
             notifyObserverUpdate("uninstalled");
-            for (int i = 0; i < mPackageListener.size(); i ++){
-                mPackageListener.get(i).onPackageRemoved(info);
-            }
         }
 
         @Override

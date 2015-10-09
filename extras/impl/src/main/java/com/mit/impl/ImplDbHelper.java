@@ -9,6 +9,7 @@ import com.lidroid.xutils.db.sqlite.SqlInfo;
 import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.util.OtherUtils;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +25,14 @@ public class ImplDbHelper {
     private final static int DB_VERSION = 4;
 
     static DbUtils db = null;
-    public static DbUtils getDbUtils(Context appContext) {
+    public static synchronized DbUtils getDbUtils(Context appContext) {
         if (db == null) {
-            String dbdir = OtherUtils.getDiskCacheDir(appContext, "databases");
+//            String dbdir = OtherUtils.getDiskCacheDir(appContext, "databases");
+            String dbdir = null;
+            File cacheDir = appContext.getDir("db", Context.MODE_PRIVATE);
+            if (cacheDir != null) {
+                dbdir = cacheDir.getPath();
+            }
             db = DbUtils.create(appContext,dbdir,DB_NAME,DB_VERSION,new ImplUpgradeListener());
         }
         return db;

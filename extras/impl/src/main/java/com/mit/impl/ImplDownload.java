@@ -622,6 +622,12 @@ public class ImplDownload {
                 }
             } else {
                 implInfo.setStatus(ImplInfo.STATUS_FAILED);
+                implInfo.setCause(ImplInfo.CAUSE_NONE);
+                if (null != e && null != e.getMessage()){
+                    if (e.getMessage().contains("ENOSPC")) {
+                        implInfo.setCause(ImplInfo.CAUSE_FAILED_BY_SPACE_NOT_ENOUGH);
+                    }
+                }
                 if (null != baseCallback) {
                     baseCallback.onFailure(implInfo, e, s);
                 }

@@ -373,7 +373,14 @@ public class ImplHelper {
             case ImplInfo.STATUS_FAILED:
                 implRes.setAction(ImplInfo.ACTION_DOWNLOAD);
                 implRes.setActionText(mResources.getString(R.string.action_retry));
-                implRes.setStatusText(mResources.getString(R.string.download_status_error));
+                switch (implInfo.getCause()) {
+                    case ImplInfo.CAUSE_FAILED_BY_SPACE_NOT_ENOUGH:
+                        implRes.setStatusText(mResources.getString(R.string.download_status_insufficient_space));
+                        break;
+                    default:
+                        implRes.setStatusText(mResources.getString(R.string.download_status_error));
+                        break;
+                }
                 implRes.setDescText(getSizeText(context, implInfo.getCurrent(), implInfo.getTotal()));
                 break;
 

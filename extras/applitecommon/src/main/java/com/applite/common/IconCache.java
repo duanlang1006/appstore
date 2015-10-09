@@ -28,6 +28,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+
 import com.applite.theme.ThemeManager;
 
 /**
@@ -124,7 +126,9 @@ public class IconCache {
         Canvas c = new Canvas(b);
         d.setBounds(0, 0, b.getWidth(), b.getHeight());
         d.draw(c);
-		// c.setBitmap(null);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB_MR2) {
+            c.setBitmap(null);
+        }
         b = ThemeManager.getInstance(mContext).getIconBitmap(b, true, "default");
         return b;
     }
