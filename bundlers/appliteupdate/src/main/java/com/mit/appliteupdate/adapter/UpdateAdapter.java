@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.applite.bean.ApkBean;
 import com.applite.common.AppliteUtils;
@@ -215,6 +217,7 @@ public class UpdateAdapter extends BaseAdapter {
         private TextView mIgnoreTv;
         private TextView mToDetailTv;
         private ImageView mDetailStateImg;
+        private Toast toast;
 
         public ViewHolder(View v) {
             this.mImg = (ImageView) v.findViewById(R.id.item_update_img);
@@ -256,6 +259,15 @@ public class UpdateAdapter extends BaseAdapter {
                 switch (implInfo.getStatus()) {
                     case ImplInfo.STATUS_RUNNING:
                         mBt.setText(implInfo.getProgress() + "%");
+                        break;
+                    case ImplInfo.STATUS_FAILED:
+                        if (null == toast) {
+                            toast = Toast.makeText(mActivity, "网络连接服务器发生错误或存储空间异常，请稍候重试！", Toast.LENGTH_SHORT);
+                        } else {
+                            toast.setText("网络连接服务器发生错误或存储空间异常，请稍候重试！");
+                        }
+                        toast.setGravity(Gravity.BOTTOM, 0, 80);
+                        toast.show();
                         break;
                     default:
                         mBt.setText(res.getActionText());
