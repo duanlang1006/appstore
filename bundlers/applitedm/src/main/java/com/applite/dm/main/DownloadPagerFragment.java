@@ -37,11 +37,7 @@ import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
-import java.util.Observable;
-import java.util.Observer;
-
-
-public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener, Observer, ViewPager.OnPageChangeListener {
+public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener, ViewPager.OnPageChangeListener {
     final static String TAG = "applite_dm";
     private ViewPager mViewPager;
 
@@ -67,7 +63,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private String COUNT_DOWNLOADED = "count downloaded";
     private String FLAG = "flag";
     private String POSITION = "position";
-    private String SIMILAR_BUTTON_PRESSED = "similar button pressed";
 
     private int prePosition = 0;
     private IDownloadOperator operator = null;
@@ -117,7 +112,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         initActionBar(mPagerSlidingTabStrip);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
         mPagerSlidingTabStrip.setOnPageChangeListener(this);
-        ImplAgent.getInstance(mActivity).addObserver(this);
+//        ImplAgent.getInstance(mActivity).addObserver(this);
         titleBar = inflater.inflate(R.layout.cover_actionbar, null);//这里是添加的控件
         initializeView(rootView);
         layout_button = (LinearLayout) rootView.findViewById(R.id.layout_button);
@@ -128,7 +123,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         AppliteSPUtils.registerChangeListener(mActivity, mPagerListener);
         AppliteSPUtils.put(mActivity, COUNT_DOWNLOADING, 0);
         AppliteSPUtils.put(mActivity, COUNT_DOWNLOADED, 0);
-        AppliteSPUtils.put(mActivity, SIMILAR_BUTTON_PRESSED, false);
 
         return rootView;
     }
@@ -158,7 +152,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         }
         destoryView = true;
         ImplLog.d(TAG, "onDestroyView," + this + "," + destoryView);
-        ImplAgent.getInstance(mActivity).deleteObserver(this);
+//        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
     @Override
@@ -229,9 +223,9 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         super.onHiddenChanged(hidden);
         if (!hidden) {
             initActionBar(mPagerSlidingTabStrip);
-            ImplAgent.getInstance(mActivity).addObserver(this);
+//            ImplAgent.getInstance(mActivity).addObserver(this);
         } else {
-            ImplAgent.getInstance(mActivity).deleteObserver(this);
+//            ImplAgent.getInstance(mActivity).deleteObserver(this);
         }
     }
 
@@ -290,18 +284,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         titleBar.setVisibility(View.GONE);
         btnDelete.setVisibility(View.GONE);
         layout_button.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void update(Observable observable, Object data) {
-        if (null == mViewPager || null == mViewPager.getAdapter()) {
-            return;
-        }
-        if ((boolean) AppliteSPUtils.get(mActivity, SIMILAR_BUTTON_PRESSED, false)) {
-            AppliteSPUtils.put(mActivity, SIMILAR_BUTTON_PRESSED, false);
-        } else {
-            mViewPager.getAdapter().notifyDataSetChanged();
-        }
     }
 
     private void initActionBar(View tabStrip) {

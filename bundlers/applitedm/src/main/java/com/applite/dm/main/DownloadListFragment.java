@@ -50,9 +50,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 public class DownloadListFragment extends OSGIBaseFragment implements DownloadPagerFragment.IDownloadOperator,
-        ListView.OnItemClickListener, AdapterView.OnItemLongClickListener, SimilarAdapter.SimilarAPKDetailListener, View.OnClickListener {
+        ListView.OnItemClickListener, AdapterView.OnItemLongClickListener, SimilarAdapter.SimilarAPKDetailListener, View.OnClickListener, Observer {
     final static String TAG = "applite_dm";
     private ListView mListview;
     private DownloadAdapter mAdapter;
@@ -70,14 +72,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     private HttpUtils mHttpUtils;
     private boolean checkBoxAnima = true;
     private int temp = 0;
-    private TextView textViewSimilarTitle = null;
-    private TextView textViewSimilarChange = null;
 
     private String COUNT_DOWNLOADING = "count downloading";
     private String COUNT_DOWNLOADED = "count downloaded";
     private String FLAG = "flag";
     private String POSITION = "position";
-    private String SIMILAR_BUTTON_PRESSED = "similar button pressed";
 
     private DownloadListener mDownloadListener = new DownloadListener() {
         @Override
@@ -182,6 +181,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ImplLog.d(TAG, "onCreateView," + this);
+        ImplAgent.getInstance(mActivity).addObserver(this);
         LayoutInflater mInflater = inflater;
         View view = mInflater.inflate(R.layout.fragment_download_list, container, false);
         mListview = (ListView) view.findViewById(android.R.id.list);
@@ -235,15 +235,15 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     private void initSimilarView(View view) {
         mSimilarView = (SimilarView) view.inflate(mActivity, R.layout.similar_view, null);
-        if (null == textViewSimilarTitle) {
-            textViewSimilarTitle = (TextView) mSimilarView.findViewById(R.id.similar_title);
-            textViewSimilarChange = (TextView) mSimilarView.findViewById(R.id.similar_change);
-            textViewSimilarChange.setOnClickListener(this);
-        }
-        textViewSimilarTitle.setText(getResources().getString(R.string.similar_title));
-        textViewSimilarChange.setText(getResources().getString(R.string.similar_change));
-//        t.setVisibility(View.INVISIBLE);
+        mSimilarView.mTitle.setText(getResources().getString(R.string.similar_title));
+        mSimilarView.mChangeView.setText(getResources().getString(R.string.similar_change));
         mSimilarDataList = new ArrayList<>();
+        post();
+        mSimilarView.setVisibility(View.VISIBLE);
+        mSimilarView.setPadding(0, 1, 0, 0);
+    }
+
+    private void post() {
         mHttpUtils = new HttpUtils();
         RequestParams params = new RequestParams();
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
@@ -263,7 +263,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                     JSONArray similar_json = new JSONArray(similar_info);
                     SimilarBean similarBean = null;
                     if (similar_json.length() != 0 && similar_json != null) {
-                        for (int i = 0; i < 4; i++) {
+                        for (int i = 0; i < similar_json.length(); i++) {
                             similarBean = new SimilarBean();
                             JSONObject obj = new JSONObject(similar_json.get(i).toString());
                             similarBean.setName(obj.getString("name"));
@@ -293,8 +293,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             }
 
         });
-        mSimilarView.setVisibility(View.VISIBLE);
-        mSimilarView.setPadding(0, 1, 0, 0);
     }
 
     @Override
@@ -332,6 +330,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        ImplAgent.getInstance(mActivity).deleteObserver(this);
         ImplLog.d(DownloadListFragment.TAG, "onDestroyView," + this);
     }
 
@@ -409,7 +408,12 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         count(0);//当前页选中项目数
         AppliteSPUtils.put(mActivity, POSITION, 0);
         if (null != mAdapter) {
-            mAdapter.notifyDataSetChanged();
+            mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
+            mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
+                    mImplList, mBitmapHelper, mDownloadListener);
+            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
+//            mAdapter.notifyDataSetChanged();
+            mListview.setAdapter(mAdapter);
         }
     }
 
@@ -441,7 +445,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         ImplInfo implInfo = (ImplInfo) params[0];
         SimilarBean bean = (SimilarBean) params[1];
         ImplChangeCallback implChangeCallback = (ImplChangeCallback) params[2];
-        AppliteSPUtils.put(mActivity, SIMILAR_BUTTON_PRESSED, true);
         ImplHelper.onClick(mActivity,
                 implInfo,
                 bean.getrDownloadUrl(),
@@ -450,24 +453,12 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
                 null,
                 implChangeCallback);
-        if (ImplInfo.STATUS_INIT == implInfo.getStatus()) {
-            mImplList.add(implInfo);
-
-////            mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
-////                    mImplList, mBitmapHelper, mDownloadListener);
-////            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
-////            mListview.setAdapter(mAdapter);
-//
-            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
-            mAdapter.notifyDataSetChanged();
-//
-////            Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
-////            mAdapter.notifyDataSetChanged();
-        }
     }
 
     @Override
     public void dataLess(int i) {
+//        post();
+//        mSimilarView.mChangeView.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -506,6 +497,35 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     public void onClick(View v) {
         if (R.id.similar_change == v.getId()) {
             initSimilarView(v);
+        }
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            ImplAgent.getInstance(mActivity).addObserver(this);
+        } else {
+            ImplAgent.getInstance(mActivity).deleteObserver(this);
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+//        if (null == mViewPager || null == mViewPager.getAdapter()) {
+//            return;
+//        } else {
+//            mViewPager.getAdapter().notifyDataSetChanged();
+//        }
+        if (null == mListview || null == mAdapter) {
+            return;
+        } else {
+            mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
+            mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
+                    mImplList, mBitmapHelper, mDownloadListener);
+            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
+//            mAdapter.notifyDataSetChanged();
+            mListview.setAdapter(mAdapter);
         }
     }
 
