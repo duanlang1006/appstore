@@ -517,6 +517,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             return;
         } else {
             mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
+            status = new boolean[mImplList.size()];
+            Arrays.fill(status, false);//全部填充为false(chechbox不选中)
             mAdapter.clear();
             for (int i = 0; i < mImplList.size(); i++) {
                 mAdapter.add(mImplList.get(i));
