@@ -16,4 +16,7 @@
     <string name="back_to_homepage">列表这么空,点我回首页看看吧</string>
     <string name="similar_title">大家还下载了</string>
     <string name="similar_change">换一换</string>
+    <string name="ensure">确定</string>
+    <string name="delete_download_records">是否删除下载记录</string>
+    <string name="delete_package">同时删除安装包</string>
 </resources>

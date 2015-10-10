@@ -415,14 +415,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
     }
 
-    private void deleteItem() {
+    private void deleteItem(boolean deleteFile) {
         List<Long> tempList = new ArrayList<>();
         for (int i = status.length - 1; i >= 0; i--) {
             if (status[i]) {
                 tempList.add(mImplList.get(i).getId());
             }
         }
-        mImplAgent.remove(tempList);
+        mImplAgent.remove(tempList, deleteFile);
         count(0);
     }
 
@@ -458,8 +458,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     }
 
     @Override
-    public void onClickDelete() {
-        deleteItem();
+    public void onClickDelete(boolean deleteFile) {
+        deleteItem(deleteFile);
         reSet();
     }
 
