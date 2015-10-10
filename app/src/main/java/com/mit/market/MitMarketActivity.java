@@ -17,7 +17,6 @@ import android.widget.Toast;
 import com.applite.android.R;
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
-import com.applite.common.IconCache;
 import com.applite.common.LogUtils;
 import com.applite.dm.main.DownloadPagerFragment;
 import com.applite.homepage.AboutFragment;
@@ -220,7 +219,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     protected void onDestroy() {
         super.onDestroy();
         unregisterClients();
-        IconCache.getInstance(this).flush();
+//        IconCache.getInstance(this).flush();
 
         //置更新数据为空
         AppliteSPUtils.put(this, AppliteSPUtils.UPDATE_DATA, "");
@@ -287,15 +286,18 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
                 ft.hide(current);
             }
         }
-        if (!newFragment.isAdded()) {
-            ft.add(R.id.container, newFragment, targetService);
-        } else {
-            ft.show(newFragment);
+        if (null != newFragment) {
+            if (!newFragment.isAdded()) {
+                ft.add(R.id.container, newFragment, targetService);
+            } else {
+                ft.show(newFragment);
+            }
         }
         if (addToBackStack) {
             ft.addToBackStack(targetService);
         }
-        ft.commit();
+//        ft.commit();      //报错java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
+        ft.commitAllowingStateLoss();
     }
 
     @Override
