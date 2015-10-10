@@ -27,7 +27,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
 import com.applite.dm.R;
@@ -38,28 +37,27 @@ import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
-import java.util.Observable;
-import java.util.Observer;
-
-
-public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener, Observer, ViewPager.OnPageChangeListener {
+public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener, ViewPager.OnPageChangeListener {
     final static String TAG = "applite_dm";
     private ViewPager mViewPager;
+
     private SectionsPagerAdapter mViewPagerAdapter;
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
     private boolean destoryView = false;
     private LayoutInflater mInflater;
-
     private WindowManager.LayoutParams lpTop;
+
     private WindowManager managerTop;
     private View titleBar;//长按时覆盖ActionBar的控件
     private Button btnCancel;
     private Button btnAllpick;
     private TextView tvShowTotal;
-
     private LinearLayout layout_button;//盛放两个按钮的布局
+
     private Button btnDelete = null;
     private Animation animaBtDel;
+
+    private String OSGI_SERVICE_DM_LIST_FRAGMENT = "osgi.service.dmlist.fragment";
 
     private String COUNT_DOWNLOADING = "count downloading";
     private String COUNT_DOWNLOADED = "count downloaded";
@@ -114,7 +112,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         initActionBar(mPagerSlidingTabStrip);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
         mPagerSlidingTabStrip.setOnPageChangeListener(this);
-        ImplAgent.getInstance(mActivity).addObserver(this);
+//        ImplAgent.getInstance(mActivity).addObserver(this);
         titleBar = inflater.inflate(R.layout.cover_actionbar, null);//这里是添加的控件
         initializeView(rootView);
         layout_button = (LinearLayout) rootView.findViewById(R.id.layout_button);
@@ -154,7 +152,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         }
         destoryView = true;
         ImplLog.d(TAG, "onDestroyView," + this + "," + destoryView);
-        ImplAgent.getInstance(mActivity).deleteObserver(this);
+//        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
     @Override
@@ -225,9 +223,9 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         super.onHiddenChanged(hidden);
         if (!hidden) {
             initActionBar(mPagerSlidingTabStrip);
-            ImplAgent.getInstance(mActivity).addObserver(this);
+//            ImplAgent.getInstance(mActivity).addObserver(this);
         } else {
-            ImplAgent.getInstance(mActivity).deleteObserver(this);
+//            ImplAgent.getInstance(mActivity).deleteObserver(this);
         }
     }
 
@@ -269,7 +267,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             hide();
             operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
             operator.resetFlag();
-
             Toast.makeText(mActivity.getApplicationContext(), R.string.cancel_operator, Toast.LENGTH_SHORT).show();
         }
     }
@@ -287,14 +284,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         titleBar.setVisibility(View.GONE);
         btnDelete.setVisibility(View.GONE);
         layout_button.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void update(Observable observable, Object data) {
-        if (null == mViewPager || null == mViewPager.getAdapter()) {
-            return;
-        }
-        mViewPager.getAdapter().notifyDataSetChanged();
     }
 
     private void initActionBar(View tabStrip) {
@@ -438,12 +427,12 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             if (null != host) {
                 if (R.string.dm_downloaded == tabs[position]) {
                     fg = (DownloadListFragment) host.newFragment(
-                            Constant.OSGI_SERVICE_DM_FRAGMENT,
+                            OSGI_SERVICE_DM_LIST_FRAGMENT,
                             DownloadListFragment.class.getName(),
                             DownloadListFragment.newBundle(R.string.dm_downloaded, ~downloadFlag));
                 } else if (R.string.dm_downloading == tabs[position]) {
                     fg = (DownloadListFragment) host.newFragment(
-                            Constant.OSGI_SERVICE_DM_FRAGMENT,
+                            OSGI_SERVICE_DM_LIST_FRAGMENT,
                             DownloadListFragment.class.getName(),
                             DownloadListFragment.newBundle(R.string.dm_downloading, downloadFlag));
                 }
@@ -493,5 +482,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         void resetFlag();
 
         int getLength();
+
     }
 }

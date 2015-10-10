@@ -50,9 +50,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 public class DownloadListFragment extends OSGIBaseFragment implements DownloadPagerFragment.IDownloadOperator,
-        ListView.OnItemClickListener, AdapterView.OnItemLongClickListener, SimilarAdapter.SimilarAPKDetailListener {
+        ListView.OnItemClickListener, AdapterView.OnItemLongClickListener, SimilarAdapter.SimilarAPKDetailListener, View.OnClickListener, Observer {
     final static String TAG = "applite_dm";
     private ListView mListview;
     private DownloadAdapter mAdapter;
@@ -179,6 +181,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ImplLog.d(TAG, "onCreateView," + this);
+        ImplAgent.getInstance(mActivity).addObserver(this);
         LayoutInflater mInflater = inflater;
         View view = mInflater.inflate(R.layout.fragment_download_list, container, false);
         mListview = (ListView) view.findViewById(android.R.id.list);
@@ -196,7 +199,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
         mListview.setOnItemClickListener(this);
         status = new boolean[mImplList.size()];
-        Arrays.fill(status, false);//全部填充为false(chechbox不选中)
+//        Arrays.fill(status, false);//全部填充为false(chechbox不选中)
         mListview.setAdapter(mAdapter);
 
         //这里是长按删除
@@ -232,10 +235,15 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     private void initSimilarView(View view) {
         mSimilarView = (SimilarView) view.inflate(mActivity, R.layout.similar_view, null);
-        TextView t = (TextView) mSimilarView.findViewById(R.id.similar_title);
-//        t.setText("大家还下载了");
-        t.setVisibility(View.GONE);
+        mSimilarView.mTitle.setText(getResources().getString(R.string.similar_title));
+        mSimilarView.mChangeView.setText(getResources().getString(R.string.similar_change));
         mSimilarDataList = new ArrayList<>();
+        post();
+        mSimilarView.setVisibility(View.VISIBLE);
+        mSimilarView.setPadding(0, 1, 0, 0);
+    }
+
+    private void post() {
         mHttpUtils = new HttpUtils();
         RequestParams params = new RequestParams();
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
@@ -255,7 +263,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                     JSONArray similar_json = new JSONArray(similar_info);
                     SimilarBean similarBean = null;
                     if (similar_json.length() != 0 && similar_json != null) {
-                        for (int i = 0; i < 4; i++) {
+                        for (int i = 0; i < similar_json.length(); i++) {
                             similarBean = new SimilarBean();
                             JSONObject obj = new JSONObject(similar_json.get(i).toString());
                             similarBean.setName(obj.getString("name"));
@@ -285,8 +293,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             }
 
         });
-        mSimilarView.setVisibility(View.VISIBLE);
-        mSimilarView.setPadding(0, 1, 0, 0);
     }
 
     @Override
@@ -324,6 +330,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        ImplAgent.getInstance(mActivity).deleteObserver(this);
         ImplLog.d(DownloadListFragment.TAG, "onDestroyView," + this);
     }
 
@@ -371,6 +378,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
             AppliteSPUtils.put(mActivity, FLAG, true);
+            //防止因增加猜你喜欢中的应用导致的数组长度越界
+            status = new boolean[mImplList.size()];
+            Arrays.fill(status, false);//全部填充为false(chechbox不选中)
             if (checkBoxAnima) {
                 VibratorUtil.Vibrate(mActivity, 200);   //震动200ms
             }
@@ -477,6 +487,45 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     @Override
     public int getLength() {
         return status.length;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (R.id.similar_change == v.getId()) {
+            initSimilarView(v);
+        }
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            ImplAgent.getInstance(mActivity).addObserver(this);
+        } else {
+            ImplAgent.getInstance(mActivity).deleteObserver(this);
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+//        if (null == mViewPager || null == mViewPager.getAdapter()) {
+//            return;
+//        } else {
+//            mViewPager.getAdapter().notifyDataSetChanged();
+//        }
+        if (null == mListview || null == mAdapter) {
+            return;
+        } else {
+            mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
+            mAdapter.clear();
+            for (int i = 0; i < mImplList.size(); i++) {
+                mAdapter.add(mImplList.get(i));
+            }
+//            mAdapter.addAll(mImplList);
+            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
+            mAdapter.notifyDataSetChanged();
+
+        }
     }
 
     //ListFragment和适配器传递数据
