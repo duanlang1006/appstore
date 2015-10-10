@@ -350,9 +350,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         //删除按钮
         if (0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) + (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0)) {
             btnDelete.setFocusable(false);
+            btnDelete.setEnabled(false);
             btnDelete.setTextAppearance(mActivity, R.style.DownloadListEmpty0);
         } else {
             btnDelete.setFocusable(true);
+            btnDelete.setEnabled(true);
             btnDelete.setTextAppearance(mActivity, R.style.DownloadOptButton);
         }
 
