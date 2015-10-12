@@ -40,6 +40,8 @@ import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
 
+import org.w3c.dom.Text;
+
 public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener, ViewPager.OnPageChangeListener {
     final static String TAG = "applite_dm";
     private ViewPager mViewPager;
@@ -63,6 +65,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private LinearLayout all_checkbox;
     private AlertDialog dialog;
     private boolean flagDeleteFile = false;
+    private View layoutCustomDialog = null;
 
     private String OSGI_SERVICE_DM_LIST_FRAGMENT = "osgi.service.dmlist.fragment";
 
@@ -128,41 +131,10 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         btnDelete.setOnClickListener(this);
 
 //        LayoutInflater inflater = getLayoutInflater();
-        View layout = mInflater.inflate(R.layout.custom_dialog, (ViewGroup) rootView.findViewById(R.id.mydialog));
-        checkBox = (CheckBox) layout.findViewById(R.id.checkbox);
-        all_checkbox = (LinearLayout) layout.findViewById(R.id.all_checkbox);
+        layoutCustomDialog = mInflater.inflate(R.layout.custom_dialog, (ViewGroup) rootView.findViewById(R.id.mydialog));
+        checkBox = (CheckBox) layoutCustomDialog.findViewById(R.id.checkbox);
+        all_checkbox = (LinearLayout) layoutCustomDialog.findViewById(R.id.all_checkbox);
         all_checkbox.setOnClickListener(this);
-        dialog = new AlertDialog.Builder(mActivity).setView(layout)
-                .setPositiveButton(getResources().getString(R.string.ensure), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (checkBox.isChecked()) {
-                            flagDeleteFile = true;
-                        } else {
-                            flagDeleteFile = false;
-                        }
-                        int totalDelete = ((int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) + (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0));
-                        for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
-                            operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, i);
-                            if (null != operator) {
-                                operator.onClickDelete(flagDeleteFile);
-                            }
-                        }
-                        operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
-                        if (0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) && 0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0)) {
-                            hide();
-                            operator.resetFlag();
-                        }
-                        Toast.makeText(mActivity, mActivity.getResources().getString(R.string.delete_message, totalDelete), Toast.LENGTH_SHORT).show();
-                    }
-
-                }).setNegativeButton(getResources().getString(R.string.cancel_btn), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-//                        pressedCancel();
-                    }
-                }).create();
-        dialog.setCanceledOnTouchOutside(false);
 
         AppliteSPUtils.registerChangeListener(mActivity, mPagerListener);
         AppliteSPUtils.put(mActivity, COUNT_DOWNLOADING, 0);
@@ -285,6 +257,9 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         } else if (v.getId() == R.id.action_more) {
 
         } else if (v.getId() == R.id.btnDelete) {//删除
+            if (null == dialog) {
+                initDialog();
+            }
             checkBox.setChecked(false);
             dialog.show();
         } else if (v.getId() == R.id.select_allpick) {
@@ -301,6 +276,40 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         } else if (v.getId() == R.id.all_checkbox) {//删除对话框的checkbox
             checkBox.setChecked(!checkBox.isChecked());
         }
+    }
+
+    private void initDialog() {
+        dialog = new AlertDialog.Builder(mActivity).setView(layoutCustomDialog)
+                .setPositiveButton(getResources().getString(R.string.ensure), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (checkBox.isChecked()) {
+                            flagDeleteFile = true;
+                        } else {
+                            flagDeleteFile = false;
+                        }
+                        int totalDelete = ((int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) + (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0));
+                        for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
+                            operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, i);
+                            if (null != operator) {
+                                operator.onClickDelete(flagDeleteFile);
+                            }
+                        }
+                        operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
+                        if (0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) && 0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0)) {
+                            hide();
+                            operator.resetFlag();
+                        }
+                        Toast.makeText(mActivity, mActivity.getResources().getString(R.string.delete_message, totalDelete), Toast.LENGTH_SHORT).show();
+                    }
+
+                }).setNegativeButton(getResources().getString(R.string.cancel_btn), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+//                        pressedCancel();
+                    }
+                }).create();
+        dialog.setCanceledOnTouchOutside(false);
     }
 
     private void pressedCancel() {

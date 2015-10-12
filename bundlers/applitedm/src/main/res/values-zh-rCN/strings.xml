@@ -18,5 +18,5 @@
     <string name="similar_change">换一换</string>
     <string name="ensure">确定</string>
     <string name="delete_download_records">是否删除下载记录</string>
-    <string name="delete_package">同时删除安装包</string>
+    <string name="dm_delete_package">同时删除安装包</string>
 </resources>
