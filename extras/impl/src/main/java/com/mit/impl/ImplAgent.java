@@ -3,6 +3,8 @@ package com.mit.impl;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -238,24 +240,31 @@ public class ImplAgent extends Observable {
                 @Override
                 public void run() {
                     ImplInfo implInfo = findImplInfoByPackageName(packageName);
-                    if (null == implInfo){
+                    if (null == implInfo) {
                         implInfo = findImplInfoByFilename(fileName);
                     }
                     if (null != implInfo) {
                         mInstaller.onSystemInstallResult(implInfo, result, mImplCallback);
-                        ImplLog.d(TAG, "com.installer.system.install.result,result," + result + ",packagename:"+packageName+",filename="+fileName);
-                    }else{
+                        ImplLog.d(TAG, "com.installer.system.install.result,result," + result + ",packagename:" + packageName + ",filename=" + fileName);
+                    } else {
                         ImplLog.d(TAG, "com.installer.system.install.result,implInfo == null");
                         for (int i = 0; i < mImplList.size(); i++) {
                             implInfo = mImplList.get(i);
-                            if (ImplInfo.STATUS_PRIVATE_INSTALLING != implInfo.getStatus()){
+                            ImplLog.d(TAG, "implInfo.getStatus() = " + implInfo.getStatus());
+                            if (ImplInfo.STATUS_PRIVATE_INSTALLING != implInfo.getStatus()) {
                                 continue;
                             }
                             String path = implInfo.getLocalPath();
-                            if (null == path || TextUtils.isEmpty(path)){
+                            if (null == path || TextUtils.isEmpty(path)) {
                                 path = implInfo.getFileSavePath();
                             }
-                            if (null == path || TextUtils.isEmpty(path) || !new File(path).exists()){
+                            PackageInfo archivePkg = mContext.getPackageManager()
+                                    .getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES);
+                            ImplLog.d(TAG, "archivePkg.packageName = " + archivePkg.packageName);
+                            if (null != archivePkg && null == archivePkg.packageName) {
+                                mInstaller.onSystemInstallResult(implInfo, result, mImplCallback);
+                            }
+                            if (null == path || TextUtils.isEmpty(path) || !new File(path).exists()) {
                                 mInstaller.onSystemInstallResult(implInfo, result, mImplCallback);
                             }
                         }
@@ -531,7 +540,7 @@ public class ImplAgent extends Observable {
 
     private ImplInfo findImplInfoByPackageName(String packageName) {
         ImplInfo implInfo = null;
-        if (null == packageName){
+        if (null == packageName) {
             return implInfo;
         }
         for (int i = 0; i < mImplList.size(); i++) {
@@ -545,7 +554,7 @@ public class ImplAgent extends Observable {
 
     private ImplInfo findImplInfoByFilename(String fileName) {
         ImplInfo implInfo = null;
-        if (null == fileName){
+        if (null == fileName) {
             return implInfo;
         }
         for (int i = 0; i < mImplList.size(); i++) {
@@ -584,7 +593,7 @@ public class ImplAgent extends Observable {
         public void onEnqued(ImplInfo info) {
             super.onEnqued(info);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadEnqued");
-            for (int i = 0; i < mPackageListener.size(); i ++){
+            for (int i = 0; i < mPackageListener.size(); i++) {
                 mPackageListener.get(i).onDownloadEnqued(info);
             }
             callbackImpl(info);
@@ -635,7 +644,7 @@ public class ImplAgent extends Observable {
                 //安装
                 mInstaller.install(info, true, this);
             }
-            for (int i = 0; i < mPackageListener.size(); i ++){
+            for (int i = 0; i < mPackageListener.size(); i++) {
                 mPackageListener.get(i).onDownloadSucess(info);
             }
             callbackImpl(info);
@@ -657,7 +666,7 @@ public class ImplAgent extends Observable {
         public void onInstallSuccess(ImplInfo info) {
             super.onInstallSuccess(info);
             MitMobclickAgent.onEvent(mContext, "impl_InstallSuccess");
-            for (int i = 0; i < mPackageListener.size(); i ++){
+            for (int i = 0; i < mPackageListener.size(); i++) {
                 mPackageListener.get(i).onPackageAdded(info);
             }
             callbackImpl(info);
@@ -687,7 +696,7 @@ public class ImplAgent extends Observable {
         public void onUninstallSuccess(ImplInfo info) {
             super.onUninstallSuccess(info);
             MitMobclickAgent.onEvent(mContext, "impl_UninstallSuccess");
-            for (int i = 0; i < mPackageListener.size(); i ++){
+            for (int i = 0; i < mPackageListener.size(); i++) {
                 mPackageListener.get(i).onPackageRemoved(info);
             }
             callbackImpl(info);
@@ -785,29 +794,43 @@ public class ImplAgent extends Observable {
 
 
     private final static List<SimplePackageListener> mPackageListener = new ArrayList<>();
-    public void registerPackageListener(SimplePackageListener listener){
-        synchronized (mPackageListener){
+
+    public void registerPackageListener(SimplePackageListener listener) {
+        synchronized (mPackageListener) {
             if (!mPackageListener.contains(listener)) {
                 mPackageListener.add(listener);
             }
         }
     }
 
-    public void unregisterPackageListener(SimplePackageListener listener){
-        synchronized (mPackageListener){
+    public void unregisterPackageListener(SimplePackageListener listener) {
+        synchronized (mPackageListener) {
             if (mPackageListener.contains(listener)) {
                 mPackageListener.remove(listener);
             }
         }
     }
 
-    public static class SimplePackageListener{
-        public void onDownloadEnqued(ImplInfo implInfo){}
-        public void onDownloadSucess(ImplInfo implInfo){}
-        public void onPackageAdded(ImplInfo implInfo){}
-        public void onPackageRemoved(ImplInfo implInfo){}
-        public void onPackageChanged(ImplInfo implInfo){}
-        public void onSystemInstallResult(ImplInfo implInfo,int result){}
-        public void onSystemRemoveResult(ImplInfo implInfo,int result){}
+    public static class SimplePackageListener {
+        public void onDownloadEnqued(ImplInfo implInfo) {
+        }
+
+        public void onDownloadSucess(ImplInfo implInfo) {
+        }
+
+        public void onPackageAdded(ImplInfo implInfo) {
+        }
+
+        public void onPackageRemoved(ImplInfo implInfo) {
+        }
+
+        public void onPackageChanged(ImplInfo implInfo) {
+        }
+
+        public void onSystemInstallResult(ImplInfo implInfo, int result) {
+        }
+
+        public void onSystemRemoveResult(ImplInfo implInfo, int result) {
+        }
     }
 }
