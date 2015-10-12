@@ -25,18 +25,9 @@ import java.util.Locale;
  * Created by hxd on 15-6-10.
  */
 public class ImplHelper {
-    private final static String TAG = "impl_helper";
-//    /**
-//     * Notification构造器
-//     */
+//    private final static String TAG = "impl_helper";
 //    private static NotificationCompat.Builder mBuilder;
-//    /**
-//     * Notification的ID
-//     */
 //    private static int notifyId_base = 100;
-//    /**
-//     * Notification管理
-//     */
 //    public static NotificationManager mNotificationManager;
 
     public static String getSizeText(Context context, long currentBytes, long totalBytes) {
@@ -128,7 +119,7 @@ public class ImplHelper {
 ////        }
 //
 //    }
-
+//
 //    private static void initNotify(Context context) {
 //        mBuilder = new NotificationCompat.Builder(context);
 //        mBuilder.setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示
@@ -138,7 +129,7 @@ public class ImplHelper {
 //                .setSmallIcon(R.drawable.ic_launcher);
 //        mNotificationManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
 //    }
-
+//
 //    /**
 //     * 显示通知栏点击跳转到指定Activity
 //     */
@@ -156,14 +147,17 @@ public class ImplHelper {
 //                .setContentTitle(temp)
 //                .setContentText("点击查看");
 ////
-//        Intent clickIntent = new Intent(context, ClickReceiver.class); //点击 Intent
-//        clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        clickIntent.putExtra("notify", notify);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        mBuilder.setContentIntent(pendingIntent);
-//        mNotificationManager.notify(notifyId_base + 1, mBuilder.build());
-////        ((OSGIServiceHost) context).jumptoDownloadManager(true);
-//
+//        Intent clickIntent = null; //点击 Intent
+//        try {
+//            clickIntent = new Intent(context, Class.forName("com.mit.market.MitMarketActivity"));
+//            clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            clickIntent.putExtra("notify", notify + "");
+//            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//            mBuilder.setContentIntent(pendingIntent);
+//            mNotificationManager.notify(notifyId_base + 1, mBuilder.build());
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
 //    }
 
 //    /**
