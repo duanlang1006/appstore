@@ -309,11 +309,20 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                         AppliteSPUtils.put(mActivity, FLAG, false);
                         return true;
                     }
+//                    else {
+//                        if (!isHomeExist()){
+//                            ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, true);
+//                            return true;
+//                        }
+//                    }
                     return false;
                 }
                 return true;
             }
         });
+//        if (null == getFragmentManager().getFragments()) {
+//            ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, true);
+//        }
     }
 
     @Override
@@ -352,6 +361,21 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
     }
 
+//    /**
+//     * 判断首页是否存在
+//     *
+//     * @return
+//     */
+//    private boolean isHomeExist() {
+//        if (null == getFragmentManager().findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT)) {
+//            LogUtils.d(TAG, "首页不存在");
+//            Toast.makeText(mActivity, "不存在", Toast.LENGTH_SHORT).show();
+//            return false;
+//        }
+//        LogUtils.d(TAG, "首页存在");
+//        Toast.makeText(mActivity, "存在", Toast.LENGTH_SHORT).show();
+//        return true;
+//    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -397,6 +421,16 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+//        if (android.R.id.home == item.getItemId()) {
+//            if (!isHomeExist()) {
+//                ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
+//                return true;
+//            }
+//        }
+
+//        if (null == getFragmentManager().getFragments()) {
+//            ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, true);
+//        }
         return super.onOptionsItemSelected(item);
     }
 

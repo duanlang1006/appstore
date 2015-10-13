@@ -72,6 +72,7 @@ public class ImplHelper {
                                String fullname,
                                String md5,
                                ImplChangeCallback callback) {
+        fillImplRes(context, implInfo);
         ImplInfo.ImplRes res = implInfo.getImplRes();
         if (ImplInfo.ACTION_DOWNLOAD == res.getAction()) {
             ImplAgent implAgent = ImplAgent.getInstance(context.getApplicationContext());
