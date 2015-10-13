@@ -235,8 +235,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     private void initSimilarView(View view) {
         mSimilarView = (SimilarView) view.inflate(mActivity, R.layout.similar_view, null);
-        mSimilarView.mTitle.setText(getResources().getString(R.string.similar_title));
-        mSimilarView.mChangeView.setText(getResources().getString(R.string.similar_change));
+        mSimilarView.getTitleView().setText(getResources().getString(R.string.similar_title));
+        mSimilarView.getChangeView().setText(getResources().getString(R.string.similar_change));
         mSimilarDataList = new ArrayList<>();
         post();
         mSimilarView.setVisibility(View.VISIBLE);
