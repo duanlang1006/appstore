@@ -6,6 +6,7 @@ import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -665,9 +666,15 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         LogUtils.i(TAG, "end_time:" + end_time);
         LogUtils.i(TAG, "path:" + path);
 
+        Bitmap bitmap;
         if (time >= start_time && time <= end_time) {
             if (!TextUtils.isEmpty(path)) {
-                mLogoIV.setBackground(new BitmapDrawable(AppliteUtils.getLoacalBitmap(path)));
+                bitmap = AppliteUtils.getLoacalBitmap(path);
+                if (null != bitmap) {
+                    mLogoIV.setBackground(new BitmapDrawable(bitmap));
+                } else {
+                    mLogoIV.setBackgroundResource(R.drawable.logo);
+                }
             }
         }
         //判断在线LOGO的是否存在和显示时间，如果当前时间大于显示时间则删除LOGO图片

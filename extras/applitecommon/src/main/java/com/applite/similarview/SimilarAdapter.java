@@ -11,8 +11,6 @@ import android.widget.TextView;
 import com.applite.common.BitmapHelper;
 import com.applite.common.R;
 import com.lidroid.xutils.BitmapUtils;
-import com.mit.impl.ImplChangeCallback;
-import com.mit.impl.ImplInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +108,6 @@ public abstract class SimilarAdapter<T> extends BaseAdapter {
         mSimilarAPKDetailListener = listener;
         mNumColumns = NumColumns;
         mShowSimilarBeans.clear();
-        mSimilarAPKDetailListener.dataLess(mSimilarBeans.size());
         if (mSimilarBeans.size() > mNumColumns) {//判断数据的个数    是否大于一行个个数
             for (int i = 0; i < NumColumns; i++) {
                 mShowSimilarBeans.add(mSimilarBeans.get(i));
@@ -132,10 +129,9 @@ public abstract class SimilarAdapter<T> extends BaseAdapter {
      * 换一换
      */
     public void change() {
-        mChangeNumber = mChangeNumber + 1;
         mShowSimilarBeans.clear();
-
         if (mSimilarBeans.size() > mNumColumns) {//总数据大于一页显示的个数
+            mChangeNumber = mChangeNumber + 1;
             if (mChangeNumber == mPageNumber - 1 && mEndPageIconNumber != 0) {//是否最后一页且最后一页不满一页个个数
                 for (int i = mSimilarBeans.size() - mNumColumns; i < mSimilarBeans.size(); i++) {
                     mShowSimilarBeans.add(mSimilarBeans.get(i));
