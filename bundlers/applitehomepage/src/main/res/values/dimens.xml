@@ -16,8 +16,8 @@
     <dimen name="apkList_iconMarginBottom">3dp</dimen>
     <dimen name="apkList_iconMarginTop">3dp</dimen>
     <dimen name="apkList_iconMinWidth">150dp</dimen>
-    <dimen name="apkList_icon_width">55dp</dimen>
-    <dimen name="apkList_icon_height">55dp</dimen>
+    <dimen name="apkList_icon_width">60dp</dimen>
+    <dimen name="apkList_icon_height">60dp</dimen>
     <dimen name="apkList_textStar_marginTop">8dp</dimen>
     <dimen name="apkList_bottom_marginRight">10dp</dimen>
     <dimen name="apkList_bottom_marginLeft">5dp</dimen>

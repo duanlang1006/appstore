@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffFFFFFF"
+    android:background="@color/background_main"
     android:orientation="vertical"
     tools:context=".PersonalFragment">
 
@@ -10,7 +10,6 @@
         android:layout_width="wrap_content"
         android:layout_height="36dp"
         android:layout_marginLeft="18dp"
-        android:background="#ffFFFFFF"
         android:gravity="center_vertical"
         android:text="@string/manager_catergory_title"
         android:textColor="@color/category_title"
@@ -23,13 +22,13 @@
         android:id="@+id/action_upgrade"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="18dp"
         android:background="@drawable/item_background">
 
         <ImageView
             android:id="@+id/upgrade_img"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_marginLeft="18dp"
             android:gravity="center_vertical"
             android:src="@drawable/icon_update" />
 

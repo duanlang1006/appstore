@@ -108,9 +108,9 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
             HomePageApkData itemData = mData.getData().get(position);
             viewHolder.initView(itemData, mData.getS_datatype(), position);
-            if(mData.getS_name().equals("排行")){
+            if (mData.getS_name().equals("排行")) {
                 viewHolder.setAppIdVisible();
-            }else{
+            } else {
                 viewHolder.setAppIdInVisible();
             }
         }
@@ -120,6 +120,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
     private String boxLabel_value;
     private int points;
     private boolean luckyflag = false;
+    private boolean pressbutton = false;
 
     @Override
     public void onClick(View v) {
@@ -128,6 +129,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             if (obj instanceof ViewHolder) {
                 ViewHolder vh = (ViewHolder) obj;
                 MitMobclickAgent.onEvent(mContext, "onClickButton" + vh.getItemPosition());
+
+                pressbutton = true;
 
                 boxLabel_value = vh.itemData.getBoxLabelvale();
                 LogUtils.d(TAG, "boxLabel_value = " + boxLabel_value);
@@ -165,6 +168,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
         private ImageView mExtentIcon;
         private String layoutStr;
         private LinearLayout pullDownView;
+        private LinearLayout apkidarea;
 
         //可变数据
         private ImplInfo implInfo;
@@ -173,6 +177,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
 
         ViewHolder(View mView) {
             this.pullDownView = (LinearLayout) mView.findViewById(R.id.pullDownView);
+            this.apkidarea = (LinearLayout) mView.findViewById(R.id.apkidarea);
             this.mAppIcon = (ImageView) mView.findViewById(R.id.imageViewName);
             this.mAppId = (TextView) mView.findViewById(R.id.apkId);
             this.mAppName = (TextView) mView.findViewById(R.id.apkName);
@@ -218,10 +223,8 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 if (null != this.mAppId) {
                     setAppIdVisible();
                     if ((position == 0) || (position == 1) || (position == 2)) {
-//                        this.mAppId.setBackgroundColor(Color.RED);
                         this.mAppId.setBackgroundResource(R.drawable.ranking_top_bg);
                     } else {
-//                        this.mAppId.setBackgroundColor(Color.TRANSPARENT);
                         this.mAppId.setBackgroundResource(R.drawable.ranking_normal_bg);
                     }
                     this.mAppId.setText(String.valueOf(position + 1));
@@ -309,6 +312,15 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                         mProgressButton.setText(res.getStatusText());
                         mProgressButton.setEnabled(false);
                         break;
+                    case ImplInfo.STATUS_FAILED:
+                        if(pressbutton){
+                            pressbutton = false;
+                            if(implInfo.getCause() == ImplInfo.CAUSE_FAILED_BY_SPACE_NOT_ENOUGH){
+                                Toast toast = Toast.makeText(mContext, "存储空间不足，请释放空间！", Toast.LENGTH_SHORT);
+                                toast.setGravity(Gravity.BOTTOM, 0, 80);
+                                toast.show();
+                            }
+                        }
                     default:
                         mProgressButton.setText(res.getActionText());
                         break;
@@ -328,15 +340,15 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
             return this.position;
         }
 
-        public void setAppIdVisible(){
-            if(null != mAppId){
-                this.mAppId.setVisibility(View.VISIBLE);
+        public void setAppIdVisible() {
+            if (null != apkidarea) {
+                this.apkidarea.setVisibility(View.VISIBLE);
             }
         }
 
-        public void setAppIdInVisible(){
-            if(null != mAppId){
-                this.mAppId.setVisibility(View.GONE);
+        public void setAppIdInVisible() {
+            if (null != apkidarea) {
+                this.apkidarea.setVisibility(View.GONE);
             }
         }
     }
