@@ -205,7 +205,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         //这里是长按删除
         mListview.setOnItemLongClickListener(this);
         mListview.setOnScrollListener(new PauseOnScrollListener(mBitmapHelper, false, true));
-        if (null != mImplList && mImplList.size() > 0) {
+        if (null != mImplList) {
             mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
                     mImplList, mBitmapHelper, mDownloadListener);
             mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
@@ -542,26 +542,32 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     @Override
     public void update(Observable observable, Object data) {
-//        if (null == mViewPager || null == mViewPager.getAdapter()) {
-//            return;
-//        } else {
-//            mViewPager.getAdapter().notifyDataSetChanged();
-//        }
-        if (null == mListview || null == mAdapter) {
+        if (null == mListview) {
             return;
+        }
+        mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
+        status = new boolean[mImplList.size()];
+        Arrays.fill(status, false);
+        if (null == mAdapter) {
+            mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
+                    mImplList, mBitmapHelper, mDownloadListener);
+            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
+            mListview.setAdapter(mAdapter);
         } else {
-            mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
-            status = new boolean[mImplList.size()];
-            Arrays.fill(status, false);//全部填充为false(chechbox不选中)
             mAdapter.clear();
             for (int i = 0; i < mImplList.size(); i++) {
                 mAdapter.add(mImplList.get(i));
             }
-//            mAdapter.addAll(mImplList);
             mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
             mAdapter.notifyDataSetChanged();
-
         }
+        int tempCount = 0;
+        for (int i = 0; i < status.length; i++) {
+            if (status[i]) {
+                tempCount++;
+            }
+        }
+        count(tempCount);
     }
 
     //ListFragment和适配器传递数据
