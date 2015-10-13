@@ -27,7 +27,7 @@ public class Constant {
     public static final String PROTOCOL_VERSION = "1.0";
 
     public static final String META_DATA_MIT = "MIT_APPKEY";
-    public static final String extenStorageDirPath = "AppliteStudio/";//下载的APK保存文件夹
+    public static final String extenStorageDirPath = "AppStore/";//下载的APK保存文件夹
     public static final String PATH = "applite/";//下载的LOGO图片和插件保存的文件夹
 
     public static final int INSTALLED = 0; // 表示已经安装，且跟现在这个apk文件是一个版本
