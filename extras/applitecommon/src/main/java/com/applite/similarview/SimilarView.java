@@ -13,20 +13,25 @@ import android.widget.TextView;
 import com.applite.common.LogUtils;
 import com.applite.common.R;
 
+import java.util.List;
+
 /**
  * Created by hxd on 15-9-1.
  */
-public class SimilarView extends LinearLayout implements View.OnClickListener {
-    public TextView mTitle;
-    public GridView mGridView;
+public class SimilarView<T> extends LinearLayout implements View.OnClickListener {
+    private TextView mTitle;
+    private GridView mGridView;
     public SimilarAdapter mAdapter;
-    public TextView mChangeView;
-    public TextView mDataNullView;
+    private TextView mChangeView;
+    private TextView mDataNullView;
 
     private int mTitleId;
     private int mChangeId;
     private int mDateNullId;
     private int mGridId;
+    private List<T> mData;
+    private SimilarAdapter.SimilarAPKDetailListener mListener;
+    private int mNumColumns;
 //    private List<SimilarBean> mSimilarData;
 
     public SimilarView(Context context) {
@@ -85,12 +90,30 @@ public class SimilarView extends LinearLayout implements View.OnClickListener {
 //        }
 //    }
 
+    public void setData(List<T> data, SimilarAdapter.SimilarAPKDetailListener<T> listener, int NumColumns) {
+        mData = data;
+        mListener = listener;
+        mNumColumns = NumColumns;
+        if (mData.size() == 0) {
+            mDataNullView.setVisibility(View.VISIBLE);
+            mGridView.setVisibility(View.GONE);
+        } else {
+            mDataNullView.setVisibility(View.GONE);
+            mGridView.setVisibility(View.VISIBLE);
+        }
+        if (null != mAdapter)
+            mAdapter.setData(data, listener, NumColumns);
+    }
+
     public void setAdapter(SimilarAdapter adapter) {
         if (null == adapter) {
             mGridView.setVisibility(View.GONE);
             return;
         }
         mAdapter = adapter;
+
+        if (null != mData)
+            mAdapter.setData(mData, mListener, mNumColumns);
         mGridView.setAdapter(adapter);
         mGridView.setVisibility(View.VISIBLE);
     }
@@ -105,6 +128,22 @@ public class SimilarView extends LinearLayout implements View.OnClickListener {
 
     public void setTitle(int titleId) {
         this.mTitle.setText(getContext().getResources().getString(titleId));
+    }
+
+    public TextView getTitleView() {
+        return mTitle;
+    }
+
+    public TextView getChangeView() {
+        return mChangeView;
+    }
+
+    public TextView getDataNullView() {
+        return mDataNullView;
+    }
+
+    public GridView getGridView() {
+        return mGridView;
     }
 
     /**
@@ -178,4 +217,5 @@ public class SimilarView extends LinearLayout implements View.OnClickListener {
                     mAdapter.change();
         }
     }
+
 }

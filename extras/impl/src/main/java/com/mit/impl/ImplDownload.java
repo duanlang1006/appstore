@@ -58,8 +58,8 @@ public class ImplDownload {
             mContext.startService(downloadSvr);
         }
         inited = true;
-        if(maxDownloadThread == 0)
-        maxDownloadThread = ImplConfig.getDownloadThreadNum(context);
+        if (maxDownloadThread == 0)
+            maxDownloadThread = ImplConfig.getDownloadThreadNum(context);
         ImplLog.d(TAG, "maxDownloadThread = " + maxDownloadThread);
     }
 
@@ -283,8 +283,8 @@ public class ImplDownload {
 //        }
 //    }
 
-    void addDownload(ImplInfo implInfo,String fullname,String md5,ImplListener callback){
-        if (null == implInfo.getDownloadUrl() || null == implInfo.getFileSavePath()){
+    void addDownload(ImplInfo implInfo, String fullname, String md5, ImplListener callback) {
+        if (null == implInfo.getDownloadUrl() || null == implInfo.getFileSavePath()) {
             if (null != callback) {
                 implInfo.setLocalPath(null);
                 implInfo.setStatus(ImplInfo.STATUS_FAILED);
@@ -327,8 +327,8 @@ public class ImplDownload {
         resumeImpl(implInfo, callback);
     }
 
-    private void resumeImpl(ImplInfo implInfo,ImplListener callback){
-        if (null == implInfo.getDownloadUrl() || null == implInfo.getFileSavePath()){
+    private void resumeImpl(ImplInfo implInfo, ImplListener callback) {
+        if (null == implInfo.getDownloadUrl() || null == implInfo.getFileSavePath()) {
             return;
         }
 
@@ -592,10 +592,14 @@ public class ImplDownload {
             }
             java.io.File file = (java.io.File) fileResponseInfo.result;
             if (null != file && file.exists()) {
-                implInfo.setLocalPath(file.getAbsolutePath());
-                implInfo.setStatus(ImplInfo.STATUS_SUCCESSFUL);
-                if (null != baseCallback) {
-                    baseCallback.onSuccess(implInfo, file);
+                if (null != implInfo.getMd5() && !TextUtils.isEmpty(implInfo.getMd5())) {
+                    new MD5Async(implInfo, file.getAbsolutePath(), baseCallback, file).execute();
+                } else {
+                    implInfo.setLocalPath(file.getAbsolutePath());
+                    implInfo.setStatus(ImplInfo.STATUS_SUCCESSFUL);
+                    if (null != baseCallback) {
+                        baseCallback.onSuccess(implInfo, file);
+                    }
                 }
             } else {
                 implInfo.setLocalPath(file.getAbsolutePath());
@@ -623,7 +627,7 @@ public class ImplDownload {
             } else {
                 implInfo.setStatus(ImplInfo.STATUS_FAILED);
                 implInfo.setCause(ImplInfo.CAUSE_NONE);
-                if (null != e && null != e.getMessage()){
+                if (null != e && null != e.getMessage()) {
                     if (e.getMessage().contains("ENOSPC")) {
                         implInfo.setCause(ImplInfo.CAUSE_FAILED_BY_SPACE_NOT_ENOUGH);
                     }
@@ -633,6 +637,54 @@ public class ImplDownload {
                 }
             }
             ImplLog.d(TAG, "onFailure," + e.getCause() + "," + e.getMessage() + "," + e.getExceptionCode() + "," + e.getClass());
+        }
+    }
+
+    private class MD5Async extends AsyncTask {
+        private String fullname;
+        private String md5;
+        private ImplInfo implInfo;
+        private ImplListener baseCallback;
+        private java.io.File file;
+
+        public MD5Async(ImplInfo implInfo, String fullname, ImplListener baseCallback, java.io.File file) {
+            ImplLog.d(TAG, "MD5Async");
+            this.fullname = fullname;
+            this.implInfo = implInfo;
+            this.baseCallback = baseCallback;
+            this.file = file;
+            md5 = implInfo.getMd5();
+        }
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            File file = new File(fullname);
+            if (!md5.equals(ImplHelper.getFileMD5(file))) {
+                ImplLog.d(TAG, "MD5Async return false");
+                return false;
+            }
+            ImplLog.d(TAG, "MD5Async return true");
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            boolean flag = (boolean) o;
+            ImplLog.d(TAG, "MD5Async onPostExecute flag = " + flag);
+            if (!flag) {
+                implInfo.setStatus(ImplInfo.STATUS_PACKAGE_INVALID);
+                implInfo.setLocalPath(fullname);
+                if (null != baseCallback) {
+                    baseCallback.onFailure(implInfo, null, "download file not exist");
+                }
+            } else {
+                implInfo.setLocalPath(fullname);
+                implInfo.setStatus(ImplInfo.STATUS_SUCCESSFUL);
+                if (null != baseCallback) {
+                    baseCallback.onSuccess(implInfo, file);
+                }
+            }
+            super.onPostExecute(o);
         }
     }
 

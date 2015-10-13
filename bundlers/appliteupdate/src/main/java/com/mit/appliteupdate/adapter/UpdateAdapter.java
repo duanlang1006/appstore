@@ -171,6 +171,7 @@ public class UpdateAdapter extends BaseAdapter {
                 mListener.ignoreDataPosition(data.getPackageName());
                 mCheckedItemPosition = -1;
                 AppliteSPUtils.put(mActivity, data.getPackageName(), data.getVersionCode());
+                Toast.makeText(mActivity,"已忽略"+data.getName()+"当前版本更新",Toast.LENGTH_SHORT).show();
             }
         });
         viewholder.mToDetailTv.setOnClickListener(new View.OnClickListener() {

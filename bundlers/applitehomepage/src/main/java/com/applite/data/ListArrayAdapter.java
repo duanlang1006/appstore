@@ -141,6 +141,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 } else
                     luckyflag = false;
                 LogUtils.d(TAG, "points = " + points + " luckyflag = " + luckyflag);
+                LogUtils.d("duanlang", "vh.itemData.getMd5() = " + vh.itemData.getMd5());
 
                 ImplHelper.onClick(mContext,
                         vh.implInfo,
@@ -148,7 +149,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                         vh.itemData.getName(),
                         vh.itemData.getIconUrl(),
                         Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.itemData.getName() + ".apk",
-                        null,
+                        vh.itemData.getMd5(),
                         vh);
             }
         }
@@ -294,7 +295,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                     int mLuckyPonints = (int) AppliteSPUtils.get(mContext, AppliteSPUtils.LUCKY_POINTS, 0);
                     mLuckyPonints += points;
                     AppliteSPUtils.put(mContext, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
-                    Toast toast = Toast.makeText(mContext, "成功下载安装有奖应用, 获得奖励 20 积分", Toast.LENGTH_LONG);
+                    Toast toast = Toast.makeText(mContext, "成功下载安装有奖应用" + implInfo.getTitle() + ", 获得奖励 " + points + " 积分", Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
                 }
@@ -313,9 +314,9 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                         mProgressButton.setEnabled(false);
                         break;
                     case ImplInfo.STATUS_FAILED:
-                        if(pressbutton){
+                        if (pressbutton) {
                             pressbutton = false;
-                            if(implInfo.getCause() == ImplInfo.CAUSE_FAILED_BY_SPACE_NOT_ENOUGH){
+                            if (implInfo.getCause() == ImplInfo.CAUSE_FAILED_BY_SPACE_NOT_ENOUGH) {
                                 Toast toast = Toast.makeText(mContext, "存储空间不足，请释放空间！", Toast.LENGTH_SHORT);
                                 toast.setGravity(Gravity.BOTTOM, 0, 80);
                                 toast.show();
