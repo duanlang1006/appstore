@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -298,31 +297,22 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     @Override
     public void onResume() {
         super.onResume();
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-                    if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
-                        reSet();
-                        AppliteSPUtils.put(mActivity, FLAG, false);
-                        return true;
-                    }
-//                    else {
-//                        if (!isHomeExist()){
-//                            ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, true);
-//                            return true;
-//                        }
+//        getView().setFocusableInTouchMode(true);
+//        getView().requestFocus();
+//        getView().setOnKeyListener(new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+//                    if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
+//                        reSet();
+//                        AppliteSPUtils.put(mActivity, FLAG, false);
+//                        return true;
 //                    }
-                    return false;
-                }
-                return true;
-            }
-        });
-//        if (null == getFragmentManager().getFragments()) {
-//            ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, true);
-//        }
+//                    return false;
+//                }
+//                return false;
+//            }
+//        });
     }
 
     @Override
@@ -360,22 +350,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             ((TextView) emptyView).setText(emptyText);
         }
     }
-
-//    /**
-//     * 判断首页是否存在
-//     *
-//     * @return
-//     */
-//    private boolean isHomeExist() {
-//        if (null == getFragmentManager().findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT)) {
-//            LogUtils.d(TAG, "首页不存在");
-//            Toast.makeText(mActivity, "不存在", Toast.LENGTH_SHORT).show();
-//            return false;
-//        }
-//        LogUtils.d(TAG, "首页存在");
-//        Toast.makeText(mActivity, "存在", Toast.LENGTH_SHORT).show();
-//        return true;
-//    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -418,19 +392,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         return false;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-//        if (android.R.id.home == item.getItemId()) {
-//            if (!isHomeExist()) {
-//                ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
-//                return true;
-//            }
-//        }
-
-//        if (null == getFragmentManager().getFragments()) {
-//            ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, true);
-//        }
         return super.onOptionsItemSelected(item);
     }
 

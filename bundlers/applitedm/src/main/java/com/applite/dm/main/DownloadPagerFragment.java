@@ -15,6 +15,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
 import com.applite.dm.R;
@@ -157,6 +159,23 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onResume() {
         super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
+                        pressedCancel();
+                        return true;
+                    } else if (!isHomeExist()) {
+                        ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
     }
 
 
@@ -168,7 +187,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         }
         destoryView = true;
         ImplLog.d(TAG, "onDestroyView," + this + "," + destoryView);
-//        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
     @Override
@@ -229,8 +247,27 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         } else if (item.getItemId() == R.id.dm_action_resume_all) {
             ImplAgent.getInstance(mActivity.getApplicationContext()).resumeAll();
             return true;
+        } else if (android.R.id.home == item.getItemId()) {
+            if (!isHomeExist()) {
+                ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * 判断首页是否存在
+     *
+     * @return
+     */
+    private boolean isHomeExist() {
+        if (null == getFragmentManager().findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT)) {
+            LogUtils.d(TAG, "首页不存在");
+            return false;
+        }
+        LogUtils.d(TAG, "首页存在");
+        return true;
     }
 
 
@@ -239,9 +276,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         super.onHiddenChanged(hidden);
         if (!hidden) {
             initActionBar(mPagerSlidingTabStrip);
-//            ImplAgent.getInstance(mActivity).addObserver(this);
         } else {
-//            ImplAgent.getInstance(mActivity).deleteObserver(this);
         }
     }
 
@@ -337,7 +372,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private void initActionBar(View tabStrip) {
         try {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
-//            actionBar.setBackgroundDrawable(res.getDrawable(R.drawable.action_bar_bg_light));
             actionBar.setDisplayUseLogoEnabled(false);
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
