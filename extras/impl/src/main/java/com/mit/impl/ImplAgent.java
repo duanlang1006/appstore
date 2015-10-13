@@ -3,7 +3,6 @@ package com.mit.impl;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Handler;
@@ -250,6 +249,7 @@ public class ImplAgent extends Observable {
                         ImplLog.d(TAG, "com.installer.system.install.result,implInfo == null");
                         for (int i = 0; i < mImplList.size(); i++) {
                             implInfo = mImplList.get(i);
+                            ImplLog.d(TAG, "implInfo.getTitle() = " + implInfo.getTitle());
                             ImplLog.d(TAG, "implInfo.getStatus() = " + implInfo.getStatus());
                             if (ImplInfo.STATUS_PRIVATE_INSTALLING != implInfo.getStatus()) {
                                 continue;
@@ -258,14 +258,14 @@ public class ImplAgent extends Observable {
                             if (null == path || TextUtils.isEmpty(path)) {
                                 path = implInfo.getFileSavePath();
                             }
-                            PackageInfo archivePkg = mContext.getPackageManager()
-                                    .getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES);
-                            ImplLog.d(TAG, "archivePkg.packageName = " + archivePkg.packageName);
-                            if (null != archivePkg && null == archivePkg.packageName) {
-                                mInstaller.onSystemInstallResult(implInfo, result, mImplCallback);
-                            }
-                            if (null == path || TextUtils.isEmpty(path) || !new File(path).exists()) {
-                                mInstaller.onSystemInstallResult(implInfo, result, mImplCallback);
+                            ImplLog.d(TAG, "path = " + path);
+                            ImplLog.d(TAG, "!new File(path).exists() = " + !new File(path).exists());
+                            ImplLog.d(TAG, "mContext.getPackageManager().getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES) = " + mContext.getPackageManager().getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES));
+
+
+                            if (null == path || TextUtils.isEmpty(path) || !new File(path).exists()
+                                    || null == mContext.getPackageManager().getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES)) {
+                                mInstaller.onSystemInstallResult(implInfo, -10000, mImplCallback);
                             }
                         }
                     }
