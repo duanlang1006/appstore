@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by yuzhimin on 6/30/15.
  */
-public class HomePageApkData implements Parcelable{
+public class HomePageApkData implements Parcelable {
     private String key;
     private String packageName;
     private String name;
@@ -22,6 +22,7 @@ public class HomePageApkData implements Parcelable{
     private String rDownloadUrl;
     private String apkSize;
     private String brief;
+    private String apkMd5;
     private String mDownloadNumber;
 
     public HomePageApkData() {
@@ -43,6 +44,7 @@ public class HomePageApkData implements Parcelable{
         rDownloadUrl = in.readString();
         apkSize = in.readString();
         brief = in.readString();
+        apkMd5 = in.readString();
         mDownloadNumber = in.readString();
     }
 
@@ -68,6 +70,7 @@ public class HomePageApkData implements Parcelable{
         dest.writeString(rDownloadUrl);
         dest.writeString(apkSize);
         dest.writeString(brief);
+        dest.writeString(apkMd5);
         dest.writeString(mDownloadNumber);
     }
 
@@ -89,6 +92,7 @@ public class HomePageApkData implements Parcelable{
                 ", key='" + key + '\'' +
                 ", packageName='" + packageName + '\'' +
                 ", name='" + name + '\'' +
+                ", apkMd5='" + apkMd5 + '\'' +
                 ", iconUrl='" + iconUrl + '\'' +
                 ", rDownloadUrl='" + rDownloadUrl + '\'' +
                 ", categorysub='" + categorysub + '\'' +
@@ -165,6 +169,9 @@ public class HomePageApkData implements Parcelable{
         return brief;
     }
 
+    public String getMd5() {
+        return apkMd5;
+    }
 
     public String getmDownloadNumber() {
         return mDownloadNumber;
@@ -228,6 +235,10 @@ public class HomePageApkData implements Parcelable{
 
     public void setBrief(String brief) {
         this.brief = brief;
+    }
+
+    public void setMd5(String apkMd5) {
+        this.apkMd5 = apkMd5;
     }
 
     public void setmDownloadNumber(String mDownloadNumber) {
