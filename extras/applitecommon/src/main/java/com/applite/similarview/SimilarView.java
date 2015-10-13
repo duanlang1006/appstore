@@ -112,7 +112,8 @@ public class SimilarView<T> extends LinearLayout implements View.OnClickListener
         }
         mAdapter = adapter;
 
-        mAdapter.setData(mData, mListener, mNumColumns);
+        if (null != mData)
+            mAdapter.setData(mData, mListener, mNumColumns);
         mGridView.setAdapter(adapter);
         mGridView.setVisibility(View.VISIBLE);
     }
