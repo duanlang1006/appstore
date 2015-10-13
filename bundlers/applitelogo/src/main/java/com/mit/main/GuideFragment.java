@@ -6,6 +6,7 @@ import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -305,7 +306,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mX[3] = (mFLayoutWidth * 2 / 10 - 30) * mFLayoutWidthScale;
         mX[4] = (mFLayoutWidth * 6 / 10 + 20) * mFLayoutWidthScale;
         mX[5] = (mFLayoutWidth * 7 / 10) * mFLayoutWidthScale;
-        mX[6] = (mFLayoutWidth * 2 / 10) * mFLayoutWidthScale;
+        mX[6] = (mFLayoutWidth * 1 / 10 - 40) * mFLayoutWidthScale;
         mX[7] = (mFLayoutWidth * 3 / 10 - 30) * mFLayoutWidthScale;
         mX[8] = (mFLayoutWidth * 6 / 10) * mFLayoutWidthScale;
         mX[9] = (mFLayoutWidth * 5 / 10 + 40) * mFLayoutWidthScale;
@@ -316,7 +317,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         mY[3] = (mFLayoutHeight * 7 / 20) * mFLayoutWidthScale;
         mY[4] = (mFLayoutHeight * 9 / 20 + 20) * mFLayoutWidthScale;
         mY[5] = (mFLayoutHeight * 11 / 20 - 30) * mFLayoutWidthScale;
-        mY[6] = (mFLayoutHeight * 12 / 20 - 30) * mFLayoutWidthScale;
+        mY[6] = (mFLayoutHeight * 12 / 20 + 30) * mFLayoutWidthScale;
         mY[7] = (mFLayoutHeight * 14 / 20 - 30) * mFLayoutWidthScale;
         mY[8] = (mFLayoutHeight * 16 / 20 - 20) * mFLayoutWidthScale;
         mY[9] = (mFLayoutHeight * 18 / 20 - 40) * mFLayoutWidthScale;
@@ -665,9 +666,15 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
         LogUtils.i(TAG, "end_time:" + end_time);
         LogUtils.i(TAG, "path:" + path);
 
+        Bitmap bitmap;
         if (time >= start_time && time <= end_time) {
             if (!TextUtils.isEmpty(path)) {
-                mLogoIV.setBackground(new BitmapDrawable(AppliteUtils.getLoacalBitmap(path)));
+                bitmap = AppliteUtils.getLoacalBitmap(path);
+                if (null != bitmap) {
+                    mLogoIV.setBackground(new BitmapDrawable(bitmap));
+                } else {
+                    mLogoIV.setBackgroundResource(R.drawable.logo);
+                }
             }
         }
         //判断在线LOGO的是否存在和显示时间，如果当前时间大于显示时间则删除LOGO图片
