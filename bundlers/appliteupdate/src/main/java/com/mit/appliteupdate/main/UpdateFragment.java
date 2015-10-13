@@ -65,6 +65,8 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
     private static final String TAG = "UpdateFragment";
     private View rootView;
+    private TextView mUpdateItemNum;
+    private TextView mUpdateItemSize;
     private TextView mAllUpdateView;
     private ListView mListView;
     private List<ApkBean> mUpdateApkList;
@@ -139,16 +141,19 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
     @Override
     public void onResume() {
+        LogUtils.d(TAG, "onResume");
         super.onResume();
     }
 
     @Override
     public void onPause() {
+        LogUtils.d(TAG, "onPause");
         super.onPause();
     }
 
     @Override
     public void onDestroy() {
+        LogUtils.d(TAG, "onDestroy");
         super.onDestroy();
         mActivity.unregisterReceiver(mReceiver);
     }
@@ -179,8 +184,27 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                     mTitleLayout.setVisibility(View.VISIBLE);
                     mActionBarTitle.setVisibility(View.VISIBLE);
                     mListView.setVisibility(View.VISIBLE);
-                    if (mUpdateApkList.size() == 0)
+                    if (mUpdateApkList.size() == 0) {
                         mNoUpdateView.setVisibility(View.VISIBLE);
+                        mUpdateItemNum.setText(getString(R.string.update_item));
+                        mUpdateItemSize.setVisibility(View.GONE);
+                    } else {
+                        mNoUpdateView.setVisibility(View.GONE);
+                        mUpdateItemNum.setText(getString(R.string.update_item) + "(" + mUpdateApkList.size() + ")");
+                        mUpdateItemSizeNum = 0.00;
+                        for (int i = 0; i < mUpdateApkList.size(); i++) {
+                            String num = AppliteUtils.bytes2kb(mUpdateApkList.get(i).getApkSize());
+                            Double sizenumvalue = Double.valueOf(num.substring(0, num.length() - 2));
+                            mUpdateItemSizeNum += sizenumvalue;
+                            mUpdateItemSizeNum = (double) (Math.round((mUpdateItemSizeNum) * 100) / 100.00);
+                            LogUtils.d(TAG, "总大小：" + mUpdateItemSizeNum);
+                        }
+                        mUpdateItemSize.setText("总计大小：" + String.valueOf(mUpdateItemSizeNum) + "MB");
+                        mUpdateItemSize.setVisibility(View.VISIBLE);
+                    }
+                    if (mIgnoreList.size() == 0) {
+                        mActionBarIgnore.setVisibility(View.INVISIBLE);
+                    }
                     return true;
                 }
             }
@@ -258,6 +282,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
      * 关联控件及监听
      */
     private void initView() {
+        LogUtils.d(TAG, "initView");
+        mUpdateItemNum = (TextView) rootView.findViewById(R.id.update_item_num);
+        mUpdateItemSize = (TextView) rootView.findViewById(R.id.update_size);
         mAllUpdateView = (TextView) rootView.findViewById(R.id.update_all_update);
         mListView = (ListView) rootView.findViewById(R.id.update_listview);
         mListView.addFooterView(mSimilarView);
@@ -396,8 +423,21 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
         if (null == mUpdateApkList || 0 == mUpdateApkList.size()) {
             mNoUpdateView.setVisibility(View.VISIBLE);
+            mUpdateItemNum.setText(getString(R.string.update_item));
+            mUpdateItemSize.setVisibility(View.GONE);
         } else {
             mNoUpdateView.setVisibility(View.GONE);
+            mUpdateItemNum.setText(getString(R.string.update_item) + "(" + mUpdateApkList.size() + ")");
+            mUpdateItemSizeNum = 0.00;
+            for (int i = 0; i < mUpdateApkList.size(); i++) {
+                String num = AppliteUtils.bytes2kb(mUpdateApkList.get(i).getApkSize());
+                Double sizenumvalue = Double.valueOf(num.substring(0, num.length() - 2));
+                mUpdateItemSizeNum += sizenumvalue;
+                mUpdateItemSizeNum = (double) (Math.round((mUpdateItemSizeNum) * 100) / 100.00);
+                LogUtils.d(TAG, "总大小：" + mUpdateItemSizeNum);
+            }
+            mUpdateItemSize.setText("总计大小：" + String.valueOf(mUpdateItemSizeNum) + "MB");
+            mUpdateItemSize.setVisibility(View.VISIBLE);
         }
 
         mAdapter = new UpdateAdapter(mActivity, mUpdateApkList, this);
@@ -405,10 +445,14 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         mListView.setVisibility(View.VISIBLE);
     }
 
+    private Double mUpdateItemSizeNum = 0.00;
+
+
     /**
      * 判断StatsView显示状态
      */
     private void setStatsLayoutVisibility(int visibility) {
+        LogUtils.i(TAG, "setStatsLayoutVisibility  visibility:" + visibility);
         switch (visibility) {
             case View.GONE:
                 mStatsLayout.setVisibility(visibility);
@@ -499,8 +543,24 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
 
             mUpdateApkList.remove(position);
         }
-        if (mUpdateApkList.size() == 0)
+
+        if (mUpdateApkList.size() == 0) {
             mNoUpdateView.setVisibility(View.VISIBLE);
+            mUpdateItemNum.setText(getString(R.string.update_item));
+            mUpdateItemSize.setVisibility(View.GONE);
+        } else {
+            mUpdateItemNum.setText(getString(R.string.update_item) + "(" + mUpdateApkList.size() + ")");
+            mUpdateItemSizeNum = 0.00;
+            for (int i = 0; i < mUpdateApkList.size(); i++) {
+                String num = AppliteUtils.bytes2kb(mUpdateApkList.get(i).getApkSize());
+                Double sizenumvalue = Double.valueOf(num.substring(0, num.length() - 2));
+                mUpdateItemSizeNum += sizenumvalue;
+                mUpdateItemSizeNum = (double) (Math.round((mUpdateItemSizeNum) * 100) / 100.00);
+                LogUtils.d(TAG, "总大小：" + mUpdateItemSizeNum);
+            }
+            mUpdateItemSize.setText("总计大小：" + String.valueOf(mUpdateItemSizeNum) + "MB");
+            mUpdateItemSize.setVisibility(View.VISIBLE);
+        }
         mAdapter.notifyDataSetChanged();
     }
 

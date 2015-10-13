@@ -6,8 +6,8 @@ package com.applite.common;
 public class DefaultValue {
 
     public static boolean defauleValueUpdateRemind = true;
-    public static boolean defaultValueDeletePackage = true;
-    public static boolean defaultValueNoPic = true;
+    public static boolean defaultValueDeletePackage = false;
+    public static boolean defaultValueNoPic = false;
     public static boolean defaultValueWIFIUpdateSwitch = true;
 
     public static boolean defaultValueHTTPSuport = true;//支持断点续传,HomePageFragment,408

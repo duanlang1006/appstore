@@ -36,6 +36,8 @@
     <string name="no_update">没有可更新应用！</string>
     <string name="loading">加载中...</string>
 
+    <string name="update_item">可用更新</string>
+    <string name="update_all">全部更新</string>
     <string name="uninstall">卸载</string>
     <string name="ignore">忽略</string>
     <string name="detail">详情</string>
