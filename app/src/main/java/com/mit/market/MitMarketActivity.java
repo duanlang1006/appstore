@@ -304,7 +304,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         }
         if (null != newFragment) {
             if (!newFragment.isAdded()) {
-                ft.add(R.id.container, newFragment, targetService);
+                ft.replace(R.id.container, newFragment, targetService);
             } else {
                 ft.show(newFragment);
             }
@@ -359,7 +359,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     @Override
     public void jumptoPersonal(boolean addToBackstack) {
-        jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT,
+        jumpto(PersonalFragment.class.getName(),
                 PersonalFragment.class.getName(),
                 null, addToBackstack);
     }
