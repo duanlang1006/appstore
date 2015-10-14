@@ -43,14 +43,8 @@ public class ImplAgent extends Observable {
     private final static String IMPL_ACTION_PACKAGE_CHANGED = Intent.ACTION_PACKAGE_CHANGED;
     private final static String IMPL_ACTION_SYSTEM_INSTALL_RESULT = "com.installer.system.install.result";
     private final static String IMPL_ACTION_SYSTEM_DELETE_RESULT = "com.installer.system.delete.result";
-    private static final String DM_NOTIFICATION = "com.mit.market.MitMarketActivity";
 
     private static final HandlerThread sWorkerThread = new HandlerThread("impl-worker");
-
-    private static NotificationCompat.Builder mBuilder;
-    private static int notifyId_base = 100;
-    public static NotificationManager mNotificationManager;
-
 
     private final static Handler mMainHandler = new Handler();
 
@@ -323,78 +317,8 @@ public class ImplAgent extends Observable {
         mDownloader.addDownload(implInfo, fullname, md5, mImplCallback);
         saveImplInfo(implInfo);
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionAdd");
-
-        showDownloadNotify(mContext, ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PAUSED
-                | ImplInfo.STATUS_FAILED | ImplInfo.STATUS_PACKAGE_INVALID);
-
     }
 
-    private void showDownloadNotify(Context context, int position) {
-        initNotify(context);
-        ImplAgent mImplAgent = ImplAgent.getInstance(context.getApplicationContext());
-//        if (R.string.downloading == position) {
-        showIntentActivityNotify(context, mImplAgent.getImplInfoCount(position) + 1, notifyId_base + 1);
-        //这里是显示 点击返回的提示
-//        } else {
-//            showIntentActivityNotify(context, mImplAgent.getImplInfoCount(position) + 1, notifyId_base + 2);
-//        }
-
-    }
-
-    private void initNotify(Context context) {
-        mBuilder = new NotificationCompat.Builder(context);
-        mBuilder.setWhen(System.currentTimeMillis())
-                .setPriority(Notification.PRIORITY_DEFAULT)
-                .setOngoing(false)
-                .setSmallIcon(R.drawable.ic_launcher);
-        mNotificationManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
-    }
-
-    /**
-     * 显示通知栏点击跳转到指定Activity
-     */
-    public void showIntentActivityNotify(Context context, int count, int notify) {
-        String temp = null;
-        if (notifyId_base + 1 == notify) {
-            temp = mContext.getResources().getString(R.string.notification_message_downloading, count);
-        } else {
-            temp = mContext.getResources().getString(R.string.notification_message_downloaded, count);
-        }
-        mBuilder.setAutoCancel(true)//点击后让通知将消失
-                .setContentTitle(temp)
-                .setContentText(mContext.getResources().getString(R.string.click_check));
-        Intent clickIntent = null; //点击 Intent
-        try {
-            clickIntent = new Intent(context, Class.forName(DM_NOTIFICATION));
-            clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            clickIntent.putExtra("notify", notify + "");
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            mBuilder.setContentIntent(pendingIntent);
-            mNotificationManager.notify(notifyId_base + 1, mBuilder.build());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    //    /**
-//     * 显示通知栏点击打开Apk
-//     */
-//    public void showIntentApkNotify() {
-//        LogUtils.d("wanghc", "我执行了showIntentApkNotify");
-//        mBuilder.setAutoCancel(true)//点击后让通知将消失
-//                .setContentTitle("您有" + mImplList.size() + "个应用下载完成")
-//                .setContentText("点击安装");
-//        //我们这里需要做的是打开一个安装包
-//        Intent apkIntent = new Intent();
-//        apkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        apkIntent.setAction(android.content.Intent.ACTION_VIEW);
-//        String apk_path = "file:///android_asset/cs.apk";
-//        Uri uri = Uri.fromFile(new File(apk_path));
-//        apkIntent.setDataAndType(uri, "application/vnd.android.package-archive");
-//        PendingIntent contextIntent = PendingIntent.getActivity(mActivity, 0, apkIntent, 0);
-//        mBuilder.setContentIntent(contextIntent);
-//        mNotificationManager.notify(notifyId1, mBuilder.build());
-//    }
     public void pauseDownload(ImplInfo implInfo) {
         if (null == implInfo) {
             return;
