@@ -584,7 +584,8 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         mAdapter.notifyDataSetChanged();
     }
 
-    private class UninstallReceiver extends BroadcastReceiver {
+    public class UninstallReceiver extends BroadcastReceiver {
+
         @Override
         public void onReceive(Context context, Intent intent) {
             //接收卸载广播
@@ -600,10 +601,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                     }
                     if (position != -1) {
                         mUpdateApkList.remove(position);
-                        mActivity.runOnUiThread(mNotifyRunnable);
                         LogUtils.d(TAG, "检测到卸载，mAdapter刷新");
-
-                        AppliteSPUtils.put(mActivity, AppliteSPUtils.UPDATE_DATA, UpdateUtils.listTojson(mUpdateApkList, mSimilarDataList));
+                        mActivity.runOnUiThread(mNotifyRunnable);
+                        mUpdateItemNum.setText(getString(R.string.update_item) + "(" + mUpdateApkList.size() + ")");
                     }
                 }
             }
