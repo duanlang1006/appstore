@@ -261,6 +261,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         mPagerSlidingTabStrip.setViewPager(mViewPager);
         mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         popupWindowPost();
+        LogUtils.i(TAG, "onCreateView");
         postSearchHint();
         return rootView;
     }
@@ -468,6 +469,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         LogUtils.i(TAG, "onDestroyView");
         mViewPager = null;
         mPagerSlidingTabStrip = null;
+        stopConvenientSearch();
     }
 
     @Override
@@ -546,7 +548,14 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     };
 
     private void startConvenientSearch() {
+        LogUtils.i(TAG, "startConvenientSearch");
         mHandler.postDelayed(mRunnable, 0);
+    }
+
+    private void stopConvenientSearch() {
+        LogUtils.i(TAG, "stopConvenientSearch");
+        if (null != mRunnable)
+            mHandler.removeCallbacks(mRunnable);
     }
 
     private void setSearchBar() {
@@ -707,6 +716,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     };
 
     private void postSearchHint() {
+        LogUtils.i(TAG, "postSearchHint");
         RequestParams params = new RequestParams();
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
