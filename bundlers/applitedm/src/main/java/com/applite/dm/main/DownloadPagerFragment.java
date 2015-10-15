@@ -124,7 +124,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         initActionBar(mPagerSlidingTabStrip);
         mPagerSlidingTabStrip.setViewPager(mViewPager);
         mPagerSlidingTabStrip.setOnPageChangeListener(this);
-//        ImplAgent.getInstance(mActivity).addObserver(this);
         titleBar = inflater.inflate(R.layout.cover_actionbar, null);//这里是添加的控件
         initializeView(rootView);
         layout_button = (LinearLayout) rootView.findViewById(R.id.layout_button);
@@ -132,7 +131,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         animaBtDel = AnimationUtils.loadAnimation(mActivity, R.anim.btn_delete_in);
         btnDelete.setOnClickListener(this);
 
-//        LayoutInflater inflater = getLayoutInflater();
         layoutCustomDialog = mInflater.inflate(R.layout.custom_dialog, (ViewGroup) rootView.findViewById(R.id.mydialog));
         checkBox = (CheckBox) layoutCustomDialog.findViewById(R.id.checkbox);
         all_checkbox = (LinearLayout) layoutCustomDialog.findViewById(R.id.all_checkbox);

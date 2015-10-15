@@ -746,7 +746,7 @@ public class ImplAgent extends Observable {
 
     private final static List<SimplePackageListener> mPackageListener = new ArrayList<>();
 
-    public void registerPackageListener(SimplePackageListener listener) {
+    public static void registerPackageListener(SimplePackageListener listener) {
         synchronized (mPackageListener) {
             if (!mPackageListener.contains(listener)) {
                 mPackageListener.add(listener);
@@ -754,7 +754,7 @@ public class ImplAgent extends Observable {
         }
     }
 
-    public void unregisterPackageListener(SimplePackageListener listener) {
+    public static void unregisterPackageListener(SimplePackageListener listener) {
         synchronized (mPackageListener) {
             if (mPackageListener.contains(listener)) {
                 mPackageListener.remove(listener);

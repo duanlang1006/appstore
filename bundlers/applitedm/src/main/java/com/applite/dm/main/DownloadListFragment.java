@@ -272,12 +272,16 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                             similarBean.setVersionCode(obj.getInt("versionCode"));
                             mSimilarDataList.add(similarBean);
                         }
+                        if (null == mSimilarDataList) {
+                            android.util.Log.i(TAG, "mSimilarDataList == null");
+                            return;
+                        }
                         if (null == mSimilarAdapter) {
                             mSimilarAdapter = new DownloadSimilarAdapter(mActivity);
-                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
+                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, mSimilarView.getNumColumns());
                             mSimilarView.setAdapter(mSimilarAdapter);
                         } else {
-                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
+                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, mSimilarView.getNumColumns());
                             mSimilarAdapter.notifyDataSetChanged();
                         }
                     }
