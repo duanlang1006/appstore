@@ -55,7 +55,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     private boolean personal_flag = false;
     Toast toast;
-
+    private UninstallReceiver mUninstallReceiver;
 
     private SharedPreferences.OnSharedPreferenceChangeListener mConfigListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
@@ -65,7 +65,6 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
             }
         }
     };
-    private UninstallReceiver mUninstallReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +97,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
                 bundle.putString("update_data", intent.getStringExtra("update_data"));
                 jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null, bundle, false);
             } else if (null != intent && "101".equals(intent.getStringExtra("notify"))) {
+                AppliteSPUtils.put(this, "position", intent.getIntExtra("position", 0));
                 jumptoDownloadManager(true);
             } else {
                 jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null,
@@ -223,7 +223,8 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
             bundle.putString("update_data", intent.getStringExtra("update_data"));
             jumpto(Constant.OSGI_SERVICE_LOGO_FRAGMENT, null, bundle, false);
         } else if (null != intent && "101".equals(intent.getStringExtra("notify"))) {
-            ((OSGIServiceHost) this).jumptoDownloadManager(true);
+            AppliteSPUtils.put(this, "position", intent.getIntExtra("position", 0));
+            jumptoDownloadManager(true);
         }
     }
 

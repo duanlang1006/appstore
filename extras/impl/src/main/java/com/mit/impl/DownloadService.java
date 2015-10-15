@@ -10,10 +10,8 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.lidroid.xutils.exception.DbException;
-import com.lidroid.xutils.util.LogUtils;
+import com.applite.sharedpreferences.AppliteSPUtils;
 
 import java.util.List;
 
@@ -155,8 +153,10 @@ public class DownloadService extends Service {
             Intent clickIntent; //点击 Intent
             if (downloading == position) {
                 temp = mContext.getResources().getString(R.string.notification_message_downloading, count);
-            } else {
+                position = 0;
+            } else if (downloaded == position) {
                 temp = mContext.getResources().getString(R.string.notification_message_downloaded, count);
+                position = 1;
             }
             mBuilder.setAutoCancel(true)//点击后让通知将消失
                     .setContentTitle(temp)
@@ -165,6 +165,7 @@ public class DownloadService extends Service {
                 clickIntent = new Intent(context, Class.forName(DM_NOTIFICATION));
                 clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 clickIntent.putExtra("notify", notifyId + "");
+                clickIntent.putExtra("position", position);
                 PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 mBuilder.setContentIntent(pendingIntent);
                 mNotificationManager.notify(notifyId, mBuilder.build());
