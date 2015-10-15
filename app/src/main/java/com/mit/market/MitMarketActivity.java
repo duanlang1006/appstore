@@ -1,6 +1,7 @@
 package com.mit.market;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -35,6 +36,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.applite.main.DetailFragment;
 import com.mit.applite.search.main.SearchFragment;
+import com.mit.appliteupdate.main.UninstallReceiver;
 import com.mit.appliteupdate.main.UpdateFragment;
 import com.mit.impl.ImplAgent;
 import com.mit.main.GuideFragment;
@@ -54,7 +56,6 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     private boolean personal_flag = false;
     Toast toast;
 
-    private String mUpdateData;
 
     private SharedPreferences.OnSharedPreferenceChangeListener mConfigListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
@@ -64,6 +65,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
             }
         }
     };
+    private UninstallReceiver mUninstallReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +108,18 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 //                    .commit();
         }
         post();
+        registerUninstallReceiver();
+    }
+
+    /**
+     * 注册卸载APK监听广播
+     */
+    private void registerUninstallReceiver() {
+        mUninstallReceiver = new UninstallReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addDataScheme("package");
+        registerReceiver(mUninstallReceiver, filter);
     }
 
     private void post() {
@@ -225,6 +239,8 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         unregisterClients();
 //        IconCache.getInstance(this).flush();
 
+        unregisterReceiver(mUninstallReceiver);
+
         //置更新数据为空
         AppliteSPUtils.put(this, AppliteSPUtils.UPDATE_DATA, "");
         AppliteSPUtils.unregisterChangeListener(this, mConfigListener);
@@ -292,7 +308,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
         }
         if (null != newFragment) {
             if (!newFragment.isAdded()) {
-                ft.add(R.id.container, newFragment, targetService);
+                ft.replace(R.id.container, newFragment, targetService);
             } else {
                 ft.show(newFragment);
             }
@@ -347,7 +363,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     @Override
     public void jumptoPersonal(boolean addToBackstack) {
-        jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT,
+        jumpto(PersonalFragment.class.getName(),
                 PersonalFragment.class.getName(),
                 null, addToBackstack);
     }

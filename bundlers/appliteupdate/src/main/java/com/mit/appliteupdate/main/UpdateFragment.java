@@ -1,10 +1,7 @@
 package com.mit.appliteupdate.main;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.ActionBar;
@@ -89,7 +86,6 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private Animation LoadingAnimation;
     private String mUpdateData;
     private Gson mGson = new Gson();
-    private UninstallReceiver mReceiver;
     private LayoutInflater mInflater;
     private ViewGroup customView;
     private TextView mActionBarIgnore;
@@ -99,6 +95,14 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private TextView mActionBarTitle;
     private IgnoreAdapter mIgnoreAdapter;
     private ImageView mNoUpdateView;
+    private SharedPreferences.OnSharedPreferenceChangeListener mSPListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            LogUtils.d(TAG, "监听到SharedPreferences值改变");
+            if (AppliteSPUtils.UPDATE_DATA.equals(key))
+                resolve((String) AppliteSPUtils.get(mActivity, AppliteSPUtils.UPDATE_DATA, ""));
+        }
+    };
 
     public UpdateFragment() {
         super();
@@ -114,11 +118,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHttpUtils = new HttpUtils();
-        mReceiver = new UninstallReceiver();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-        filter.addDataScheme("package");
-        mActivity.registerReceiver(mReceiver, filter);
+        AppliteSPUtils.registerChangeListener(mActivity, mSPListener);
     }
 
     @Override
@@ -155,7 +155,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     public void onDestroy() {
         LogUtils.d(TAG, "onDestroy");
         super.onDestroy();
-        mActivity.unregisterReceiver(mReceiver);
+        AppliteSPUtils.unregisterChangeListener(mActivity, mSPListener);
     }
 
     @Override
@@ -584,29 +584,4 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         mAdapter.notifyDataSetChanged();
     }
 
-    private class UninstallReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            //接收卸载广播
-            String action = intent.getAction();
-            if (Intent.ACTION_PACKAGE_REMOVED.equals(action)) {
-                int position = -1;
-                String packageName = intent.getDataString();
-                if (null != mUpdateApkList && !mUpdateApkList.isEmpty() && null != mAdapter) {
-                    for (int i = 0; i < mUpdateApkList.size(); i++) {
-                        if (packageName.equals("package:" + mUpdateApkList.get(i).getPackageName())) {
-                            position = i;
-                        }
-                    }
-                    if (position != -1) {
-                        mUpdateApkList.remove(position);
-                        mActivity.runOnUiThread(mNotifyRunnable);
-                        LogUtils.d(TAG, "检测到卸载，mAdapter刷新");
-
-                        AppliteSPUtils.put(mActivity, AppliteSPUtils.UPDATE_DATA, UpdateUtils.listTojson(mUpdateApkList, mSimilarDataList));
-                    }
-                }
-            }
-        }
-    }
 }
