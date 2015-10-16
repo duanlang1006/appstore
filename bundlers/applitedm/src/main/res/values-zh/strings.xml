@@ -19,4 +19,6 @@
     <string name="ensure">确定</string>
     <string name="delete_download_records">是否删除下载记录</string>
     <string name="dm_delete_package">同时删除安装包</string>
+    <string name="delete_btn">删除</string>
+    <string name="share_btn">分享</string>
 </resources>
