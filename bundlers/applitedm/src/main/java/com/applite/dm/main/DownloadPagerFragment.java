@@ -1,7 +1,9 @@
 package com.applite.dm.main;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
@@ -13,6 +15,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,10 +26,12 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.applite.common.PagerSlidingTabStrip;
 import com.applite.dm.R;
@@ -36,6 +41,8 @@ import com.mit.impl.ImplInfo;
 import com.mit.impl.ImplLog;
 import com.osgi.extra.OSGIBaseFragment;
 import com.osgi.extra.OSGIServiceHost;
+
+import org.w3c.dom.Text;
 
 public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnClickListener, ViewPager.OnPageChangeListener {
     final static String TAG = "applite_dm";
@@ -56,6 +63,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     private Button btnDelete = null;
     private Animation animaBtDel;
+    private CheckBox checkBox;
+    private LinearLayout all_checkbox;
+    private AlertDialog dialog;
+    private boolean flagDeleteFile = false;
+    private View layoutCustomDialog = null;
 
     private String OSGI_SERVICE_DM_LIST_FRAGMENT = "osgi.service.dmlist.fragment";
 
@@ -120,6 +132,12 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         animaBtDel = AnimationUtils.loadAnimation(mActivity, R.anim.btn_delete_in);
         btnDelete.setOnClickListener(this);
 
+//        LayoutInflater inflater = getLayoutInflater();
+        layoutCustomDialog = mInflater.inflate(R.layout.custom_dialog, (ViewGroup) rootView.findViewById(R.id.mydialog));
+        checkBox = (CheckBox) layoutCustomDialog.findViewById(R.id.checkbox);
+        all_checkbox = (LinearLayout) layoutCustomDialog.findViewById(R.id.all_checkbox);
+        all_checkbox.setOnClickListener(this);
+
         AppliteSPUtils.registerChangeListener(mActivity, mPagerListener);
         AppliteSPUtils.put(mActivity, COUNT_DOWNLOADING, 0);
         AppliteSPUtils.put(mActivity, COUNT_DOWNLOADED, 0);
@@ -141,6 +159,23 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onResume() {
         super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
+                        pressedCancel();
+                        return true;
+                    } else if (!isHomeExist()) {
+                        ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
     }
 
 
@@ -152,7 +187,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         }
         destoryView = true;
         ImplLog.d(TAG, "onDestroyView," + this + "," + destoryView);
-//        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
     @Override
@@ -213,8 +247,27 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         } else if (item.getItemId() == R.id.dm_action_resume_all) {
             ImplAgent.getInstance(mActivity.getApplicationContext()).resumeAll();
             return true;
+        } else if (android.R.id.home == item.getItemId()) {
+            if (!isHomeExist()) {
+                ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * 判断首页是否存在
+     *
+     * @return
+     */
+    private boolean isHomeExist() {
+        if (null == getFragmentManager().findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT)) {
+            LogUtils.d(TAG, "首页不存在");
+            return false;
+        }
+        LogUtils.d(TAG, "首页存在");
+        return true;
     }
 
 
@@ -223,9 +276,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         super.onHiddenChanged(hidden);
         if (!hidden) {
             initActionBar(mPagerSlidingTabStrip);
-//            ImplAgent.getInstance(mActivity).addObserver(this);
         } else {
-//            ImplAgent.getInstance(mActivity).deleteObserver(this);
         }
     }
 
@@ -241,19 +292,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         } else if (v.getId() == R.id.action_more) {
 
         } else if (v.getId() == R.id.btnDelete) {//删除
-            int totalDelete = ((int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) + (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0));
-            for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
-                operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, i);
-                if (null != operator) {
-                    operator.onClickDelete();
-                }
+            if (null == dialog) {
+                initDialog();
             }
-            operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
-            if (0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) && 0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0)) {
-                hide();
-                operator.resetFlag();
-            }
-            Toast.makeText(mActivity, mActivity.getResources().getString(R.string.delete_message, totalDelete), Toast.LENGTH_SHORT).show();
+            checkBox.setChecked(false);
+            dialog.show();
         } else if (v.getId() == R.id.select_allpick) {
             operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
             if (null != operator) {
@@ -264,11 +307,51 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                 }
             }
         } else if (v.getId() == R.id.select_cancel) {//取消
-            hide();
-            operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
-            operator.resetFlag();
-            Toast.makeText(mActivity.getApplicationContext(), R.string.cancel_operator, Toast.LENGTH_SHORT).show();
+            pressedCancel();
+        } else if (v.getId() == R.id.all_checkbox) {//删除对话框的checkbox
+            checkBox.setChecked(!checkBox.isChecked());
         }
+    }
+
+    private void initDialog() {
+        dialog = new AlertDialog.Builder(mActivity).setView(layoutCustomDialog)
+                .setPositiveButton(getResources().getString(R.string.ensure), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (checkBox.isChecked()) {
+                            flagDeleteFile = true;
+                        } else {
+                            flagDeleteFile = false;
+                        }
+                        int totalDelete = ((int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) + (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0));
+                        for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
+                            operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, i);
+                            if (null != operator) {
+                                operator.onClickDelete(flagDeleteFile);
+                            }
+                        }
+                        operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
+                        if (0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) && 0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0)) {
+                            hide();
+                            operator.resetFlag();
+                        }
+                        Toast.makeText(mActivity, mActivity.getResources().getString(R.string.delete_message, totalDelete), Toast.LENGTH_SHORT).show();
+                    }
+
+                }).setNegativeButton(getResources().getString(R.string.cancel_btn), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+//                        pressedCancel();
+                    }
+                }).create();
+        dialog.setCanceledOnTouchOutside(false);
+    }
+
+    private void pressedCancel() {
+        hide();
+        operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
+        operator.resetFlag();
+        Toast.makeText(mActivity.getApplicationContext(), R.string.cancel_operator, Toast.LENGTH_SHORT).show();
     }
 
     private void show() {
@@ -289,7 +372,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     private void initActionBar(View tabStrip) {
         try {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
-//            actionBar.setBackgroundDrawable(res.getDrawable(R.drawable.action_bar_bg_light));
             actionBar.setDisplayUseLogoEnabled(false);
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -475,7 +557,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     }
 
     public interface IDownloadOperator {
-        void onClickDelete();
+        void onClickDelete(boolean b);
 
         void onClickSeleteAll();
 

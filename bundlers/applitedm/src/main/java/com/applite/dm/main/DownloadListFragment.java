@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -205,7 +204,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         //这里是长按删除
         mListview.setOnItemLongClickListener(this);
         mListview.setOnScrollListener(new PauseOnScrollListener(mBitmapHelper, false, true));
-        if (null != mImplList && mImplList.size() > 0) {
+        if (null != mImplList) {
             mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
                     mImplList, mBitmapHelper, mDownloadListener);
             mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
@@ -298,22 +297,22 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     @Override
     public void onResume() {
         super.onResume();
-        getView().setFocusableInTouchMode(true);
-        getView().requestFocus();
-        getView().setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-                    if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
-                        reSet();
-                        AppliteSPUtils.put(mActivity, FLAG, false);
-                        return true;
-                    }
-                    return false;
-                }
-                return true;
-            }
-        });
+//        getView().setFocusableInTouchMode(true);
+//        getView().requestFocus();
+//        getView().setOnKeyListener(new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+//                    if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
+//                        reSet();
+//                        AppliteSPUtils.put(mActivity, FLAG, false);
+//                        return true;
+//                    }
+//                    return false;
+//                }
+//                return false;
+//            }
+//        });
     }
 
     @Override
@@ -351,7 +350,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             ((TextView) emptyView).setText(emptyText);
         }
     }
-
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -394,7 +392,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         return false;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
@@ -415,14 +412,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
     }
 
-    private void deleteItem() {
+    private void deleteItem(boolean deleteFile) {
         List<Long> tempList = new ArrayList<>();
         for (int i = status.length - 1; i >= 0; i--) {
             if (status[i]) {
                 tempList.add(mImplList.get(i).getId());
             }
         }
-        mImplAgent.remove(tempList);
+        mImplAgent.remove(tempList, deleteFile);
         count(0);
     }
 
@@ -458,8 +455,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     }
 
     @Override
-    public void onClickDelete() {
-        deleteItem();
+    public void onClickDelete(boolean deleteFile) {
+        deleteItem(deleteFile);
         reSet();
     }
 
@@ -508,26 +505,32 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     @Override
     public void update(Observable observable, Object data) {
-//        if (null == mViewPager || null == mViewPager.getAdapter()) {
-//            return;
-//        } else {
-//            mViewPager.getAdapter().notifyDataSetChanged();
-//        }
-        if (null == mListview || null == mAdapter) {
+        if (null == mListview) {
             return;
+        }
+        mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
+        status = new boolean[mImplList.size()];
+        Arrays.fill(status, false);
+        if (null == mAdapter) {
+            mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
+                    mImplList, mBitmapHelper, mDownloadListener);
+            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
+            mListview.setAdapter(mAdapter);
         } else {
-            mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
-            status = new boolean[mImplList.size()];
-            Arrays.fill(status, false);//全部填充为false(chechbox不选中)
             mAdapter.clear();
             for (int i = 0; i < mImplList.size(); i++) {
                 mAdapter.add(mImplList.get(i));
             }
-//            mAdapter.addAll(mImplList);
             mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
             mAdapter.notifyDataSetChanged();
-
         }
+        int tempCount = 0;
+        for (int i = 0; i < status.length; i++) {
+            if (status[i]) {
+                tempCount++;
+            }
+        }
+        count(tempCount);
     }
 
     //ListFragment和适配器传递数据
