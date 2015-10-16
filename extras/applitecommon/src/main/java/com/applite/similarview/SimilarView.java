@@ -2,15 +2,12 @@ package com.applite.similarview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.applite.common.LogUtils;
 import com.applite.common.R;
 
 import java.util.List;
@@ -32,7 +29,6 @@ public class SimilarView<T> extends LinearLayout implements View.OnClickListener
     private List<T> mData;
     private SimilarAdapter.SimilarAPKDetailListener mListener;
     private int mNumColumns;
-//    private List<SimilarBean> mSimilarData;
 
     public SimilarView(Context context) {
         super(context, null);
@@ -65,30 +61,9 @@ public class SimilarView<T> extends LinearLayout implements View.OnClickListener
         mChangeView = (TextView) findViewById(mChangeId);
         mDataNullView = (TextView) findViewById(mDateNullId);
         mGridView = (GridView) findViewById(mGridId);
-//        mTitle = (TextView) findViewById(R.id.similar_title);
-//        mDataNullView = (TextView) findViewById(R.id.similar_data_null);
-//        mChangeView = (TextView) findViewById(R.id.similar_change);
-//        mGridView = (GridView) findViewById(R.id.similar_grid);
         mGridView.setFocusable(false);
         mChangeView.setOnClickListener(this);
     }
-
-//    public void setData(List<SimilarBean> data,SimilarAdapter.SimilarAPKDetailListener listener){
-//        mSimilarData = data;
-//        if (null != mSimilarData && mSimilarData.size() > 0){
-//            mGridView.setVisibility(View.VISIBLE);
-//            if (null == mAdapter){
-//                mAdapter = new SimilarAdapter(getContext());
-//                mAdapter.setData(data,listener);
-//                mGridView.setAdapter(mAdapter);
-//            }else{
-//                mAdapter.setData(data,listener);
-//                mAdapter.notifyDataSetChanged();
-//            }
-//        }else{
-//            mGridView.setVisibility(View.GONE);
-//        }
-//    }
 
     public void setData(List<T> data, SimilarAdapter.SimilarAPKDetailListener<T> listener, int NumColumns) {
         mData = data;
