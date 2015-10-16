@@ -68,7 +68,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private RelativeLayout mRLayout;
     private Button mInstallView;
     private Button mToHomeView;
-    private List<GuideBean> mGuideContents = new ArrayList<GuideBean>();
+    private List<GuideBean> mGuideContents;
     private ImageView mLogoIV;
 
     private View rootView;
@@ -93,7 +93,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private int FAILURE_POST_NUMBER = 0;//请求失败的次数
     private boolean misguide;
     private float mFLayoutWidthScale;
-    private boolean[] ISAPKADD = {true, true, true, true, true, true, true, true, true, true};//当前位置是否可以添加APK
+    private boolean[] ISAPKADD;//当前位置是否可以添加APK
     private int[] mApkShowNumber = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};//当前位置添加了几次APK
     private int MAX_APK_SHOW_NUMBER = 5;//每个位置最多显示的APK个数
     private int mDownloadQueueNumber = 0;
@@ -156,6 +156,8 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                              Bundle savedInstanceState) {
         LogUtils.i(TAG, "onCreateView");
         mInflater = inflater;
+        mGuideContents = new ArrayList<GuideBean>();
+        ISAPKADD = new boolean[]{true, true, true, true, true, true, true, true, true, true};
         try {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.hide();
@@ -231,6 +233,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     public void onDestroyView() {
         super.onDestroyView();
         LogUtils.i(TAG, "onDestroyView");
+        mGuideContents = null;
         mHandler.removeCallbacks(mThread);//关闭延时线程
         implAgent.deleteObserver(this);
     }
@@ -327,6 +330,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      * 首页指导网络请求
      */
     private void post() {
+        LogUtils.i(TAG, "首页指导网络请求");
         RequestParams params = new RequestParams();
         params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.addBodyParameter("packagename", mActivity.getPackageName());
@@ -357,6 +361,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      * @param data
      */
     private void setData(String data) {
+        LogUtils.e(TAG, "setData");
         GuideBean bean = null;
         try {
             JSONObject obj = new JSONObject(data);
@@ -399,6 +404,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      * @param bean
      */
     private void addAppView(final GuideBean bean) {
+        LogUtils.e(TAG, "addAppView");
         ISAPKADD[bean.getmShowPosition()] = false;
         mApkShowNumber[bean.getmShowPosition()] = mApkShowNumber[bean.getmShowPosition()] + 1;
 
