@@ -48,8 +48,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     private SectionsPagerAdapter mViewPagerAdapter;
     private PagerSlidingTabStrip mPagerSlidingTabStrip;
-    //    private boolean destoryView = false;
-    //    private LayoutInflater mInflater;
     private WindowManager.LayoutParams layoutTop;
 
     private WindowManager topviewManager;
@@ -135,7 +133,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onResume() {
         super.onResume();
-        if (1 == (int) AppliteSPUtils.get(mActivity, "position", 0)) {
+        if (1 == (int) AppliteSPUtils.get(mActivity, POSITION, 0)) {
             mViewPager.setCurrentItem(1);
         }
         getView().setFocusableInTouchMode(true);
@@ -160,14 +158,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-//        if (null != topviewManager && destoryView) {
         if (null != topviewManager) {
             topviewManager.removeView(titleBar);
             layoutTop = null;
             topviewManager = null;
-//            destoryView = true;
         }
-//        ImplLog.d(TAG, "onDestroyView," + this + "," + destoryView);
     }
 
     @Override
@@ -209,12 +204,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
             ImplAgent.getInstance(mActivity.getApplicationContext()).resumeAll();
             return true;
         }
-//        else if (android.R.id.home == item.getItemId()) {
-//            if (!isHomeExist()) {
-//                ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
-//                return true;
-//            }
-//        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -237,10 +226,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                 }
                 fgm.popBackStack();
             } else {
-//                if (!isHomeExist()) {
-//                    ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
-//                    return;
-//                }
                 mActivity.finish();
             }
         } else if (v.getId() == R.id.btnDelete) {//删除

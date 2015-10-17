@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -162,7 +163,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                     break;
                 case ImplInfo.STATUS_RUNNING://下载中
                     custompb.setImageResource(R.drawable.download_status_running);
-                    descView.setText("0.00MB/???MB");
                     break;
                 case ImplInfo.STATUS_PAUSED://下载暂停
                     custompb.setImageResource(R.drawable.download_status_pause);
@@ -186,7 +186,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         private void setIcon() {
             Bitmap resBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.file_type_apk);
             String url = implInfo.getIconUrl();
-            if (null != url && !TextUtils.isEmpty(url)&& AppliteUtils.isLoadNetworkBitmap(mContext)) {
+            if (null != url && !TextUtils.isEmpty(url) && AppliteUtils.isLoadNetworkBitmap(mContext)) {
                 int width = (int) mContext.getResources().getDimension(R.dimen.list_item_icon_size);
                 int height = width;
                 mBitmapHelper.configDefaultBitmapMaxSize(width, height);

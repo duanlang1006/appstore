@@ -46,6 +46,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Observable;
@@ -163,6 +164,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
         mImplAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
         mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
+        Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
         mBitmapHelper = new BitmapUtils(mActivity.getApplicationContext());
         AppliteSPUtils.registerChangeListener(mActivity, mListListener);
         count(0);//当前页选中项目数
@@ -172,8 +174,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ImplLog.d(TAG, "onCreateView," + this);
-//        ImplAgent.getInstance(mActivity).addObserver(this);
-//        LayoutInflater mInflater = inflater;
         View view = inflater.inflate(R.layout.fragment_download_list, container, false);
         mListview = (ListView) view.findViewById(android.R.id.list);
         TextView emptyText = (TextView) view.findViewById(R.id.empty);
@@ -196,7 +196,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         if (null != mImplList) {
             mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
                     mImplList, mBitmapHelper, mDownloadListener);
-            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
             mListview.setAdapter(mAdapter);
         }
         return view;
@@ -331,12 +330,22 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     private void deleteItem(boolean deleteFile) {
         List<Long> tempList = new ArrayList<>();
+        for (int i = 0; i < status.length; i++) {
+            Log.i("wanghc", "mImplList[" + i + "]:" + mImplList.get(i).getTitle());
+            Log.i("wanghc", "status" + i + ":" + status[i]);
+        }
+        Log.i("wanghc", "-----------");
         for (int i = status.length - 1; i >= 0; i--) {
+//        for (int i = 0; i < status.length; i++) {
             if (status[i]) {
                 tempList.add(mImplList.get(i).getId());
+                Log.i("wanghc", "mImplList" + mImplList.get(i).getTitle());
             }
         }
-        mImplAgent.remove(tempList, deleteFile);
+        Log.i("wanghc", "-----------");
+        if (!tempList.isEmpty()) {
+            mImplAgent.remove(tempList, deleteFile);
+        }
         count(0);
     }
 
@@ -383,19 +392,18 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             return;
         }
         mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
+        Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
         status = new boolean[mImplList.size()];
         Arrays.fill(status, false);
         if (null == mAdapter) {
             mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
                     mImplList, mBitmapHelper, mDownloadListener);
-            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
             mListview.setAdapter(mAdapter);
         } else {
             mAdapter.clear();
             for (int i = 0; i < mImplList.size(); i++) {
                 mAdapter.add(mImplList.get(i));
             }
-            mAdapter.sort(IMPL_TIMESTAMP_COMPARATOR);
             mAdapter.notifyDataSetChanged();
         }
         int tempCount = 0;

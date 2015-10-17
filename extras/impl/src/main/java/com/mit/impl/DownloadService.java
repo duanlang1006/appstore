@@ -11,7 +11,6 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.applite.sharedpreferences.AppliteSPUtils;
 
 import java.util.List;
 
@@ -121,8 +120,6 @@ public class DownloadService extends Service {
 
 //        @Override
 //        public void onPackageRemoved(ImplInfo implInfo) {
-//            //删除时是否走这个方法
-//            Log.i("wang0hc", "onPackageRemoved");
 //            removeNotification(mContext);
 //        }
 
@@ -143,7 +140,6 @@ public class DownloadService extends Service {
         private void removeNotification(Context mContext) {
             if (0 == calculate(mContext, downloading) && 0 == calculate(mContext, downloaded)) {
                 mNotificationManager.cancel(notifyId);
-                Log.i("wang0hc", "remove");
             }
         }
 

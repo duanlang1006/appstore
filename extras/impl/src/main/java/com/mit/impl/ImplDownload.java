@@ -368,8 +368,8 @@ public class ImplDownload {
     void resumeAll(List<ImplInfo> implList, ImplListener callback) {
         for (ImplInfo implInfo : implList) {
             switch (implInfo.getStatus()) {
-                case ImplInfo.STATUS_PENDING:
-                case ImplInfo.STATUS_RUNNING:
+//                case ImplInfo.STATUS_PENDING:
+//                case ImplInfo.STATUS_RUNNING:
                 case ImplInfo.STATUS_PAUSED:
                 case ImplInfo.STATUS_FAILED:
                     resume(implInfo, callback);
