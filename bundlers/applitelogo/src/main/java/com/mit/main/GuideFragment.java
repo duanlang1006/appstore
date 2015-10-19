@@ -68,7 +68,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private RelativeLayout mRLayout;
     private Button mInstallView;
     private Button mToHomeView;
-    private List<GuideBean> mGuideContents;
+    private List<GuideBean> mGuideContents = new ArrayList<GuideBean>();
     private ImageView mLogoIV;
 
     private View rootView;
@@ -156,7 +156,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                              Bundle savedInstanceState) {
         LogUtils.i(TAG, "onCreateView");
         mInflater = inflater;
-        mGuideContents = new ArrayList<GuideBean>();
         ISAPKADD = new boolean[]{true, true, true, true, true, true, true, true, true, true};
         try {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
@@ -233,7 +232,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     public void onDestroyView() {
         super.onDestroyView();
         LogUtils.i(TAG, "onDestroyView");
-        mGuideContents = null;
+//        mGuideContents = null;
         mHandler.removeCallbacks(mThread);//关闭延时线程
         implAgent.deleteObserver(this);
     }
@@ -241,6 +240,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mGuideContents = null;
         MitMobclickAgent.onEvent(mActivity, whichPage + "_onDestroy");
     }
 
