@@ -1,5 +1,5 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">AppliteCommon</string>
 
-    <string name="progress_button_text_install">Install</string>
+    <string name="progress_button_text_install">安装</string>
 </resources>

@@ -18,12 +18,9 @@ import com.applite.common.Constant;
 import com.applite.common.DefaultValue;
 import com.applite.common.LogUtils;
 import com.applite.sharedpreferences.AppliteSPUtils;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest;
+import com.mit.afinal.FinalHttp;
+import com.mit.afinal.http.AjaxCallBack;
+import com.mit.afinal.http.AjaxParams;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;
 import com.mit.impl.ImplInfo;
@@ -33,9 +30,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 import java.io.File;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,7 +43,8 @@ public class NetworkReceiver extends BroadcastReceiver {
     private Context mContext;
     private ImplAgent implAgent;
     private List<ApkBean> mDataContents = new ArrayList<ApkBean>();
-    private HttpUtils mHttpUtils;
+//    private HttpUtils mHttpUtils;
+    private FinalHttp mFinalHttp;
 
     public NetworkReceiver() {
     }
@@ -113,26 +109,48 @@ public class NetworkReceiver extends BroadcastReceiver {
     }
 
     private void post() {
-        if (null == mHttpUtils)
-            mHttpUtils = new HttpUtils();
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mContext, Constant.META_DATA_MIT));
-        params.addBodyParameter("packagename", mContext.getPackageName());
-        params.addBodyParameter("type", "update_management");
-        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
-        params.addBodyParameter("update_info", AppliteUtils.getAllApkData(mContext));
-        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//        if (null == mHttpUtils)
+//            mHttpUtils = new HttpUtils();
+//        RequestParams params = new RequestParams();
+//        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mContext, Constant.META_DATA_MIT));
+//        params.addBodyParameter("packagename", mContext.getPackageName());
+//        params.addBodyParameter("type", "update_management");
+//        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
+//        params.addBodyParameter("update_info", AppliteUtils.getAllApkData(mContext));
+//        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//            @Override
+//            public void onSuccess(ResponseInfo<String> responseInfo) {
+//                LogUtils.d(TAG, "更新请求成功，resulit：" + responseInfo.result);
+//                resolve(responseInfo.result);
+//            }
+//
+//            @Override
+//            public void onFailure(HttpException e, String s) {
+//                LogUtils.d(TAG, "更新请求失败：" + s);
+//            }
+//
+//        });
+
+        if (null == mFinalHttp)
+            mFinalHttp = new FinalHttp();
+        AjaxParams params = new AjaxParams();
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mContext, Constant.META_DATA_MIT));
+        params.put("packagename", mContext.getPackageName());
+        params.put("type", "update_management");
+        params.put("protocol_version", Constant.PROTOCOL_VERSION);
+        params.put("update_info", AppliteUtils.getAllApkData(mContext));
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<String>() {
             @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
-                LogUtils.d(TAG, "更新请求成功，resulit：" + responseInfo.result);
-                resolve(responseInfo.result);
+            public void onSuccess(String responseInfo) {
+                LogUtils.d(TAG, "更新请求成功：" + responseInfo);
+                resolve(responseInfo);
             }
 
             @Override
-            public void onFailure(HttpException e, String s) {
-                LogUtils.d(TAG, "更新请求失败：" + s);
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
+                LogUtils.d(TAG, "更新请求失败：" + strMsg);
+                super.onFailure(t, errorNo, strMsg);
             }
-
         });
     }
 

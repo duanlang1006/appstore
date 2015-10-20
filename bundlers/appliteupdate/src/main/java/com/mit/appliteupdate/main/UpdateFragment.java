@@ -32,12 +32,9 @@ import com.applite.similarview.SimilarAdapter;
 import com.applite.similarview.SimilarBean;
 import com.applite.similarview.SimilarView;
 import com.google.gson.Gson;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest;
+import com.mit.afinal.FinalHttp;
+import com.mit.afinal.http.AjaxCallBack;
+import com.mit.afinal.http.AjaxParams;
 import com.mit.appliteupdate.R;
 import com.mit.appliteupdate.adapter.IgnoreAdapter;
 import com.mit.appliteupdate.adapter.MySimilarAdapter;
@@ -80,7 +77,8 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private TextView mStatsButton;
     private boolean mPostStats = true;
     private ImplAgent implAgent;
-    private HttpUtils mHttpUtils;
+    //    private HttpUtils mHttpUtils;
+    private FinalHttp mFinalHttp;
     private LinearLayout mLoadLayout;
     private ImageView mLoadView;
     private Animation LoadingAnimation;
@@ -117,7 +115,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mHttpUtils = new HttpUtils();
+//        mHttpUtils = new HttpUtils();
+        if (null == mFinalHttp)
+            mFinalHttp = new FinalHttp();
         AppliteSPUtils.registerChangeListener(mActivity, mSPListener);
     }
 
@@ -345,31 +345,57 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private void post() {
         setLoadLayoutVisibility(View.VISIBLE);
         mPostStats = false;
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.addBodyParameter("packagename", mActivity.getPackageName());
-        params.addBodyParameter("type", "update_management");
-        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
-        params.addBodyParameter("update_info", AppliteUtils.getAllApkData(mActivity));
-        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//        RequestParams params = new RequestParams();
+//        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+//        params.addBodyParameter("packagename", mActivity.getPackageName());
+//        params.addBodyParameter("type", "update_management");
+//        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
+//        params.addBodyParameter("update_info", AppliteUtils.getAllApkData(mActivity));
+//        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//            @Override
+//            public void onSuccess(ResponseInfo<String> responseInfo) {
+//                setLoadLayoutVisibility(View.GONE);
+//                LogUtils.i(TAG, "更新请求成功，resulit：" + responseInfo.result);
+//                AppliteSPUtils.put(mActivity, AppliteSPUtils.UPDATE_DATA, responseInfo.result);
+//                resolve(responseInfo.result);
+//                mPostStats = true;
+//            }
+//
+//            @Override
+//            public void onFailure(HttpException e, String s) {
+//                setLoadLayoutVisibility(View.GONE);
+//                LogUtils.i(TAG, "更新请求失败：" + s);
+//                setStatsLayoutVisibility(View.VISIBLE);
+//                mPostStats = true;
+//            }
+//
+//        });
+
+        AjaxParams params = new AjaxParams();
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.put("packagename", mActivity.getPackageName());
+        params.put("type", "update_management");
+        params.put("protocol_version", Constant.PROTOCOL_VERSION);
+        params.put("update_info", AppliteUtils.getAllApkData(mActivity));
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<String>() {
             @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
+            public void onSuccess(String responseInfo) {
                 setLoadLayoutVisibility(View.GONE);
-                LogUtils.i(TAG, "更新请求成功，resulit：" + responseInfo.result);
-                AppliteSPUtils.put(mActivity, AppliteSPUtils.UPDATE_DATA, responseInfo.result);
-                resolve(responseInfo.result);
+                LogUtils.i(TAG, "更新请求成功，responseInfo：" + responseInfo);
+                AppliteSPUtils.put(mActivity, AppliteSPUtils.UPDATE_DATA, responseInfo);
+                resolve(responseInfo);
                 mPostStats = true;
             }
 
             @Override
-            public void onFailure(HttpException e, String s) {
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
                 setLoadLayoutVisibility(View.GONE);
-                LogUtils.i(TAG, "更新请求失败：" + s);
+                LogUtils.i(TAG, "更新请求失败：" + strMsg);
                 setStatsLayoutVisibility(View.VISIBLE);
                 mPostStats = true;
             }
-
         });
+
     }
 
 
