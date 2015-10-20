@@ -18,7 +18,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -35,12 +34,9 @@ import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
 import com.applite.common.LogUtils;
 import com.google.gson.Gson;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest;
+import com.mit.afinal.FinalHttp;
+import com.mit.afinal.http.AjaxCallBack;
+import com.mit.afinal.http.AjaxParams;
 import com.mit.applite.search.adapter.HotWordAdapter;
 import com.mit.applite.search.R;
 import com.mit.applite.search.adapter.PreloadAdapter;
@@ -59,140 +55,86 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchFragment extends OSGIBaseFragment implements View.OnClickListener, SearchApkAdapter.UpdateInatsllButtonText, HotWordAdapter.ClickHotWordItemPostlistener {
+public class SearchFragment extends OSGIBaseFragment implements View.OnClickListener, HotWordAdapter.ClickHotWordItemPostlistener {
 
     private static final String TAG = "SearchFragment";
-    private ImageView mBackView;
-    private EditText mEtView;
-    private ImageView mSearchView;
-    private LinearLayout mHotWordLL;
-    private ListView mListView;
-    private List<ApkBean> mSearchApkContents = new ArrayList<ApkBean>();
-    private SearchApkAdapter mAdapter;
+    private static final int SHOW_VIEW_HOTWORD = 1;
+    private static final int SHOW_VIEW_PRELOAD = 2;
+    private static final int SHOW_VIEW_SEARCH = 3;
+    private static final int SHOW_VIEW_NONETWORK = 4;
+    private static final int SHOW_VIEW_LOADING_LAYOUT = 5;
+    private static final int SHOW_VIEW_NULL = 6;
+    private static final int SHOW_VIEW_DEFAULT = 0;
+
+    private int SHOW_STATE = SHOW_VIEW_DEFAULT;
+    private static final int CHANG_NUMBER = 1;
+    private static final int SEARCH_DEFAULT_PAGE = 0;
+
+    //View
     private View rootView;
-
-    //热词相关
-    private List<HotWordBean> mHotWordBeans = new ArrayList<HotWordBean>();
-    private int mChangeNumbew = 1;//在线热词换一换点击的次数
-    private GridView mGridView;
-    private HotWordAdapter mGvAdapter;
-    private int mEndPageNumber;//最后一页热词的个数
-    private int mHotWordPage;//热词的页数
-
+    private ViewGroup customView;
+    private ImageView mBackView;
+    private ImageView mSearchView;
     private ImageView mDeleteView;
-    private List<HotWordBean> mShowHotData = new ArrayList<HotWordBean>();
+    private EditText mEtView;
+    private LinearLayout mHotWordLL;
+    private GridView mGridView;
     private TextView mHotChangeView;
-
-    private ListView mPreloadListView;
-    private List<ApkBean> mPreloadData = new ArrayList<ApkBean>();
-    private boolean isShowPreload = true;//是否显示预加载
-    private int mPostPreloadNumber = 0;
-    private PreloadAdapter mPreloadAdapter;
-    private int mSearchPostPage = 0;
-    private boolean isLastRow = false;
+    //    private ListView mPreloadListView;
+    private ListView mListView;
+    private Button mRefresh;
+    private RelativeLayout mNoNetwork;
     private View moreView;//搜索ListView尾部布局
-    private boolean ISTOEND = false;//服务器数据是否到底
-    private String mSearchText = "";//当前搜索的关键字
-    private boolean IS_PULL_UP_LOAD_POST_END = true;//上拉加载是否结束
-    private int mShowHotWordNumber = 9;
-
-    private Button refresh;
-    private RelativeLayout no_network;
-
-//    private int HINT_UPDATE_TIME = 2000;
-//    private int HINT_SHOW_NUMBER = 0;
-
-//    private boolean switch_hint = false;
-
-    private Runnable mNotifyRunnable = new Runnable() {
-        @Override
-        public void run() {
-            mAdapter.notifyDataSetChanged();
-        }
-    };
-
-    private AbsListView.OnScrollListener mOnScrollListener = new AbsListView.OnScrollListener() {
-        @Override
-        public void onScrollStateChanged(AbsListView view, int scrollState) {
-            if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
-                LogUtils.i(TAG, "拉到最底部");
-                if (mListView.getFooterViewsCount() == 0)
-                    mListView.addFooterView(moreView);
-
-                if (ISTOEND) {
-                    mMoreProgressBar.setVisibility(View.GONE);
-                    mMoreText.setText(AppliteUtils.getString(mActivity, R.string.no_data));
-//                    Toast.makeText(mActivity, "木有更多数据！", Toast.LENGTH_SHORT).show();
-//                    mListView.removeFooterView(moreView); //移除底部视图
-                } else {
-                    mMoreProgressBar.setVisibility(View.VISIBLE);
-                    mMoreText.setText(AppliteUtils.getString(mActivity, R.string.loading));
-
-                    //加载更多数据，这里使用异步加载
-                    if (IS_PULL_UP_LOAD_POST_END) {
-                        if (TextUtils.isEmpty(mDetailTag)) {
-                            postSearch(mEtView.getText().toString());
-                        } else {
-                            postDetailTag();
-                        }
-                        IS_PULL_UP_LOAD_POST_END = false;
-                    }
-
-                }
-                LogUtils.i(TAG, "加载更多数据");
-
-                isLastRow = false;
-            }
-        }
-
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                             int totalItemCount) {
-            //判断是否滚到最后一行
-            if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount > 0) {
-                LogUtils.i(TAG, "滚到最后一行");
-                isLastRow = true;
-            }
-        }
-    };
-
-    private String mInfo;
-    private String mKeyword;
-    private String mHintword;
     private TextView mMoreText;
     private ProgressBar mMoreProgressBar;
-    private LayoutInflater mInflater;
-    private String mEtViewText;//页面隐藏时mEtView里面的字
-    private HttpUtils mHttpUtils;
-    private ViewGroup customView;
     private LinearLayout mLoadingLayout;
     private ImageView mLoadingImgView;
     private Animation LoadingAnimation;
-    private String[] mHint;
-    private Gson mGson = new Gson();
 
-    //    private Handler mHandler = new Handler();
-//    private Runnable mRunnable = new Runnable() {
-//
-//        @Override
-//        public void run() {
-//            if (null != mHint && mHint.length != 0) {
-//                mEtView.setHint(mHint[HINT_SHOW_NUMBER]);
-//                mHandler.postDelayed(this, HINT_UPDATE_TIME);
-//                if (HINT_SHOW_NUMBER < mHint.length - 1) {
-//                    HINT_SHOW_NUMBER = HINT_SHOW_NUMBER + 1;
-//                } else {
-//                    HINT_SHOW_NUMBER = 0;
-//                }
-//            }
-//        }
-//    };
+    //Adapter
+    private HotWordAdapter mGvAdapter;
+    //    private PreloadAdapter mPreloadAdapter;
+    private SearchApkAdapter mAdapter;
+
+    //数据
+    private String mSearchData;//搜索返回数据
+    private String mPreloadData;//预加载返回数据
+    private String mHotWordData;//热词返回数据
+    private List<HotWordBean> mShowHotList = new ArrayList<HotWordBean>();
+    private List<HotWordBean> mHotWordList = new ArrayList<HotWordBean>();
+    //    private List<ApkBean> mPreloadBean = new ArrayList<ApkBean>();
+    private List<ApkBean> mSearchList = new ArrayList<ApkBean>();
+    private String mKeyword;
+    private String mHintword;
+
+    //热词相关
+    private int mChangeNumber = CHANG_NUMBER;//在线热词换一换点击的次数
+    private int mEndPageNumber;//最后一页热词的个数
+    private int mHotWordPage;//热词的页数
+    private int mShowHotWordNumber = 9;
+
+    //预加载相关
+//    private int mPostPreloadNumber = 0;
+
+    //搜索相关
+    private int SEARCH_POST_CURRENT_PAGE = SEARCH_DEFAULT_PAGE;
+
+    //    private boolean isShowPreload = true;//是否显示预加载
+    private boolean isToEnd = false;//服务器数据是否到底
+    private boolean isLastRow = false;
+    private boolean isAllowPost = true;//是否允许请求
+    private boolean isShowSearchView = true;//是否显示搜索列表
+    private boolean isClickRefresh = false;//是否点击刷新
+
+    private LayoutInflater mInflater;
+    private FinalHttp mFinalHttp;
+    private Gson mGson = new Gson();
     private String mDetailTag;
+    private String mSearchLastName;//上次请求关键字
 
     public SearchFragment() {
         super();
     }
-
 
     public static Bundle newBundle(String DetailTag, String info, String keyword, String hintword) {
         Bundle b = new Bundle();
@@ -206,15 +148,15 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mHttpUtils = new HttpUtils();
+        mFinalHttp = new FinalHttp();
         Bundle params = getArguments();
         if (null != params) {
             mDetailTag = params.getString("DetailTag");
             LogUtils.i(TAG, "mDetailTag:" + mDetailTag);
-            this.mInfo = params.getString("info");
+            this.mHotWordData = params.getString("info");
             this.mKeyword = params.getString("keyword");
             this.mHintword = params.getString("hintword");
-            LogUtils.i(TAG, "mHintword = " + mHintword + " mKeyword = " + mKeyword + " mInfo = " + mInfo);
+            LogUtils.i(TAG, "mHintword = " + mHintword + " mKeyword = " + mKeyword + " mInfo = " + mHotWordData);
         }
     }
 
@@ -233,46 +175,40 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         initView();
         if (TextUtils.isEmpty(mDetailTag)) {
             initActionBar();
-            if (TextUtils.isEmpty(mInfo))
-                postHotWord();
-            else
-                resolve(mInfo);
-            if (!TextUtils.isEmpty(mKeyword))
-                mEtViewModifyPostSearch(mKeyword, false);
+            if (SHOW_STATE == SHOW_VIEW_DEFAULT) {//第一次进
+                if (null == mKeyword) {//是否直接搜索
+                    if (null == mHotWordData) {//在线热词是否有数据
+                        postHotWord();
+                    } else {
+                        setHotWordData(mHotWordData);
+                    }
+                } else {
+                    postSearch(mKeyword, SEARCH_DEFAULT_PAGE);
+                }
+            } else {
+                setHotWordShowData(mShowHotList);
+                setSearchData(mSearchList);
+                if (SHOW_STATE == SHOW_VIEW_HOTWORD) {
+                    setShowView(SHOW_VIEW_HOTWORD);
+                } else if (SHOW_STATE == SHOW_VIEW_SEARCH) {
+                    setShowView(SHOW_VIEW_SEARCH);
+                }
+            }
         } else {
             initDetailTagActionBar();
-            isHotWordLayoutVisibility(View.GONE);
-            mPreloadListView.setVisibility(View.GONE);
-            mListView.setVisibility(View.GONE);
-            mLoadingLayout.setVisibility(View.VISIBLE);
+            setShowView(SHOW_VIEW_LOADING_LAYOUT);
             postDetailTag();
         }
-        if (!TextUtils.isEmpty(mHintword)) {
-            mEtView.setHint(mHintword);
-        }
         return rootView;
-    }
-
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        if (hidden) {
-            LogUtils.i(TAG, "隐藏搜索页面");
-            mEtViewText = mEtView.getText().toString();
-            closeKeyboard();
-        } else {
-            LogUtils.i(TAG, "显示搜索页面");
-            initActionBar();
-            closeKeyboard();
-            //startConvenientSearch();
-        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         getfocuable();
-        openKeyboard();
+        if (mListView.getVisibility() == View.GONE) {
+            openKeyboard();
+        }
     }
 
     @Override
@@ -305,6 +241,45 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.search_back) {
+            getFragmentManager().popBackStack();
+        } else if (v.getId() == R.id.hot_word_change) {
+            MitMobclickAgent.onEvent(mActivity, "clickHotWordChange");
+            changeHotWord();
+        } else if (v.getId() == R.id.search_delete) {
+            mEtView.setText(null);
+            setShowView(SHOW_VIEW_HOTWORD);
+            getfocuable();
+            openKeyboard();
+            isShowSearchView = false;
+        } else if (v.getId() == R.id.search_search) {
+            MitMobclickAgent.onEvent(mActivity, "clickSearch");
+            getfocuable();
+            closeKeyboard();
+
+            if (TextUtils.isEmpty(mEtView.getText())) {
+                if (TextUtils.isEmpty(mEtView.getHint())) {
+                    Toast.makeText(mActivity, AppliteUtils.getString(mActivity, R.string.srarch_content_no_null), Toast.LENGTH_SHORT).show();
+                } else {
+                    MitMobclickAgent.onEvent(mActivity, "searchHint");
+                    mEtView.setText(mEtView.getHint().toString());
+                    postSearch(mEtView.getHint().toString(), SEARCH_DEFAULT_PAGE);
+                }
+            } else {
+                postSearch(mEtView.getText().toString(), SEARCH_DEFAULT_PAGE);
+            }
+        } else if (v.getId() == R.id.refresh_btn) {
+            if (TextUtils.isEmpty(mDetailTag)) {
+                isClickRefresh = true;
+                postSearch(mEtView.getText().toString(), SEARCH_DEFAULT_PAGE);
+            } else {
+                postDetailTag();
+            }
+        }
     }
 
     /**
@@ -344,12 +319,14 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mDeleteView.setOnClickListener(this);
                 getfocuable();
                 openKeyboard();
+                if (!TextUtils.isEmpty(mHintword)) {
+                    mEtView.setHint(mHintword);
+                }
+                if (null != mKeyword) {
+//                    isShowPreload = false;
+                    mEtView.setText(mKeyword);
+                }
             }
-            if (null != mEtViewText) {
-                isShowPreload = false;
-                mEtView.setText(mEtViewText);
-            }
-
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -383,24 +360,24 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         mListView = (ListView) rootView.findViewById(R.id.search_listview);
         mGridView = (GridView) rootView.findViewById(R.id.search_gv);
         mHotChangeView = (TextView) rootView.findViewById(R.id.hot_word_change);
-        mPreloadListView = (ListView) rootView.findViewById(R.id.search_preload_listview);
+//        mPreloadListView = (ListView) rootView.findViewById(R.id.search_preload_listview);
 
-        refresh = (Button) rootView.findViewById(R.id.refresh_btn);
-        no_network = (RelativeLayout) rootView.findViewById(R.id.no_network);
+        mRefresh = (Button) rootView.findViewById(R.id.refresh_btn);
+        mNoNetwork = (RelativeLayout) rootView.findViewById(R.id.no_network);
 
-        mPreloadListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mPreloadListView.setVisibility(View.GONE);
-                mEtViewModifyPostSearch(mPreloadData.get(position).getName(), false);
-            }
-        });
+//        mPreloadListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                mPreloadListView.setVisibility(View.GONE);
+//                mEtViewModifyPostSearch(mPreloadBean.get(position).getName(), false);
+//            }
+//        });
 
         mListView.setSelected(true);
         mListView.setOnScrollListener(mOnScrollListener);
 
         mHotChangeView.setOnClickListener(this);
-        refresh.setOnClickListener(this);
+        mRefresh.setOnClickListener(this);
     }
 
     private TextWatcher mTextWatcher = new TextWatcher() {
@@ -417,33 +394,124 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         @Override
         public void afterTextChanged(Editable s) {
             LogUtils.i(TAG, "输入文字后的状态");
-            IS_PULL_UP_LOAD_POST_END = true;
-            if (TextUtils.isEmpty(mEtView.getText().toString())) {
-                isHotWordLayoutVisibility(View.VISIBLE);
-                no_network.setVisibility(View.GONE);
-                mListView.setVisibility(View.GONE);
-                mPreloadListView.setVisibility(View.GONE);
-            } else {
-                no_network.setVisibility(View.GONE);
-                isHotWordLayoutVisibility(View.GONE);
-                if (isShowPreload) {//是否postPreload请求
-                    mListView.setVisibility(View.GONE);
-                    mPostPreloadNumber = mPostPreloadNumber + 1;
-                    postPreload(mEtView.getText().toString(), mPostPreloadNumber);
-                }
-            }
-            isShowPreload = true;
+            isShowSearchView = false;
+            isAllowPost = true;
         }
     };
+
+    private AbsListView.OnScrollListener mOnScrollListener = new AbsListView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            if (isLastRow && scrollState == this.SCROLL_STATE_IDLE) {
+                LogUtils.i(TAG, "拉到最底部");
+                if (mListView.getFooterViewsCount() == 0)
+                    mListView.addFooterView(moreView);
+
+                if (isToEnd) {
+                    mMoreProgressBar.setVisibility(View.GONE);
+                    mMoreText.setText(AppliteUtils.getString(mActivity, R.string.no_data));
+                } else {
+                    mMoreProgressBar.setVisibility(View.VISIBLE);
+                    mMoreText.setText(AppliteUtils.getString(mActivity, R.string.loading));
+
+                    //加载更多数据，这里使用异步加载
+                    if (isAllowPost) {
+                        if (TextUtils.isEmpty(mDetailTag)) {
+                            postSearch(mEtView.getText().toString(), SEARCH_POST_CURRENT_PAGE);
+                        } else {
+                            postDetailTag();
+                        }
+                        isAllowPost = false;
+                    }
+
+                }
+                LogUtils.i(TAG, "加载更多数据");
+                isLastRow = false;
+            }
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+            //判断是否滚到最后一行
+            if (firstVisibleItem + visibleItemCount == totalItemCount && totalItemCount > 0) {
+                LogUtils.i(TAG, "滚到最后一行");
+                isLastRow = true;
+            }
+        }
+    };
+
+    /**
+     * 设置控件显示隐藏状态
+     *
+     * @param i
+     */
+    private void setShowView(int i) {
+        switch (i) {
+            case SHOW_VIEW_HOTWORD:
+                setHotWordLayoutVisibility(View.VISIBLE);
+//                mPreloadListView.setVisibility(View.GONE);
+                mListView.setVisibility(View.GONE);
+                mNoNetwork.setVisibility(View.GONE);
+                mLoadingLayout.setVisibility(View.GONE);
+                SHOW_STATE = SHOW_VIEW_HOTWORD;
+                break;
+            case SHOW_VIEW_PRELOAD:
+                setHotWordLayoutVisibility(View.GONE);
+//                mPreloadListView.setVisibility(View.VISIBLE);
+                mListView.setVisibility(View.GONE);
+                mNoNetwork.setVisibility(View.GONE);
+                mLoadingLayout.setVisibility(View.GONE);
+                SHOW_STATE = SHOW_VIEW_PRELOAD;
+                closeKeyboard();
+                break;
+            case SHOW_VIEW_SEARCH:
+                setHotWordLayoutVisibility(View.GONE);
+//                mPreloadListView.setVisibility(View.GONE);
+                if (isShowSearchView)
+                    mListView.setVisibility(View.VISIBLE);
+                mNoNetwork.setVisibility(View.GONE);
+                mLoadingLayout.setVisibility(View.GONE);
+                SHOW_STATE = SHOW_VIEW_SEARCH;
+                closeKeyboard();
+                break;
+            case SHOW_VIEW_NONETWORK:
+                setHotWordLayoutVisibility(View.GONE);
+//                mPreloadListView.setVisibility(View.VISIBLE);
+                mListView.setVisibility(View.GONE);
+                mNoNetwork.setVisibility(View.VISIBLE);
+                mLoadingLayout.setVisibility(View.GONE);
+                SHOW_STATE = SHOW_VIEW_PRELOAD;
+                closeKeyboard();
+                break;
+            case SHOW_VIEW_LOADING_LAYOUT:
+                setHotWordLayoutVisibility(View.GONE);
+//                mPreloadListView.setVisibility(View.VISIBLE);
+                mListView.setVisibility(View.GONE);
+                mNoNetwork.setVisibility(View.GONE);
+                mLoadingLayout.setVisibility(View.VISIBLE);
+                SHOW_STATE = SHOW_VIEW_PRELOAD;
+                closeKeyboard();
+                break;
+            case SHOW_VIEW_NULL:
+                setHotWordLayoutVisibility(View.GONE);
+//                mPreloadListView.setVisibility(View.GONE);
+                mListView.setVisibility(View.GONE);
+                mNoNetwork.setVisibility(View.GONE);
+                mLoadingLayout.setVisibility(View.GONE);
+//                SHOW_STATE = SHOW_VIEW_NULL;
+                closeKeyboard();
+                break;
+        }
+    }
 
     /**
      * 判断在线热词Layout是否隐藏
      *
      * @param i
      */
-    private void isHotWordLayoutVisibility(int i) {
+    private void setHotWordLayoutVisibility(int i) {
         if (i == View.VISIBLE) {
-            if (!mHotWordBeans.isEmpty()) {
+            if (!mHotWordList.isEmpty()) {
                 mHotWordLL.setVisibility(View.VISIBLE);
             } else {
                 mHotWordLL.setVisibility(View.GONE);
@@ -452,62 +520,6 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         } else if (i == View.GONE) {
             mHotWordLL.setVisibility(View.GONE);
         } else if (i == View.INVISIBLE) {
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.search_back) {
-            getFragmentManager().popBackStack();
-        } else if (v.getId() == R.id.search_delete) {
-            mPreloadListView.setVisibility(View.GONE);
-            mListView.setVisibility(View.GONE);
-            mLoadingLayout.setVisibility(View.GONE);
-            no_network.setVisibility(View.GONE);
-            isHotWordLayoutVisibility(View.VISIBLE);
-            mEtView.setText(null);
-            getfocuable();
-            openKeyboard();
-//            stopConvenientSearch();
-        } else if (v.getId() == R.id.search_search) {
-            MitMobclickAgent.onEvent(mActivity, "clickSearch");
-            getfocuable();
-            closeKeyboard();
-//            stopConvenientSearch();
-            mPreloadListView.setVisibility(View.GONE);
-            if (TextUtils.isEmpty(mEtView.getText())) {
-                if (TextUtils.isEmpty(mEtView.getHint())) {
-                    Toast.makeText(mActivity, AppliteUtils.getString(mActivity, R.string.srarch_content_no_null),
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    MitMobclickAgent.onEvent(mActivity, "searchHint");
-                    mEtViewModifyPostSearch(mEtView.getHint().toString(), false);
-                }
-            } else {
-                mListView.setSelection(0);
-                if (mSearchText.equals(mEtView.getText().toString())) {
-                    mListView.setVisibility(View.VISIBLE);
-                } else {
-                    mEtViewModifyPostSearch(null, true);
-                }
-            }
-        } else if (v.getId() == R.id.hot_word_change) {
-            MitMobclickAgent.onEvent(mActivity, "clickHotWordChange");
-//            losefocuable();
-//            closeKeyboard();
-            changeHotWord();
-//            startConvenientSearch();
-        } else if (v.getId() == R.id.refresh_btn) {
-            no_network.setVisibility(View.GONE);
-            if (TextUtils.isEmpty(mDetailTag)) {
-                postSearch(mEtView.getText().toString());
-            } else {
-                postDetailTag();
-            }
-        } else if (v.getId() == R.id.search_et) {
-            getfocuable();
-            openKeyboard();
-//            stopConvenientSearch();
         }
     }
 
@@ -524,24 +536,11 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     private void changeHotWord() {
-        if (mChangeNumbew >= mHotWordPage)
-            mChangeNumbew = 0;
-        mShowHotData.clear();
-        setHotWordShowData(mChangeNumbew);
-        mChangeNumbew = mChangeNumbew + 1;
+        if (mChangeNumber >= mHotWordPage)
+            mChangeNumber = 0;
+        setHotWordShowData(mChangeNumber);
+        mChangeNumber = mChangeNumber + 1;
     }
-
-//    private void stopConvenientSearch() {
-//        switch_hint = false;
-////        mHandler.removeCallbacks(mRunnable);
-//    }
-
-//    private void startConvenientSearch() {
-//        if (!switch_hint) {
-//            switch_hint = true;
-//            mHandler.postDelayed(mRunnable, 0);
-//        }
-//    }
 
     private void openKeyboard() {
         if (TextUtils.isEmpty(mDetailTag))
@@ -554,230 +553,28 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     /**
-     * 搜索框的字 改变后的搜索请求
-     */
-    private void mEtViewModifyPostSearch(String searchName, boolean showPreload) {
-        isShowPreload = showPreload;
-        if (!showPreload) {
-            closeKeyboard();
-            LogUtils.i(TAG, "searchName = " + searchName);
-            mEtView.setText(searchName);
-            if (searchName.length() < 21) {
-                mEtView.setSelection(searchName.length());
-            } else {
-                mEtView.setSelection(20);
-            }
-        }
-        if (IS_PULL_UP_LOAD_POST_END) {
-            ISTOEND = false;
-            IS_PULL_UP_LOAD_POST_END = false;
-            mSearchPostPage = 0;
-            postSearch(mEtView.getText().toString());
-        }
-    }
-
-    /**
-     * 搜索网络请求
-     *
-     * @param name
-     */
-    public void postSearch(String name) {
-        isHotWordLayoutVisibility(View.GONE);
-        if (mSearchPostPage == 0)
-            mLoadingLayout.setVisibility(View.VISIBLE);
-
-        if (SearchUtils.isLetter(name)) {
-            name = AppliteUtils.SplitLetter(name);
-        }
-        LogUtils.i(TAG, "name:" + name);
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.addBodyParameter("packagename", mActivity.getPackageName());
-        params.addBodyParameter("type", "search");
-        params.addBodyParameter("key", name);
-        params.addBodyParameter("key_type", "search_name");
-        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
-        params.addBodyParameter("page", mSearchPostPage + "");
-        final String finalName = name;
-        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
-            @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
-                mLoadingLayout.setVisibility(View.GONE);
-                LogUtils.i(TAG, "搜索网络请求成功，result:" + responseInfo.result);
-                if (!TextUtils.isEmpty(mEtView.getText().toString())) {
-                    setSearchData(responseInfo.result);
-
-                    mSearchText = finalName;
-                    IS_PULL_UP_LOAD_POST_END = true;//请求结束后，才可以继续请求
-                    mSearchPostPage = mSearchPostPage + 1;//请求成功后，请求的页数加1
-                }
-            }
-
-            @Override
-            public void onFailure(HttpException e, String s) {
-                mLoadingLayout.setVisibility(View.GONE);
-                if (mListView.getVisibility() == View.GONE && mPreloadListView.getVisibility() == View.GONE && mHotWordLL.getVisibility() == View.GONE)
-                    no_network.setVisibility(View.VISIBLE);
-                IS_PULL_UP_LOAD_POST_END = true;
-                mListView.removeFooterView(moreView);
-                if (null != mAdapter)
-                    mActivity.runOnUiThread(mNotifyRunnable);
-
-                Toast.makeText(mActivity, AppliteUtils.getString(mActivity, R.string.post_failure),
-                        Toast.LENGTH_SHORT).show();
-                LogUtils.e(TAG, "搜索网络请求失败:" + s);
-            }
-        });
-    }
-
-    /**
-     * 显示搜索得到的数据
-     *
-     * @param data
-     */
-    private void setSearchData(String data) {
-        if (!mSearchApkContents.isEmpty() && mSearchPostPage == 0) {
-            mSearchApkContents.clear();
-            if (null != mAdapter) {
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-        try {
-            SearchBean searchBean = mGson.fromJson(data, SearchBean.class);
-            if (null != searchBean) {
-                int app_key = searchBean.getApp_key();
-                ISTOEND = searchBean.getIstoend();
-                List<ApkBean> contents = searchBean.getSearch_info();
-                if (null != contents) {
-                    mSearchApkContents.addAll(contents);
-                }
-
-                mPreloadListView.setVisibility(View.GONE);
-                isHotWordLayoutVisibility(View.GONE);
-                mListView.setVisibility(View.VISIBLE);
-                if (mListView.getFooterViewsCount() == 0)
-                    mListView.addFooterView(moreView);
-
-                if (null == mAdapter) {
-                    mAdapter = new SearchApkAdapter(mActivity, mSearchApkContents, this);
-                    mListView.setAdapter(mAdapter);
-                } else {
-                    mAdapter.notifyDataSetChanged();
-                }
-                mListView.removeFooterView(moreView);
-
-                if (mSearchPostPage == 0) {
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mListView.setSelection(0);
-                        }
-                    }, 200);//ListView设置显示条目位置，需要延时一会。因为ListView没有显示之前，设置不了显示位置
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogUtils.e(TAG, "搜索JSON解析失败");
-        }
-    }
-
-    /**
-     * 预加载网络请求
-     *
-     * @param name
-     * @param number 点击搜索随便填
-     */
-    public void postPreload(String name, final int number) {
-        if (SearchUtils.isLetter(name)) {
-            name = AppliteUtils.SplitLetter(name);
-        }
-        LogUtils.i(TAG, "name:" + name);
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.addBodyParameter("packagename", mActivity.getPackageName());
-        params.addBodyParameter("type", "search");
-        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
-        params.addBodyParameter("key", name);
-        params.addBodyParameter("key_type", "search_name");
-        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
-            @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
-                LogUtils.i(TAG, "预加载网络请求成功，result:" + responseInfo.result);
-                if (number == mPostPreloadNumber)
-                    setPreloadData(responseInfo.result);
-            }
-
-            @Override
-            public void onFailure(HttpException e, String s) {
-                LogUtils.e(TAG, "预加载网络请求失败:" + s);
-            }
-        });
-    }
-
-    /**
-     * 显示预加载的数据
-     *
-     * @param result
-     */
-    private void setPreloadData(String result) {
-        if (!mPreloadData.isEmpty()) {
-            mPreloadData.clear();
-            if (null != mPreloadAdapter) {
-                mPreloadAdapter.notifyDataSetChanged();
-            }
-        }
-        try {
-            SearchBean searchBean = mGson.fromJson(result, SearchBean.class);
-            if (null != searchBean) {
-                int app_key = searchBean.getApp_key();
-                List<ApkBean> contents = searchBean.getSearch_info();
-                if (null != contents) {
-                    mPreloadData.addAll(contents);
-                }
-
-                if (!TextUtils.isEmpty(mEtView.getText().toString())) {
-                    isHotWordLayoutVisibility(View.GONE);
-                    if (!mEtView.getText().toString().equals(mSearchText)) {
-                        mListView.setVisibility(View.GONE);
-                        mPreloadListView.setVisibility(View.VISIBLE);
-                    }
-
-                    int SHOW_ICON_NUMBER = 1 + (int) (Math.random() * 3);
-                    if (null == mPreloadAdapter) {
-                        mPreloadAdapter = new PreloadAdapter(mActivity, mPreloadData, SHOW_ICON_NUMBER);
-                        mPreloadListView.setAdapter(mPreloadAdapter);
-                    } else {
-                        mPreloadAdapter.notifyDataSetChanged();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogUtils.e(TAG, "搜索预加载JSON解析失败");
-        }
-    }
-
-    /**
      * 在线热词网络请求
      */
     private void postHotWord() {
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.addBodyParameter("packagename", mActivity.getPackageName());
-        params.addBodyParameter("type", "hot_word");
-        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
-        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+        AjaxParams params = new AjaxParams();
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.put("packagename", mActivity.getPackageName());
+        params.put("type", "hot_word");
+        params.put("protocol_version", Constant.PROTOCOL_VERSION);
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<String>() {
             @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
-                LogUtils.i(TAG, "在线热词请求成功，reuslt:" + responseInfo.result);
-                if (mHotWordBeans.isEmpty())
-                    resolve(responseInfo.result);
+            public void onSuccess(String s) {
+                LogUtils.i(TAG, "在线热词请求成功，reuslt:" + s);
+                mHotWordData = s;
+                setHotWordData(s);
             }
 
             @Override
-            public void onFailure(HttpException e, String s) {
-                LogUtils.e(TAG, "在线热词请求失败:" + s);
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
+                super.onFailure(t, errorNo, strMsg);
+                LogUtils.e(TAG, "在线热词请求失败:" + strMsg);
             }
+
         });
     }
 
@@ -786,24 +583,13 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      *
      * @param data
      */
-    private void resolve(String data) {
+    private void setHotWordData(String data) {
+        mHotWordList.clear();
         HotWordBean bean = null;
         try {
             JSONObject obj = new JSONObject(data);
             int app_key = obj.getInt("app_key");
             String hotword_info = obj.getString("hotword_info");
-            String hint_info = obj.getString("searchscroll_info");
-            LogUtils.i(TAG, "Hint:" + hint_info);
-
-            JSONArray hint_json = new JSONArray(hint_info);
-            mHint = new String[hint_json.length()];
-            for (int i = 0; i < hint_json.length(); i++) {
-                JSONObject hint_obj = new JSONObject(hint_json.get(i).toString());
-                String hint = hint_obj.getString("searchscroll");
-                mHint[i] = hint;
-            }
-            //mHandler.postDelayed(mRunnable, 0);
-            //mEtView.setHint(mHint[0]);
 
             JSONArray hotword_json = new JSONArray(hotword_info);
             for (int i = 0; i < hotword_json.length(); i++) {
@@ -817,16 +603,16 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 
                 bean.setmStep(object.getInt("step"));
                 bean.setmDataType(object.getString("s_datatype"));
-                mHotWordBeans.add(bean);
+                mHotWordList.add(bean);
             }
-            mEndPageNumber = mHotWordBeans.size() % mShowHotWordNumber;
+            mEndPageNumber = mHotWordList.size() % mShowHotWordNumber;
             if (mEndPageNumber == 0) {
-                mHotWordPage = mHotWordBeans.size() / mShowHotWordNumber;
+                mHotWordPage = mHotWordList.size() / mShowHotWordNumber;
             } else {
-                mHotWordPage = mHotWordBeans.size() / mShowHotWordNumber + 1;
+                mHotWordPage = mHotWordList.size() / mShowHotWordNumber + 1;
             }
             setHotWordShowData(0);
-            LogUtils.i(TAG, "在线热词返回的数量=" + mHotWordBeans.size());
+            LogUtils.i(TAG, "在线热词返回的数量:" + mHotWordList.size());
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.e(TAG, "在线热词JSON解析失败");
@@ -837,72 +623,179 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      * 设置在线热词显示的数据
      */
     private void setHotWordShowData(int position) {
-        if (mHotWordBeans.size() > mShowHotWordNumber) {
+        mShowHotList.clear();
+        if (mHotWordList.size() > mShowHotWordNumber) {
             if (position == mHotWordPage - 1 && mEndPageNumber != 0) {
-                for (int i = mHotWordBeans.size() - mShowHotWordNumber; i < mHotWordBeans.size(); i++) {
-                    mShowHotData.add(mHotWordBeans.get(i));
+                for (int i = mHotWordList.size() - mShowHotWordNumber; i < mHotWordList.size(); i++) {
+                    mShowHotList.add(mHotWordList.get(i));
                 }
             } else {
                 for (int i = 0 + mShowHotWordNumber * position; i < mShowHotWordNumber + mShowHotWordNumber * position; i++) {
-                    mShowHotData.add(mHotWordBeans.get(i));
+                    mShowHotList.add(mHotWordList.get(i));
                 }
             }
         } else {
-            for (int i = 0; i < mHotWordBeans.size(); i++) {
-                mShowHotData.add(mHotWordBeans.get(i));
+            for (int i = 0; i < mHotWordList.size(); i++) {
+                mShowHotList.add(mHotWordList.get(i));
             }
         }
-        if (null == mGvAdapter) {
-            mGvAdapter = new HotWordAdapter(mActivity, mShowHotData, this);
-            mGridView.setAdapter(mGvAdapter);
-        } else {
-            mGvAdapter.notifyDataSetChanged();
-        }
-
-        mPreloadListView.setVisibility(View.GONE);
-        mListView.setVisibility(View.GONE);
-        if (TextUtils.isEmpty(mEtView.getText().toString()))
-            isHotWordLayoutVisibility(View.VISIBLE);
+        if (null == mGvAdapter)
+            mGvAdapter = new HotWordAdapter(mActivity, mShowHotList, this);
+        mGridView.setAdapter(mGvAdapter);
+        setShowView(SHOW_VIEW_HOTWORD);
     }
 
-    @Override
-    public void updateText() {
-        mActivity.runOnUiThread(mNotifyRunnable);
+    private void setHotWordShowData(List<HotWordBean> list) {
+        if (null == mGvAdapter)
+            mGvAdapter = new HotWordAdapter(mActivity, list, this);
+        mGridView.setAdapter(mGvAdapter);
+    }
+
+    /**
+     * 搜索网络请求
+     *
+     * @param name
+     */
+    public void postSearch(String name, final int page) {
+        isShowSearchView = true;
+        if (page == 0) {
+            setShowView(SHOW_VIEW_LOADING_LAYOUT);
+            if (name.equals(mSearchLastName) && !isClickRefresh) {
+                mListView.setSelection(0);
+                setShowView(SHOW_VIEW_SEARCH);
+                return;
+            } else {
+                SEARCH_POST_CURRENT_PAGE = 0;
+            }
+        }
+        isClickRefresh = false;
+        mSearchLastName = name;
+
+        if (SearchUtils.isLetter(name)) {
+            name = AppliteUtils.SplitLetter(name);
+        }
+        LogUtils.i(TAG, "name:" + name);
+        AjaxParams params = new AjaxParams();
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.put("packagename", mActivity.getPackageName());
+        params.put("type", "search");
+        params.put("key", name);
+        params.put("key_type", "search_name");
+        params.put("protocol_version", Constant.PROTOCOL_VERSION);
+        params.put("page", page + "");
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<String>() {
+            @Override
+            public void onSuccess(String s) {
+                LogUtils.i(TAG, "搜索网络请求成功，result:" + s);
+                isAllowPost = true;
+                mLoadingLayout.setVisibility(View.GONE);
+                SEARCH_POST_CURRENT_PAGE = page + 1;//请求成功后，请求的页数加1
+
+                if (mEtView.getText().toString().equals(mSearchLastName))
+                    setSearchData(s, page);
+            }
+
+            @Override
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
+                super.onFailure(t, errorNo, strMsg);
+                LogUtils.e(TAG, "搜索网络请求失败:" + strMsg);
+                isAllowPost = true;
+                mLoadingLayout.setVisibility(View.GONE);
+                mListView.removeFooterView(moreView);
+
+                if (mListView.getVisibility() == View.GONE && /*mPreloadListView.getVisibility() == View.GONE &&*/ mHotWordLL.getVisibility() == View.GONE)
+                    setShowView(SHOW_VIEW_NONETWORK);
+
+                Toast.makeText(mActivity, AppliteUtils.getString(mActivity, R.string.post_failure), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * 显示搜索得到的数据
+     *
+     * @param data
+     */
+    private void setSearchData(String data, int page) {
+        if (page == 0)
+            mSearchList.clear();
+        try {
+            SearchBean searchBean = mGson.fromJson(data, SearchBean.class);
+            if (null != searchBean) {
+                int app_key = searchBean.getApp_key();
+                isToEnd = searchBean.getIstoend();
+                List<ApkBean> contents = searchBean.getSearch_info();
+                if (null != contents) {
+                    mSearchList.addAll(contents);
+                }
+                if (null == mAdapter) {
+                    mAdapter = new SearchApkAdapter(mActivity, mSearchList);
+                    mListView.setAdapter(mAdapter);
+                } else {
+                    mAdapter.notifyDataSetChanged();
+                }
+                if (page == 0) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mListView.setSelection(0);
+                        }
+                    }, 200);//ListView设置显示条目位置，需要延时一会。因为ListView没有显示之前，设置不了显示位置
+                }
+                setShowView(SHOW_VIEW_SEARCH);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtils.e(TAG, "搜索JSON解析失败");
+        }
+    }
+
+    private void setSearchData(List<ApkBean> SearchList) {
+        if (null == mAdapter)
+            mAdapter = new SearchApkAdapter(mActivity, SearchList);
+        mListView.setAdapter(mAdapter);
     }
 
     @Override
     public void clickItem(String name) {
-        mEtViewModifyPostSearch(name, false);
+        mEtView.setText(name);
+        postSearch(name, SEARCH_DEFAULT_PAGE);
     }
 
     /**
      * 详情标签请求
      */
     private void postDetailTag() {
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.addBodyParameter("packagename", mActivity.getPackageName());
-        params.addBodyParameter("type", "search");
-        params.addBodyParameter("key_type", "search_tag");
-        params.addBodyParameter("key", mDetailTag);
-        params.addBodyParameter("page", mSearchPostPage + "");
-        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
-        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+        if (SEARCH_POST_CURRENT_PAGE == 0) {
+            setShowView(SHOW_VIEW_LOADING_LAYOUT);
+        }
+        AjaxParams params = new AjaxParams();
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.put("packagename", mActivity.getPackageName());
+        params.put("type", "search");
+        params.put("key_type", "search_tag");
+        params.put("key", mDetailTag);
+        params.put("page", SEARCH_POST_CURRENT_PAGE + "");
+        params.put("protocol_version", Constant.PROTOCOL_VERSION);
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<String>() {
             @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
-                LogUtils.i(TAG, "详情点击标签请求成功，reuslt:" + responseInfo.result);
-                resolveDetailTagData(responseInfo.result);
-                IS_PULL_UP_LOAD_POST_END = true;//请求结束后，才可以继续请求
-                mSearchPostPage = mSearchPostPage + 1;//请求成功后，请求的页数加1
+            public void onSuccess(String s) {
+                LogUtils.i(TAG, "详情点击标签请求成功，reuslt:" + s);
+                isAllowPost = true;//请求结束后，才可以继续请求
+
+                resolveDetailTagData(s);
+                SEARCH_POST_CURRENT_PAGE = SEARCH_POST_CURRENT_PAGE + 1;//请求成功后，请求的页数加1
             }
 
             @Override
-            public void onFailure(HttpException e, String s) {
-                LogUtils.e(TAG, "详情点击标签请求请求失败:" + s);
-                IS_PULL_UP_LOAD_POST_END = true;//请求结束后，才可以继续请求
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
+                super.onFailure(t, errorNo, strMsg);
+                LogUtils.e(TAG, "详情点击标签请求请求失败:" + strMsg);
+                isAllowPost = true;//请求结束后，才可以继续请求
                 mLoadingLayout.setVisibility(View.GONE);
+
                 if (mListView.getVisibility() == View.GONE)
-                    no_network.setVisibility(View.VISIBLE);
+                    setShowView(SHOW_VIEW_NONETWORK);
             }
         });
     }
@@ -917,20 +810,19 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             SearchBean searchBean = mGson.fromJson(data, SearchBean.class);
             if (null != searchBean) {
                 int app_key = searchBean.getApp_key();
-                ISTOEND = searchBean.getIstoend();
+                isToEnd = searchBean.getIstoend();
                 List<ApkBean> contents = searchBean.getSearch_info();
                 if (null != contents) {
-                    mSearchApkContents.addAll(contents);
+                    mSearchList.addAll(contents);
                 }
 
                 if (null == mAdapter) {
-                    mAdapter = new SearchApkAdapter(mActivity, mSearchApkContents, this);
+                    mAdapter = new SearchApkAdapter(mActivity, mSearchList);
                     mListView.setAdapter(mAdapter);
                 } else {
                     mAdapter.notifyDataSetChanged();
                 }
-                mLoadingLayout.setVisibility(View.GONE);
-                mListView.setVisibility(View.VISIBLE);
+                setShowView(SHOW_VIEW_SEARCH);
             }
         } catch (Exception e) {
             e.printStackTrace();

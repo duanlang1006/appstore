@@ -117,6 +117,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     private int points;
     private boolean luckyflag = false;
+    private String mPostReturnData;
 
     public static Bundle newBundle(String packageName, String name, String imgUrl, int versionCode, String boxlabelvalue) {
         Bundle b = new Bundle();
@@ -167,12 +168,14 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         this.container = container;
-
         rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         initView();
         setProgressButtonState();
-        if (!TextUtils.isEmpty(mPackageName))
+        if (null == mPostReturnData) {
             post(mPackageName);
+        } else {
+            setData(mPostReturnData);
+        }
         return rootView;
     }
 
@@ -416,6 +419,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
                 LogUtils.i(TAG, "应用详情网络请求成功:" + responseInfo.result);
+                mPostReturnData = responseInfo.result;
                 setData(responseInfo.result);
             }
 
@@ -442,15 +446,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             int app_key = detailData.getApp_key();
             mSimilarData = detailData.getSimilar_info();
             LogUtils.i(TAG, "应用详情similar_info:" + mSimilarData);
-            if (null == mSimilarAdapter) {
+            if (null == mSimilarAdapter)
                 mSimilarAdapter = new MySimilarAdapter(mActivity);
-                mSimilarAdapter.setData(mSimilarData, this, mSimilarView.getNumColumns());
-                mSimilarView.setAdapter(mSimilarAdapter);
-            } else {
-                mSimilarAdapter.setData(mSimilarData, this, mSimilarView.getNumColumns());
-                mSimilarAdapter.notifyDataSetChanged();
-            }
-//            mSimilarView.setVisibility(View.VISIBLE);
+            mSimilarAdapter.setData(mSimilarData, this, 4);
+            mSimilarView.setAdapter(mSimilarAdapter);
 
             mApkDatas = detailData.getDetail_info();
             LogUtils.i(TAG, "应用详情detail_info:" + mApkDatas);
