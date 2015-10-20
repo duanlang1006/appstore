@@ -24,8 +24,7 @@
     <string name="umeng_fb_send_fail">发送失败</string>
     <string name="umeng_fb_sending">正在发送&#8230;</string>
     <string name="umeng_fb_contact_key_qq">qq</string>
-    <string name="umeng_fb_contact_key_email">email</string>
-    <string name="umeng_fb_contact_key_phone">phone</string>
+    <string name="umeng_fb_contact_key_phone">手机</string>
     <string name="umeng_fb_contact_key_other">plain</string>
     <!-- 5.0.1 -->
     <string name="umeng_fb_press_speech">按住说话</string>

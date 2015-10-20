@@ -144,7 +144,7 @@ public class ImplDownload {
                 implInfo.setCurrent(0);
                 implInfo.setTotal(0);
                 HttpUtils http = new HttpUtils();
-                http.configRequestThreadPoolSize(maxDownloadThread);
+//                http.configRequestThreadPoolSize(ImplConfig.getDownloadThreadNum(mContext));
                 DownloadCallback downloadCallback = new DownloadCallback<File>(implInfo, callback);
                 HttpHandler<File> handler = http.download(implInfo.getDownloadUrl(), fullname, true, true, downloadCallback);
                 implInfo.setHandler(handler);
@@ -333,7 +333,7 @@ public class ImplDownload {
         }
 
         HttpUtils http = new HttpUtils();
-        http.configRequestThreadPoolSize(maxDownloadThread);
+//        http.configRequestThreadPoolSize(ImplConfig.getDownloadThreadNum(mContext));
         DownloadCallback<File> downloadCallback = new DownloadCallback<File>(implInfo, callback);
         if ((implInfo.getDownloadUrl() != null) && (implInfo.getFileSavePath() != null)) {
             HttpHandler<File> handler = http.download(

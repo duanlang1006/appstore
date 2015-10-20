@@ -42,6 +42,9 @@
     <string name="about">关于</string>
     <string name="help">帮助</string>
 
+    <string name="dialog_dataclean_title">清除緩存</string>
+    <string name="dialog_dataclean_content">確定要刪除所有數據嗎？</string>
+
     <string name="testimonial_0">恭喜您抽中 10 积分</string>
     <string name="testimonial_1">恭喜您抽中 50 积分</string>
     <string name="testimonial_2">恭喜您抽中 100 积分</string>
@@ -78,5 +81,22 @@
     <string name="select_1_limit">大于1MB的文件，等待有WLAN时下载</string>
     <string name="select_less_1_limit">大于512KB的文件，等待有WLAN时下载</string>
     <string name="select_all_limit">使用数据网络下载任何大小文件都等待WLAN网络</string>
+    <string name="dialog_feedback_hint">请输入您的意见和建议</string>
+    <string name="dialog_feedback_title">我们很重视您的意见和建议</string>
+    <string name="dialog_contact_hint">手机/QQ邮箱</string>
+    <string name="tag_rb1">下载失败</string>
+    <string name="tag_rb2">找不到应用</string>
+    <string name="tag_rb3">操作不流畅</string>
+    <string name="tag_rb5">闪退或重启</string>
+    <string name="tag_rb4">界面不好</string>
+    <string name="tag_rb6">账号有问题</string>
+    <string name="tv_1">被采纳的意见会获得</string>
+    <string name="tv_2">小奖品</string>
+    <string name="tv_3">，记得留下联系方式哦～</string>
+    <string name="umeng_fb_questions_anwser">A:</string>
+    <string name="umeng_fb_questions_question">Q:</string>
+    <string name="zero_flow_update_detail">零流量下载</string>
+    <string name="update_remind">更新提醒</string>
+    <string name="umeng_fb_contact_key_email">邮件</string>
 
 </resources>

@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     my_app_nam
-    <string name="my_app_name">Applite</string>
-    <string name="app_name">ApplitHome</string>
-    <string name="personal">Personal</string>
+    <string name="my_app_name">应用商店</string>
+    <string name="app_name">首页</string>
+    <string name="personal">个人中心</string>
 
-    <string name="load_more">loading...</string>
-    <string name="manager_catergory_title">manager</string>
-    <string name="download_manager">Download manager</string>
-    <string name="upgrade_manager">Upgrade manager</string>
-    <string name="logo_manager">Logo manager</string>
-    <string name="zero_flow_update">Zero flow update</string>
-    <string name="setting">Setting</string>
-    <string name="lucky_draw">Lucky draw</string>
-    <string name="load_end">ending...</string>
+    <string name="load_more">加载数据中···</string>
+    <string name="manager_catergory_title">管理</string>
+    <string name="download_manager">下载队列</string>
+    <string name="upgrade_manager">应用升级</string>
+    <string name="logo_manager">我的一天</string>
+    <string name="zero_flow_update">零流量更新</string>
+    <string name="setting">设置</string>
+    <string name="lucky_draw">幸运抽奖</string>
+    <string name="load_end">已经到底啦···</string>
 
-    <string name="install">Install</string>
+    <string name="install">安装</string>
 
-    <string name="rules_title">Rules</string>
-    <string name="ok">OK</string>
+    <string name="rules_title">抽奖规则</string>
+    <string name="ok">确定</string>
 
-    <string name="gametitle">Games</string>
+    <string name="gametitle">游戏</string>
 
-    <string name="IntegralProblem">Integral Problem</string>
+    <string name="IntegralProblem">对不起，剩余积分不足</string>
 
-    <string name="beyond_limit">Beyond the limit of the day</string>
+    <string name="beyond_limit">今天抽奖次数已满，请明天再来</string>
 
-    <string name="rules_no1">Rules no1</string>
-    <string name="rules_no2">Rules no2</string>
-    <string name="rules_no3">Rules no3</string>
-    <string name="rules_no4">Rules no4</string>
-    <string name="rules_no5">Rules no5</string>
-    <string name="rules_no6">Rules no6</string>
-    <string name="rules_no7">Rules no7</string>
-    <string name="rules_else">Rules else</string>
-    <string name="rules_end">Rules end</string>
+    <string name="rules_no1">首次进入应用商店赠送一次抽奖机会。</string>
+    <string name="rules_no2">首次抽中虚拟奖品（例如流量）和实物奖品（例如手机），需要分享才能领取。</string>
+    <string name="rules_no3">只有已验证过的账号可兑换和领取奖品（手机号码注册或安全手机的账号为已验证账号）。</string>
+    <string name="rules_no4">每个账号每周只能兑换一次话费或者实物。</string>
+    <string name="rules_no5">抽中虚拟奖品（例如流量）和实物奖品（例如手机）用户需填写手机号码，工作人员与之取得联系确认兑奖方式。</string>
+    <string name="rules_no6">每天最多能够参与3次抽奖。</string>
+    <string name="rules_no7">每次抽奖消耗20积分。</string>
+    <string name="rules_else">其他： 若发现违规行为（包括但不限作弊、倒卖奖品、利用漏洞刷积分等），应用商店有权取消兑奖资格，并有权清空非法获得的积分。</string>
+    <string name="rules_end">积分规则和兑换规则的最终解释权归应用商店所有！</string>
 
-    <string name="update_remind">Remind when updating</string>
-    <string name="notification">Notification</string>
-    <string name="update_notification">Update Notification</string>
-    <string name="other_function">Other Function</string>
-    <string name="clean_cache">Clean Cache</string>
-    <string name="clean_cache_detail">Clean You Cache</string>
-    <string name="delete_package">Delete Package</string>
-    <string name="delete_package_detail">Delete The Package When Finish The Setup</string>
-    <string name="no_picture">No Picture</string>
-    <string name="no_picture_detail">Only Download Picture When You Are Using WIFI</string>
-    <string name="feedback">Feedback</string>
-    <string name="about">About</string>
-    <string name="help">Help</string>
+    <string name="update_remind">更新提醒</string>
+    <string name="notification">通知栏提示</string>
+    <string name="update_notification">更新提醒</string>
+    <string name="other_function">其他功能</string>
+    <string name="clean_cache">清除缓存</string>
+    <string name="clean_cache_detail">点我清除缓存</string>
+    <string name="delete_package">删除安装包</string>
+    <string name="delete_package_detail">安装完成后删除安装包</string>
+    <string name="no_picture">智能无图</string>
+    <string name="no_picture_detail">仅WIFI下载图片</string>
+    <string name="feedback">意见反馈</string>
+    <string name="about">关于</string>
+    <string name="help">帮助</string>
 
     <string name="dialog_dataclean_title">清除缓存</string>
     <string name="dialog_dataclean_content">确定要删除所有数据吗?</string>
