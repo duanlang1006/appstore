@@ -28,7 +28,8 @@
     <string name="install_status_installing" >Installing</string>
     <string name="install_status_upgrade" >Found to upgrade</string>
     <string name="network_disable_toast" >Can\'t connect to the network.Check your data connection and try again.</string>
-    <string name="notification_message_downloading">You have %1$d Apps is Downloading</string>
-    <string name="notification_message_downloaded">You have %1$d Apps is Downloaded</string>
+    <string name="notification_message_downloading">You have %1$d Apps is downloading</string>
+    <string name="notification_message_downloaded">Applications download completed</string>
+    <string name="notification_message_pause">Applications download paused</string>
     <string name="click_check">Click and check</string>
 </resources>

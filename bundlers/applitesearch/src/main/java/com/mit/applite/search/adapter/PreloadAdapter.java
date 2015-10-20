@@ -116,7 +116,7 @@ public class PreloadAdapter extends BaseAdapter {
                         vh.bean.getName(),
                         vh.bean.getIconUrl(),
                         Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getName() + ".apk",
-                        null,
+                        vh.implInfo.getMd5(),
                         vh);
             }
         });

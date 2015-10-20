@@ -14,7 +14,7 @@ import java.io.File;
 /**
  * Created by hxd on 15-6-11.
  */
-@Table(name=ImplDbHelper.TABLE_IMPLINFO)
+@Table(name = ImplDbHelper.TABLE_IMPLINFO)
 public class ImplInfo {
     public final static int ACTION_DOWNLOAD = 1;   //下载
     public final static int ACTION_INSTALL = 2;    //安装过程
@@ -27,11 +27,11 @@ public class ImplInfo {
     public final static int STATUS_PAUSED = DownloadManager.STATUS_PAUSED;          //下载暂停
     public final static int STATUS_SUCCESSFUL = DownloadManager.STATUS_SUCCESSFUL;  //下载成功
     public final static int STATUS_FAILED = DownloadManager.STATUS_FAILED;      //下载失败
-    public final static int STATUS_PACKAGE_INVALID = 1<<8;      //包不合法
-    public final static int STATUS_PRIVATE_INSTALLING = 1<<9;   //静默安装
-    public final static int STATUS_NORMAL_INSTALLING=1<<10;     //普通安装
-    public final static int STATUS_INSTALLED = 1<<11;           //已安装
-    public final static int STATUS_INSTALL_FAILED = 1<<12;      //安装失败
+    public final static int STATUS_PACKAGE_INVALID = 1 << 8;      //包不合法
+    public final static int STATUS_PRIVATE_INSTALLING = 1 << 9;   //静默安装
+    public final static int STATUS_NORMAL_INSTALLING = 1 << 10;     //普通安装
+    public final static int STATUS_INSTALLED = 1 << 11;           //已安装
+    public final static int STATUS_INSTALL_FAILED = 1 << 12;      //安装失败
 //    public final static int STATUS_UPGRADE = 1<<13;             //有更新
 
     public final static int INSTALL_SUCCEEDED = 1;//ApplicationManager
@@ -188,10 +188,10 @@ public class ImplInfo {
         return autoRename;
     }
 
-    public int getProgress(){
+    public int getProgress() {
         int progress = 0;
-        if (total > 0){
-            progress = (int)(current*100/total);
+        if (total > 0) {
+            progress = (int) (current * 100 / total);
         }
         return progress;
     }
@@ -320,21 +320,21 @@ public class ImplInfo {
 
     @Override
     public String toString() {
-        return "ImplInfo:"+title+","+state+","+status;
+        return "ImplInfo:" + title + "," + state + "," + status;
     }
 
-    public void initImplRes(Context context){
-        if (implRes.inited){
+    public void initImplRes(Context context) {
+        if (implRes.inited) {
             return;
         }
-        ImplHelper.fillImplRes(context,this);
+        ImplHelper.fillImplRes(context, this);
     }
 
-    public void updateImplRes(Context context){
-        ImplHelper.fillImplRes(context,this);
+    public void updateImplRes(Context context) {
+        ImplHelper.fillImplRes(context, this);
     }
 
-    public class ImplRes{
+    public class ImplRes {
         private boolean inited;
         private int action;
         private String actionText;
@@ -346,7 +346,7 @@ public class ImplInfo {
             reset();
         }
 
-        public void reset(){
+        public void reset() {
             action = ImplInfo.ACTION_DOWNLOAD;
             actionText = "";
             statusText = "";

@@ -504,7 +504,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 bean.getName(),
                 bean.getIconUrl(),
                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
-                null,
+                implInfo.getMd5(),
                 implChangeCallback);
     }
 

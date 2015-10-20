@@ -91,6 +91,13 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 vh.actionBtn.setVisibility(View.VISIBLE);
                 vh.custompb.setVisibility(View.GONE);
                 vh.statusView.setVisibility(View.INVISIBLE);
+                if (ImplInfo.STATUS_PRIVATE_INSTALLING == vh.implInfo.getStatus()) {
+                    vh.actionBtn.setEnabled(false);
+                    vh.actionBtn.setFocusable(false);
+                }else{
+                    vh.actionBtn.setEnabled(true);
+                    vh.actionBtn.setFocusable(true);
+                }
             }
             vh.deleteCheckBox.setVisibility(View.GONE);
         }
@@ -106,7 +113,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 vh.implInfo.getTitle(),
                 vh.implInfo.getIconUrl(),
                 vh.implInfo.getFileSavePath(),
-                null,
+                vh.implInfo.getMd5(),
                 vh);
     }
 

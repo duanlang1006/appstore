@@ -9,8 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-
 
 import java.util.List;
 
@@ -50,7 +48,7 @@ public class DownloadService extends Service {
     public void onCreate() {
         super.onCreate();
         listener = new DownloadPackageListener(this);
-        ImplAgent.registerPackageListener(listener);
+        ImplAgent.getInstance(getApplicationContext()).registerPackageListener(listener);
     }
 
     @Override
@@ -69,7 +67,7 @@ public class DownloadService extends Service {
 //                LogUtils.e(e.getMessage(), e);
 //            }
 //        }
-        ImplAgent.unregisterPackageListener(listener);
+        ImplAgent.getInstance(getApplicationContext()).unregisterPackageListener(listener);
         super.onDestroy();
     }
 
@@ -110,49 +108,70 @@ public class DownloadService extends Service {
 
         @Override
         public void onDownloadEnqued(ImplInfo implInfo) {
-            showDownloadNotify(mContext, downloading);
+            showDownloadNotify(mContext);
         }
 
         @Override
         public void onDownloadSucess(ImplInfo implInfo) {
-            showDownloadNotify(mContext, downloaded);
+            showDownloadNotify(mContext);
         }
 
-//        @Override
+        @Override
+        public void onDownloadPaused(ImplInfo implInfo) {
+            showDownloadNotify(mContext);
+        }
+
+        @Override
+        public void onDownloadResume(ImplInfo implInfo) {
+            showDownloadNotify(mContext);
+        }
+
+        //        @Override
 //        public void onPackageRemoved(ImplInfo implInfo) {
 //            removeNotification(mContext);
 //        }
 
-        private void showDownloadNotify(Context mContext, int position) {
+        private void showDownloadNotify(Context mContext) {
             initNotify(mContext);
-            int temp = calculate(mContext, downloading);
-            if (downloading == position) {
-                showIntentActivityNotify(mContext, temp, position);
-            } else if (downloaded == position) {
-                if (0 == temp) {
-                    showIntentActivityNotify(mContext, calculate(mContext, position), position);
+            int tempCount = calculate(mContext, downloading);
+            if (tempCount != 0) {
+                if (tempCount == calculate(mContext, downloading, ImplInfo.STATUS_PAUSED)) {
+                    showIntentActivityNotify(mContext, 2);
                 } else {
-                    return;
+                    showIntentActivityNotify(mContext, 0);
                 }
+            } else if (calculate(mContext, downloaded) != 0) {
+                showIntentActivityNotify(mContext, 1);
+            } else {
+                //Resume
+                showIntentActivityNotify(mContext, 1);
             }
         }
 
-        private void removeNotification(Context mContext) {
-            if (0 == calculate(mContext, downloading) && 0 == calculate(mContext, downloaded)) {
-                mNotificationManager.cancel(notifyId);
-            }
-        }
+//        private void removeNotification(Context mContext) {
+//            if (0 == calculate(mContext, downloading) && 0 == calculate(mContext, downloaded)) {
+//                mNotificationManager.cancel(notifyId);
+//            }
+//        }
 
         //显示通知栏点击跳转到指定Activity
-        public void showIntentActivityNotify(Context context, int count, int position) {
+        // 0 下载中;1 下载完成; 2 暂停
+        public void showIntentActivityNotify(Context context, int status) {
             String temp = null;
             Intent clickIntent; //点击 Intent
-            if (downloading == position) {
-                temp = mContext.getResources().getString(R.string.notification_message_downloading, count);
-                position = 0;
-            } else if (downloaded == position) {
-                temp = mContext.getResources().getString(R.string.notification_message_downloaded, count);
-                position = 1;
+            switch (status) {
+                case 0:
+                    temp = mContext.getResources().getString(R.string.notification_message_downloading,
+                            calculate(mContext, downloading, ImplInfo.STATUS_RUNNING)
+                                    + calculate(mContext, downloading, ImplInfo.STATUS_PENDING));
+                    break;
+                case 1:
+                    temp = mContext.getResources().getString(R.string.notification_message_downloaded);
+                    break;
+                case 2:
+                    temp = mContext.getResources().getString(R.string.notification_message_pause);
+                    status = 0;
+                    break;
             }
             mBuilder.setAutoCancel(true)//点击后让通知将消失
                     .setContentTitle(temp)
@@ -161,7 +180,7 @@ public class DownloadService extends Service {
                 clickIntent = new Intent(context, Class.forName(DM_NOTIFICATION));
                 clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 clickIntent.putExtra("notify", notifyId + "");
-                clickIntent.putExtra("position", position);
+                clickIntent.putExtra("position", status);
                 PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 mBuilder.setContentIntent(pendingIntent);
                 mNotificationManager.notify(notifyId, mBuilder.build());
@@ -172,6 +191,10 @@ public class DownloadService extends Service {
 
         private int calculate(Context context, int position) {
             return ImplAgent.getInstance(context.getApplicationContext()).getImplInfoCount(position);
+        }
+
+        private int calculate(Context context, int position, int status) {
+            return ImplAgent.getInstance(context.getApplicationContext()).getImplInfoStatusCount(position, status);
         }
 
         private void initNotify(Context context) {

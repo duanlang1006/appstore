@@ -205,12 +205,12 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     public void onDetach() {
         super.onDetach();
         ImplLog.d(DownloadListFragment.TAG, "onDetach," + this);
+        ImplAgent.getInstance(mActivity).deleteObserver(this);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ImplAgent.getInstance(mActivity).deleteObserver(this);
         ImplLog.d(DownloadListFragment.TAG, "onDestroyView," + this);
     }
 
@@ -330,19 +330,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     private void deleteItem(boolean deleteFile) {
         List<Long> tempList = new ArrayList<>();
-        for (int i = 0; i < status.length; i++) {
-            Log.i("wanghc", "mImplList[" + i + "]:" + mImplList.get(i).getTitle());
-            Log.i("wanghc", "status" + i + ":" + status[i]);
-        }
-        Log.i("wanghc", "-----------");
         for (int i = status.length - 1; i >= 0; i--) {
-//        for (int i = 0; i < status.length; i++) {
             if (status[i]) {
                 tempList.add(mImplList.get(i).getId());
-                Log.i("wanghc", "mImplList" + mImplList.get(i).getTitle());
             }
         }
-        Log.i("wanghc", "-----------");
         if (!tempList.isEmpty()) {
             mImplAgent.remove(tempList, deleteFile);
         }
@@ -486,7 +478,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                 bean.getName(),
                 bean.getIconUrl(),
                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
-                null,
+                implInfo.getMd5(),
                 implChangeCallback);
     }
 
