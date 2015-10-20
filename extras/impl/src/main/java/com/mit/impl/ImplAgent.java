@@ -322,7 +322,7 @@ public class ImplAgent extends Observable {
         ImplLog.d(TAG, "pauseDownload," + implInfo.getTitle() + "," + implInfo.getStatus());
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionPause");
         mDownloader.pause(implInfo, mImplCallback);
-        mImplCallback.onPaused(implInfo);
+        mImplCallback.onCancelled(implInfo);
     }
 
     public void pauseAll() {
@@ -339,7 +339,7 @@ public class ImplAgent extends Observable {
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionResume");
         bindImplCallback(appCallback, implInfo);
         mDownloader.resume(implInfo, mImplCallback);
-        mImplCallback.onResume(implInfo);
+        mImplCallback.onStart(implInfo);
     }
 
     public void resumeAll() {
@@ -377,28 +377,6 @@ public class ImplAgent extends Observable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        notifyObserverUpdate("remove");
-    }
-
-    public void remove(Long id) {
-        File deleteFile;
-        ImplInfo implInfo = findImplInfoById(id);
-        if (null == implInfo) {
-            return;
-        }
-        ImplLog.d(TAG, "remove," + implInfo.getTitle() + "," + implInfo.getStatus());
-        MitMobclickAgent.onEvent(mContext, "impl_DownloadActionRemove");
-        mImplList.remove(implInfo);
-        mDownloader.remove(implInfo);
-        deleteFile = new File(implInfo.getFileSavePath());
-        if (deleteFile.exists() && deleteFile.isFile()) {
-            deleteFile.delete();
-        }
-        try {
-            db.delete(implInfo);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         notifyObserverUpdate("remove");
     }
@@ -455,18 +433,6 @@ public class ImplAgent extends Observable {
         for (ImplInfo info : mImplList) {
             if ((info.getStatus() & statusFlag) != 0 && info.getId() > 0) {
                 count++;
-            }
-        }
-        return count;
-    }
-
-    public int getImplInfoStatusCount(int statusFlag, int status) {
-        int count = 0;
-        for (ImplInfo info : mImplList) {
-            if ((info.getStatus() & statusFlag) != 0 && info.getId() > 0) {
-                if (status == info.getStatus()) {
-                    count++;
-                }
             }
         }
         return count;
@@ -598,6 +564,9 @@ public class ImplAgent extends Observable {
         public void onStart(ImplInfo info) {
             super.onStart(info);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadStart");
+            for (int i = 0; i < mPackageListener.size(); i++) {
+                mPackageListener.get(i).onDownloadResume(info);
+            }
             callbackImpl(info);
             saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onStart");
@@ -606,7 +575,10 @@ public class ImplAgent extends Observable {
         @Override
         public void onCancelled(ImplInfo info) {
             super.onCancelled(info);
-            MitMobclickAgent.onEvent(mContext, "impl_DownloadCancelled");
+            MitMobclickAgent.onEvent(mContext, "impl_DownloadPaused");
+            for (int i = 0; i < mPackageListener.size(); i++) {
+                mPackageListener.get(i).onDownloadPaused(info);
+            }
             callbackImpl(info);
             saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onCancelled");
@@ -643,30 +615,6 @@ public class ImplAgent extends Observable {
             callbackImpl(info);
             saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onFailure," + msg);
-        }
-
-        @Override
-        public void onPaused(ImplInfo info) {
-            super.onPaused(info);
-            MitMobclickAgent.onEvent(mContext, "impl_DownloadPaused");
-            for (int i = 0; i < mPackageListener.size(); i++) {
-                mPackageListener.get(i).onDownloadPaused(info);
-            }
-            callbackImpl(info);
-            saveImplInfo(info);
-            ImplLog.d(TAG, info.getTitle() + ",onPaused");
-        }
-
-        @Override
-        public void onResume(ImplInfo info) {
-            super.onResume(info);
-            MitMobclickAgent.onEvent(mContext, "impl_DownloadResume");
-            for (int i = 0; i < mPackageListener.size(); i++) {
-                mPackageListener.get(i).onDownloadResume(info);
-            }
-            callbackImpl(info);
-            saveImplInfo(info);
-            ImplLog.d(TAG, info.getTitle() + ",onResume");
         }
 
         @Override

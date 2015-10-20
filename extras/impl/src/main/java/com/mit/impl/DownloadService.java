@@ -193,8 +193,21 @@ public class DownloadService extends Service {
             return ImplAgent.getInstance(context.getApplicationContext()).getImplInfoCount(position);
         }
 
+//        private int calculate(Context context, int position, int status) {
+//            return ImplAgent.getInstance(context.getApplicationContext()).getImplInfoStatusCount(position, status);
+//        }
+
+
         private int calculate(Context context, int position, int status) {
-            return ImplAgent.getInstance(context.getApplicationContext()).getImplInfoStatusCount(position, status);
+            int count = 0;
+            for (ImplInfo info : ImplAgent.getInstance(context).getDownloadInfoList(position)) {
+                if ((info.getStatus() & position) != 0 && info.getId() > 0) {
+                    if (status == info.getStatus()) {
+                        count++;
+                    }
+                }
+            }
+            return count;
         }
 
         private void initNotify(Context context) {

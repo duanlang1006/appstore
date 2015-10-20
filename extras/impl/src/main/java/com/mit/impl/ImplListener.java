@@ -30,8 +30,6 @@ abstract class ImplListener {
     public void onLoading(ImplInfo info,long total, long current, boolean isUploading){};
     public void onSuccess(ImplInfo info,File file){};
     public void onFailure(ImplInfo info,Throwable t,String msg){};
-    public void onPaused(ImplInfo implInfo){};
-    public void onResume(ImplInfo implInfo){};
 
     public void onInstallSuccess(ImplInfo info){}
     public void onInstalling(ImplInfo info){}

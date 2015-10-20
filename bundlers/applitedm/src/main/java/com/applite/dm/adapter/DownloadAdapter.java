@@ -94,7 +94,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 if (ImplInfo.STATUS_PRIVATE_INSTALLING == vh.implInfo.getStatus()) {
                     vh.actionBtn.setEnabled(false);
                     vh.actionBtn.setFocusable(false);
-                }else{
+                } else {
                     vh.actionBtn.setEnabled(true);
                     vh.actionBtn.setFocusable(true);
                 }
@@ -113,7 +113,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 vh.implInfo.getTitle(),
                 vh.implInfo.getIconUrl(),
                 vh.implInfo.getFileSavePath(),
-                vh.implInfo.getMd5(),
+                null,
                 vh);
     }
 

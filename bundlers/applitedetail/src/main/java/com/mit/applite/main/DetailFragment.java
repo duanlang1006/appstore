@@ -292,7 +292,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                                 mApkName,
                                 mImgUrl,
                                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + mApkName + ".apk",
-                                implinfo.getMd5(),
+                                null,
                                 implCallback);
                     }
                 }

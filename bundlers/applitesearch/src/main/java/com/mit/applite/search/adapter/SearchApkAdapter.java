@@ -100,7 +100,7 @@ public class SearchApkAdapter extends BaseAdapter {
                         vh.bean.getName(),
                         vh.bean.getIconUrl(),
                         Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + vh.bean.getName() + ".apk",
-                        vh.implInfo.getMd5(),
+                        null,
                         vh);
             }
         });

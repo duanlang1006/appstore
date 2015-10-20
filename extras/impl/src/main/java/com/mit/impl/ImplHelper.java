@@ -1,19 +1,15 @@
 package com.mit.impl;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.widget.Toast;
 
-import com.applite.common.Constant;
 import com.lidroid.xutils.util.MimeTypeUtils;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 
@@ -299,7 +295,7 @@ public class ImplHelper {
                 break;
 
             case ImplInfo.STATUS_SUCCESSFUL:
-                implRes.setAction(ImplInfo.ACTION_INSTALL);
+                implRes.setAction(ImplInfo.ACTION_OPEN);
                 implRes.setActionText(mResources.getString(R.string.action_open));
                 implRes.setStatusText(mResources.getString(R.string.download_status_success));
                 implRes.setDescText(Formatter.formatFileSize(context, implInfo.getTotal()));
@@ -309,15 +305,15 @@ public class ImplHelper {
                     PackageInfo archivePkg = context.getPackageManager()
                             .getPackageArchiveInfo(localPath, PackageManager.GET_ACTIVITIES);
                     if (null != archivePkg) {
-                        implRes.setAction(ImplInfo.ACTION_INSTALL);
+                        implRes.setAction(ImplInfo.ACTION_OPEN);
                         implRes.setActionIntent(getLaunchDownloadIntent(context, archivePkg.packageName));
-//                        if (null == implRes.getActionIntent()) {
-                        implRes.setActionText(mResources.getString(R.string.action_open));
-//                        } else {
-//                            implRes.setActionText(mResources.getString(R.string.action_install));
-//                        }
+                        if (null == implRes.getActionIntent()) {
+                            implRes.setActionText(mResources.getString(R.string.action_open));
+                        } else {
+                            implRes.setActionText(mResources.getString(R.string.action_open));
+                        }
                         implRes.setDescText((String.format(mResources.getString(R.string.apk_version), archivePkg.versionName)));
-//                        implRes.setActionIntent(getLaunchDownloadIntent(context, archivePkg.packageName));
+                        implRes.setActionIntent(getLaunchDownloadIntent(context, archivePkg.packageName));
                     } else {//下载apk解析错误
                         implRes.setAction(ImplInfo.ACTION_DOWNLOAD);
                         implRes.setActionText(mResources.getString(R.string.action_retry));
@@ -339,7 +335,7 @@ public class ImplHelper {
                         //安装版本比目标版本新，需要打开
                         implRes.setAction(ImplInfo.ACTION_OPEN);
                         implRes.setActionText(mResources.getString(R.string.action_open));
-                        implRes.setStatusText(mResources.getString(R.string.action_open));
+                        implRes.setStatusText(mResources.getString(R.string.install_status_success));
                         implRes.setActionIntent(getLaunchDownloadIntent(context, implInfo.getPackageName()));
                     } else {
                         //目标版本比较新

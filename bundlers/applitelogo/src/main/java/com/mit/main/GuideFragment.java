@@ -556,7 +556,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                 bean.getName(),
                 bean.getImgurl(),
                 Environment.getExternalStorageDirectory() + File.separator + Constant.extenStorageDirPath + bean.getName() + ".apk",
-                implInfo.getMd5(),
+                null,
                 null);
     }
 
