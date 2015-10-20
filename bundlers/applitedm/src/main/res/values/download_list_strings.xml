@@ -14,12 +14,12 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- The title that appears at the top of the activity listing downloads [CHAR LIMIT=25] -->
-    <string name="download_title">Downloads</string>
-    <string name="no_downloads">No downloads</string>
-    <string name="missing_title">&lt;Unknown&gt;</string>
-    <string name="delete_download">Delete</string>
-    <string name="detail_download">Detail</string>
-    <string name="apk_version">version:%1$s</string>
+    <string name="download_title">下载内容</string>
+    <string name="no_downloads">无下载内容</string>
+    <string name="missing_title">&lt;未知&gt;</string>
+    <string name="delete_download">删除</string>
+    <string name="detail_download">详情</string>
+    <string name="apk_version">版本号:%1$s</string>
     <string name="share_btn">分享</string>
     <string name="delete_btn">删除</string>
 </resources>

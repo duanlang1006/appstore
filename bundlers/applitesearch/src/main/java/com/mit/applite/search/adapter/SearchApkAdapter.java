@@ -33,18 +33,12 @@ import java.util.List;
  */
 public class SearchApkAdapter extends BaseAdapter {
 
-    private final UpdateInatsllButtonText mListener;
     private BitmapUtils mBitmapUtil;
     private List<ApkBean> mSearchBeans;
     private Context mActivity;
     private ImplAgent implAgent;
 
-    public interface UpdateInatsllButtonText {
-        void updateText();
-    }
-
-    public SearchApkAdapter(Context context, List<ApkBean> mSearchBeans, UpdateInatsllButtonText listener) {
-        mListener = listener;
+    public SearchApkAdapter(Context context, List<ApkBean> mSearchBeans) {
         this.mSearchBeans = mSearchBeans;
         mActivity = context;
         mBitmapUtil = BitmapHelper.getBitmapUtils(mActivity.getApplicationContext());

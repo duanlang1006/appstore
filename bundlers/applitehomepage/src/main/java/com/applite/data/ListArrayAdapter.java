@@ -141,7 +141,7 @@ public class ListArrayAdapter extends BaseAdapter implements View.OnClickListene
                 } else
                     luckyflag = false;
                 LogUtils.d(TAG, "points = " + points + " luckyflag = " + luckyflag);
-                LogUtils.d("duanlang", "vh.itemData.getMd5() = " + vh.itemData.getMd5());
+                LogUtils.d(TAG, "vh.itemData.getMd5() = " + vh.itemData.getMd5());
 
                 ImplHelper.onClick(mContext,
                         vh.implInfo,

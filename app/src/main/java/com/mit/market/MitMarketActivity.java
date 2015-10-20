@@ -34,6 +34,9 @@ import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
+import com.mit.afinal.FinalHttp;
+import com.mit.afinal.http.AjaxCallBack;
+import com.mit.afinal.http.AjaxParams;
 import com.mit.applite.main.DetailFragment;
 import com.mit.applite.search.main.SearchFragment;
 import com.mit.appliteupdate.main.UninstallReceiver;
@@ -123,26 +126,47 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     }
 
     private void post() {
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(this, Constant.META_DATA_MIT));
-        params.addBodyParameter("packagename", this.getPackageName());
-        params.addBodyParameter("type", "update_management");
-        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
-        params.addBodyParameter("update_info", AppliteUtils.getAllApkData(this));
-        HttpUtils mHttpUtils = new HttpUtils();
-        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//        RequestParams params = new RequestParams();
+//        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(this, Constant.META_DATA_MIT));
+//        params.addBodyParameter("packagename", this.getPackageName());
+//        params.addBodyParameter("type", "update_management");
+//        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
+//        params.addBodyParameter("update_info", AppliteUtils.getAllApkData(this));
+//        HttpUtils mHttpUtils = new HttpUtils();
+//        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//            @Override
+//            public void onSuccess(ResponseInfo<String> responseInfo) {
+//                LogUtils.i(TAG, "首页更新请求成功，resulit：" + responseInfo.result);
+//                AppliteSPUtils.put(MitMarketActivity.this, AppliteSPUtils.UPDATE_DATA, responseInfo.result);
+//            }
+//
+//            @Override
+//            public void onFailure(HttpException e, String s) {
+//                LogUtils.i(TAG, "首页更新请求失败：" + s);
+//            }
+//
+//        });
+
+        AjaxParams params = new AjaxParams();
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(this, Constant.META_DATA_MIT));
+        params.put("packagename", this.getPackageName());
+        params.put("type", "update_management");
+        params.put("protocol_version", Constant.PROTOCOL_VERSION);
+        params.put("update_info", AppliteUtils.getAllApkData(this));
+        FinalHttp mFinalHttp = new FinalHttp();
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<String>() {
             @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
-                LogUtils.i(TAG, "首页更新请求成功，resulit：" + responseInfo.result);
-                AppliteSPUtils.put(MitMarketActivity.this, AppliteSPUtils.UPDATE_DATA, responseInfo.result);
+            public void onSuccess(String responseInfo) {
+                LogUtils.i(TAG, "首页更新请求成功，resulit：" + responseInfo);
+                AppliteSPUtils.put(MitMarketActivity.this, AppliteSPUtils.UPDATE_DATA, responseInfo);
             }
 
             @Override
-            public void onFailure(HttpException e, String s) {
-                LogUtils.i(TAG, "首页更新请求失败：" + s);
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
+                LogUtils.i(TAG, "首页更新请求失败：" + strMsg);
             }
-
         });
+
     }
 
     @Override

@@ -36,10 +36,11 @@ import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.HttpHandler;
-import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest;
+import com.mit.afinal.FinalHttp;
+import com.mit.afinal.http.AjaxCallBack;
+import com.mit.afinal.http.AjaxParams;
 import com.mit.bean.GuideBean;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplHelper;
@@ -93,7 +94,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     private int FAILURE_POST_NUMBER = 0;//请求失败的次数
     private boolean misguide;
     private float mFLayoutWidthScale;
-    private boolean[] ISAPKADD = {true, true, true, true, true, true, true, true, true, true};//当前位置是否可以添加APK
+    private boolean[] ISAPKADD;//当前位置是否可以添加APK
     private int[] mApkShowNumber = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};//当前位置添加了几次APK
     private int MAX_APK_SHOW_NUMBER = 5;//每个位置最多显示的APK个数
     private int mDownloadQueueNumber = 0;
@@ -156,6 +157,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                              Bundle savedInstanceState) {
         LogUtils.i(TAG, "onCreateView");
         mInflater = inflater;
+        ISAPKADD = new boolean[]{true, true, true, true, true, true, true, true, true, true};
         try {
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.hide();
@@ -231,6 +233,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     public void onDestroyView() {
         super.onDestroyView();
         LogUtils.i(TAG, "onDestroyView");
+//        mGuideContents = null;
         mHandler.removeCallbacks(mThread);//关闭延时线程
         implAgent.deleteObserver(this);
     }
@@ -327,28 +330,55 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      * 首页指导网络请求
      */
     private void post() {
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.addBodyParameter("packagename", mActivity.getPackageName());
-        params.addBodyParameter("type", "guide");
-        params.addBodyParameter("sort", "gift");
-        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+        LogUtils.i(TAG, "首页指导网络请求");
+//        RequestParams params = new RequestParams();
+//        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+//        params.addBodyParameter("packagename", mActivity.getPackageName());
+//        params.addBodyParameter("type", "guide");
+//        params.addBodyParameter("sort", "gift");
+//        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//            @Override
+//            public void onSuccess(ResponseInfo<String> responseInfo) {
+//                FAILURE_POST_NUMBER = 0;
+//                LogUtils.i(TAG, "首页指导网络请求成功，reuslt:" + responseInfo.result);
+//                setData(responseInfo.result);
+//            }
+//
+//            @Override
+//            public void onFailure(HttpException e, String s) {
+//                LogUtils.e(TAG, "首页指导网络请求失败:" + s);
+//                if (FAILURE_POST_NUMBER < 3) {
+//                    FAILURE_POST_NUMBER = FAILURE_POST_NUMBER + 1;
+//                    post();
+//                }
+//            }
+//        });
+
+        AjaxParams params = new AjaxParams();
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.put("packagename", mActivity.getPackageName());
+        params.put("type", "guide");
+        params.put("sort", "gift");
+        FinalHttp mFinalHttp = new FinalHttp();
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<String>() {
             @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
+            public void onSuccess(String responseInfo) {
                 FAILURE_POST_NUMBER = 0;
-                LogUtils.i(TAG, "首页指导网络请求成功，reuslt:" + responseInfo.result);
-                setData(responseInfo.result);
+                LogUtils.i(TAG, "首页指导网络请求成功，reuslt:" + responseInfo);
+                setData(responseInfo);
             }
 
             @Override
-            public void onFailure(HttpException e, String s) {
-                LogUtils.e(TAG, "首页指导网络请求失败:" + s);
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
+                LogUtils.e(TAG, "首页指导网络请求失败:" + strMsg);
                 if (FAILURE_POST_NUMBER < 3) {
                     FAILURE_POST_NUMBER = FAILURE_POST_NUMBER + 1;
                     post();
                 }
             }
         });
+
+
     }
 
     /**
@@ -357,6 +387,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      * @param data
      */
     private void setData(String data) {
+        LogUtils.e(TAG, "setData");
         GuideBean bean = null;
         try {
             JSONObject obj = new JSONObject(data);
@@ -373,6 +404,8 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
                 bean.setImgurl(object.getString("iconUrl"));
                 bean.setUrl(object.getString("rDownloadUrl"));
                 bean.setmShowPosition(object.getInt("show_place_value"));
+                LogUtils.i(TAG, "mGuideContents = " + mGuideContents);
+                LogUtils.i(TAG, "bean = " + bean);
                 mGuideContents.add(bean);
             }
             addAllAppView();
@@ -399,6 +432,7 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      * @param bean
      */
     private void addAppView(final GuideBean bean) {
+        LogUtils.e(TAG, "addAppView");
         ISAPKADD[bean.getmShowPosition()] = false;
         mApkShowNumber[bean.getmShowPosition()] = mApkShowNumber[bean.getmShowPosition()] + 1;
 
@@ -690,16 +724,69 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
      * LOGO页面的网络请求
      */
     private void logoPost() {
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.addBodyParameter("packagename", mActivity.getPackageName());
-        params.addBodyParameter("type", "logo");
-        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//        RequestParams params = new RequestParams();
+//        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+//        params.addBodyParameter("packagename", mActivity.getPackageName());
+//        params.addBodyParameter("type", "logo");
+//        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//            @Override
+//            public void onSuccess(ResponseInfo<String> responseInfo) {
+//                LogUtils.i(TAG, "LOGO网络请求成功，reuslt：" + responseInfo.result);
+//                try {
+//                    JSONObject obj = new JSONObject(responseInfo.result);
+//                    int app_key = obj.getInt("app_key");
+//                    String info = obj.getString("info");
+//                    if (!TextUtils.isEmpty(info)) {
+//                        JSONObject object = new JSONObject(info);
+//                        long NextTime = object.getLong("nexttime") * 1000;
+//                        long ShowTime = object.getInt("i_staytime") * 1000;
+//                        String BigImgUrl = object.getString("i_biglogourl");
+//                        String SmallImgUrl = object.getString("i_smalllogourl");
+//                        long StartTime = object.getLong("limit_starttime") * 1000;
+//                        long EndTime = object.getLong("limit_endtime") * 1000;
+//                        String packageName = object.getString("packageName");
+//                        String name = object.getString("name");
+//                        String iconUrl = object.getString("iconUrl");
+//                        LogUtils.d(TAG, "BigImgUrl:" + BigImgUrl);
+//                        LogUtils.d(TAG, "LOGO_IMG_DOWNLOAD_URL:" + AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, ""));
+//                        if (!BigImgUrl.equals(AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, ""))) {
+//                            AppliteUtils.delFile((String) AppliteSPUtils.get(mActivity, AppliteSPUtils.LOGO_IMG_SAVE_PATH, ""));
+//                            download(Constant.LOGO_IMG_NAME, BigImgUrl);
+//                        }
+//
+//                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_NEXT_TIME, NextTime);
+//                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_SHOW_TIME, ShowTime);
+//                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_START_SHOW_TIME, StartTime);
+//                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_END_SHOW_TIME, EndTime);
+//                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_IMG_DOWNLOAD_URL, BigImgUrl);
+//                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_APK_PACKAGENAME, packageName);
+//                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_APK_NAME, name);
+//                        AppliteSPUtils.put(mActivity, AppliteSPUtils.LOGO_APK_ICON_URL, iconUrl);
+//                    }
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                    LogUtils.e(TAG, "LOGO,JSON解析异常");
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(HttpException e, String s) {
+//                LogUtils.e(TAG, "LOGO网络请求失败：" + s);
+//            }
+//        });
+
+        AjaxParams params = new AjaxParams();
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.put("packagename", mActivity.getPackageName());
+        params.put("type", "logo");
+        FinalHttp mFinalHttp = new FinalHttp();
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<String>() {
             @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
-                LogUtils.i(TAG, "LOGO网络请求成功，reuslt：" + responseInfo.result);
+            public void onSuccess(String responseInfo) {
+                LogUtils.i(TAG, "LOGO网络请求成功，reuslt：" + responseInfo);
                 try {
-                    JSONObject obj = new JSONObject(responseInfo.result);
+                    JSONObject obj = new JSONObject(responseInfo);
                     int app_key = obj.getInt("app_key");
                     String info = obj.getString("info");
                     if (!TextUtils.isEmpty(info)) {
@@ -737,10 +824,11 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
             }
 
             @Override
-            public void onFailure(HttpException e, String s) {
-                LogUtils.e(TAG, "LOGO网络请求失败：" + s);
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
+                LogUtils.e(TAG, "LOGO网络请求失败：" + strMsg);
             }
         });
+
     }
 
 }

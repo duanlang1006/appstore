@@ -1,35 +1,34 @@
 <resources>
     <string name="app_name">Impl</string>
 
-    <string name="download_status_error">Unsuccessful</string>
-    <string name="download_status_insufficient_space" >Space not enough</string>
-    <string name="download_status_invalid_package" >Invalid package</string>
-    <string name="download_status_waiting_for_network" >Waiting for network</string>
-    <string name="download_status_success">Download complete</string>
-    <string name="download_status_running">In progress</string>
-    <string name="download_status_queued">Queued</string>
-    <string name="download_status_paused">Pausing</string>
-    <string name="download_status_waiting">Waiting</string>
-    <string name="download_status_waiting_network">Waiting network</string>
-    <string name="download_status_waiting_wlan">Waiting WLAN</string>
+    <string name="download_status_error">失败</string>
+    <string name="download_status_insufficient_space">空间不足</string>
+    <string name="download_status_invalid_package">APK解析错误</string>
+    <string name="download_status_waiting_for_network">等待网络</string>
+    <string name="download_status_success">下载完成</string>
+    <string name="download_status_running">正在下载</string>
+    <string name="download_status_queued">已加入队列</string>
+    <string name="download_status_paused">已暂停</string>
+    <string name="download_status_waiting">等待下载</string>
+    <string name="download_status_waiting_network">等待网络</string>
+    <string name="download_status_waiting_wlan">等待WLAN</string>
 
-    <string name="apk_version">version:%1$s</string>
+    <string name="apk_version">版本:%1$s</string>
 
-    <string name="action_retry">Retry</string>
-    <string name="action_open">Open</string>
-    <string name="action_pause">Pause</string>
-    <string name="action_install" >Install</string>
-    <string name="action_upgrade" >Upgrade</string>
-    <string name="action_resume" >Resume</string>
-    <string name="action_waiting" >Waiting</string>
+    <string name="action_retry">重试</string>
+    <string name="action_open">打开</string>
+    <string name="action_pause">暂停</string>
+    <string name="action_install">安装</string>
+    <string name="action_upgrade">更新</string>
+    <string name="action_resume">继续</string>
+    <string name="action_waiting">等待</string>
 
-    <string name="install_status_success" >Installed</string>
-    <string name="install_status_failed" >Install failed</string>
-    <string name="install_status_installing" >Installing</string>
-    <string name="install_status_upgrade" >Found to upgrade</string>
-    <string name="network_disable_toast" >Can\'t connect to the network.Check your data connection and try again.</string>
-    <string name="notification_message_downloading">You have %1$d Apps is downloading</string>
-    <string name="notification_message_downloaded">Applications download completed</string>
-    <string name="notification_message_pause">Applications download paused</string>
-    <string name="click_check">Click and check</string>
+    <string name="install_status_success">已安装</string>
+    <string name="install_status_failed">安装失败</string>
+    <string name="install_status_installing">正在安装</string>
+    <string name="install_status_upgrade">发现更新</string>
+    <string name="network_disable_toast">没有网络连接，请重新检查网络后再试</string>
+    <string name="notification_message_downloading">您有%1$d个应用正在下载</string>
+    <string name="notification_message_downloaded">您有%1$d个应用已下载完成</string>
+    <string name="click_check">点击查看</string>
 </resources>

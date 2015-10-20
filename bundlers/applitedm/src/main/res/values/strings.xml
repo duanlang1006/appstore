@@ -1,22 +1,22 @@
 <resources>
-    <string name="app_name">DownloadManager</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name">下载管理</string>
+    <string name="action_settings">设置</string>
     <string name="dm_downloading">下载中</string>
     <string name="dm_downloaded">已下载</string>
 
-    <string name="action_search">Search</string>
-    <string name="action_pause_all">Pause all</string>
-    <string name="action_download_all">Download all</string>
-    <string name="cancel_btn">Cancal</string>
-    <string name="allpick_btn">All Pick</string>
-    <string name="nonepick_btn">None Pick</string>
-    <string name="cancel_operator">Cancel</string>
-    <string name="delete_message">You hava delete %1$d Downloads</string>
-    <string name="choose_message">You hava choose %1$d Downloads</string>
-    <string name="back_to_homepage">List so empty,Click me and Return homepage</string>
-    <string name="similar_title">Others downloaded</string>
-    <string name="similar_change">Change</string>
-    <string name="ensure">Ensure</string>
-    <string name="delete_download_records">Delete download records</string>
-    <string name="dm_delete_package">And delete the package</string>
+    <string name="action_search">搜索</string>
+    <string name="action_pause_all">全部暂停</string>
+    <string name="action_download_all">全部开始</string>
+    <string name="cancel_btn">取消</string>
+    <string name="allpick_btn">全选</string>
+    <string name="nonepick_btn">全不选</string>
+    <string name="cancel_operator">取消操作</string>
+    <string name="delete_message">成功删除了 %1$d 条记录</string>
+    <string name="choose_message">选中了 %1$d 条记录</string>
+    <string name="back_to_homepage">列表这么空,点我回首页看看吧</string>
+    <string name="similar_title">大家还下载了</string>
+    <string name="similar_change">换一换</string>
+    <string name="ensure">确定</string>
+    <string name="delete_download_records">是否删除下载记录</string>
+    <string name="dm_delete_package">同时删除安装包</string>
 </resources>

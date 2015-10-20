@@ -19,4 +19,14 @@
     <color name="dividing_line">#b7b6b7</color>
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
+
+    //日历控件颜色
+    <color name="week_color">#ffeeeeee</color>
+    <color name="non_current_month">#ff888888</color>
+    <color name="month_selected_week_bgcolor">#FFDDDDDD</color>
+    <color name="month_mini_day_number">#FF000000</color>
+    <color name="month_other_month_day_number">#ff939497</color>
+    <color name="month_grid_lines">#ffCCCCCC</color>
+    <color name="mini_month_today_outline_color">#FF000000</color>
+    <color name="month_week_num_color">#FF999999</color>
 </resources>
