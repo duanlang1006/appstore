@@ -39,15 +39,12 @@ import com.applite.view.FlowLayout;
 import com.applite.view.ProgressButton;
 import com.google.gson.Gson;
 import com.lidroid.xutils.BitmapUtils;
-import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadCallBack;
 import com.lidroid.xutils.bitmap.callback.BitmapLoadFrom;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest;
+import com.mit.afinal.FinalHttp;
+import com.mit.afinal.http.AjaxCallBack;
+import com.mit.afinal.http.AjaxParams;
 import com.mit.applite.bean.DetailData;
 import com.mit.applite.utils.DetailUtils;
 import com.mit.impl.ImplAgent;
@@ -405,29 +402,50 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      * @param mPackageName
      */
     private void post(String mPackageName) {
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.addBodyParameter("packagename", mActivity.getPackageName());
-        params.addBodyParameter("type", "detail");
-        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
-        params.addBodyParameter("name", mPackageName);
-        HttpUtils mHttpUtils = new HttpUtils();
-        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//        RequestParams params = new RequestParams();
+//        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+//        params.addBodyParameter("packagename", mActivity.getPackageName());
+//        params.addBodyParameter("type", "detail");
+//        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
+//        params.addBodyParameter("name", mPackageName);
+//        HttpUtils mHttpUtils = new HttpUtils();
+//        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//            @Override
+//            public void onSuccess(ResponseInfo<String> responseInfo) {
+//                LogUtils.i(TAG, "应用详情网络请求成功:" + responseInfo.result);
+//                setData(responseInfo.result);
+//            }
+//
+//            @Override
+//            public void onFailure(HttpException e, String s) {
+//                LogUtils.e(TAG, "应用详情网络请求失败:" + s);
+//                // 这里设置没有网络时的图片
+////                mLoadLayout.setVisibility(View.GONE);
+////                mDataLayout.setVisibility(View.GONE);
+////                no_network.setVisibility(View.VISIBLE);
+//            }
+//        });
+
+        AjaxParams params = new AjaxParams();
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.put("packagename", mActivity.getPackageName());
+        params.put("type", "detail");
+        params.put("protocol_version", Constant.PROTOCOL_VERSION);
+        params.put("name", mPackageName);
+        FinalHttp mFinalHttp = new FinalHttp();
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<String>() {
             @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
-                LogUtils.i(TAG, "应用详情网络请求成功:" + responseInfo.result);
-                setData(responseInfo.result);
+            public void onSuccess(String responseInfo) {
+                LogUtils.i(TAG, "应用详情网络请求成功:" + responseInfo);
+                setData(responseInfo);
             }
 
             @Override
-            public void onFailure(HttpException e, String s) {
-                LogUtils.e(TAG, "应用详情网络请求失败:" + s);
-                // 这里设置没有网络时的图片
-//                mLoadLayout.setVisibility(View.GONE);
-//                mDataLayout.setVisibility(View.GONE);
-//                no_network.setVisibility(View.VISIBLE);
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
+                LogUtils.e(TAG, "应用详情网络请求失败:" + strMsg);
             }
         });
+
     }
 
     /**

@@ -41,11 +41,6 @@ import com.applite.utils.SPUtils;
 import com.applite.view.ScreenView;
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.mitupdatesdk.MitMobclickAgent;
 import com.mit.mitupdatesdk.MitUpdateAgent;
 import com.osgi.extra.OSGIBaseFragment;
@@ -717,24 +712,45 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
     private void postSearchHint() {
         LogUtils.i(TAG, "postSearchHint");
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.addBodyParameter("packagename", mActivity.getPackageName());
-        params.addBodyParameter("type", "hot_word");
-        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
-        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//        RequestParams params = new RequestParams();
+//        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+//        params.addBodyParameter("packagename", mActivity.getPackageName());
+//        params.addBodyParameter("type", "hot_word");
+//        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
+//        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//            @Override
+//            public void onSuccess(ResponseInfo<String> responseInfo) {
+//                mInfo = responseInfo.result;
+//                setSearchData(responseInfo.result);
+//                startConvenientSearch();
+//            }
+//
+//            @Override
+//            public void onFailure(HttpException e, String s) {
+//                LogUtils.e(TAG, "快捷搜索热词请求失败:" + s);
+//            }
+//        });
+
+        com.mit.afinal.http.AjaxParams params = new com.mit.afinal.http.AjaxParams();
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.put("packagename", mActivity.getPackageName());
+        params.put("type", "hot_word");
+        params.put("protocol_version", Constant.PROTOCOL_VERSION);
+        com.mit.afinal.FinalHttp mFinalHttp = new com.mit.afinal.FinalHttp();
+        mFinalHttp.post(Constant.URL, params, new com.mit.afinal.http.AjaxCallBack<String>() {
             @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
-                mInfo = responseInfo.result;
-                setSearchData(responseInfo.result);
+            public void onSuccess(String responseInfo) {
+                mInfo = responseInfo;
+                setSearchData(responseInfo);
                 startConvenientSearch();
             }
 
             @Override
-            public void onFailure(HttpException e, String s) {
-                LogUtils.e(TAG, "快捷搜索热词请求失败:" + s);
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
+                LogUtils.e(TAG, "快捷搜索热词请求失败:" + strMsg);
             }
         });
+
     }
 
     private void setSearchData(String result) {
