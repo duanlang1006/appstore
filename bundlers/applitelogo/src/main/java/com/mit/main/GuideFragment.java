@@ -240,7 +240,6 @@ public class GuideFragment extends OSGIBaseFragment implements View.OnClickListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mGuideContents = null;
         MitMobclickAgent.onEvent(mActivity, whichPage + "_onDestroy");
     }
 
