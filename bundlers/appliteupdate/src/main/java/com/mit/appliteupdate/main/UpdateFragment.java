@@ -414,14 +414,10 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             mSimilarDataList = updateData.getSimilar_info();
             LogUtils.d(TAG, "mSimilarDataList：" + mSimilarDataList);
         }
-        if (null == mSimilarAdapter) {
+        if (null == mSimilarAdapter)
             mSimilarAdapter = new MySimilarAdapter(mActivity);
-            mSimilarAdapter.setData(mSimilarDataList, this, 4);
-            mSimilarView.setAdapter(mSimilarAdapter);
-        } else {
-            mSimilarAdapter.setData(mSimilarDataList, this, 4);
-            mSimilarAdapter.notifyDataSetChanged();
-        }
+        mSimilarAdapter.setData(mSimilarDataList, this, 4);
+        mSimilarView.setAdapter(mSimilarAdapter);
 
         //删除已经忽略的APK
         Iterator iter = mUpdateApkList.iterator();

@@ -1,0 +1,100 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/month_view_week"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@color/week_color"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/week_fri"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingLeft="2.5dp"
+            android:paddingRight="2.5dp"
+            android:text="01\n周"
+            android:textColor="@color/non_current_month"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/week_sec"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingLeft="2.5dp"
+            android:paddingRight="2.5dp"
+            android:text="02\n周"
+            android:textColor="@color/non_current_month"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/week_third"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingLeft="2.5dp"
+            android:paddingRight="2.5dp"
+            android:text="03\n周"
+            android:textColor="@color/non_current_month"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/week_four"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingLeft="2.5dp"
+            android:paddingRight="2.5dp"
+            android:text="04\n周"
+            android:textColor="@color/non_current_month"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/week_fif"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingLeft="2.5dp"
+            android:paddingRight="2.5dp"
+            android:text="05\n周"
+            android:textColor="@color/non_current_month"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/week_six"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingLeft="2.5dp"
+            android:paddingRight="2.5dp"
+            android:text="06\n周"
+            android:textColor="@color/non_current_month"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <com.example.android213.calendar.CalendarGridView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:cacheColorHint="@android:color/white"
+        android:horizontalSpacing="1dp"
+        android:listSelector="@android:color/transparent"
+        android:numColumns="1"
+        android:scrollbars="none"
+        android:stretchMode="columnWidth" />
+
+</LinearLayout>
