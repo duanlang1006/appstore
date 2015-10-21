@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import java.util.List;
 
@@ -135,7 +136,7 @@ public class DownloadService extends Service {
             initNotify(mContext);
             int tempCount = calculate(mContext, downloading);
             if (tempCount != 0) {
-                if (tempCount == calculate(mContext, downloading, ImplInfo.STATUS_PAUSED)) {
+                if (tempCount == calculate(mContext, ImplInfo.STATUS_PAUSED)) {
                     showIntentActivityNotify(mContext, 2);
                 } else {
                     showIntentActivityNotify(mContext, 0);
@@ -162,8 +163,8 @@ public class DownloadService extends Service {
             switch (status) {
                 case 0:
                     temp = mContext.getResources().getString(R.string.notification_message_downloading,
-                            calculate(mContext, downloading, ImplInfo.STATUS_RUNNING)
-                                    + calculate(mContext, downloading, ImplInfo.STATUS_PENDING));
+                            calculate(mContext, ImplInfo.STATUS_RUNNING)
+                                    + calculate(mContext, ImplInfo.STATUS_PENDING));
                     break;
                 case 1:
                     temp = mContext.getResources().getString(R.string.notification_message_downloaded);
@@ -196,19 +197,6 @@ public class DownloadService extends Service {
 //        private int calculate(Context context, int position, int status) {
 //            return ImplAgent.getInstance(context.getApplicationContext()).getImplInfoStatusCount(position, status);
 //        }
-
-
-        private int calculate(Context context, int position, int status) {
-            int count = 0;
-            for (ImplInfo info : ImplAgent.getInstance(context).getDownloadInfoList(position)) {
-                if ((info.getStatus() & position) != 0 && info.getId() > 0) {
-                    if (status == info.getStatus()) {
-                        count++;
-                    }
-                }
-            }
-            return count;
-        }
 
         private void initNotify(Context context) {
             if (null == mBuilder) {
