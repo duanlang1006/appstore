@@ -20,11 +20,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -78,7 +77,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             vh.deleteCheckBox.setVisibility(View.VISIBLE);
             vh.deleteCheckBox.setChecked(mListener.getStatus(position));
             if (true == mListener.getFlag2()) {
-                vh.deleteCheckBox.startAnimation(vh.animaCheckBox);
                 mListener.setFlag2(false);
             }
             vh.actionBtn.setVisibility(View.GONE);
@@ -93,10 +91,16 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 vh.actionBtn.setVisibility(View.VISIBLE);
                 vh.custompb.setVisibility(View.GONE);
                 vh.statusView.setVisibility(View.INVISIBLE);
+                if (ImplInfo.STATUS_PRIVATE_INSTALLING == vh.implInfo.getStatus()) {
+                    vh.actionBtn.setEnabled(false);
+                    vh.actionBtn.setFocusable(false);
+                } else {
+                    vh.actionBtn.setEnabled(true);
+                    vh.actionBtn.setFocusable(true);
+                }
             }
             vh.deleteCheckBox.setVisibility(View.GONE);
         }
-//        vh.refresh();
         return view;
     }
 
@@ -123,7 +127,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         CheckBox deleteCheckBox;
         ImageView iconView;
         public ImplInfo implInfo;
-        Animation animaCheckBox;
 
 
         ViewHolder(View view) {
@@ -152,7 +155,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             titleView.setText(title);
             setIcon();
             refresh();
-            animaCheckBox = AnimationUtils.loadAnimation(mContext, R.anim.checkbox_in);
         }
 
         void refresh() {
@@ -191,7 +193,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         private void setIcon() {
             Bitmap resBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.file_type_apk);
             String url = implInfo.getIconUrl();
-            if (null != url && !TextUtils.isEmpty(url)&& AppliteUtils.isLoadNetworkBitmap(mContext)) {
+            if (null != url && !TextUtils.isEmpty(url) && AppliteUtils.isLoadNetworkBitmap(mContext)) {
                 int width = (int) mContext.getResources().getDimension(R.dimen.list_item_icon_size);
                 int height = width;
                 mBitmapHelper.configDefaultBitmapMaxSize(width, height);
