@@ -308,12 +308,11 @@ public class ImplHelper {
                         implRes.setAction(ImplInfo.ACTION_OPEN);
                         implRes.setActionIntent(getLaunchDownloadIntent(context, archivePkg.packageName));
                         if (null == implRes.getActionIntent()) {
-                            implRes.setActionText(mResources.getString(R.string.action_open));
+                            implRes.setActionText(mResources.getString(R.string.action_install));
                         } else {
-                            implRes.setActionText(mResources.getString(R.string.action_open));
+                            implRes.setActionText(mResources.getString(R.string.action_install));
                         }
                         implRes.setDescText((String.format(mResources.getString(R.string.apk_version), archivePkg.versionName)));
-                        implRes.setActionIntent(getLaunchDownloadIntent(context, archivePkg.packageName));
                     } else {//下载apk解析错误
                         implRes.setAction(ImplInfo.ACTION_DOWNLOAD);
                         implRes.setActionText(mResources.getString(R.string.action_retry));

@@ -163,8 +163,7 @@ public class DownloadService extends Service {
             switch (status) {
                 case 0:
                     temp = mContext.getResources().getString(R.string.notification_message_downloading,
-                            calculate(mContext, ImplInfo.STATUS_RUNNING)
-                                    + calculate(mContext, ImplInfo.STATUS_PENDING));
+                            calculate(mContext, ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PENDING));
                     break;
                 case 1:
                     temp = mContext.getResources().getString(R.string.notification_message_downloaded);

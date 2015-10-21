@@ -322,7 +322,7 @@ public class ImplAgent extends Observable {
         ImplLog.d(TAG, "pauseDownload," + implInfo.getTitle() + "," + implInfo.getStatus());
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionPause");
         mDownloader.pause(implInfo, mImplCallback);
-        mImplCallback.onCancelled(implInfo);
+//        mImplCallback.onCancelled(implInfo);
     }
 
     public void pauseAll() {
@@ -339,7 +339,7 @@ public class ImplAgent extends Observable {
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionResume");
         bindImplCallback(appCallback, implInfo);
         mDownloader.resume(implInfo, mImplCallback);
-        mImplCallback.onStart(implInfo);
+//        mImplCallback.onStart(implInfo);
     }
 
     public void resumeAll() {

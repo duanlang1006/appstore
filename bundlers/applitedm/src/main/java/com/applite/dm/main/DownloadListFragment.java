@@ -4,13 +4,18 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
+
+import com.mit.afinal.FinalHttp;
+import com.mit.afinal.http.AjaxCallBack;
+import com.mit.afinal.http.AjaxParams;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
@@ -26,11 +31,6 @@ import com.applite.similarview.SimilarView;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.bitmap.PauseOnScrollListener;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
 import com.mit.impl.ImplHelper;
@@ -62,6 +62,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     private int mTitleId;
     private ImplAgent mImplAgent;
     private List<ImplInfo> mImplList;
+
 
     private BitmapUtils mBitmapHelper;
     private SimilarView mSimilarView;
@@ -246,19 +247,69 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     }
 
     private void post() {
-        mHttpUtils = new HttpUtils();
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-        params.addBodyParameter("packagename", mActivity.getPackageName());
-        params.addBodyParameter("type", "update_management");
-        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
-        params.addBodyParameter("update_info", AppliteUtils.getAllApkData(mActivity));
-        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//        mHttpUtils = new HttpUtils();
+//        RequestParams params = new RequestParams();
+//        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+//        params.addBodyParameter("packagename", mActivity.getPackageName());
+//        params.addBodyParameter("type", "update_management");
+//        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
+//        params.addBodyParameter("update_info", AppliteUtils.getAllApkData(mActivity));
+//        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
+//            @Override
+//            public void onSuccess(ResponseInfo<String> responseInfo) {
+//                LogUtils.i(TAG, "更新请求成功，resulit：" + responseInfo.result);
+//                try {
+//                    JSONObject object = new JSONObject(responseInfo.result);
+//                    String similar_info = object.getString("similar_info");
+//                    if (!mSimilarDataList.isEmpty())
+//                        mSimilarDataList.clear();
+//                    JSONArray similar_json = new JSONArray(similar_info);
+//                    SimilarBean similarBean = null;
+//                    if (similar_json.length() != 0 && similar_json != null) {
+//                        for (int i = 0; i < similar_json.length(); i++) {
+//                            similarBean = new SimilarBean();
+//                            JSONObject obj = new JSONObject(similar_json.get(i).toString());
+//                            similarBean.setName(obj.getString("name"));
+//                            similarBean.setPackageName(obj.getString("packageName"));
+//                            similarBean.setIconUrl(obj.getString("iconUrl"));
+//                            similarBean.setrDownloadUrl(obj.getString("rDownloadUrl"));
+//                            similarBean.setVersionCode(obj.getInt("versionCode"));
+//                            mSimilarDataList.add(similarBean);
+//                        }
+//                        if (null == mSimilarAdapter) {
+//                            mSimilarAdapter = new DownloadSimilarAdapter(mActivity);
+//                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
+//                            mSimilarView.setAdapter(mSimilarAdapter);
+//                        } else {
+//                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
+//                            mSimilarAdapter.notifyDataSetChanged();
+//                        }
+//                    }
+//                } catch (JSONException e) {
+//                    Toast.makeText(mActivity, "kong", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(HttpException e, String s) {
+//                LogUtils.i(TAG, mActivity.getPackageName() + "");
+//            }
+//
+//        });
+
+        AjaxParams params = new AjaxParams();
+        params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
+        params.put("packagename", mActivity.getPackageName());
+        params.put("type", "update_management");
+        params.put("protocol_version", Constant.PROTOCOL_VERSION);
+        params.put("update_info", AppliteUtils.getAllApkData(mActivity));
+        FinalHttp mFinalHttp = new FinalHttp();
+        mFinalHttp.post(Constant.URL, params, new AjaxCallBack<String>() {
             @Override
-            public void onSuccess(ResponseInfo<String> responseInfo) {
-                LogUtils.i(TAG, "更新请求成功，resulit：" + responseInfo.result);
+            public void onSuccess(String responseInfo) {
+                LogUtils.i(TAG, "更新请求成功，resulit：" + responseInfo);
                 try {
-                    JSONObject object = new JSONObject(responseInfo.result);
+                    JSONObject object = new JSONObject(responseInfo);
                     String similar_info = object.getString("similar_info");
                     if (!mSimilarDataList.isEmpty())
                         mSimilarDataList.clear();
@@ -275,30 +326,27 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                             similarBean.setVersionCode(obj.getInt("versionCode"));
                             mSimilarDataList.add(similarBean);
                         }
-                        if (null == mSimilarDataList) {
-                            android.util.Log.i(TAG, "mSimilarDataList == null");
-                            return;
-                        }
                         if (null == mSimilarAdapter) {
                             mSimilarAdapter = new DownloadSimilarAdapter(mActivity);
-                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, mSimilarView.getNumColumns());
+                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
                             mSimilarView.setAdapter(mSimilarAdapter);
                         } else {
-                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, mSimilarView.getNumColumns());
+                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
                             mSimilarAdapter.notifyDataSetChanged();
                         }
                     }
                 } catch (JSONException e) {
-//                    Toast.makeText(mActivity, "kong", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, "kong", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(HttpException e, String s) {
-                LogUtils.i(TAG, mActivity.getPackageName() + "");
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
+                LogUtils.i(TAG, mActivity.getPackageName() + " strMsg");
             }
-
         });
+
+
     }
 
 //    /**
