@@ -1,9 +1,6 @@
 package com.mit.impl;
 
 import android.app.DownloadManager;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,7 +8,6 @@ import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 
 import com.lidroid.xutils.DbUtils;
@@ -326,6 +322,7 @@ public class ImplAgent extends Observable {
         ImplLog.d(TAG, "pauseDownload," + implInfo.getTitle() + "," + implInfo.getStatus());
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionPause");
         mDownloader.pause(implInfo, mImplCallback);
+//        mImplCallback.onCancelled(implInfo);
     }
 
     public void pauseAll() {
@@ -342,6 +339,7 @@ public class ImplAgent extends Observable {
         MitMobclickAgent.onEvent(mContext, "impl_DownloadActionResume");
         bindImplCallback(appCallback, implInfo);
         mDownloader.resume(implInfo, mImplCallback);
+//        mImplCallback.onStart(implInfo);
     }
 
     public void resumeAll() {
@@ -566,6 +564,9 @@ public class ImplAgent extends Observable {
         public void onStart(ImplInfo info) {
             super.onStart(info);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadStart");
+            for (int i = 0; i < mPackageListener.size(); i++) {
+                mPackageListener.get(i).onDownloadResume(info);
+            }
             callbackImpl(info);
             saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onStart");
@@ -575,6 +576,9 @@ public class ImplAgent extends Observable {
         public void onCancelled(ImplInfo info) {
             super.onCancelled(info);
             MitMobclickAgent.onEvent(mContext, "impl_DownloadPaused");
+            for (int i = 0; i < mPackageListener.size(); i++) {
+                mPackageListener.get(i).onDownloadPaused(info);
+            }
             callbackImpl(info);
             saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onCancelled");
@@ -782,6 +786,13 @@ public class ImplAgent extends Observable {
         }
 
         public void onSystemRemoveResult(ImplInfo implInfo, int result) {
+        }
+
+        public void onDownloadPaused(ImplInfo implInfo) {
+        }
+
+        public void onDownloadResume(ImplInfo implInfo) {
+
         }
     }
 }

@@ -129,7 +129,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 		tabTextSize = a.getDimensionPixelSize(0, tabTextSize);
 		tabTextColor = a.getColorStateList(1);
         tabTypefaceStyle = a.getInt(2,tabTypefaceStyle);
-        LogUtils.d(TAG,"tabTextSize="+tabTextSize+",tabTextColor="+tabTextColor+",tabTypefaceStyle="+tabTypefaceStyle);
+        LogUtils.d(TAG, "tabTextSize=" + tabTextSize + ",tabTextColor=" + tabTextColor + ",tabTypefaceStyle=" + tabTypefaceStyle);
 		a.recycle();
 
 		// get custom attrs

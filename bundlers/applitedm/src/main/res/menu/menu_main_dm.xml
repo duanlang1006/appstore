@@ -13,10 +13,5 @@
         android:showAsAction="never"
         android:title="@string/action_download_all" />
         
-    <item
-        android:id="@+id/action_dm"
-        android:showAsAction="never"
-        android:icon="@drawable/icon_dm_light"
-        android:title="@string/action_dm"/>
-        
+
 </menu>
