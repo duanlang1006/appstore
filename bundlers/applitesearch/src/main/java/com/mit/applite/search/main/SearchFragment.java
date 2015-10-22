@@ -120,7 +120,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private int SEARCH_POST_CURRENT_PAGE = SEARCH_DEFAULT_PAGE;
     private String mSearchLastName;//上次请求关键字
 
-    private boolean isPostPreload = true;//预加载是否请求
+    private boolean isPostPreload = false;//预加载是否请求
     private boolean isToEnd = false;//服务器数据是否到底
     private boolean isLastRow = false;
     private boolean isAllowPost = true;//是否允许请求
@@ -270,6 +270,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 } else {
                     MitMobclickAgent.onEvent(mActivity, "searchHint");
                     mEtView.setText(mEtView.getHint().toString());
+                    mEtView.setSelection(mEtView.getHint().toString().length());
                     postSearch(mEtView.getHint().toString(), SEARCH_DEFAULT_PAGE);
                 }
             } else {
@@ -326,9 +327,10 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                     mEtView.setHint(mHintword);
                 }
                 if (null != mKeyword) {
-                    isPostPreload = false;
                     mEtView.setText(mKeyword);
+                    mEtView.setSelection(mKeyword.length());
                 }
+                isPostPreload = false;
             }
             ActionBar actionBar = ((ActionBarActivity) mActivity).getSupportActionBar();
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -374,6 +376,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mPreloadListView.setVisibility(View.GONE);
                 isPostPreload = false;
                 mEtView.setText(mPreloadList.get(position).getName());
+                mEtView.setSelection(mPreloadList.get(position).getName().length());
                 postSearch(mPreloadList.get(position).getName(), SEARCH_DEFAULT_PAGE);
             }
         });
@@ -402,10 +405,12 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             if (TextUtils.isEmpty(mEtView.getText().toString())) {
                 setShowView(SHOW_VIEW_HOTWORD);
             } else {
-                isShowSearchView = false;
+//                isShowSearchView = false;
                 isAllowPost = true;
-                if (isPostPreload)
+                if (isPostPreload) {
+                    mPostPreloadNumber = mPostPreloadNumber + 1;
                     postPreload(mEtView.getText().toString(), mPostPreloadNumber);
+                }
                 isPostPreload = true;
             }
         }
@@ -665,6 +670,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     public void clickItem(String name) {
         isPostPreload = false;
         mEtView.setText(name);
+        mEtView.setSelection(name.length());
         postSearch(name, SEARCH_DEFAULT_PAGE);
     }
 
