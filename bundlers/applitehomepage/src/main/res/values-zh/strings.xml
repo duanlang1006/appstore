@@ -32,7 +32,7 @@
     <string name="notification">通知栏提示</string>
     <string name="update_notification">更新提醒</string>
     <string name="other_function">其他功能</string>
-    <string name="clean_cache">清除缓存</string>
+    <string name="clean_cache">清理缓存</string>
     <string name="clean_cache_detail">点我清除缓存</string>
     <string name="delete_package">删除安装包</string>
     <string name="delete_package_detail">安装完成后删除安装包</string>
@@ -42,8 +42,8 @@
     <string name="about">关于</string>
     <string name="help">帮助</string>
 
-    <string name="dialog_dataclean_title">清除緩存</string>
-    <string name="dialog_dataclean_content">確定要刪除所有數據嗎？</string>
+    <string name="dialog_dataclean_title">清理缓存</string>
+    <string name="dialog_dataclean_content">确定要删除所有数据吗</string>
 
     <string name="testimonial_0">恭喜您抽中 10 积分</string>
     <string name="testimonial_1">恭喜您抽中 50 积分</string>
