@@ -560,6 +560,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 bitmapUtils.display(img, mViewPagerUrlList[i], new BitmapLoadCallBack<ImageView>() {
                     @Override
                     public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
+                        imageView.setDrawingCacheEnabled(false);
                         if (bitmap.getWidth() > bitmap.getHeight()) {
                             imageView.setImageBitmap(DetailUtils.rotateBitmap(bitmap, 90));
                         } else {
