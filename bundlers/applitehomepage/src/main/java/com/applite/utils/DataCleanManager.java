@@ -94,7 +94,7 @@ public class DataCleanManager {
     public static String getFormatSize(double size) {
         double kiloByte = size / 1024;
         if (kiloByte < 1) {
-            return "OK";
+            return "1KB";
         }
 
         double megaByte = kiloByte / 1024;
