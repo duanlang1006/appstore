@@ -658,6 +658,7 @@ public class ImplAgent extends Observable {
             saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onUninstallSuccess");
             notifyObserverUpdate("uninstalled");
+            mInstaller.install(info, false, this);
         }
 
         @Override
@@ -794,5 +795,8 @@ public class ImplAgent extends Observable {
         public void onDownloadResume(ImplInfo implInfo) {
 
         }
+
+//        public void onUninstall(ImplInfo implInfo) {
+//        }
     }
 }

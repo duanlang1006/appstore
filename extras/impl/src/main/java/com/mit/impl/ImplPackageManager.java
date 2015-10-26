@@ -1,7 +1,9 @@
 package com.mit.impl;
 
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -68,7 +70,7 @@ public class ImplPackageManager {
         }
     }
 
-    void install(ImplInfo implInfo, boolean silent, ImplListener callback) {
+    void install(final ImplInfo implInfo, boolean silent, final ImplListener callback) {
         String path = implInfo.getLocalPath();
         if (null == path || TextUtils.isEmpty(path)) {
             path = implInfo.getFileSavePath();
@@ -78,6 +80,20 @@ public class ImplPackageManager {
         }
         PackageInfo info = pm.getPackageArchiveInfo(path, PackageManager.GET_ACTIVITIES);
         if (null != info && info.packageName.equals(implInfo.getPackageName())) {
+            //签名如果不一致,停止安装,删除
+            if (!implInfo.isSignatureEqual()) {
+                AlertDialog dialog = new AlertDialog.Builder(mContext).
+                        setTitle(mContext.getResources().getString(R.string.remind)).
+                        setMessage(mContext.getResources().getString(R.string.remind_message))
+                        .setPositiveButton(mContext.getResources().getString(R.string.uninstall), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ImplPackageManager.getInstance(mContext).uninstall(implInfo, false, callback);
+                            }
+                        }).setNegativeButton(mContext.getResources().getString(R.string.cancel), null).show();
+                dialog.setCanceledOnTouchOutside(false);
+                return;
+            }
             try {
                 pm.getApplicationInfo("com.android.installer", 0);
                 installImpl(implInfo, path, silent);
@@ -97,6 +113,54 @@ public class ImplPackageManager {
             callback.onInstallFailure(implInfo, -100000);
         }
     }
+
+//    private static boolean isEqual(String apkSignature, String packageSignature) {
+//        if (null == apkSignature) {
+//            return true;
+//        }
+//        if (null == packageSignature) {
+//            return true;
+//        }
+//        if (apkSignature.equals(packageSignature)) {
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    /**
+//     * 获取安装包签名
+//     *
+//     * @param packagePath
+//     * @return
+//     */
+//    private String getPackageSignature(Context context, String packagePath) {
+//        try {
+//            PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(
+//                    packagePath, PackageManager.GET_SIGNATURES);
+//            Log.i("wanghc", "111:" + packageInfo.signatures[0].toCharsString());
+//            return packageInfo.signatures[0].toCharsString();
+//        } catch (Exception e) {
+//            return null;
+//        }
+//    }
+//
+//    /**
+//     * 获取已安装应用签名
+//     *
+//     * @param context
+//     * @param packageName
+//     * @return
+//     */
+//    public String getApkSignature(Context context, String packageName) {
+//        try {
+//            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(
+//                    packageName, PackageManager.GET_SIGNATURES);
+//    Log.i("wanghc", "222:" + packageInfo.signatures[0].toCharsString());
+//            return packageInfo.signatures[0].toCharsString();
+//        } catch (Exception e) {
+//            return null;
+//        }
+//    }
 
     void uninstall(ImplInfo implInfo, boolean silent, ImplListener callback) {
         try {
@@ -131,6 +195,7 @@ public class ImplPackageManager {
             callback.onUninstallSuccess(implInfo);
         } else {
             callback.onUninstallFailure(implInfo, result);
+            onPackageChanged(implInfo, callback);
         }
     }
 
@@ -172,7 +237,7 @@ public class ImplPackageManager {
             implInfo.setStatus(ImplInfo.STATUS_PRIVATE_INSTALLING);
         } else {
             Uri path = Uri.fromFile(new File(filename));
-            Intent activityIntent = new Intent(Intent.ACTION_VIEW);
+            final Intent activityIntent = new Intent(Intent.ACTION_VIEW);
             activityIntent.setDataAndType(path, "application/vnd.android.package-archive");
             activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             try {
@@ -183,4 +248,5 @@ public class ImplPackageManager {
             implInfo.setStatus(ImplInfo.STATUS_NORMAL_INSTALLING);
         }
     }
+
 }

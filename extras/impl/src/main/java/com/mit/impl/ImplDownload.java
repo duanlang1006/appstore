@@ -2,6 +2,8 @@ package com.mit.impl;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.text.TextUtils;
@@ -129,6 +131,10 @@ public class ImplDownload {
         protected void onPostExecute(File file) {
             super.onPostExecute(file);
             ImplLog.d(TAG, "AddDownloadAsync::onPostExecute," + implInfo.getTitle() + "," + implInfo.getStatus());
+
+            implInfo.setSignatureEqual(isEqual(getPackageSignature(mContext, implInfo.getFileSavePath()),
+                                                    getApkSignature(mContext, implInfo.getPackageName())));
+
             if (null != file) {
                 implInfo.setFileSavePath(file.getAbsolutePath());
                 implInfo.setLocalPath(file.getAbsolutePath());
@@ -151,6 +157,53 @@ public class ImplDownload {
                 implInfo.setState(handler.getState());
                 downloadCallback.onEnqued(0);
             }
+        }
+
+    }
+
+    private boolean isEqual(String apkSignature, String packageSignature) {
+        if (null == apkSignature) {
+            return true;
+        }
+        if (null == packageSignature) {
+            return true;
+        }
+        if (apkSignature.equals(packageSignature)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 获取安装包签名
+     *
+     * @param packagePath
+     * @return
+     */
+    private String getPackageSignature(Context context, String packagePath) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageArchiveInfo(
+                    packagePath, PackageManager.GET_SIGNATURES);
+            return packageInfo.signatures[0].toCharsString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * 获取已安装应用签名
+     *
+     * @param context
+     * @param packageName
+     * @return
+     */
+    public String getApkSignature(Context context, String packageName) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(
+                    packageName, PackageManager.GET_SIGNATURES);
+            return packageInfo.signatures[0].toCharsString();
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -592,7 +645,8 @@ public class ImplDownload {
             }
             java.io.File file = (java.io.File) fileResponseInfo.result;
             if (null != file && file.exists()) {
-                if (null != implInfo.getMd5() && !TextUtils.isEmpty(implInfo.getMd5())) {
+                if (null != implInfo.getMd5() && !TextUtils.isEmpty(implInfo.getMd5())
+                        || null != getApkSignature(mContext, implInfo.getPackageName())) {
                     new MD5Async(implInfo, file.getAbsolutePath(), baseCallback, file).execute();
                 } else {
                     implInfo.setLocalPath(file.getAbsolutePath());
