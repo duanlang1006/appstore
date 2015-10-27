@@ -145,7 +145,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         }
         LogUtils.i(TAG, "mApkName:" + mApkName + "------mPackageName:" + mPackageName + "------mImgUrl:" + mImgUrl + "------mVersionCode:" + mVersionCode);
         LogUtils.i(TAG, "mBoxlabelValue:" + mBoxlabelValue);
-        initActionBar();
     }
 
     @Override
@@ -167,6 +166,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
         this.container = container;
         rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         initView();
+        initActionBar();
+
         setProgressButtonState();
         if (null == mPostReturnData) {
             post(mPackageName);
@@ -559,6 +560,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 bitmapUtils.display(img, mViewPagerUrlList[i], new BitmapLoadCallBack<ImageView>() {
                     @Override
                     public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
+                        imageView.setDrawingCacheEnabled(false);
                         if (bitmap.getWidth() > bitmap.getHeight()) {
                             imageView.setImageBitmap(DetailUtils.rotateBitmap(bitmap, 90));
                         } else {
