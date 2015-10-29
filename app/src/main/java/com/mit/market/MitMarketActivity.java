@@ -28,12 +28,6 @@ import com.applite.homepage.LuckyFragment;
 import com.applite.homepage.PersonalFragment;
 import com.applite.homepage.SettingFragment;
 import com.applite.sharedpreferences.AppliteSPUtils;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest;
 import com.mit.afinal.FinalHttp;
 import com.mit.afinal.http.AjaxCallBack;
 import com.mit.afinal.http.AjaxParams;
@@ -57,7 +51,7 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
     private static final String TAG = "applite_MitMarketActivity";
 
     private boolean personal_flag = false;
-    Toast toast;
+    private Toast toast = null;
     private UninstallReceiver mUninstallReceiver;
 
     private SharedPreferences.OnSharedPreferenceChangeListener mConfigListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -297,9 +291,13 @@ public class MitMarketActivity extends ActionBarActivity implements OSGIServiceH
 
     private void exit() {
         if ((System.currentTimeMillis() - clickTime) > 2000) {
-            Toast.makeText(getApplicationContext(), "再按一次退出应用商店", Toast.LENGTH_SHORT).show();
+            toast = toast.makeText(getApplicationContext(), "再按一次退出应用商店", Toast.LENGTH_SHORT);
+            toast.show();
             clickTime = System.currentTimeMillis();
         } else {
+            if (null != toast) {
+                toast.cancel();
+            }
             this.finish();
         }
     }
