@@ -207,6 +207,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         } else if (item.getItemId() == R.id.dm_action_resume_all) {
             ImplAgent.getInstance(mActivity.getApplicationContext()).resumeAll();
             return true;
+        } else if (android.R.id.home == item.getItemId()) {
+            if (!isHomeExist()) {
+                ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -221,18 +226,19 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     @Override
     public void onClick(View v) {
-        FragmentManager fgm = getFragmentManager();
-        if (v.getId() == R.id.action_back) {
-            if (null != fgm.getFragments() && fgm.getFragments().size() > 0) {
-                if (!isHomeExist()) {
-                    ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
-                    return;
-                }
-                fgm.popBackStack();
-            } else {
-                mActivity.finish();
-            }
-        } else if (v.getId() == R.id.btnDelete) {//删除
+//        FragmentManager fgm = getFragmentManager();
+//        if (v.getId() == R.id.action_back) {
+//            if (null != fgm.getFragments() && fgm.getFragments().size() > 0) {
+//                if (!isHomeExist()) {
+//                    ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
+//                    return;
+//                }
+//                fgm.popBackStack();
+//            } else {
+//                mActivity.finish();
+//            }
+//        } else
+        if (v.getId() == R.id.btnDelete) {//删除
             if (null == dialog) {
                 initDialog();
             }
@@ -280,6 +286,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
      *
      * @return
      */
+
     private boolean isHomeExist() {
         if (null == getFragmentManager().findFragmentByTag(Constant.OSGI_SERVICE_MAIN_FRAGMENT)) {
             LogUtils.d(TAG, "首页不存在");
