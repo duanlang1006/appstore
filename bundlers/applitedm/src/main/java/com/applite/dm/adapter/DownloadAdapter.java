@@ -186,7 +186,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             } else {
                 actionBtn.setEnabled(true);
                 actionBtn.setFocusable(true);
-                actionBtn.setTextColor(mContext.getResources().getColor(R.color.apklis_button_normal));
+                actionBtn.setTextColor(mContext.getResources().getColor(R.color.apklist_btn_text_color));
             }
 
             ImplLog.d("impl_dm", implInfo.getTitle() + "," + implRes.getStatusText() + "," + implRes.getDescText() + "," + implInfo.getProgress());
