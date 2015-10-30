@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
@@ -174,7 +175,8 @@ public class DownloadService extends Service {
             }
             mBuilder.setAutoCancel(true)//点击后让通知将消失
                     .setContentTitle(temp)
-                    .setContentText(mContext.getResources().getString(R.string.click_check));
+                    .setContentText(mContext.getResources().getString(R.string.click_check))
+                    .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_launcher));
             try {
                 clickIntent = new Intent(context, Class.forName(DM_NOTIFICATION));
                 clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
