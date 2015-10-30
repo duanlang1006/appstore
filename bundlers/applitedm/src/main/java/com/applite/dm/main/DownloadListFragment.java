@@ -480,7 +480,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
     }
 
-
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         if (position > mImplList.size() - 1) {
