@@ -483,6 +483,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        if (position > mImplList.size() - 1) {
+            return false;
+        }
         if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
             AppliteSPUtils.put(mActivity, FLAG, true);
             //防止因增加猜你喜欢中的应用导致的数组长度越界(在onItemClick中增加的应用)
