@@ -55,6 +55,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SearchFragment extends OSGIBaseFragment implements View.OnClickListener, HotWordAdapter.ClickHotWordItemPostlistener {
 
@@ -270,7 +272,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 } else {
                     MitMobclickAgent.onEvent(mActivity, "searchHint");
                     mEtView.setText(mEtView.getHint().toString());
-                    mEtView.setSelection(mEtView.getHint().toString().length());
+                    mEtView.setSelection(mEtView.length());
                     postSearch(mEtView.getHint().toString(), SEARCH_DEFAULT_PAGE);
                 }
             } else {
@@ -328,7 +330,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 }
                 if (null != mKeyword) {
                     mEtView.setText(mKeyword);
-                    mEtView.setSelection(mKeyword.length());
+                    mEtView.setSelection(mEtView.length());
                 }
                 isPostPreload = false;
             }
@@ -376,7 +378,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 mPreloadListView.setVisibility(View.GONE);
                 isPostPreload = false;
                 mEtView.setText(mPreloadList.get(position).getName());
-                mEtView.setSelection(mPreloadList.get(position).getName().length());
+                mEtView.setSelection(mEtView.length());
                 postSearch(mPreloadList.get(position).getName(), SEARCH_DEFAULT_PAGE);
             }
         });
@@ -388,7 +390,21 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         mRefresh.setOnClickListener(this);
     }
 
+    /**
+     * 非有效字符过滤
+     *
+     * @param str
+     * @return
+     */
+    private String stringFilter(String str) {
+        String regEx = "[ `~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(str);
+        return m.replaceAll("");
+    }
+
     private TextWatcher mTextWatcher = new TextWatcher() {
+
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             LogUtils.i(TAG, "输入文本之前的状态");
@@ -397,6 +413,15 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             LogUtils.i(TAG, "输入文字中的状态，count是一次性输入字符数");
+            String editable = mEtView.getText().toString();
+            if (editable.length() == 1) {
+                String str = stringFilter(editable); //过滤特殊字符
+                if (!editable.equals(str)) {
+                    mEtView.setText(str);
+                    Toast.makeText(mActivity, "请输入有效字符!", Toast.LENGTH_SHORT).show();
+                }
+                mEtView.setSelection(mEtView.length());
+            }
         }
 
         @Override
@@ -670,7 +695,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     public void clickItem(String name) {
         isPostPreload = false;
         mEtView.setText(name);
-        mEtView.setSelection(name.length());
+        mEtView.setSelection(mEtView.length());
         postSearch(name, SEARCH_DEFAULT_PAGE);
     }
 
@@ -740,8 +765,12 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      * @param data
      */
     private void setSearchData(String data, int page) {
-        if (page == 0)
+        if (page == 0) {
             mSearchList.clear();
+            if (null != mAdapter) {
+                mAdapter.notifyDataSetChanged();
+            }
+        }
         try {
             SearchBean searchBean = mGson.fromJson(data, SearchBean.class);
             if (null != searchBean) {
@@ -822,6 +851,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      */
     private void setPreloadData(String result) {
         mPreloadList.clear();
+        if (null != mPreloadAdapter) {
+            mPreloadAdapter.notifyDataSetChanged();
+        }
         try {
             SearchBean searchBean = mGson.fromJson(result, SearchBean.class);
             if (null != searchBean) {

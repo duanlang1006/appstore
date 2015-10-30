@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -92,7 +93,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     private ListView mIgnoreListView;
     private TextView mActionBarTitle;
     private IgnoreAdapter mIgnoreAdapter;
-    private ImageView mNoUpdateView;
+    private TextView mNoUpdateView;
     private SharedPreferences.OnSharedPreferenceChangeListener mSPListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -143,6 +144,18 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
     public void onResume() {
         LogUtils.d(TAG, "onResume");
         super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    hideIgnoreList();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -179,34 +192,8 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
                 ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
                 return true;
             } else {
-                if (mIgnoreListView.getVisibility() == View.VISIBLE) {
-                    mIgnoreListView.setVisibility(View.GONE);
-                    mTitleLayout.setVisibility(View.VISIBLE);
-                    mActionBarTitle.setVisibility(View.VISIBLE);
-                    mListView.setVisibility(View.VISIBLE);
-                    if (mUpdateApkList.size() == 0) {
-                        mNoUpdateView.setVisibility(View.VISIBLE);
-                        mUpdateItemNum.setText(getString(R.string.update_item));
-                        mUpdateItemSize.setVisibility(View.GONE);
-                    } else {
-                        mNoUpdateView.setVisibility(View.GONE);
-                        mUpdateItemNum.setText(getString(R.string.update_item) + "(" + mUpdateApkList.size() + ")");
-                        mUpdateItemSizeNum = 0.00;
-                        for (int i = 0; i < mUpdateApkList.size(); i++) {
-                            String num = AppliteUtils.bytes2kb(mUpdateApkList.get(i).getApkSize());
-                            Double sizenumvalue = Double.valueOf(num.substring(0, num.length() - 2));
-                            mUpdateItemSizeNum += sizenumvalue;
-                            mUpdateItemSizeNum = (double) (Math.round((mUpdateItemSizeNum) * 100) / 100.00);
-                            LogUtils.d(TAG, "总大小：" + mUpdateItemSizeNum);
-                        }
-                        mUpdateItemSize.setText("总计大小：" + String.valueOf(mUpdateItemSizeNum) + "MB");
-                        mUpdateItemSize.setVisibility(View.VISIBLE);
-                    }
-                    if (mIgnoreList.size() == 0) {
-                        mActionBarIgnore.setVisibility(View.INVISIBLE);
-                    }
-                    return true;
-                }
+                hideIgnoreList();
+                return true;
             }
         }
         return super.onOptionsItemSelected(item);
@@ -245,12 +232,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             mActionBarTitle.setVisibility(View.GONE);
             mNoUpdateView.setVisibility(View.GONE);
             mIgnoreListView.setVisibility(View.VISIBLE);
-            if (null == mIgnoreAdapter) {
+            if (null == mIgnoreAdapter)
                 mIgnoreAdapter = new IgnoreAdapter(mActivity, mIgnoreList, this);
-                mIgnoreListView.setAdapter(mIgnoreAdapter);
-            } else {
-                mIgnoreAdapter.notifyDataSetChanged();
-            }
+            mIgnoreListView.setAdapter(mIgnoreAdapter);
         }
     }
 
@@ -292,7 +276,7 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         mStatsButton = (TextView) rootView.findViewById(R.id.update_post_button);
         mTitleLayout = (LinearLayout) rootView.findViewById(R.id.update_title);
         mIgnoreListView = (ListView) rootView.findViewById(R.id.update_ignore_listview);
-        mNoUpdateView = (ImageView) rootView.findViewById(R.id.update_no_update_iv);
+        mNoUpdateView = (TextView) rootView.findViewById(R.id.update_no_update_tv);
 
         //加载中控件
         mLoadLayout = (LinearLayout) rootView.findViewById(R.id.update_loading_layout);
@@ -319,6 +303,41 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         }
         LogUtils.d(TAG, "首页存在");
         return true;
+    }
+
+    /**
+     * 隐藏忽略List
+     */
+    private void hideIgnoreList() {
+        if (mIgnoreListView.getVisibility() == View.VISIBLE) {
+            mIgnoreListView.setVisibility(View.GONE);
+            mTitleLayout.setVisibility(View.VISIBLE);
+            mActionBarTitle.setVisibility(View.VISIBLE);
+            mListView.setVisibility(View.VISIBLE);
+            if (mUpdateApkList.size() == 0) {
+                mNoUpdateView.setVisibility(View.VISIBLE);
+                mUpdateItemNum.setText(getString(R.string.update_item));
+                mUpdateItemSize.setVisibility(View.GONE);
+            } else {
+                mNoUpdateView.setVisibility(View.GONE);
+                mUpdateItemNum.setText(getString(R.string.update_item) + "(" + mUpdateApkList.size() + ")");
+                mUpdateItemSizeNum = 0.00;
+                for (int i = 0; i < mUpdateApkList.size(); i++) {
+                    String num = AppliteUtils.bytes2kb(mUpdateApkList.get(i).getApkSize());
+                    Double sizenumvalue = Double.valueOf(num.substring(0, num.length() - 2));
+                    mUpdateItemSizeNum += sizenumvalue;
+                    mUpdateItemSizeNum = (double) (Math.round((mUpdateItemSizeNum) * 100) / 100.00);
+                    LogUtils.d(TAG, "总大小：" + mUpdateItemSizeNum);
+                }
+                mUpdateItemSize.setText("总计大小：" + String.valueOf(mUpdateItemSizeNum) + "MB");
+                mUpdateItemSize.setVisibility(View.VISIBLE);
+            }
+            if (mIgnoreList.size() == 0) {
+                mActionBarIgnore.setVisibility(View.GONE);
+            }
+        } else {
+            getFragmentManager().popBackStackImmediate();
+        }
     }
 
     /**
@@ -420,6 +439,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
         mSimilarView.setAdapter(mSimilarAdapter);
 
         //删除已经忽略的APK
+        mIgnoreList.clear();
+        if (null != mIgnoreAdapter)
+            mIgnoreAdapter.notifyDataSetChanged();
         Iterator iter = mUpdateApkList.iterator();
         while (iter.hasNext()) {
             ApkBean data = (ApkBean) iter.next();

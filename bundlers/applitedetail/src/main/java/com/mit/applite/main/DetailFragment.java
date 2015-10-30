@@ -102,7 +102,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private int COLLAPSIBLE_STATE_SPREAD = 2;//展开状态
     private int CONTENT_STATE = COLLAPSIBLE_STATE_NONE;
     private Handler mHandler = new Handler();
-    private List<View> mDetailImgList = new ArrayList<View>();
     private LinearLayout mHorDefaultLayout;
     private LinearLayout mTagStateLayout;
 
@@ -459,6 +458,11 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      * @param data
      */
     private void setData(String data) {
+        mSimilarData.clear();
+        mApkDatas.clear();
+        if (null != mSimilarAdapter)
+            mSimilarAdapter.notifyDataSetChanged();
+
         Gson gson = new Gson();
         DetailData detailData = gson.fromJson(data, DetailData.class);
         if (null != detailData) {
@@ -549,14 +553,13 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
     private void setPreViewImg(String mViewPagerUrl) {
         String[] mViewPagerUrlList = mViewPagerUrl.split(",");
         mHorDefaultLayout.setVisibility(View.GONE);
+        BitmapUtils bitmapUtils = new BitmapUtils(mActivity);
         for (int i = 0; i < mViewPagerUrlList.length; i++) {
             LogUtils.i(TAG, "应用图片URL地址：" + mViewPagerUrlList[i]);
             final View child = mActivity.getLayoutInflater().inflate(R.layout.item_detail_viewpager_img, container, false);
             final ImageView img = (ImageView) child.findViewById(R.id.item_viewpager_img);
             mImgLl.addView(child);
-            mDetailImgList.add(child);
             if (AppliteUtils.isLoadNetworkBitmap(mActivity)) {
-                BitmapUtils bitmapUtils = new BitmapUtils(mActivity);
                 bitmapUtils.display(img, mViewPagerUrlList[i], new BitmapLoadCallBack<ImageView>() {
                     @Override
                     public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
@@ -570,7 +573,6 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
                     @Override
                     public void onLoadFailed(ImageView imageView, String s, Drawable drawable) {
-//                        imageView.setBackground(mActivity.getResources().getDrawable(R.drawable.detail_default_img));
                         imageView.setImageResource(R.drawable.detail_default_img);
                     }
                 });
