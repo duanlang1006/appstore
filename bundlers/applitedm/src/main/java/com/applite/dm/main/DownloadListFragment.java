@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 
-import com.applite.dm.R;
 import com.mit.afinal.FinalHttp;
 import com.mit.afinal.http.AjaxCallBack;
 import com.mit.afinal.http.AjaxParams;
@@ -23,11 +22,13 @@ import com.applite.common.LogUtils;
 import com.applite.common.VibratorUtil;
 import com.applite.dm.adapter.DownloadAdapter;
 import com.applite.dm.adapter.DownloadSimilarAdapter;
+import com.applite.dm.R;
 import com.applite.sharedpreferences.AppliteSPUtils;
 import com.applite.similarview.SimilarAdapter;
 import com.applite.similarview.SimilarBean;
 import com.applite.similarview.SimilarView;
 import com.lidroid.xutils.BitmapUtils;
+import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.bitmap.PauseOnScrollListener;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
@@ -66,7 +67,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     private SimilarView mSimilarView;
     private List<SimilarBean> mSimilarDataList;
     private SimilarAdapter mSimilarAdapter;
-
     //    private boolean checkBoxAnima = true;
     private int temp = 0;
 
@@ -392,7 +392,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     public void onClickDelete(boolean b) {
         deleteItem(b);
         reSet();
-        if(null != mSimilarView && View.VISIBLE == mSimilarView.getVisibility()){
+        if (null != mSimilarView && View.VISIBLE == mSimilarView.getVisibility()) {
             mSimilarAdapter.notifyDataSetChanged();
         }
     }

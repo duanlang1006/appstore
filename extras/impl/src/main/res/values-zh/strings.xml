@@ -1,8 +1,8 @@
 <resources>
     <string name="download_status_error">失败</string>
-    <string name="download_status_insufficient_space">空间不足</string>
-    <string name="download_status_invalid_package">APK解析错误</string>
-    <string name="download_status_waiting_for_network">等待网络</string>
+    <string name="download_status_insufficient_space" >空间不足</string>
+    <string name="download_status_invalid_package" >APK解析错误</string>
+    <string name="download_status_waiting_for_network" >等待网络</string>
     <string name="download_status_success">下载完成</string>
     <string name="download_status_running">正在下载</string>
     <string name="download_status_queued">已加入队列</string>
@@ -16,22 +16,18 @@
     <string name="action_retry">重试</string>
     <string name="action_open">打开</string>
     <string name="action_pause">暂停</string>
-    <string name="action_install">安装</string>
-    <string name="action_upgrade">更新</string>
-    <string name="action_resume">继续</string>
-    <string name="action_waiting">等待</string>
+    <string name="action_install" >安装</string>
+    <string name="action_upgrade" >更新</string>
+    <string name="action_resume" >继续</string>
+    <string name="action_waiting" >等待</string>
 
-    <string name="install_status_success">已安装</string>
-    <string name="install_status_failed">安装失败</string>
-    <string name="install_status_installing">正在安装</string>
-    <string name="install_status_upgrade">发现更新</string>
-    <string name="network_disable_toast">没有网络连接，请重新检查网络后再试</string>
+    <string name="install_status_success" >已安装</string>
+    <string name="install_status_failed" >安装失败</string>
+    <string name="install_status_installing" >正在安装</string>
+    <string name="install_status_upgrade" >发现更新</string>
+    <string name="network_disable_toast" >没有网络连接，请重新检查网络后再试</string>
     <string name="notification_message_downloading">您有%1$d个应用正在下载</string>
     <string name="notification_message_downloaded">应用下载完成</string>
     <string name="notification_message_pause">应用任务暂停</string>
     <string name="click_check">点击查看</string>
-    <string name="remind">提示</string>
-    <string name="remind_message">您的本地应用似乎有些问题,是否卸载后在安装?</string>
-    <string name="uninstall">卸载</string>
-    <string name="cancel">取消</string>
 </resources>
