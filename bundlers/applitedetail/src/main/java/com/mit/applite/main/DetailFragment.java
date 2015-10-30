@@ -3,6 +3,7 @@ package com.mit.applite.main;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -458,64 +459,68 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      * @param data
      */
     private void setData(String data) {
-        mSimilarData.clear();
-        mApkDatas.clear();
-        if (null != mSimilarAdapter)
-            mSimilarAdapter.notifyDataSetChanged();
+        try {
+            mSimilarData.clear();
+            mApkDatas.clear();
+            if (null != mSimilarAdapter)
+                mSimilarAdapter.notifyDataSetChanged();
 
-        Gson gson = new Gson();
-        DetailData detailData = gson.fromJson(data, DetailData.class);
-        if (null != detailData) {
-            int app_key = detailData.getApp_key();
-            mSimilarData = detailData.getSimilar_info();
-            LogUtils.i(TAG, "应用详情similar_info:" + mSimilarData);
-            if (null == mSimilarAdapter)
-                mSimilarAdapter = new MySimilarAdapter(mActivity);
-            mSimilarAdapter.setData(mSimilarData, this, 4);
-            mSimilarView.setAdapter(mSimilarAdapter);
+            Gson gson = new Gson();
+            DetailData detailData = gson.fromJson(data, DetailData.class);
+            if (null != detailData) {
+                int app_key = detailData.getApp_key();
+                mSimilarData = detailData.getSimilar_info();
+                LogUtils.i(TAG, "应用详情similar_info:" + mSimilarData);
+                if (null == mSimilarAdapter)
+                    mSimilarAdapter = new MySimilarAdapter(mActivity);
+                mSimilarAdapter.setData(mSimilarData, this, 4);
+                mSimilarView.setAdapter(mSimilarAdapter);
 
-            mApkDatas = detailData.getDetail_info();
-            LogUtils.i(TAG, "应用详情detail_info:" + mApkDatas);
-            ApkBean bean = mApkDatas.get(0);
-            mPackageName = bean.getPackageName();
-            mApkName = bean.getName();
-            mImgUrl = bean.getIconUrl();
-            mVersionCode = bean.getVersionCode();
-            mRating = bean.getRating();
-            mDownloadUrl = bean.getrDownloadUrl();
-            mApkSize = bean.getApkSize();
-            mDescription = bean.getDescription();
-            mViewPagerUrl = bean.getScreenshotsUrl();
-            mApkTag = bean.getTag();
-            mDeveloper = bean.getDeveloper();
-            String mVersionName = bean.getVersionName();
-            String mDownloadNumber = bean.getDownloadTimes();
-            String mUpdateLog = bean.getUpdateInfo();
+                mApkDatas = detailData.getDetail_info();
+                LogUtils.i(TAG, "应用详情detail_info:" + mApkDatas);
+                ApkBean bean = mApkDatas.get(0);
+                mPackageName = bean.getPackageName();
+                mApkName = bean.getName();
+                mImgUrl = bean.getIconUrl();
+                mVersionCode = bean.getVersionCode();
+                mRating = bean.getRating();
+                mDownloadUrl = bean.getrDownloadUrl();
+                mApkSize = bean.getApkSize();
+                mDescription = bean.getDescription();
+                mViewPagerUrl = bean.getScreenshotsUrl();
+                mApkTag = bean.getTag();
+                mDeveloper = bean.getDeveloper();
+                String mVersionName = bean.getVersionName();
+                String mDownloadNumber = bean.getDownloadTimes();
+                String mUpdateLog = bean.getUpdateInfo();
 
-            Bitmap bmp = BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.ratingbar_star_small_off_light);
-            mXingView.setMinimumHeight(bmp.getHeight());
-            mXingView.setRating(Float.parseFloat(mRating) / 2.0f);
-            mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(mApkSize) + " | " + mDeveloper);
-            if (TextUtils.isEmpty(mDescription)) {
-                mApkContentView.setText(mActivity.getResources().getText(R.string.no_app_detail));
-            } else {
-                mApkContentView.setText(mDescription);
-            }
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (mApkContentView.getLineCount() <= DEFAULT_MAX_LINE_COUNT) {
-                        mOpenIntroduceView.setVisibility(View.GONE);
-                    } else {
-                        mApkContentView.setLines(DEFAULT_MAX_LINE_COUNT);
-                        CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
-                    }
+                Bitmap bmp = BitmapFactory.decodeResource(mActivity.getResources(), R.drawable.ratingbar_star_small_off_light);
+                mXingView.setMinimumHeight(bmp.getHeight());
+                mXingView.setRating(Float.parseFloat(mRating) / 2.0f);
+                mApkSizeAndCompanyView.setText(AppliteUtils.bytes2kb(mApkSize) + " | " + mDeveloper);
+                if (TextUtils.isEmpty(mDescription)) {
+                    mApkContentView.setText(mActivity.getResources().getText(R.string.no_app_detail));
+                } else {
+                    mApkContentView.setText(mDescription);
                 }
-            }, 500);
-            setPreViewImg(mViewPagerUrl);
-            setApkTag(mApkTag);
-            if (null == mImplInfo)
-                setProgressButtonState();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mApkContentView.getLineCount() <= DEFAULT_MAX_LINE_COUNT) {
+                            mOpenIntroduceView.setVisibility(View.GONE);
+                        } else {
+                            mApkContentView.setLines(DEFAULT_MAX_LINE_COUNT);
+                            CONTENT_STATE = COLLAPSIBLE_STATE_SHRINKUP;
+                        }
+                    }
+                }, 500);
+                setPreViewImg(mViewPagerUrl);
+                setApkTag(mApkTag);
+                if (null == mImplInfo)
+                    setProgressButtonState();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -551,6 +556,10 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
      * 设置应用介绍的图片
      */
     private void setPreViewImg(String mViewPagerUrl) {
+        final Matrix matrix = new Matrix();
+        matrix.reset();
+        matrix.setRotate(90);
+
         String[] mViewPagerUrlList = mViewPagerUrl.split(",");
         mHorDefaultLayout.setVisibility(View.GONE);
         BitmapUtils bitmapUtils = new BitmapUtils(mActivity);
@@ -565,9 +574,12 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     public void onLoadCompleted(ImageView imageView, String s, Bitmap bitmap, BitmapDisplayConfig bitmapDisplayConfig, BitmapLoadFrom bitmapLoadFrom) {
                         imageView.setDrawingCacheEnabled(false);
                         if (bitmap.getWidth() > bitmap.getHeight()) {
-                            imageView.setImageBitmap(DetailUtils.rotateBitmap(bitmap, 90));
+                            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                            imageView.setImageBitmap(bitmap);
+//                            imageView.setImageBitmap(DetailUtils.rotateBitmap(bitmap, 90));
                         } else {
-                            imageView.setImageBitmap(DetailUtils.rotateBitmap(bitmap, 0));
+                            imageView.setImageBitmap(bitmap);
+//                            imageView.setImageBitmap(DetailUtils.rotateBitmap(bitmap, 0));
                         }
                     }
 
