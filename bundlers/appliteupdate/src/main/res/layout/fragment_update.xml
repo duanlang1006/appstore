@@ -19,22 +19,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="@string/update_item"
+            android:layout_weight="0.11"
             android:singleLine="true"
+            android:text="@string/update_item"
             android:textColor="#9a999a"
-            android:textSize="15dp"
-            android:layout_weight="0.11" />
+            android:textSize="15dp" />
 
         <TextView
             android:id="@+id/update_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.50"
             android:layout_margin="5dp"
+            android:layout_weight="0.50"
             android:singleLine="true"
-            android:visibility="gone"
             android:textColor="#9a999a"
-            android:textSize="15dp" />
+            android:textSize="15dp"
+            android:visibility="gone" />
 
 
         <TextView
@@ -118,11 +118,14 @@
     </RelativeLayout>
 
     <!-- 无更新内容时，显示图片-->
-    <ImageView
-        android:id="@+id/update_no_update_iv"
+    <TextView
+        android:id="@+id/update_no_update_tv"
         android:layout_width="fill_parent"
         android:layout_height="250dp"
-        android:src="@drawable/no_update"
+        android:gravity="center"
+        android:text="无可更新应用"
+        android:textColor="@color/black"
+        android:textSize="25sp"
         android:visibility="gone" />
 
     <ListView
