@@ -28,7 +28,6 @@ import com.applite.similarview.SimilarAdapter;
 import com.applite.similarview.SimilarBean;
 import com.applite.similarview.SimilarView;
 import com.lidroid.xutils.BitmapUtils;
-import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.bitmap.PauseOnScrollListener;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;

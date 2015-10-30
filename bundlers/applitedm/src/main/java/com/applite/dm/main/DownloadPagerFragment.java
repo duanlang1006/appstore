@@ -313,12 +313,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                         }
                         Toast.makeText(mActivity, mActivity.getResources().getString(R.string.delete_message, totalDelete), Toast.LENGTH_SHORT).show();
                     }
-                }).setNegativeButton(getResources().getString(R.string.cancel_btn), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-//                        pressedCancel();
-                    }
-                }).create();
+                }).setNegativeButton(getResources().getString(R.string.cancel_btn), null).create();
         dialog.setCanceledOnTouchOutside(false);
     }
 
