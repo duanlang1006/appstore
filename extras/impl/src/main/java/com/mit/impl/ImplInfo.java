@@ -7,7 +7,6 @@ import android.content.Intent;
 import com.lidroid.xutils.db.annotation.Table;
 import com.lidroid.xutils.db.annotation.Transient;
 import com.lidroid.xutils.http.HttpHandler;
-import com.mit.mitupdatesdk.MitMobclickAgent;
 
 import java.io.File;
 

@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.applite.common.AppliteUtils;
 import com.applite.common.Constant;
@@ -29,7 +28,6 @@ import com.applite.similarview.SimilarAdapter;
 import com.applite.similarview.SimilarBean;
 import com.applite.similarview.SimilarView;
 import com.lidroid.xutils.BitmapUtils;
-import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.bitmap.PauseOnScrollListener;
 import com.mit.impl.ImplAgent;
 import com.mit.impl.ImplChangeCallback;
@@ -68,9 +66,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     private SimilarView mSimilarView;
     private List<SimilarBean> mSimilarDataList;
     private SimilarAdapter mSimilarAdapter;
-
-    private HttpUtils mHttpUtils;
-    private boolean checkBoxAnima = true;
+    //    private boolean checkBoxAnima = true;
     private int temp = 0;
 
     private String COUNT_DOWNLOADING = "count downloading";
@@ -80,7 +76,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     private DownloadListener mDownloadListener = new DownloadListener() {
         @Override
-        public boolean getFlag1() {
+        public boolean isShowCheckBox() {
             return (boolean) AppliteSPUtils.get(mActivity, FLAG, false);
         }
 
@@ -97,15 +93,15 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             return mTitleId;
         }
 
-        @Override
-        public boolean getFlag2() {
-            return checkBoxAnima;
-        }
-
-        @Override
-        public void setFlag2(boolean b) {
-            checkBoxAnima = b;
-        }
+//        @Override
+//        public boolean getCheckBoxAnimaStatus() {
+//            return checkBoxAnima;
+//        }
+//
+//        @Override
+//        public void setCheckBoxAnimaStatus(boolean b) {
+//            checkBoxAnima = b;
+//        }
     };
 
     public static final Comparator<ImplInfo> IMPL_TIMESTAMP_COMPARATOR = new Comparator<ImplInfo>() {
@@ -166,9 +162,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         mImplAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
         mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
         Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
+        status = new boolean[mImplList.size()];
         mBitmapHelper = new BitmapUtils(mActivity.getApplicationContext());
         AppliteSPUtils.registerChangeListener(mActivity, mListListener);
-        count(0);//当前页选中项目数
+        putCount(0);//当前页选中项目数
         AppliteSPUtils.put(mActivity, FLAG, false);
     }
 
@@ -193,7 +190,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         mListview.setAdapter(mAdapter);
         mListview.setOnItemLongClickListener(this);
         mListview.setOnScrollListener(new PauseOnScrollListener(mBitmapHelper, false, true));
-        status = new boolean[mImplList.size()];
+
         if (null != mImplList) {
             mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
                     mImplList, mBitmapHelper, mDownloadListener);
@@ -216,7 +213,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     }
 
     //当前页选中项目数
-    private void count(int number) {
+    private void putCount(int number) {
         if (mTitleId == R.string.dm_downloading) {
             AppliteSPUtils.put(mActivity, COUNT_DOWNLOADING, number);
         } else if (mTitleId == R.string.dm_downloaded) {
@@ -224,7 +221,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
     }
 
-    private int count() {
+    private int getCount() {
         if (mTitleId == R.string.dm_downloading) {
             return (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0);
         } else if (mTitleId == R.string.dm_downloaded) {
@@ -336,7 +333,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                         }
                     }
                 } catch (JSONException e) {
-                    Toast.makeText(mActivity, "kong", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(mActivity, "kong", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -368,9 +365,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             mSimilarView.setPadding(0, 1, 0, 0);
         }
         Arrays.fill(status, false);//status数组复位
-        checkBoxAnima = true;
-        count(0);//当前页选中项目数
-        AppliteSPUtils.put(mActivity, POSITION, 0);
+//        checkBoxAnima = true;
+        AppliteSPUtils.put(mActivity, FLAG, false);
+        putCount(0);//当前页选中项目数
+//        AppliteSPUtils.put(mActivity, POSITION, 0);
         if (null != mAdapter) {
             mAdapter.notifyDataSetChanged();
         }
@@ -386,33 +384,35 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         if (!tempList.isEmpty()) {
             mImplAgent.remove(tempList, deleteFile);
         }
-        count(0);
+        putCount(0);
     }
 
     @Override
     public void onClickDelete(boolean b) {
         deleteItem(b);
         reSet();
+        if (null != mSimilarView && View.VISIBLE == mSimilarView.getVisibility()) {
+            mSimilarAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
     public void onClickSeleteAll() {
         Arrays.fill(status, true);
-        count(mImplList.size());
+        putCount(mImplList.size());
         mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onClickDeselectAll() {
         Arrays.fill(status, false);
-        count(0);
+        putCount(0);
         mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void resetFlag() {
         reSet();
-        AppliteSPUtils.put(mActivity, FLAG, false);
     }
 
     //获取本页下载项的个数
@@ -435,6 +435,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
         status = new boolean[mImplList.size()];
         Arrays.fill(status, false);
+        putCount(0);
         if (null == mAdapter) {
             mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
                     mImplList, mBitmapHelper, mDownloadListener);
@@ -446,13 +447,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             }
             mAdapter.notifyDataSetChanged();
         }
-        int tempCount = 0;
-        for (int i = 0; i < status.length; i++) {
-            if (status[i]) {
-                tempCount++;
-            }
-        }
-        count(tempCount);
     }
 
     @Override
@@ -464,6 +458,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (position > mImplList.size() - 1) {
+            return;
+        }
         DownloadAdapter.ViewHolder vh = (DownloadAdapter.ViewHolder) view.getTag();
         if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
             if (null != vh) {
@@ -477,28 +474,32 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             }
         } else {
             status[position] = !status[position];
-            temp = count();
-            count((status[position] == false) ? temp - 1 : temp + 1);//当前页选中项目数
+            temp = getCount();
+            putCount((status[position] == false) ? temp - 1 : temp + 1);//当前页选中项目数
             mAdapter.notifyDataSetChanged();
         }
     }
+
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
             AppliteSPUtils.put(mActivity, FLAG, true);
             //防止因增加猜你喜欢中的应用导致的数组长度越界(在onItemClick中增加的应用)
+            mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
+            Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
             status = new boolean[mImplList.size()];
+            putCount(0);
             Arrays.fill(status, false);//全部填充为false(chechbox不选中)
-            if (checkBoxAnima) {
+            if ((boolean) AppliteSPUtils.get(mActivity, FLAG, true)) {
                 VibratorUtil.Vibrate(mActivity, 200);   //震动200ms
+//                checkBoxAnima = false;
             }
             if (R.string.dm_downloading == mTitleId) {
                 mSimilarView.setVisibility(View.GONE);
                 mSimilarView.setPadding(0, -mSimilarView.getHeight(), 0, 0);
-
             }
-            mAdapter.notifyDataSetChanged();
+//            mAdapter.notifyDataSetChanged();
         }
         return false;
     }
@@ -536,14 +537,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     //ListFragment和适配器传递数据
     public interface DownloadListener {
-        boolean getFlag1();
+        boolean isShowCheckBox();
 
         boolean getStatus(int position);
 
         int getTitleId();
 
-        boolean getFlag2();
-
-        void setFlag2(boolean b);
+//        boolean getCheckBoxAnimaStatus();
+//
+//        void setCheckBoxAnimaStatus(boolean b);
     }
 }

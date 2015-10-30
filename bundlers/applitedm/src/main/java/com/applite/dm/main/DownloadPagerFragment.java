@@ -135,6 +135,8 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         super.onResume();
         if (1 == (int) AppliteSPUtils.get(mActivity, POSITION, 0)) {
             mViewPager.setCurrentItem(1);
+            AppliteSPUtils.put(mActivity, POSITION, R.string.dm_downloaded);
+            prePosition = 1;
         }
         getView().setFocusableInTouchMode(true);
         getView().requestFocus();
@@ -149,6 +151,8 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                         ((OSGIServiceHost) mActivity).jumpto(Constant.OSGI_SERVICE_MAIN_FRAGMENT, null, null, false);
                         return true;
                     }
+                } else if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_MENU) {
+                    return true;
                 }
                 return false;
             }
@@ -237,7 +241,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         } else if (v.getId() == R.id.select_allpick) {//全选/全不选
             operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
             if (null != operator) {
-                if (operator.getLength() == count()) {
+                if (operator.getLength() == getCount()) {
                     operator.onClickDeselectAll();
                 } else {
                     operator.onClickSeleteAll();
@@ -252,15 +256,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
 
     @Override
     public void onPageScrolled(int i, float v, int i1) {
-        if (prePosition != i) {
-            prePosition = i;
-            if (0 == prePosition) {
-                AppliteSPUtils.put(mActivity, POSITION, R.string.dm_downloading);
-            } else if (1 == prePosition) {
-                AppliteSPUtils.put(mActivity, POSITION, R.string.dm_downloaded);
-            }
-            setButtonStatus();
-        }
     }
 
     @Override
@@ -318,19 +313,18 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                         }
                         Toast.makeText(mActivity, mActivity.getResources().getString(R.string.delete_message, totalDelete), Toast.LENGTH_SHORT).show();
                     }
-                }).setNegativeButton(getResources().getString(R.string.cancel_btn), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-//                        pressedCancel();
-                    }
-                }).create();
+                }).setNegativeButton(getResources().getString(R.string.cancel_btn), null).create();
         dialog.setCanceledOnTouchOutside(false);
     }
 
     private void pressedCancel() {
         hide();
-        operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
-        operator.resetFlag();
+        for (int i = 0; i < mViewPagerAdapter.getCount(); i++) {
+            operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, i);
+            if (null != operator) {
+                operator.resetFlag();
+            }
+        }
         Toast.makeText(mActivity.getApplicationContext(), R.string.cancel_operator, Toast.LENGTH_SHORT).show();
     }
 
@@ -413,14 +407,14 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                 ((int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0) + (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0))));
         //全选按钮
         operator = (IDownloadOperator) mViewPagerAdapter.instantiateItem(mViewPager, prePosition);
-        if (0 == operator.getLength() && 0 == count()) {
+        if (0 == operator.getLength() && 0 == getCount()) {
             btnAllpick.setFocusable(false);
             btnAllpick.setEnabled(false);
             btnAllpick.setText(R.string.allpick_btn);
         } else {
             btnAllpick.setFocusable(true);
             btnAllpick.setEnabled(true);
-            if (operator.getLength() == count()) {
+            if (operator.getLength() == getCount()) {
                 btnAllpick.setText(R.string.nonepick_btn);
             } else {//其他状态
                 btnAllpick.setText(R.string.allpick_btn);
@@ -440,7 +434,7 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     }
 
     //当前选中项目数
-    private int count() {
+    private int getCount() {
         if (0 == prePosition) {
             return (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0);
         } else if (1 == prePosition) {
