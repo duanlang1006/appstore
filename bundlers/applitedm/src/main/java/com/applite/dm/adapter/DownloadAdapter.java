@@ -20,7 +20,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,12 +72,12 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         vh.initView((ImplInfo) getItem(position));
         vh.actionBtn.setOnClickListener(this);
         vh.custompb.setOnClickListener(this);
-        if (mListener.getFlag1()) {//显示删除多选框
+        if (mListener.isShowCheckBox()) {//显示删除多选框
             vh.deleteCheckBox.setVisibility(View.VISIBLE);
             vh.deleteCheckBox.setChecked(mListener.getStatus(position));
-            if (true == mListener.getFlag2()) {
-                mListener.setFlag2(false);
-            }
+//            if (true == mListener.getFlag2()) {
+//                mListener.setFlag2(false);
+//            }
             vh.actionBtn.setVisibility(View.GONE);
             vh.custompb.setVisibility(View.GONE);
         } else {//正常状态(没有删除的多选框)
@@ -91,15 +90,8 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 vh.actionBtn.setVisibility(View.VISIBLE);
                 vh.custompb.setVisibility(View.GONE);
                 vh.statusView.setVisibility(View.INVISIBLE);
-                if (ImplInfo.STATUS_PRIVATE_INSTALLING == vh.implInfo.getStatus()) {
-                    vh.actionBtn.setEnabled(false);
-                    vh.actionBtn.setFocusable(false);
-                } else {
-                    vh.actionBtn.setEnabled(true);
-                    vh.actionBtn.setFocusable(true);
-                }
+
             }
-            vh.deleteCheckBox.setVisibility(View.GONE);
         }
         return view;
     }
@@ -187,6 +179,16 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             statusView.setText(implRes.getStatusText());
             statusView.invalidate();
             custompb.setProgress(implInfo.getProgress());
+            if (ImplInfo.STATUS_PRIVATE_INSTALLING == implInfo.getStatus()) {
+                actionBtn.setEnabled(false);
+                actionBtn.setFocusable(false);
+                actionBtn.setTextColor(mContext.getResources().getColor(R.color.lightslategrey));
+            } else {
+                actionBtn.setEnabled(true);
+                actionBtn.setFocusable(true);
+                actionBtn.setTextColor(mContext.getResources().getColor(R.color.apklis_button_normal));
+            }
+
             ImplLog.d("impl_dm", implInfo.getTitle() + "," + implRes.getStatusText() + "," + implRes.getDescText() + "," + implInfo.getProgress());
         }
 

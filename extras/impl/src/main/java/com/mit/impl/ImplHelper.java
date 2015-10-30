@@ -353,9 +353,11 @@ public class ImplHelper {
                                     implRes.setAction(ImplInfo.ACTION_DOWNLOAD);
                                     implRes.setActionText(mResources.getString(R.string.action_upgrade));
                                 } else {
-                                    //否则需要打开安装
-                                    implRes.setAction(ImplInfo.ACTION_OPEN);
-                                    implRes.setActionText(mResources.getString(R.string.action_open));
+                                    //否则需要升级安装
+//                                    implRes.setAction(ImplInfo.ACTION_OPEN);
+//                                    implRes.setActionText(mResources.getString(R.string.action_open));
+                                    implRes.setAction(ImplInfo.ACTION_INSTALL);
+                                    implRes.setActionText(mResources.getString(R.string.action_install));
                                     implRes.setActionIntent(getOpenDownloadIntent(localPath, mimeType));
                                 }
                             } else {

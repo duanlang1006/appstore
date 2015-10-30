@@ -192,10 +192,6 @@ public class DownloadService extends Service {
             return ImplAgent.getInstance(context.getApplicationContext()).getImplInfoCount(position);
         }
 
-//        private int calculate(Context context, int position, int status) {
-//            return ImplAgent.getInstance(context.getApplicationContext()).getImplInfoStatusCount(position, status);
-//        }
-
         private void initNotify(Context context) {
             if (null == mBuilder) {
                 mBuilder = new NotificationCompat.Builder(context);
