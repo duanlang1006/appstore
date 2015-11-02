@@ -131,9 +131,9 @@ public class UpdateNotification {
         mIntent.putExtra("update_data", array.toString());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, UUID.randomUUID().hashCode(), mIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notification = new Notification();
-        notification.icon = R.drawable.ic_launcher;
+//        notification.icon = R.drawable.ic_launcher;
         notification.contentView = new RemoteViews(context.getPackageName(), R.layout.notification);
-        notification.contentView.setImageViewResource(R.id.notification_large_icon, R.drawable.ic_launcher);
+//        notification.contentView.setImageViewResource(R.id.notification_large_icon, R.drawable.ic_launcher);
         notification.contentView.setTextViewText(R.id.notification_update, "您有" + number + "款应用可更新");
         try {
             if (array.length() < 6) {
