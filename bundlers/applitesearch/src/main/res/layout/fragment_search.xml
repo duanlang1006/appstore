@@ -88,15 +88,29 @@
             android:numColumns="3"
             android:verticalSpacing="1dp"></GridView>
 
-        <TextView
-            android:id="@+id/hot_word_change"
+        <!--<TextView-->
+            <!--android:id="@+id/hot_word_change"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginTop="20dp"-->
+            <!--android:background="@drawable/hot_word_change_bg"-->
+            <!--android:padding="10dp"-->
+            <!--android:text="换一换"-->
+            <!--android:textColor="@color/black" />-->
+
+        <ImageView
+            android:id="@+id/hot_word_change1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/hot_word_change_bg"
-            android:padding="10dp"
-            android:text="换一换"
-            android:textColor="@color/black" />
+            android:layout_marginTop="15dp"
+            android:src="@drawable/change_hw" />
+
+        <ImageView
+            android:id="@+id/hot_word_shake"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/shake_image" />
 
     </LinearLayout>
 
