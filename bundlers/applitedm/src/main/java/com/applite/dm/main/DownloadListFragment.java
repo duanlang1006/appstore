@@ -391,7 +391,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     public void onClickDelete(boolean b) {
         deleteItem(b);
         reSet();
-        if (null != mSimilarView && View.VISIBLE == mSimilarView.getVisibility()) {
+        if (null != mSimilarView && View.VISIBLE == mSimilarView.getVisibility() && mSimilarView != null) {
             mSimilarAdapter.notifyDataSetChanged();
         }
     }

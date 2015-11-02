@@ -177,6 +177,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         if (null != item) {
             item.setVisible(false);
         }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
         if (prePosition == 1) {
             menu.findItem(R.id.dm_action_pause_all).setEnabled(false);
             menu.findItem(R.id.dm_action_resume_all).setEnabled(false);
@@ -317,6 +322,9 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                         if (0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0) && 0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADED, 0)) {
                             hide();
                             operator.resetFlag();
+                        }
+                        if (0 == prePosition && 0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0)) {
+                            mActivity.invalidateOptionsMenu();
                         }
                         Toast.makeText(mActivity, mActivity.getResources().getString(R.string.delete_message, totalDelete), Toast.LENGTH_SHORT).show();
                     }
