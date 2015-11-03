@@ -323,9 +323,6 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
                             hide();
                             operator.resetFlag();
                         }
-                        if (0 == prePosition && 0 == (int) AppliteSPUtils.get(mActivity, COUNT_DOWNLOADING, 0)) {
-                            mActivity.invalidateOptionsMenu();
-                        }
                         Toast.makeText(mActivity, mActivity.getResources().getString(R.string.delete_message, totalDelete), Toast.LENGTH_SHORT).show();
                     }
                 }).setNegativeButton(getResources().getString(R.string.cancel_btn), null).create();
