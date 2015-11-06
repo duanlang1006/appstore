@@ -624,6 +624,9 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
             mIgnoreList.remove(position);
             mActionBarIgnore.setText(mActivity.getResources().getString(R.string.ignore_update) + "(" + mIgnoreList.size() + ")");
         }
+        if (mIgnoreList.size() == 0) {
+            hideIgnoreList();
+        }
         mIgnoreAdapter.notifyDataSetChanged();
         mAdapter.notifyDataSetChanged();
     }

@@ -1,8 +1,15 @@
 package com.mit.applite.search.main;
 
 import android.app.Activity;
+import android.app.Service;
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
@@ -38,8 +45,8 @@ import com.google.gson.Gson;
 import com.mit.afinal.FinalHttp;
 import com.mit.afinal.http.AjaxCallBack;
 import com.mit.afinal.http.AjaxParams;
-import com.mit.applite.search.adapter.HotWordAdapter;
 import com.mit.applite.search.R;
+import com.mit.applite.search.adapter.HotWordAdapter;
 import com.mit.applite.search.adapter.PreloadAdapter;
 import com.mit.applite.search.adapter.SearchApkAdapter;
 import com.mit.applite.search.bean.HotWordBean;
@@ -58,7 +65,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SearchFragment extends OSGIBaseFragment implements View.OnClickListener, HotWordAdapter.ClickHotWordItemPostlistener {
+public class SearchFragment extends OSGIBaseFragment implements View.OnClickListener, HotWordAdapter.ClickHotWordItemPostlistener, SensorEventListener {
 
     private static final String TAG = "SearchFragment";
     private static final int SHOW_VIEW_HOTWORD = 1;
@@ -82,7 +89,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private EditText mEtView;
     private LinearLayout mHotWordLL;
     private GridView mGridView;
-    private TextView mHotChangeView;
+//    private TextView mHotChangeView;
+    private ImageView mHotChangeView1;
+    private ImageView mHotChangeShake;
     private ListView mPreloadListView;
     private ListView mListView;
     private Button mRefresh;
@@ -134,6 +143,11 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private Gson mGson = new Gson();
     private String mDetailTag;
 
+    //摇一摇
+    private SensorManager sensorManager = null;
+    private Vibrator vibrator = null;
+    private long shakeTime = 0; //记录第一次摇的时间
+
     public SearchFragment() {
         super();
     }
@@ -166,6 +180,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MitMobclickAgent.onEvent(mActivity, "toSearchFragment");
+
+        sensorManager = (SensorManager) mActivity.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+        vibrator = (Vibrator) mActivity.getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE);
     }
 
     @Override
@@ -214,6 +231,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         if (mListView.getVisibility() == View.GONE && mPreloadListView.getVisibility() == View.GONE) {
             openKeyboard();
         }
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -241,6 +261,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     public void onPause() {
         super.onPause();
         closeKeyboard();
+        sensorManager.unregisterListener(this);
     }
 
     @Override
@@ -252,7 +273,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     public void onClick(View v) {
         if (v.getId() == R.id.search_back) {
             getFragmentManager().popBackStack();
-        } else if (v.getId() == R.id.hot_word_change) {
+        } else if (v.getId() == R.id.hot_word_change1) {
             MitMobclickAgent.onEvent(mActivity, "clickHotWordChange");
             changeHotWord();
         } else if (v.getId() == R.id.search_delete) {
@@ -366,7 +387,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         mHotWordLL = (LinearLayout) rootView.findViewById(R.id.hot_word_ll);
         mListView = (ListView) rootView.findViewById(R.id.search_listview);
         mGridView = (GridView) rootView.findViewById(R.id.search_gv);
-        mHotChangeView = (TextView) rootView.findViewById(R.id.hot_word_change);
+//        mHotChangeView = (TextView) rootView.findViewById(R.id.hot_word_change);
+        mHotChangeView1 = (ImageView) rootView.findViewById(R.id.hot_word_change1);
+        mHotChangeShake = (ImageView) rootView.findViewById(R.id.hot_word_shake);
         mPreloadListView = (ListView) rootView.findViewById(R.id.search_preload_listview);
 
         mRefresh = (Button) rootView.findViewById(R.id.refresh_btn);
@@ -386,7 +409,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
         mListView.setSelected(true);
         mListView.setOnScrollListener(mOnScrollListener);
 
-        mHotChangeView.setOnClickListener(this);
+//        mHotChangeView.setOnClickListener(this);
+        mHotChangeView1.setOnClickListener(this);
+
         mRefresh.setOnClickListener(this);
     }
 
@@ -952,5 +977,53 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
             e.printStackTrace();
             LogUtils.e(TAG, "详情点击标签返回JSON解析失败");
         }
+    }
+
+    /**
+     * Called when sensor values have changed.
+     * <p>See {@link SensorManager SensorManager}
+     * for details on possible sensor types.
+     * <p>See also {@link SensorEvent SensorEvent}.
+     * <p/>
+     * <p><b>NOTE:</b> The application doesn't own the
+     * {@link SensorEvent event}
+     * object passed as a parameter and therefore cannot hold on to it.
+     * The object may be part of an internal pool and may be reused by
+     * the framework.
+     *
+     * @param event the {@link SensorEvent SensorEvent}.
+     */
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        int sensorType = event.sensor.getType();
+
+        float[] values = event.values;
+        if (sensorType == Sensor.TYPE_ACCELEROMETER) {
+            if ((Math.abs(values[0]) > 15 || Math.abs(values[1]) > 15 ||
+                    Math.abs(values[2]) > 15)) {
+                if (System.currentTimeMillis() - shakeTime > 1000) {
+                    //两次摇的时间间隔小于1秒，不触发以下动作
+                    MitMobclickAgent.onEvent(mActivity, "clickHotWordChange");
+                    changeHotWord();
+                    vibrator.vibrate(200);
+                    shakeTime = System.currentTimeMillis();
+                }
+            }
+        }
+    }
+
+    /**
+     * Called when the accuracy of the registered sensor has changed.
+     * <p/>
+     * <p>See the SENSOR_STATUS_* constants in
+     * {@link SensorManager SensorManager} for details.
+     *
+     * @param sensor
+     * @param accuracy The new accuracy of this sensor, one of
+     *                 {@code SensorManager.SENSOR_STATUS_*}
+     */
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        //TODO 当传感器精度改变时回调该方法，Do nothing.
     }
 }
