@@ -130,6 +130,7 @@ public class ImplHelper {
                                     String fullname,
                                     String md5,
                                     ImplChangeCallback callback) {
+        fillImplRes(context, implInfo);
         if (ImplInfo.ACTION_DOWNLOAD == implInfo.getImplRes().getAction()) {
             ImplAgent implAgent = ImplAgent.getInstance(context.getApplicationContext());
             switch (implInfo.getStatus()) {
@@ -146,6 +147,7 @@ public class ImplHelper {
 //                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
                     break;
                 default:
+//                    implInfo.getImplRes().setStatusText(context.getResources().getString(R.string.download_status_waiting));
                     implAgent.newDownload(implInfo,
                             downloadUrl,
                             name,
@@ -182,6 +184,7 @@ public class ImplHelper {
 //                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
                     break;
                 case ImplInfo.STATUS_INSTALLED:
+                    break;
                 default:
                     implAgent.newDownload(implInfo,
                             downloadUrl,
@@ -248,7 +251,7 @@ public class ImplHelper {
             case ImplInfo.STATUS_INIT:
                 implRes.setAction(ImplInfo.ACTION_DOWNLOAD);
                 implRes.setActionText(mResources.getString(R.string.action_install));
-                implRes.setStatusText("");
+                implRes.setStatusText(mResources.getString(R.string.download_status_waiting));
                 implRes.setDescText(getSizeText(context, implInfo.getCurrent(), implInfo.getTotal()));
                 break;
             case ImplInfo.STATUS_PENDING:
@@ -331,7 +334,7 @@ public class ImplHelper {
                             .getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
                     implRes.setDescText((String.format(mResources.getString(R.string.apk_version), installed.versionName)));
                     if (implInfo.getVersionCode() <= installed.versionCode) {
-                        //安装版本比目标版本新，需要打开
+                        //已安装版本比目标版本新，需要打开
                         implRes.setAction(ImplInfo.ACTION_OPEN);
                         implRes.setActionText(mResources.getString(R.string.action_open));
                         implRes.setStatusText(mResources.getString(R.string.install_status_success));

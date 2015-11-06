@@ -350,7 +350,7 @@ public class ImplAgent extends Observable {
 
     //    public void remove(Long... ids){
     public void remove(List<Long> ids, boolean flagDeleteFile) {
-        if (null == ids || ids.size() < 1) {
+        if (null == ids || ids.isEmpty()) {
             return;
         }
         File deleteFile;
@@ -625,8 +625,10 @@ public class ImplAgent extends Observable {
                 mPackageListener.get(i).onPackageAdded(info);
             }
             callbackImpl(info);
+            ImplHelper.fillImplRes(mContext, info);
             saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onInstallSuccess");
+            notifyObserverUpdate("onSuccess");
         }
 
         @Override

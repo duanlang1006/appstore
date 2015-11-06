@@ -19,4 +19,7 @@
     <string name="ensure">确定</string>
     <string name="delete_download_records">是否删除下载记录</string>
     <string name="dm_delete_package">同时删除安装包</string>
+
+    <string name="action_install">安装</string>
+    <string name="install_status_installing">正在安装</string>
 </resources>

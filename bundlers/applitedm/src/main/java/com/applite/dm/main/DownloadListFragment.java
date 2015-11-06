@@ -51,7 +51,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class DownloadListFragment extends OSGIBaseFragment implements DownloadPagerFragment.IDownloadOperator,
-        ListView.OnItemClickListener, AdapterView.OnItemLongClickListener, SimilarAdapter.SimilarAPKDetailListener, View.OnClickListener, Observer {
+        ListView.OnItemClickListener, AdapterView.OnItemLongClickListener, SimilarAdapter.SimilarAPKDetailListener,
+        View.OnClickListener, Observer {
     final static String TAG = "applite_dm";
     private ListView mListview;
     private DownloadAdapter mAdapter;
@@ -392,7 +393,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         deleteItem(b);
         reSet();
         if (null != mSimilarView && View.VISIBLE == mSimilarView.getVisibility()) {
-            if(null == mSimilarAdapter){
+            if (null == mSimilarAdapter) {
                 post();
             }
             mSimilarAdapter.notifyDataSetChanged();
