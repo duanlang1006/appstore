@@ -90,7 +90,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 vh.actionBtn.setVisibility(View.VISIBLE);
                 vh.custompb.setVisibility(View.GONE);
                 vh.statusView.setVisibility(View.INVISIBLE);
-
             }
         }
         return view;

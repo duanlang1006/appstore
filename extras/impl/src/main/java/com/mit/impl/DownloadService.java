@@ -127,7 +127,7 @@ public class DownloadService extends Service {
             showDownloadNotify(mContext);
         }
 
-        //        @Override
+//        @Override
 //        public void onPackageRemoved(ImplInfo implInfo) {
 //            removeNotification(mContext);
 //        }
@@ -163,7 +163,8 @@ public class DownloadService extends Service {
             switch (status) {
                 case 0:
                     temp = mContext.getResources().getString(R.string.notification_message_downloading,
-                            calculate(mContext, ImplInfo.STATUS_RUNNING | ImplInfo.STATUS_PENDING));
+                            calculate(mContext, ImplInfo.STATUS_PENDING | ImplInfo.STATUS_RUNNING
+                                    | ImplInfo.STATUS_PAUSED | ImplInfo.STATUS_FAILED | ImplInfo.STATUS_PACKAGE_INVALID));
                     break;
                 case 1:
                     temp = mContext.getResources().getString(R.string.notification_message_downloaded);
@@ -173,10 +174,7 @@ public class DownloadService extends Service {
                     status = 0;
                     break;
             }
-            mBuilder.setAutoCancel(true)//点击后让通知将消失
-                    .setContentTitle(temp)
-                    .setContentText(mContext.getResources().getString(R.string.click_check))
-                    .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_launcher));
+            mBuilder.setContentTitle(temp);
             try {
                 clickIntent = new Intent(context, Class.forName(DM_NOTIFICATION));
                 clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -200,7 +198,11 @@ public class DownloadService extends Service {
                 mBuilder.setWhen(System.currentTimeMillis())
                         .setPriority(Notification.PRIORITY_DEFAULT)
                         .setOngoing(false)
-                        .setSmallIcon(R.drawable.ic_launcher);
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setAutoCancel(true)//点击后让通知将消失
+                        .setContentText(mContext.getResources().getString(R.string.click_check))
+                        .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_launcher))
+                ;
                 mNotificationManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
             }
         }

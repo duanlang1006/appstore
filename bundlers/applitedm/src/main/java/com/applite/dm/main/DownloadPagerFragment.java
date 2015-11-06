@@ -177,6 +177,11 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
         if (null != item) {
             item.setVisible(false);
         }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
         if (prePosition == 1) {
             menu.findItem(R.id.dm_action_pause_all).setEnabled(false);
             menu.findItem(R.id.dm_action_resume_all).setEnabled(false);
@@ -367,27 +372,24 @@ public class DownloadPagerFragment extends OSGIBaseFragment implements View.OnCl
     }
 
     private void initializeView(View view) {
-//        if (null == layoutTop) {
-        layoutTop = new WindowManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                mActivity.getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material),
-                WindowManager.LayoutParams.TYPE_APPLICATION,
-                // 设置为无焦点状态
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                        | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, // 没有边界
-                // 半透明效果
-                PixelFormat.TRANSLUCENT);
-        layoutTop.gravity = Gravity.TOP;
-        layoutTop.windowAnimations = R.style.anim_view_top;
-        topviewManager = (WindowManager) mActivity.getSystemService(Context.WINDOW_SERVICE);
-        topviewManager.addView(titleBar, layoutTop);
+        if (null == layoutTop) {
+            layoutTop = new WindowManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    mActivity.getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material),
+                    WindowManager.LayoutParams.TYPE_APPLICATION,
+                    // 设置为无焦点状态
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                            | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, // 没有边界
+                    // 半透明效果
+                    PixelFormat.TRANSLUCENT);
+            layoutTop.gravity = Gravity.TOP;
+//            layoutTop.windowAnimations = R.style.anim_view_top;
 
-        titleBar.setVisibility(View.GONE);
-        initItem(view);
-//        }
-//        btnCancel.setOnClickListener(this);
-//        btnAllpick.setOnClickListener(this);
-//        btnDelete.setOnClickListener(this);
+            topviewManager = (WindowManager) mActivity.getSystemService(Context.WINDOW_SERVICE);
+            topviewManager.addView(titleBar, layoutTop);
 
+            titleBar.setVisibility(View.GONE);
+            initItem(view);
+        }
     }
 
     private void initItem(View view) {

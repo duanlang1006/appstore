@@ -2,6 +2,8 @@ package com.mit.impl;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.text.TextUtils;
@@ -295,6 +297,7 @@ public class ImplDownload {
 //        ImplAgent.mWorkHandler.post(new AddDownloadTask(implInfo, fullname, md5, callback));
 //        new AddDownloadThread(implInfo, fullname, md5, callback).start();
 //        EXECUTOR.execute(new AddDownloadTask(implInfo, fullname, md5, callback));
+//        new SignatureAsync(implInfo, fullname).execute();
         new AddDownloadAsync(implInfo, fullname, md5, callback).execute();
     }
 
@@ -714,4 +717,80 @@ public class ImplDownload {
             return ColumnDbType.INTEGER;
         }
     }
+
+//    private class SignatureAsync extends AsyncTask<Void, Void, Void> {
+//        private ImplInfo implInfo;
+//        private String fullname;
+//
+//        public SignatureAsync(ImplInfo implInfo, String fullname) {
+//            this.implInfo = implInfo;
+//            this.fullname = fullname;
+//        }
+//
+//        @Override
+//        protected Void doInBackground(Void... params) {
+//            String apkSignature = null;
+//            String packagepath = null;
+//            apkSignature = getApkSignature(implInfo.getPackageName());
+//            if (TextUtils.isEmpty(apkSignature)) {
+//                return null;
+//            }
+//            packagepath = implInfo.getFileSavePath();
+//            if (!TextUtils.isEmpty(packagepath)) {
+//                implInfo.setSignatureEqual(isEqual(getApkSignature(packagepath), apkSignature));
+//            } else {
+//                implInfo.setSignatureEqual(isEqual(getApkSignature(fullname), apkSignature));
+//            }
+//            return null;
+//        }
+//
+//        /**
+//         * 比对签名
+//         */
+//        private boolean isEqual(String apkSignature, String packageSignature) {
+//            if (null == apkSignature) {
+//                return true;
+//            }
+//            if (null == packageSignature) {
+//                return true;
+//            }
+//            if (apkSignature.equals(packageSignature)) {
+//                return true;
+//            }
+//            return false;
+//        }
+
+//        /**
+//         * 获取安装包签名
+//         *
+//         * @param packagePath
+//         * @return
+//         */
+//        private String getPackageSignature(String packagePath) {
+//            try {
+//                PackageInfo packageInfo = mContext.getPackageManager().getPackageArchiveInfo(
+//                        packagePath, PackageManager.GET_SIGNATURES);
+//                return packageInfo.signatures[0].toCharsString();
+//            } catch (Exception e) {
+//                return null;
+//            }
+//        }
+
+//        /**
+//         * 获取已安装应用签名
+//         *
+//         * @param packageName
+//         * @return
+//         */
+//        public String getApkSignature(String packageName) {
+//            try {
+//                PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(
+//                        packageName, PackageManager.GET_SIGNATURES);
+//                return packageInfo.signatures[0].toCharsString();
+//            } catch (Exception e) {
+//                return null;
+//            }
+//        }
+//
+//    }
 }

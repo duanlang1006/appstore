@@ -248,7 +248,7 @@ public class ImplHelper {
             case ImplInfo.STATUS_INIT:
                 implRes.setAction(ImplInfo.ACTION_DOWNLOAD);
                 implRes.setActionText(mResources.getString(R.string.action_install));
-                implRes.setStatusText("");
+                implRes.setStatusText(mResources.getString(R.string.download_status_waiting));
                 implRes.setDescText(getSizeText(context, implInfo.getCurrent(), implInfo.getTotal()));
                 break;
             case ImplInfo.STATUS_PENDING:
@@ -331,7 +331,7 @@ public class ImplHelper {
                             .getPackageInfo(implInfo.getPackageName(), PackageManager.GET_ACTIVITIES);
                     implRes.setDescText((String.format(mResources.getString(R.string.apk_version), installed.versionName)));
                     if (implInfo.getVersionCode() <= installed.versionCode) {
-                        //安装版本比目标版本新，需要打开
+                        //已安装版本比目标版本新，需要打开
                         implRes.setAction(ImplInfo.ACTION_OPEN);
                         implRes.setActionText(mResources.getString(R.string.action_open));
                         implRes.setStatusText(mResources.getString(R.string.install_status_success));

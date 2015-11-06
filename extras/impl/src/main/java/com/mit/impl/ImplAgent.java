@@ -350,7 +350,7 @@ public class ImplAgent extends Observable {
 
     //    public void remove(Long... ids){
     public void remove(List<Long> ids, boolean flagDeleteFile) {
-        if (null == ids || ids.size() < 1) {
+        if (null == ids || ids.isEmpty()) {
             return;
         }
         File deleteFile;
@@ -625,6 +625,7 @@ public class ImplAgent extends Observable {
                 mPackageListener.get(i).onPackageAdded(info);
             }
             callbackImpl(info);
+            notifyObserverUpdate("onInstallSuccess");
             saveImplInfo(info);
             ImplLog.d(TAG, info.getTitle() + ",onInstallSuccess");
         }
@@ -681,6 +682,7 @@ public class ImplAgent extends Observable {
         private void callbackImpl(ImplInfo info) {
             synchronized (mWeakCallbackMap) {
                 //回调
+                info.updateImplRes(mContext);
                 List<WeakReference<ImplChangeCallback>> list = mWeakCallbackMap.get(info);
                 if (null != list) {
                     Iterator it = list.iterator();
@@ -688,7 +690,6 @@ public class ImplAgent extends Observable {
                         WeakReference<ImplChangeCallback> weakref = (WeakReference<ImplChangeCallback>) it.next();
                         ImplChangeCallback callback = weakref.get();
                         if (null != callback) {
-                            info.updateImplRes(mContext);
                             if (Looper.myLooper() != Looper.getMainLooper()) {
                                 mMainHandler.post(new CallbackRunnable(info, callback));
                             } else {

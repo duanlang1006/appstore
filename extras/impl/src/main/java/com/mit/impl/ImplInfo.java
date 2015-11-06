@@ -57,6 +57,7 @@ public class ImplInfo {
     private boolean userContinue;   //用户确认继续
     private String md5;             //下载文件对应的MD5码
     private String localPath;       //下载完成后最终路径
+//    private boolean signatureEqual; //apk的签名比对结果 true 一致,false 不一致
 
     @Transient
     private HttpHandler<File> handler;      //下载handler
@@ -332,6 +333,14 @@ public class ImplInfo {
     public void updateImplRes(Context context) {
         ImplHelper.fillImplRes(context, this);
     }
+
+//    public boolean isSignatureEqual() {
+//        return signatureEqual;
+//    }
+//
+//    public void setSignatureEqual(boolean signatureEqual) {
+//        this.signatureEqual = signatureEqual;
+//    }
 
     public class ImplRes {
         private boolean inited;
