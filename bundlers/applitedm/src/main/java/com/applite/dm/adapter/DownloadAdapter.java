@@ -178,10 +178,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             statusView.setText(implRes.getStatusText());
             statusView.invalidate();
             custompb.setProgress(implInfo.getProgress());
-            if (ImplInfo.STATUS_PRIVATE_INSTALLING == implInfo.getStatus() && implInfo.isAutoLaunch()
-                    && implRes.getActionText().equals(mContext.getResources().getString(R.string.action_install))
-                    && implRes.getStatusText().equals(mContext.getResources().getString(R.string.install_status_installing))) {
-//            if (ImplInfo.ACTION_INSTALL == implRes.getAction()) {
+            if (ImplInfo.STATUS_PRIVATE_INSTALLING == implInfo.getStatus()) {
                 actionBtn.setEnabled(false);
                 actionBtn.setFocusable(false);
                 actionBtn.setTextColor(mContext.getResources().getColor(R.color.lightslategrey));

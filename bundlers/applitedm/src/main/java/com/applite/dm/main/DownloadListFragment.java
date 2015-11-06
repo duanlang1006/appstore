@@ -191,7 +191,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         mListview.setAdapter(mAdapter);
         mListview.setOnItemLongClickListener(this);
         mListview.setOnScrollListener(new PauseOnScrollListener(mBitmapHelper, false, true));
-
         if (null != mImplList) {
             mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
                     mImplList, mBitmapHelper, mDownloadListener);
@@ -238,6 +237,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             mSimilarView.getTitleView().setText(getResources().getString(R.string.similar_title));
             mSimilarView.getChangeView().setText(getResources().getString(R.string.similar_change));
             mSimilarDataList = new ArrayList<>();
+            mSimilarAdapter = new DownloadSimilarAdapter(mActivity);
+            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
+            mSimilarView.setAdapter(mSimilarAdapter);
             post();
             mSimilarView.setVisibility(View.VISIBLE);
             mSimilarView.setPadding(0, 1, 0, 0);
@@ -324,14 +326,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                             similarBean.setVersionCode(obj.getInt("versionCode"));
                             mSimilarDataList.add(similarBean);
                         }
-                        if (null == mSimilarAdapter) {
-                            mSimilarAdapter = new DownloadSimilarAdapter(mActivity);
-                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
-                            mSimilarView.setAdapter(mSimilarAdapter);
-                        } else {
-                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
-                            mSimilarAdapter.notifyDataSetChanged();
-                        }
+                        mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
+                        mSimilarAdapter.notifyDataSetChanged();
                     }
                 } catch (JSONException e) {
 //                    Toast.makeText(mActivity, "kong", Toast.LENGTH_SHORT).show();
@@ -393,9 +389,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         deleteItem(b);
         reSet();
         if (null != mSimilarView && View.VISIBLE == mSimilarView.getVisibility()) {
-            if (null == mSimilarAdapter) {
-                post();
-            }
             mSimilarAdapter.notifyDataSetChanged();
         }
     }

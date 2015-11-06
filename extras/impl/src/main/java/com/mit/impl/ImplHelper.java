@@ -130,7 +130,6 @@ public class ImplHelper {
                                     String fullname,
                                     String md5,
                                     ImplChangeCallback callback) {
-        fillImplRes(context, implInfo);
         if (ImplInfo.ACTION_DOWNLOAD == implInfo.getImplRes().getAction()) {
             ImplAgent implAgent = ImplAgent.getInstance(context.getApplicationContext());
             switch (implInfo.getStatus()) {
@@ -147,7 +146,6 @@ public class ImplHelper {
 //                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
                     break;
                 default:
-//                    implInfo.getImplRes().setStatusText(context.getResources().getString(R.string.download_status_waiting));
                     implAgent.newDownload(implInfo,
                             downloadUrl,
                             name,
@@ -184,7 +182,6 @@ public class ImplHelper {
 //                            Toast.makeText(mActivity, "该应用您已经安装过了！", Toast.LENGTH_SHORT).show();
                     break;
                 case ImplInfo.STATUS_INSTALLED:
-                    break;
                 default:
                     implAgent.newDownload(implInfo,
                             downloadUrl,
