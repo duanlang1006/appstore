@@ -225,6 +225,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             public void onClick(View paramView) {
                 LogUtils.i(TAG, "click the retry button ");
                 httpRequest();
+                postSearchHint();
             }
         });
 
@@ -256,13 +257,19 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
         mPagerSlidingTabStrip.setViewPager(mViewPager);
         mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         popupWindowPost();
-        LogUtils.i(TAG, "onCreateView");
-        postSearchHint();
+
+        if (null != mHint && mHint.length != 0) {
+            startConvenientSearch();
+        } else {
+            postSearchHint();
+        }
+
         return rootView;
     }
 
     @Override
     public void onResume() {
+        LogUtils.i(TAG, "onResume");
         super.onResume();
         MitMobclickAgent.onPageStart(whichPage); //统计页面
         getView().setFocusableInTouchMode(true);
@@ -289,8 +296,15 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
 
     @Override
     public void onPause() {
+        LogUtils.i(TAG, "onPause");
         super.onPause();
         MitMobclickAgent.onPageEnd(whichPage);
+    }
+
+    @Override
+    public void onStop() {
+        LogUtils.i(TAG, "onStop");
+        super.onStop();
     }
 
     @Override
@@ -523,7 +537,7 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
     private String[] mHint_Name;
     private String[] mHint_IconUrl;
 
-    private int HINT_UPDATE_TIME = 2000;
+    private int HINT_UPDATE_TIME = 3000;
     private int HINT_SHOW_NUMBER = 0;
     private Handler mHandler = new Handler();
     private Runnable mRunnable = new Runnable() {
@@ -813,13 +827,13 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             @Override
             public void onSuccess(Object o) {
                 super.onSuccess(o);
-//                LogUtils.i(TAG, "获取首页数据:");
+                LogUtils.i(TAG, "获取首页数据:");
                 try {
                     HomePageDataBean data = mGson.fromJson((String) o, HomePageDataBean.class);
-                    LogUtils.i(TAG, "获取首页数据:" + data);
+//                    LogUtils.i(TAG, "获取首页数据:" + data);
                     if (1 == data.getAppKey()) {
                         mPageData = data.getSubjectData();
-                        LogUtils.i(TAG, "获取首页数据  mPageData: " + mPageData);
+//                        LogUtils.i(TAG, "获取首页数据  mPageData: " + mPageData);
                         if (!mPageData.get(0).getS_key().equals("goods")) {
                             homeflag = false;
                             LogUtils.i(TAG, "首页分类  goods homeflag = " + homeflag);
