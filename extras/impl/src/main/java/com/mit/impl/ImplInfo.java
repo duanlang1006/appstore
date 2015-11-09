@@ -58,6 +58,7 @@ public class ImplInfo {
     private String md5;             //下载文件对应的MD5码
     private String localPath;       //下载完成后最终路径
 //    private boolean signatureEqual; //apk的签名比对结果 true 一致,false 不一致
+    private boolean isChecked;      //应用在下载界面中被选中
 
     @Transient
     private HttpHandler<File> handler;      //下载handler
@@ -86,6 +87,7 @@ public class ImplInfo {
         userContinue = false;
         md5 = null;
         implRes = new ImplRes();
+        isChecked = false;
     }
 
     public long getId() {
@@ -332,6 +334,14 @@ public class ImplInfo {
 
     public void updateImplRes(Context context) {
         ImplHelper.fillImplRes(context, this);
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setIsChecked(boolean isChecked) {
+        this.isChecked = isChecked;
     }
 
 //    public boolean isSignatureEqual() {

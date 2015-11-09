@@ -9,14 +9,14 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.applite.common.R;
 
 /**
  * Created by wanghaochen on 15-8-25.
  */
-public class CustomProgressBar extends ImageButton {
+public class CustomProgressBar extends TextView {
     private int progress = 0;
     private int max = 100;
     private Paint paint;
@@ -40,6 +40,11 @@ public class CustomProgressBar extends ImageButton {
         super(context, attrs);
         paint = new Paint();
         oval = new RectF();
+    }
+
+    @Override
+    public void setBackgroundResource(int resid) {
+        super.setBackgroundResource(resid);
     }
 
     @Override
