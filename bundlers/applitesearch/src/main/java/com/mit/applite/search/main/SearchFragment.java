@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -89,7 +90,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private EditText mEtView;
     private LinearLayout mHotWordLL;
     private GridView mGridView;
-//    private TextView mHotChangeView;
+    //    private TextView mHotChangeView;
     private ImageView mHotChangeView1;
     private ImageView mHotChangeShake;
     private ListView mPreloadListView;
@@ -147,6 +148,9 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     private SensorManager sensorManager = null;
     private Vibrator vibrator = null;
     private long shakeTime = 0; //记录第一次摇的时间
+
+
+    private Toast toast = null;
 
     public SearchFragment() {
         super();
@@ -265,6 +269,12 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        toast.cancel();
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
     }
@@ -297,6 +307,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                     postSearch(mEtView.getHint().toString(), SEARCH_DEFAULT_PAGE);
                 }
             } else {
+                isClickRefresh = true;
                 postSearch(mEtView.getText().toString(), SEARCH_DEFAULT_PAGE);
             }
         } else if (v.getId() == R.id.refresh_btn) {
@@ -802,6 +813,16 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
                 int app_key = searchBean.getApp_key();
                 isToEnd = searchBean.getIstoend();
                 List<ApkBean> contents = searchBean.getSearch_info();
+                if (contents.isEmpty()) {
+                    if (null == toast) {
+                        toast = Toast.makeText(mActivity, "没有搜索到内容", Toast.LENGTH_SHORT);
+                    } else {
+                        toast.setText("没有搜索到内容");
+                        toast.setDuration(Toast.LENGTH_SHORT);
+                    }
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
                 if (null != contents) {
                     mSearchList.addAll(contents);
                 }
