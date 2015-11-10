@@ -163,9 +163,9 @@ public class ImplPackageManager {
     }
 
     private void installImpl(final ImplInfo implInfo, String filename, boolean silent) {
-//        if (implInfo.isSignatureEqual()) {
-//            silent = false;
-//        }
+        if (implInfo.isSignatureEqual()) {
+            silent = false;
+        }
         if (silent) {
             Intent intent = new Intent();
             intent.setAction("com.installer.system");
