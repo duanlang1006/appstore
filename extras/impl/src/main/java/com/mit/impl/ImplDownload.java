@@ -297,7 +297,6 @@ public class ImplDownload {
 //        ImplAgent.mWorkHandler.post(new AddDownloadTask(implInfo, fullname, md5, callback));
 //        new AddDownloadThread(implInfo, fullname, md5, callback).start();
 //        EXECUTOR.execute(new AddDownloadTask(implInfo, fullname, md5, callback));
-//        new SignatureAsync(implInfo, fullname).execute();
         new AddDownloadAsync(implInfo, fullname, md5, callback).execute();
     }
 
@@ -595,15 +594,7 @@ public class ImplDownload {
             }
             java.io.File file = (java.io.File) fileResponseInfo.result;
             if (null != file && file.exists()) {
-                if (null != implInfo.getMd5() && !TextUtils.isEmpty(implInfo.getMd5())) {
-                    new MD5Async(implInfo, file.getAbsolutePath(), baseCallback, file).execute();
-                } else {
-                    implInfo.setLocalPath(file.getAbsolutePath());
-                    implInfo.setStatus(ImplInfo.STATUS_SUCCESSFUL);
-                    if (null != baseCallback) {
-                        baseCallback.onSuccess(implInfo, file);
-                    }
-                }
+                new DoneAsync(implInfo, file.getAbsolutePath(), baseCallback, file).execute();
             } else {
                 implInfo.setLocalPath(file.getAbsolutePath());
                 implInfo.setStatus(ImplInfo.STATUS_FAILED);
@@ -643,15 +634,15 @@ public class ImplDownload {
         }
     }
 
-    private class MD5Async extends AsyncTask {
+    private class DoneAsync extends AsyncTask {
         private String fullname;
         private String md5;
         private ImplInfo implInfo;
         private ImplListener baseCallback;
         private java.io.File file;
 
-        public MD5Async(ImplInfo implInfo, String fullname, ImplListener baseCallback, java.io.File file) {
-            ImplLog.d(TAG, "MD5Async");
+        public DoneAsync(ImplInfo implInfo, String fullname, ImplListener baseCallback, java.io.File file) {
+            ImplLog.d(TAG, "DoneAsync");
             this.fullname = fullname;
             this.implInfo = implInfo;
             this.baseCallback = baseCallback;
@@ -662,18 +653,34 @@ public class ImplDownload {
         @Override
         protected Object doInBackground(Object[] params) {
             File file = new File(fullname);
-            if (!md5.equals(ImplHelper.getFileMD5(file))) {
-                ImplLog.d(TAG, "MD5Async return false");
-                return false;
+            if (!TextUtils.isEmpty(md5)) {
+                if (!md5.equals(ImplHelper.getFileMD5(file))) {
+                    ImplLog.d(TAG, "DoneAsync return false");
+                    implInfo.setSignatureEqual(true);
+                    return false;
+                }
             }
-            ImplLog.d(TAG, "MD5Async return true");
+            //check signature
+            String apkSignature = getApkSignature(implInfo.getPackageName());
+            if (TextUtils.isEmpty(apkSignature)) {
+                implInfo.setSignatureEqual(true);
+            }else {
+                String packagepath = implInfo.getFileSavePath();
+                if (!TextUtils.isEmpty(packagepath)) {
+                    implInfo.setSignatureEqual(isEqual(getApkSignature(packagepath), apkSignature));
+                } else {
+                    implInfo.setSignatureEqual(isEqual(getApkSignature(fullname), apkSignature));
+                }
+            }
+
+            ImplLog.d(TAG, "DoneAsync return true");
             return true;
         }
 
         @Override
         protected void onPostExecute(Object o) {
             boolean flag = (boolean) o;
-            ImplLog.d(TAG, "MD5Async onPostExecute flag = " + flag);
+            ImplLog.d(TAG, "DoneAsync onPostExecute flag = " + flag);
             if (!flag) {
                 implInfo.setStatus(ImplInfo.STATUS_PACKAGE_INVALID);
                 implInfo.setLocalPath(fullname);
@@ -689,6 +696,55 @@ public class ImplDownload {
             }
             super.onPostExecute(o);
         }
+
+        /**
+         * 比对签名
+         */
+        private boolean isEqual(String apkSignature, String packageSignature) {
+            if (null == apkSignature) {
+                return true;
+            }
+            if (null == packageSignature) {
+                return true;
+            }
+            if (apkSignature.equals(packageSignature)) {
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * 获取安装包签名
+         *
+         * @param packagePath
+         * @return
+         */
+        private String getPackageSignature(String packagePath) {
+            try {
+                PackageInfo packageInfo = mContext.getPackageManager().getPackageArchiveInfo(
+                        packagePath, PackageManager.GET_SIGNATURES);
+                return packageInfo.signatures[0].toCharsString();
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        /**
+         * 获取已安装应用签名
+         *
+         * @param packageName
+         * @return
+         */
+        public String getApkSignature(String packageName) {
+            try {
+                PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(
+                        packageName, PackageManager.GET_SIGNATURES);
+                return packageInfo.signatures[0].toCharsString();
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
     }
 
     private class HttpHandlerStateConverter implements ColumnConverter<HttpHandler.State> {
@@ -718,79 +774,4 @@ public class ImplDownload {
         }
     }
 
-//    private class SignatureAsync extends AsyncTask<Void, Void, Void> {
-//        private ImplInfo implInfo;
-//        private String fullname;
-//
-//        public SignatureAsync(ImplInfo implInfo, String fullname) {
-//            this.implInfo = implInfo;
-//            this.fullname = fullname;
-//        }
-//
-//        @Override
-//        protected Void doInBackground(Void... params) {
-//            String apkSignature = null;
-//            String packagepath = null;
-//            apkSignature = getApkSignature(implInfo.getPackageName());
-//            if (TextUtils.isEmpty(apkSignature)) {
-//                return null;
-//            }
-//            packagepath = implInfo.getFileSavePath();
-//            if (!TextUtils.isEmpty(packagepath)) {
-//                implInfo.setSignatureEqual(isEqual(getApkSignature(packagepath), apkSignature));
-//            } else {
-//                implInfo.setSignatureEqual(isEqual(getApkSignature(fullname), apkSignature));
-//            }
-//            return null;
-//        }
-//
-//        /**
-//         * 比对签名
-//         */
-//        private boolean isEqual(String apkSignature, String packageSignature) {
-//            if (null == apkSignature) {
-//                return true;
-//            }
-//            if (null == packageSignature) {
-//                return true;
-//            }
-//            if (apkSignature.equals(packageSignature)) {
-//                return true;
-//            }
-//            return false;
-//        }
-
-//        /**
-//         * 获取安装包签名
-//         *
-//         * @param packagePath
-//         * @return
-//         */
-//        private String getPackageSignature(String packagePath) {
-//            try {
-//                PackageInfo packageInfo = mContext.getPackageManager().getPackageArchiveInfo(
-//                        packagePath, PackageManager.GET_SIGNATURES);
-//                return packageInfo.signatures[0].toCharsString();
-//            } catch (Exception e) {
-//                return null;
-//            }
-//        }
-
-//        /**
-//         * 获取已安装应用签名
-//         *
-//         * @param packageName
-//         * @return
-//         */
-//        public String getApkSignature(String packageName) {
-//            try {
-//                PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(
-//                        packageName, PackageManager.GET_SIGNATURES);
-//                return packageInfo.signatures[0].toCharsString();
-//            } catch (Exception e) {
-//                return null;
-//            }
-//        }
-//
-//    }
 }

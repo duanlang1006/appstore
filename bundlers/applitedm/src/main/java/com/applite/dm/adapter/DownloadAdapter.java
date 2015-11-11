@@ -74,10 +74,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         vh.custompb.setOnClickListener(this);
         if (mListener.isShowCheckBox()) {//显示删除多选框
             vh.deleteCheckBox.setVisibility(View.VISIBLE);
-            vh.deleteCheckBox.setChecked(mListener.getStatus(position));
-//            if (true == mListener.getFlag2()) {
-//                mListener.setFlag2(false);
-//            }
+            vh.deleteCheckBox.setChecked(mListener.getStatus(vh.implInfo.getId()));
             vh.actionBtn.setVisibility(View.GONE);
             vh.custompb.setVisibility(View.GONE);
         } else {//正常状态(没有删除的多选框)
@@ -108,7 +105,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
                 vh);
     }
 
-
     public class ViewHolder implements ImplChangeCallback {
         CustomProgressBar custompb;
         TextView titleView;
@@ -118,7 +114,6 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         CheckBox deleteCheckBox;
         ImageView iconView;
         public ImplInfo implInfo;
-
 
         ViewHolder(View view) {
             actionBtn = (TextView) view.findViewById(R.id.button_op);
@@ -157,18 +152,18 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
             actionBtn.setEnabled(true);
             switch (implInfo.getStatus()) {
                 case ImplInfo.STATUS_PENDING://下载等待
-                    custompb.setImageResource(R.drawable.download_status_pause);
+                    custompb.setBackgroundResource(R.drawable.pic_pause);
                     break;
                 case ImplInfo.STATUS_RUNNING://下载中
-                    custompb.setImageResource(R.drawable.download_status_running);
+                    custompb.setBackgroundResource(R.drawable.pic_running);
                     break;
                 case ImplInfo.STATUS_PAUSED://下载暂停
-                    custompb.setImageResource(R.drawable.download_status_pause);
+                    custompb.setBackgroundResource(R.drawable.pic_pause);
                     break;
                 case ImplInfo.STATUS_PACKAGE_INVALID:
                 case ImplInfo.STATUS_INSTALL_FAILED: //安装失败
                 case ImplInfo.STATUS_FAILED://下载失败
-                    custompb.setImageResource(R.drawable.download_status_retry);
+                    custompb.setBackgroundResource(R.drawable.pic_retry);
                     break;
                 default:
                     break;

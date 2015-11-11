@@ -43,9 +43,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -56,7 +56,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     final static String TAG = "applite_dm";
     private ListView mListview;
     private DownloadAdapter mAdapter;
-    private boolean[] status = null;//这里存放checkBox的选中状态
     private int mStatusFlags;
     private int mTitleId;
     private ImplAgent mImplAgent;
@@ -69,6 +68,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     private SimilarAdapter mSimilarAdapter;
     //    private boolean checkBoxAnima = true;
     private int temp = 0;
+    private HashMap<Long, Boolean> status = new HashMap();
+
+    private TextView emptyView = null;
 
     private String COUNT_DOWNLOADING = "count downloading";
     private String COUNT_DOWNLOADED = "count downloaded";
@@ -82,16 +84,13 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
 
         @Override
-        public boolean getStatus(int position) {
-            if (position < 0 || position >= status.length) {
-                return false;
-            }
-            return status[position];
+        public int getTitleId() {
+            return mTitleId;
         }
 
         @Override
-        public int getTitleId() {
-            return mTitleId;
+        public boolean getStatus(long id) {
+            return status.get(id);
         }
 
 //        @Override
@@ -133,6 +132,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (key.equals(POSITION)) {
+                mAdapter.notifyDataSetChanged();
                 if (R.string.dm_downloading == (int) AppliteSPUtils.get(mActivity, POSITION, 0)) {
                     if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false) && View.VISIBLE == mSimilarView.getVisibility()) {
                         mSimilarView.setVisibility(View.GONE);
@@ -163,10 +163,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         mImplAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
         mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
         Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
-        status = new boolean[mImplList.size()];
+        setStatus(false);
+        putCount(0);//当前页选中项目数
         mBitmapHelper = new BitmapUtils(mActivity.getApplicationContext());
         AppliteSPUtils.registerChangeListener(mActivity, mListListener);
-        putCount(0);//当前页选中项目数
         AppliteSPUtils.put(mActivity, FLAG, false);
     }
 
@@ -175,17 +175,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         ImplLog.d(TAG, "onCreateView," + this);
         View view = inflater.inflate(R.layout.fragment_download_list, container, false);
         mListview = (ListView) view.findViewById(android.R.id.list);
-        TextView emptyText = (TextView) view.findViewById(R.id.empty);
-        mListview.setEmptyView(emptyText);
+        emptyView = (TextView) view.findViewById(R.id.emptylistview);
+        setEmptyViewStatus();
         if (mTitleId == R.string.dm_downloading) {
             initSimilarView(view);
             mListview.addFooterView(mSimilarView);
-//            emptyText.setText(mActivity.getResources().getString(R.string.back_to_homepage));
-//            emptyText.setEnabled(true);
-//            Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher);
-//            drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
-//            emptyText.setCompoundDrawables(null, drawable, null, null);
-//            emptyText.setOnClickListener(this);
         }
         mListview.setOnItemClickListener(this);
         mListview.setAdapter(mAdapter);
@@ -199,6 +193,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         return view;
     }
 
+    private void setEmptyViewStatus() {
+        if (mImplList.isEmpty()) {
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            emptyView.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
@@ -209,6 +211,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        setStatus(false);
+        putCount(0);
+        mAdapter.notifyDataSetChanged();
         ImplLog.d(DownloadListFragment.TAG, "onDestroyView," + this);
     }
 
@@ -247,56 +252,6 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     }
 
     private void post() {
-//        mHttpUtils = new HttpUtils();
-//        RequestParams params = new RequestParams();
-//        params.addBodyParameter("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
-//        params.addBodyParameter("packagename", mActivity.getPackageName());
-//        params.addBodyParameter("type", "update_management");
-//        params.addBodyParameter("protocol_version", Constant.PROTOCOL_VERSION);
-//        params.addBodyParameter("update_info", AppliteUtils.getAllApkData(mActivity));
-//        mHttpUtils.send(HttpRequest.HttpMethod.POST, Constant.URL, params, new RequestCallBack<String>() {
-//            @Override
-//            public void onSuccess(ResponseInfo<String> responseInfo) {
-//                LogUtils.i(TAG, "更新请求成功，resulit：" + responseInfo.result);
-//                try {
-//                    JSONObject object = new JSONObject(responseInfo.result);
-//                    String similar_info = object.getString("similar_info");
-//                    if (!mSimilarDataList.isEmpty())
-//                        mSimilarDataList.clear();
-//                    JSONArray similar_json = new JSONArray(similar_info);
-//                    SimilarBean similarBean = null;
-//                    if (similar_json.length() != 0 && similar_json != null) {
-//                        for (int i = 0; i < similar_json.length(); i++) {
-//                            similarBean = new SimilarBean();
-//                            JSONObject obj = new JSONObject(similar_json.get(i).toString());
-//                            similarBean.setName(obj.getString("name"));
-//                            similarBean.setPackageName(obj.getString("packageName"));
-//                            similarBean.setIconUrl(obj.getString("iconUrl"));
-//                            similarBean.setrDownloadUrl(obj.getString("rDownloadUrl"));
-//                            similarBean.setVersionCode(obj.getInt("versionCode"));
-//                            mSimilarDataList.add(similarBean);
-//                        }
-//                        if (null == mSimilarAdapter) {
-//                            mSimilarAdapter = new DownloadSimilarAdapter(mActivity);
-//                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
-//                            mSimilarView.setAdapter(mSimilarAdapter);
-//                        } else {
-//                            mSimilarAdapter.setData(mSimilarDataList, DownloadListFragment.this, 4);
-//                            mSimilarAdapter.notifyDataSetChanged();
-//                        }
-//                    }
-//                } catch (JSONException e) {
-//                    Toast.makeText(mActivity, "kong", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(HttpException e, String s) {
-//                LogUtils.i(TAG, mActivity.getPackageName() + "");
-//            }
-//
-//        });
-
         AjaxParams params = new AjaxParams();
         params.put("appkey", AppliteUtils.getMitMetaDataValue(mActivity, Constant.META_DATA_MIT));
         params.put("packagename", mActivity.getPackageName());
@@ -330,7 +285,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                         mSimilarAdapter.notifyDataSetChanged();
                     }
                 } catch (JSONException e) {
-//                    Toast.makeText(mActivity, "kong", Toast.LENGTH_SHORT).show();
+                    //                    Toast.makeText(mActivity, "kong", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -361,10 +316,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             mSimilarView.setVisibility(View.VISIBLE);
             mSimilarView.setPadding(0, 1, 0, 0);
         }
-        Arrays.fill(status, false);//status数组复位
+        setStatus(false);
+        putCount(0);//当前页选中项目数
 //        checkBoxAnima = true;
         AppliteSPUtils.put(mActivity, FLAG, false);
-        putCount(0);//当前页选中项目数
 //        AppliteSPUtils.put(mActivity, POSITION, 0);
         if (null != mAdapter) {
             mAdapter.notifyDataSetChanged();
@@ -373,15 +328,15 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     private void deleteItem(boolean deleteFile) {
         List<Long> tempList = new ArrayList<>();
-        for (int i = status.length - 1; i >= 0; i--) {
-            if (status[i]) {
-                tempList.add(mImplList.get(i).getId());
+        for (ImplInfo implInfo : mImplList) {
+            if (status.get(implInfo.getId())) {
+                tempList.add(implInfo.getId());
+                status.remove(implInfo.getId());
             }
         }
         if (!tempList.isEmpty()) {
             mImplAgent.remove(tempList, deleteFile);
         }
-        putCount(0);
     }
 
     @Override
@@ -395,14 +350,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     @Override
     public void onClickSeleteAll() {
-        Arrays.fill(status, true);
+        setStatus(true);
         putCount(mImplList.size());
         mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onClickDeselectAll() {
-        Arrays.fill(status, false);
+        setStatus(false);
         putCount(0);
         mAdapter.notifyDataSetChanged();
     }
@@ -417,7 +372,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     public int getLength() {
         //直接跳转到下载完成页会异常
         try {
-            return status.length;
+            return mImplList.size();
         } catch (NullPointerException e) {
             return 0;
         }
@@ -430,9 +385,22 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
         mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
         Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
-        status = new boolean[mImplList.size()];
-        Arrays.fill(status, false);
-        putCount(0);
+
+        //遍历新的mImplList
+        for (ImplInfo implInfo : mImplList) {
+            //有新增元素（新mImplList中存在，status中不存在）
+            if (!status.containsKey(implInfo.getId())) {
+                status.put(implInfo.getId(), false);
+                continue;
+            }
+            //检查是否有移除元素（mImplList中已经移除但status中仍然存在）
+            if (status.containsKey(implInfo.getId())) {
+                continue;
+            }
+            //否则就是status中有mImplList中不存在的元素
+            status.remove(implInfo.getId());
+        }
+
         if (null == mAdapter) {
             mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
                     mImplList, mBitmapHelper, mDownloadListener);
@@ -444,6 +412,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             }
             mAdapter.notifyDataSetChanged();
         }
+        setEmptyViewStatus();
     }
 
     @Override
@@ -470,9 +439,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                         true);
             }
         } else {
-            status[position] = !status[position];
+            status.put(vh.implInfo.getId(), !status.get(vh.implInfo.getId()));
             temp = getCount();
-            putCount((status[position] == false) ? temp - 1 : temp + 1);//当前页选中项目数
+            putCount(status.get(vh.implInfo.getId()) ? temp + 1 : temp - 1);
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -484,12 +453,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
         if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
             AppliteSPUtils.put(mActivity, FLAG, true);
-            //防止因增加猜你喜欢中的应用导致的数组长度越界(在onItemClick中增加的应用)
             mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
             Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
-            status = new boolean[mImplList.size()];
+            setStatus(false);
             putCount(0);
-            Arrays.fill(status, false);//全部填充为false(chechbox不选中)
             if ((boolean) AppliteSPUtils.get(mActivity, FLAG, true)) {
                 VibratorUtil.Vibrate(mActivity, 200);   //震动200ms
 //                checkBoxAnima = false;
@@ -501,6 +468,12 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 //            mAdapter.notifyDataSetChanged();
         }
         return false;
+    }
+
+    private void setStatus(boolean b) {
+        for (ImplInfo implInfo : mImplList) {
+            status.put(implInfo.getId(), b);
+        }
     }
 
     @Override
@@ -538,10 +511,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     public interface DownloadListener {
         boolean isShowCheckBox();
 
-        boolean getStatus(int position);
-
         int getTitleId();
 
+        boolean getStatus(long id);
+//
 //        boolean getCheckBoxAnimaStatus();
 //
 //        void setCheckBoxAnimaStatus(boolean b);
