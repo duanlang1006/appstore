@@ -594,15 +594,7 @@ public class ImplDownload {
             }
             java.io.File file = (java.io.File) fileResponseInfo.result;
             if (null != file && file.exists()) {
-                if (null != implInfo.getMd5() && !TextUtils.isEmpty(implInfo.getMd5())) {
-                    new MD5Async(implInfo, file.getAbsolutePath(), baseCallback, file).execute();
-                } else {
-                    implInfo.setLocalPath(file.getAbsolutePath());
-                    implInfo.setStatus(ImplInfo.STATUS_SUCCESSFUL);
-                    if (null != baseCallback) {
-                        baseCallback.onSuccess(implInfo, file);
-                    }
-                }
+                new DoneAsync(implInfo, file.getAbsolutePath(), baseCallback, file).execute();
             } else {
                 implInfo.setLocalPath(file.getAbsolutePath());
                 implInfo.setStatus(ImplInfo.STATUS_FAILED);
@@ -642,15 +634,15 @@ public class ImplDownload {
         }
     }
 
-    private class MD5Async extends AsyncTask {
+    private class DoneAsync extends AsyncTask {
         private String fullname;
         private String md5;
         private ImplInfo implInfo;
         private ImplListener baseCallback;
         private java.io.File file;
 
-        public MD5Async(ImplInfo implInfo, String fullname, ImplListener baseCallback, java.io.File file) {
-            ImplLog.d(TAG, "MD5Async");
+        public DoneAsync(ImplInfo implInfo, String fullname, ImplListener baseCallback, java.io.File file) {
+            ImplLog.d(TAG, "DoneAsync");
             this.fullname = fullname;
             this.implInfo = implInfo;
             this.baseCallback = baseCallback;
@@ -661,33 +653,34 @@ public class ImplDownload {
         @Override
         protected Object doInBackground(Object[] params) {
             File file = new File(fullname);
-
-            if (!md5.equals(ImplHelper.getFileMD5(file))) {
-                ImplLog.d(TAG, "MD5Async return false");
-                implInfo.setSignatureEqual(true);
-                return false;
+            if (!TextUtils.isEmpty(md5)) {
+                if (!md5.equals(ImplHelper.getFileMD5(file))) {
+                    ImplLog.d(TAG, "DoneAsync return false");
+                    implInfo.setSignatureEqual(true);
+                    return false;
+                }
             }
-
+            //check signature
             String apkSignature = getApkSignature(implInfo.getPackageName());
             if (TextUtils.isEmpty(apkSignature)) {
                 implInfo.setSignatureEqual(true);
+            }else {
+                String packagepath = implInfo.getFileSavePath();
+                if (!TextUtils.isEmpty(packagepath)) {
+                    implInfo.setSignatureEqual(isEqual(getApkSignature(packagepath), apkSignature));
+                } else {
+                    implInfo.setSignatureEqual(isEqual(getApkSignature(fullname), apkSignature));
+                }
             }
 
-            String packagepath = implInfo.getFileSavePath();
-            if (!TextUtils.isEmpty(packagepath)) {
-                implInfo.setSignatureEqual(isEqual(getApkSignature(packagepath), apkSignature));
-            } else {
-                implInfo.setSignatureEqual(isEqual(getApkSignature(fullname), apkSignature));
-            }
-
-            ImplLog.d(TAG, "MD5Async return true");
+            ImplLog.d(TAG, "DoneAsync return true");
             return true;
         }
 
         @Override
         protected void onPostExecute(Object o) {
             boolean flag = (boolean) o;
-            ImplLog.d(TAG, "MD5Async onPostExecute flag = " + flag);
+            ImplLog.d(TAG, "DoneAsync onPostExecute flag = " + flag);
             if (!flag) {
                 implInfo.setStatus(ImplInfo.STATUS_PACKAGE_INVALID);
                 implInfo.setLocalPath(fullname);
