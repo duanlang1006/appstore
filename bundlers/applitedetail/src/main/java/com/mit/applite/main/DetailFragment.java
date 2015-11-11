@@ -285,6 +285,13 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 if (!TextUtils.isEmpty(mPackageName)) {
                     mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
                     ImplInfo implinfo = (ImplInfo) mProgressButton.getTag();
+
+                    if (implinfo.getStatus() == ImplInfo.STATUS_PRIVATE_INSTALLING) {
+                        LogUtils.d(TAG, "正在静默安装");
+//                        mProgressButton.setEnabled(false);
+                        return;
+                    }
+
                     if (null != implinfo) {
                         ImplHelper.onClick(mActivity,
                                 implinfo,
@@ -607,7 +614,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
 
     @Override
     public void onClickButton(Object... params) {
-        LogUtils.d(TAG, "params" + params);
+        LogUtils.d(TAG, "onClickButton");
         ImplInfo implInfo = (ImplInfo) params[0];
         SimilarBean bean = (SimilarBean) params[1];
         ImplChangeCallback implChangeCallback = (ImplChangeCallback) params[2];
@@ -640,6 +647,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             mProgressButton.setProgress(info.getProgress());
 
             if (info.getStatus() == ImplInfo.STATUS_PRIVATE_INSTALLING) {
+                LogUtils.d(TAG, "正在静默安装");
                 mProgressButton.setText(res.getStatusText());
             }
 
