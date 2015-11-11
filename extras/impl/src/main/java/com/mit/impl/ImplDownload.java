@@ -120,23 +120,8 @@ public class ImplDownload {
             if (file.exists()
                     && null != md5 && !TextUtils.isEmpty(md5)
                     && md5.equals(ImplHelper.getFileMD5(file))) {
-
-                String apkSignature = getApkSignature(implInfo.getPackageName());
-                if (TextUtils.isEmpty(apkSignature)) {
-                    implInfo.setSignatureEqual(true);
-                    return null;
-                }
-
-                String packagepath = implInfo.getFileSavePath();
-                if (!TextUtils.isEmpty(packagepath)) {
-                    implInfo.setSignatureEqual(isEqual(getApkSignature(packagepath), apkSignature));
-                } else {
-                    implInfo.setSignatureEqual(isEqual(getApkSignature(fullname), apkSignature));
-                }
-
                 return file;
             } else if (file.exists()) {
-                implInfo.setSignatureEqual(true);
                 file.delete();
             }
             return null;
@@ -167,54 +152,6 @@ public class ImplDownload {
                 implInfo.setHandler(handler);
                 implInfo.setState(handler.getState());
                 downloadCallback.onEnqued(0);
-            }
-        }
-
-        /**
-         * 比对签名
-         */
-        private boolean isEqual(String apkSignature, String packageSignature) {
-            if (null == apkSignature) {
-                return true;
-            }
-            if (null == packageSignature) {
-                return true;
-            }
-            if (apkSignature.equals(packageSignature)) {
-                return true;
-            }
-            return false;
-        }
-
-        /**
-         * 获取安装包签名
-         *
-         * @param packagePath
-         * @return
-         */
-        private String getPackageSignature(String packagePath) {
-            try {
-                PackageInfo packageInfo = mContext.getPackageManager().getPackageArchiveInfo(
-                        packagePath, PackageManager.GET_SIGNATURES);
-                return packageInfo.signatures[0].toCharsString();
-            } catch (Exception e) {
-                return null;
-            }
-        }
-
-        /**
-         * 获取已安装应用签名
-         *
-         * @param packageName
-         * @return
-         */
-        public String getApkSignature(String packageName) {
-            try {
-                PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(
-                        packageName, PackageManager.GET_SIGNATURES);
-                return packageInfo.signatures[0].toCharsString();
-            } catch (Exception e) {
-                return null;
             }
         }
     }
@@ -724,10 +661,25 @@ public class ImplDownload {
         @Override
         protected Object doInBackground(Object[] params) {
             File file = new File(fullname);
+
             if (!md5.equals(ImplHelper.getFileMD5(file))) {
                 ImplLog.d(TAG, "MD5Async return false");
+                implInfo.setSignatureEqual(true);
                 return false;
             }
+
+            String apkSignature = getApkSignature(implInfo.getPackageName());
+            if (TextUtils.isEmpty(apkSignature)) {
+                implInfo.setSignatureEqual(true);
+            }
+
+            String packagepath = implInfo.getFileSavePath();
+            if (!TextUtils.isEmpty(packagepath)) {
+                implInfo.setSignatureEqual(isEqual(getApkSignature(packagepath), apkSignature));
+            } else {
+                implInfo.setSignatureEqual(isEqual(getApkSignature(fullname), apkSignature));
+            }
+
             ImplLog.d(TAG, "MD5Async return true");
             return true;
         }
@@ -751,6 +703,55 @@ public class ImplDownload {
             }
             super.onPostExecute(o);
         }
+
+        /**
+         * 比对签名
+         */
+        private boolean isEqual(String apkSignature, String packageSignature) {
+            if (null == apkSignature) {
+                return true;
+            }
+            if (null == packageSignature) {
+                return true;
+            }
+            if (apkSignature.equals(packageSignature)) {
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * 获取安装包签名
+         *
+         * @param packagePath
+         * @return
+         */
+        private String getPackageSignature(String packagePath) {
+            try {
+                PackageInfo packageInfo = mContext.getPackageManager().getPackageArchiveInfo(
+                        packagePath, PackageManager.GET_SIGNATURES);
+                return packageInfo.signatures[0].toCharsString();
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        /**
+         * 获取已安装应用签名
+         *
+         * @param packageName
+         * @return
+         */
+        public String getApkSignature(String packageName) {
+            try {
+                PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(
+                        packageName, PackageManager.GET_SIGNATURES);
+                return packageInfo.signatures[0].toCharsString();
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
     }
 
     private class HttpHandlerStateConverter implements ColumnConverter<HttpHandler.State> {

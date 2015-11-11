@@ -74,7 +74,7 @@ public class DownloadAdapter extends ArrayAdapter implements View.OnClickListene
         vh.custompb.setOnClickListener(this);
         if (mListener.isShowCheckBox()) {//显示删除多选框
             vh.deleteCheckBox.setVisibility(View.VISIBLE);
-            vh.deleteCheckBox.setChecked(vh.implInfo.isChecked());
+            vh.deleteCheckBox.setChecked(mListener.getStatus(vh.implInfo.getId()));
             vh.actionBtn.setVisibility(View.GONE);
             vh.custompb.setVisibility(View.GONE);
         } else {//正常状态(没有删除的多选框)

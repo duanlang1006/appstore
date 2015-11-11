@@ -45,6 +45,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -67,6 +68,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     private SimilarAdapter mSimilarAdapter;
     //    private boolean checkBoxAnima = true;
     private int temp = 0;
+    private HashMap<Long, Boolean> status = new HashMap();
 
     private TextView emptyView = null;
 
@@ -84,6 +86,11 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         @Override
         public int getTitleId() {
             return mTitleId;
+        }
+
+        @Override
+        public boolean getStatus(long id) {
+            return status.get(id);
         }
 
 //        @Override
@@ -125,6 +132,7 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             if (key.equals(POSITION)) {
+                mAdapter.notifyDataSetChanged();
                 if (R.string.dm_downloading == (int) AppliteSPUtils.get(mActivity, POSITION, 0)) {
                     if ((boolean) AppliteSPUtils.get(mActivity, FLAG, false) && View.VISIBLE == mSimilarView.getVisibility()) {
                         mSimilarView.setVisibility(View.GONE);
@@ -155,10 +163,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         mImplAgent = ImplAgent.getInstance(mActivity.getApplicationContext());
         mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
         Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
-        setCheckBox(false);
+        setStatus(false);
+        putCount(0);//当前页选中项目数
         mBitmapHelper = new BitmapUtils(mActivity.getApplicationContext());
         AppliteSPUtils.registerChangeListener(mActivity, mListListener);
-        putCount(0);//当前页选中项目数
         AppliteSPUtils.put(mActivity, FLAG, false);
     }
 
@@ -203,7 +211,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        setCheckBox(false);
+        setStatus(false);
+        putCount(0);
         mAdapter.notifyDataSetChanged();
         ImplLog.d(DownloadListFragment.TAG, "onDestroyView," + this);
     }
@@ -307,29 +316,22 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
             mSimilarView.setVisibility(View.VISIBLE);
             mSimilarView.setPadding(0, 1, 0, 0);
         }
-        setCheckBox(false);
+        setStatus(false);
+        putCount(0);//当前页选中项目数
 //        checkBoxAnima = true;
         AppliteSPUtils.put(mActivity, FLAG, false);
-        putCount(0);//当前页选中项目数
 //        AppliteSPUtils.put(mActivity, POSITION, 0);
         if (null != mAdapter) {
             mAdapter.notifyDataSetChanged();
         }
     }
 
-    private void setCheckBox(boolean b) {
-        mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
-        for (ImplInfo implInfo : mImplList) {
-            implInfo.setIsChecked(b);
-        }
-
-    }
-
     private void deleteItem(boolean deleteFile) {
         List<Long> tempList = new ArrayList<>();
         for (ImplInfo implInfo : mImplList) {
-            if (implInfo.isChecked()) {
+            if (status.get(implInfo.getId())) {
                 tempList.add(implInfo.getId());
+                status.remove(implInfo.getId());
             }
         }
         if (!tempList.isEmpty()) {
@@ -348,14 +350,14 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 
     @Override
     public void onClickSeleteAll() {
-        setCheckBox(true);
+        setStatus(true);
         putCount(mImplList.size());
         mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onClickDeselectAll() {
-        setCheckBox(false);
+        setStatus(false);
         putCount(0);
         mAdapter.notifyDataSetChanged();
     }
@@ -383,6 +385,22 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
         mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
         Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
+
+        //遍历新的mImplList
+        for (ImplInfo implInfo : mImplList) {
+            //有新增元素（新mImplList中存在，status中不存在）
+            if (!status.containsKey(implInfo.getId())) {
+                status.put(implInfo.getId(), false);
+                continue;
+            }
+            //检查是否有移除元素（mImplList中已经移除但status中仍然存在）
+            if (status.containsKey(implInfo.getId())) {
+                continue;
+            }
+            //否则就是status中有mImplList中不存在的元素
+            status.remove(implInfo.getId());
+        }
+
         if (null == mAdapter) {
             mAdapter = new DownloadAdapter(mActivity, R.layout.download_list_item,
                     mImplList, mBitmapHelper, mDownloadListener);
@@ -421,9 +439,9 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
                         true);
             }
         } else {
-            vh.implInfo.setIsChecked(!vh.implInfo.isChecked());
+            status.put(vh.implInfo.getId(), !status.get(vh.implInfo.getId()));
             temp = getCount();
-            putCount(vh.implInfo.isChecked() ? temp + 1 : temp - 1);
+            putCount(status.get(vh.implInfo.getId()) ? temp + 1 : temp - 1);
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -435,11 +453,10 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         }
         if (!(boolean) AppliteSPUtils.get(mActivity, FLAG, false)) {
             AppliteSPUtils.put(mActivity, FLAG, true);
-            //防止因增加猜你喜欢中的应用导致的数组长度越界(在onItemClick中增加的应用)
             mImplList = mImplAgent.getDownloadInfoList(mStatusFlags);
             Collections.sort(mImplList, IMPL_TIMESTAMP_COMPARATOR);
+            setStatus(false);
             putCount(0);
-            setCheckBox(false);
             if ((boolean) AppliteSPUtils.get(mActivity, FLAG, true)) {
                 VibratorUtil.Vibrate(mActivity, 200);   //震动200ms
 //                checkBoxAnima = false;
@@ -451,6 +468,12 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
 //            mAdapter.notifyDataSetChanged();
         }
         return false;
+    }
+
+    private void setStatus(boolean b) {
+        for (ImplInfo implInfo : mImplList) {
+            status.put(implInfo.getId(), b);
+        }
     }
 
     @Override
@@ -489,6 +512,8 @@ public class DownloadListFragment extends OSGIBaseFragment implements DownloadPa
         boolean isShowCheckBox();
 
         int getTitleId();
+
+        boolean getStatus(long id);
 //
 //        boolean getCheckBoxAnimaStatus();
 //
