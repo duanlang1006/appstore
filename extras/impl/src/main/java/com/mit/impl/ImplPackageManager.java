@@ -163,7 +163,7 @@ public class ImplPackageManager {
     }
 
     private void installImpl(final ImplInfo implInfo, String filename, boolean silent) {
-        if (implInfo.isSignatureEqual()) {
+        if (!implInfo.isSignatureEqual()) {
             silent = false;
         }
         if (silent) {
