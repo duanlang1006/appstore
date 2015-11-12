@@ -424,69 +424,78 @@ public class UpdateFragment extends OSGIBaseFragment implements View.OnClickList
      * @param result
      */
     private void resolve(String result) {
-        if (!TextUtils.isEmpty(mUpdateData))
-            setLoadLayoutVisibility(View.GONE);
-        UpdateData updateData = mGson.fromJson(result, UpdateData.class);
-        if (null != updateData) {
-            mUpdateApkList = updateData.getInstalled_update_list();
-            LogUtils.d(TAG, "mUpdateApkList：" + mUpdateApkList);
-            mSimilarDataList = updateData.getSimilar_info();
-            LogUtils.d(TAG, "mSimilarDataList：" + mSimilarDataList);
-        }
-        if (null == mSimilarAdapter)
-            mSimilarAdapter = new MySimilarAdapter(mActivity);
-        mSimilarAdapter.setData(mSimilarDataList, this, 4);
-        mSimilarView.setAdapter(mSimilarAdapter);
+        try {
+            if (!TextUtils.isEmpty(mUpdateData))
+                setLoadLayoutVisibility(View.GONE);
+            UpdateData updateData = mGson.fromJson(result, UpdateData.class);
+            if (null != updateData) {
+                mUpdateApkList = updateData.getInstalled_update_list();
+                LogUtils.d(TAG, "mUpdateApkList：" + mUpdateApkList);
+                mSimilarDataList = updateData.getSimilar_info();
+                LogUtils.d(TAG, "mSimilarDataList：" + mSimilarDataList);
+            }
+            if (null == mSimilarAdapter) {
+                mSimilarAdapter = new MySimilarAdapter(mActivity);
+            }
+            if (null == mSimilarDataList) {
+                Toast.makeText(mActivity, "数据加载失败,请返回重试", Toast.LENGTH_SHORT).show();
+            } else {
+                mSimilarAdapter.setData(mSimilarDataList, this, 4);
+                mSimilarView.setAdapter(mSimilarAdapter);
+            }
 
-        //删除已经忽略的APK
-        mIgnoreList.clear();
-        if (null != mIgnoreAdapter)
-            mIgnoreAdapter.notifyDataSetChanged();
-        Iterator iter = mUpdateApkList.iterator();
-        while (iter.hasNext()) {
-            ApkBean data = (ApkBean) iter.next();
-            boolean isKeyExist = AppliteSPUtils.contains(mActivity, data.getPackageName());
-            if (isKeyExist) {
-                int VersionCode = (int) AppliteSPUtils.get(mActivity, data.getPackageName(), 0);
-                if (data.getVersionCode() == VersionCode) {
-                    LogUtils.d(TAG, "忽略的Name：" + data.getName());
-                    iter.remove();
-                    mUpdateApkList.remove(iter);
-                    mIgnoreList.add(data);
-                } else {
-                    AppliteSPUtils.remove(mActivity, data.getPackageName());
+            //删除已经忽略的APK
+            mIgnoreList.clear();
+            if (null != mIgnoreAdapter)
+                mIgnoreAdapter.notifyDataSetChanged();
+            Iterator iter = mUpdateApkList.iterator();
+            while (iter.hasNext()) {
+                ApkBean data = (ApkBean) iter.next();
+                boolean isKeyExist = AppliteSPUtils.contains(mActivity, data.getPackageName());
+                if (isKeyExist) {
+                    int VersionCode = (int) AppliteSPUtils.get(mActivity, data.getPackageName(), 0);
+                    if (data.getVersionCode() == VersionCode) {
+                        LogUtils.d(TAG, "忽略的Name：" + data.getName());
+                        iter.remove();
+                        mUpdateApkList.remove(iter);
+                        mIgnoreList.add(data);
+                    } else {
+                        AppliteSPUtils.remove(mActivity, data.getPackageName());
+                    }
                 }
             }
-        }
-        if (mIgnoreList.size() > 0) {//有忽略的才显示，不然就隐藏
-            mActionBarIgnore.setText(mActivity.getResources().getString(R.string.ignore_update) + "(" + mIgnoreList.size() + ")");
-            mActionBarIgnore.setVisibility(View.VISIBLE);
-        } else {
-            mActionBarIgnore.setVisibility(View.GONE);
-        }
-
-        if (null == mUpdateApkList || 0 == mUpdateApkList.size()) {
-            mNoUpdateView.setVisibility(View.VISIBLE);
-            mUpdateItemNum.setText(getString(R.string.update_item));
-            mUpdateItemSize.setVisibility(View.GONE);
-        } else {
-            mNoUpdateView.setVisibility(View.GONE);
-            mUpdateItemNum.setText(getString(R.string.update_item) + "(" + mUpdateApkList.size() + ")");
-            mUpdateItemSizeNum = 0.00;
-            for (int i = 0; i < mUpdateApkList.size(); i++) {
-                String num = AppliteUtils.bytes2kb(mUpdateApkList.get(i).getApkSize());
-                Double sizenumvalue = Double.valueOf(num.substring(0, num.length() - 2));
-                mUpdateItemSizeNum += sizenumvalue;
-                mUpdateItemSizeNum = (double) (Math.round((mUpdateItemSizeNum) * 100) / 100.00);
-                LogUtils.d(TAG, "总大小：" + mUpdateItemSizeNum);
+            if (mIgnoreList.size() > 0) {//有忽略的才显示，不然就隐藏
+                mActionBarIgnore.setText(mActivity.getResources().getString(R.string.ignore_update) + "(" + mIgnoreList.size() + ")");
+                mActionBarIgnore.setVisibility(View.VISIBLE);
+            } else {
+                mActionBarIgnore.setVisibility(View.GONE);
             }
-            mUpdateItemSize.setText("总计大小：" + String.valueOf(mUpdateItemSizeNum) + "MB");
-            mUpdateItemSize.setVisibility(View.VISIBLE);
-        }
 
-        mAdapter = new UpdateAdapter(mActivity, mUpdateApkList, this);
-        mListView.setAdapter(mAdapter);
-        mListView.setVisibility(View.VISIBLE);
+            if (null == mUpdateApkList || 0 == mUpdateApkList.size()) {
+                mNoUpdateView.setVisibility(View.VISIBLE);
+                mUpdateItemNum.setText(getString(R.string.update_item));
+                mUpdateItemSize.setVisibility(View.GONE);
+            } else {
+                mNoUpdateView.setVisibility(View.GONE);
+                mUpdateItemNum.setText(getString(R.string.update_item) + "(" + mUpdateApkList.size() + ")");
+                mUpdateItemSizeNum = 0.00;
+                for (int i = 0; i < mUpdateApkList.size(); i++) {
+                    String num = AppliteUtils.bytes2kb(mUpdateApkList.get(i).getApkSize());
+                    Double sizenumvalue = Double.valueOf(num.substring(0, num.length() - 2));
+                    mUpdateItemSizeNum += sizenumvalue;
+                    mUpdateItemSizeNum = (double) (Math.round((mUpdateItemSizeNum) * 100) / 100.00);
+                    LogUtils.d(TAG, "总大小：" + mUpdateItemSizeNum);
+                }
+                mUpdateItemSize.setText("总计大小：" + String.valueOf(mUpdateItemSizeNum) + "MB");
+                mUpdateItemSize.setVisibility(View.VISIBLE);
+            }
+
+            mAdapter = new UpdateAdapter(mActivity, mUpdateApkList, this);
+            mListView.setAdapter(mAdapter);
+            mListView.setVisibility(View.VISIBLE);
+        } catch (Exception e) {
+
+        }
     }
 
     private Double mUpdateItemSizeNum = 0.00;
