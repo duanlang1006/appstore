@@ -289,6 +289,8 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     if (implinfo.getStatus() == ImplInfo.STATUS_PRIVATE_INSTALLING) {
                         LogUtils.d(TAG, "正在静默安装");
 //                        mProgressButton.setEnabled(false);
+                        mProgressButton.setText("正在安装");
+                        mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
                         return;
                     }
 
@@ -387,6 +389,12 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 } else {
                     mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
                 }
+
+                if (mImplInfo.getStatus() == ImplInfo.STATUS_PRIVATE_INSTALLING) {
+                    mProgressButton.setText(res.getStatusText());
+                    mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
+                }
+
                 mProgressButton.setTag(mImplInfo);
             }
         }
@@ -649,6 +657,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
             if (info.getStatus() == ImplInfo.STATUS_PRIVATE_INSTALLING) {
                 LogUtils.d(TAG, "正在静默安装");
                 mProgressButton.setText(res.getStatusText());
+                mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
             }
 
             if ((info.getStatus() == info.STATUS_INSTALLED) && luckyflag) {
@@ -656,7 +665,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                 int mLuckyPonints = (int) AppliteSPUtils.get(mActivity, AppliteSPUtils.LUCKY_POINTS, 0);
                 mLuckyPonints += points;
                 AppliteSPUtils.put(mActivity, AppliteSPUtils.LUCKY_POINTS, mLuckyPonints);
-                Toast toast = Toast.makeText(mActivity, "成功下载安装有奖应用, 获得奖励 20 积分", Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(mActivity, "成功下载安装有奖应用, 获得奖励" + points + "积分", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
                 mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_foreground));

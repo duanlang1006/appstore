@@ -271,7 +271,8 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        toast.cancel();
+        if (null != toast)
+            toast.cancel();
     }
 
     @Override
@@ -1005,7 +1006,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
      * <p>See {@link SensorManager SensorManager}
      * for details on possible sensor types.
      * <p>See also {@link SensorEvent SensorEvent}.
-     * <p/>
+     * <p>
      * <p><b>NOTE:</b> The application doesn't own the
      * {@link SensorEvent event}
      * object passed as a parameter and therefore cannot hold on to it.
@@ -1035,7 +1036,7 @@ public class SearchFragment extends OSGIBaseFragment implements View.OnClickList
 
     /**
      * Called when the accuracy of the registered sensor has changed.
-     * <p/>
+     * <p>
      * <p>See the SENSOR_STATUS_* constants in
      * {@link SensorManager SensorManager} for details.
      *
