@@ -286,7 +286,7 @@ public class DetailFragment extends OSGIBaseFragment implements View.OnClickList
                     mProgressButton.setBackgroundColor(mActivity.getResources().getColor(R.color.progress_background));
                     ImplInfo implinfo = (ImplInfo) mProgressButton.getTag();
 
-                    if (implinfo.getStatus() == ImplInfo.STATUS_PRIVATE_INSTALLING) {
+                    if ((null != implinfo) && (implinfo.getStatus() == ImplInfo.STATUS_PRIVATE_INSTALLING)) {
                         LogUtils.d(TAG, "正在静默安装");
 //                        mProgressButton.setEnabled(false);
                         mProgressButton.setText("正在安装");
