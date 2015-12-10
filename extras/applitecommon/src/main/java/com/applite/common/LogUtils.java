@@ -15,7 +15,7 @@ public class LogUtils {
     /**
      * 是否需要打印bug，可以在application的onCreate函数里面初始化
      */
-    public static boolean isDebug = false;
+    public static boolean isDebug = true;
     public static final String TAG = "applite";
 
     // 下面四个是默认tag的函数

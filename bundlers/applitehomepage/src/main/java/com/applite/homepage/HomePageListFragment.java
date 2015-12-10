@@ -3,7 +3,6 @@ package com.applite.homepage;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
@@ -137,7 +136,7 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
             httpRequest();
         }
 
-        setTopicView(context);
+//        setTopicView(context);
         setMoreView(inflater);
 
         mListView.setOnItemClickListener(this);
@@ -245,25 +244,6 @@ public class HomePageListFragment extends OSGIBaseFragment implements AbsListVie
             e.printStackTrace();
         }
     }
-
-    private final ActionBar.TabListener mBarTabListener = new ActionBar.TabListener() {
-        private final static String TAG = "homepage_ListFragment_mBarTabListener";
-
-        @Override
-        public void onTabReselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-//            LogUtils.i(TAG, "onTabReselected arg0.getPosition()= " + arg0.getPosition());
-        }
-
-        @Override
-        public void onTabSelected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-//            LogUtils.i(TAG, "onTabSelected arg0.getPosition()= " + arg0.getPosition());
-        }
-
-        @Override
-        public void onTabUnselected(ActionBar.Tab arg0, FragmentTransaction arg1) {
-//            LogUtils.i(TAG, "onTabUnselected arg0.getPosition()= " + arg0.getPosition());
-        }
-    };
 
     private void setTopicView(Context context) {
         List<SpecialTopicData> topicList = (null == mData) ? null : mData.getSpecialtopic_data();

@@ -134,8 +134,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
                     mViewPager.setVisibility(View.VISIBLE);
                     mSectionsPagerAdapter.notifyDataSetChanged();
                 }
-                mPagerSlidingTabStrip.setViewPager(mViewPager);
-                mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
+//                mPagerSlidingTabStrip.setViewPager(mViewPager);
+//                mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
             }
         }
     };
@@ -254,8 +254,8 @@ public class HomePageFragment extends OSGIBaseFragment implements View.OnClickLi
             mViewPager.setVisibility(View.VISIBLE);
         }
         initActionBar();
-        mPagerSlidingTabStrip.setViewPager(mViewPager);
-        mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
+//        mPagerSlidingTabStrip.setViewPager(mViewPager);
+//        mPagerSlidingTabStrip.setOnPageChangeListener(mPageChangeListener);
         popupWindowPost();
 
         if (null != mHint && mHint.length != 0) {

@@ -117,6 +117,7 @@ public class UpdateAdapter extends BaseAdapter {
             mBitmapUtil.display(viewholder.mImg, data.getIconUrl());
         try {
             PackageInfo mPackageInfo = mPackageManager.getPackageInfo(data.getPackageName(), PackageManager.GET_ACTIVITIES);
+            LogUtils.d("mPackageInfo", "mPackageInfo = " + mPackageInfo);
             viewholder.mVersionName.setText(mPackageInfo.versionName + " -> " + data.getVersionName());
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -171,7 +172,7 @@ public class UpdateAdapter extends BaseAdapter {
                 mListener.ignoreDataPosition(data.getPackageName());
                 mCheckedItemPosition = -1;
                 AppliteSPUtils.put(mActivity, data.getPackageName(), data.getVersionCode());
-                Toast.makeText(mActivity,"已忽略"+data.getName()+"当前版本更新",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mActivity, "已忽略" + data.getName() + "当前版本更新", Toast.LENGTH_SHORT).show();
             }
         });
         viewholder.mToDetailTv.setOnClickListener(new View.OnClickListener() {
